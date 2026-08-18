@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dietary Preferences</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "inverse-surface": "#31302e",
+                        "tertiary": "#5a614a",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-tertiary-container": "#313824",
+                        "primary-fixed": "#ffdf9e",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "primary": "#735b25",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "outline": "#7e7668",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#b89b5e",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5",
+                        "outline-variant": "#d0c5b5",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#dee6c8",
+                        "secondary": "#695d44",
+                        "surface": "#fdf8f5",
+                        "on-background": "#1c1b1a",
+                        "on-secondary-container": "#6f6349",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .chip-selected {
+            border-color: #b89b5e !important;
+            background-color: rgba(232, 216, 184, 0.2) !important;
+        }
+        .spice-selected {
+            border-color: #b89b5e !important;
+            background-color: rgba(232, 216, 184, 0.2) !important;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased md:hidden max-w-md mx-auto relative shadow-2xl">
+<!-- Header (Transactional - No global nav shell) -->
+<header class="flex items-center px-container-padding py-stack-md bg-surface z-10 sticky top-0">
+<button class="w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low rounded-full transition-colors -ml-3">
+<span class="material-symbols-outlined" data-icon="arrow_back" data-weight="regular">arrow_back</span>
+</button>
+<div class="flex-1 flex justify-center">
+<span class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-widest">Step 4 of 5</span>
+</div>
+<div class="w-12 h-12"></div> <!-- Spacer -->
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-container-padding py-stack-md flex flex-col overflow-y-auto pb-32">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-sm mt-stack-md">Anything we should know?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-section-gap">Select your dietary preferences to help us tailor your dining experience.</p>
+<!-- Preference Section: Dietary Needs -->
+<section class="mb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dietary Needs</h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">No Preference</button>
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">Vegetarian</button>
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">Halal</button>
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">No Beef</button>
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">No Mutton</button>
+<button class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95" onclick="this.classList.toggle('chip-selected')">No Dairy</button>
+</div>
+</section>
+<!-- Preference Section: Spice Level -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Spice Tolerance</h2>
+<div class="flex flex-col gap-unit">
+<button class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98" onclick="selectSpice(this)">
+<span class="font-body-lg text-body-lg text-on-surface">No Spicy Food</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98" onclick="selectSpice(this)">
+<span class="font-body-lg text-body-lg text-on-surface">Mild Spice</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98" onclick="selectSpice(this)">
+<span class="font-body-lg text-body-lg text-on-surface">Medium Spice</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98" onclick="selectSpice(this)">
+<div class="flex items-center gap-2">
+<span class="font-body-lg text-body-lg text-on-surface">Extra Spicy</span>
+<span class="material-symbols-outlined text-error text-[18px]">local_fire_department</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Bottom Action Bar (Contextual FAB Replacement) -->
+<div class="fixed bottom-0 left-0 w-full md:max-w-md md:left-1/2 md:-translate-x-1/2 bg-surface border-t border-surface-container py-stack-md px-container-padding pb-safe shadow-[0_-4px_16px_rgba(0,0,0,0.02)] z-20">
+<button class="w-full bg-primary-container text-on-primary py-4 rounded-full font-label-lg text-label-lg uppercase tracking-widest hover:opacity-90 hover:shadow-md active:scale-95 transition-all shadow-[0_4px_16px_rgba(184,155,94,0.2)] cursor-pointer">
+            Continue
+        </button>
+</div>
+<script>
+        function selectSpice(btn) {
+            // Remove selected state from all
+            document.querySelectorAll('.spice-level-btn').forEach(b => {
+                b.classList.remove('spice-selected');
+                b.querySelector('.check-icon').classList.add('text-outline-variant');
+                b.querySelector('.check-icon').classList.remove('text-primary-container');
+                b.querySelector('.check-icon').textContent = "radio_button_unchecked";
+            });
+
+            // Add selected state to clicked
+            btn.classList.add('spice-selected');
+            btn.querySelector('.check-icon').classList.remove('text-outline-variant');
+            btn.querySelector('.check-icon').classList.add('text-primary-container');
+             btn.querySelector('.check-icon').textContent = "radio_button_checked";
+        }
+        
+        // Initialize default spice selection visually for demo
+        document.addEventListener('DOMContentLoaded', () => {
+             const spiceBtns = document.querySelectorAll('.spice-level-btn');
+             spiceBtns.forEach(b => {
+                 b.querySelector('.check-icon').textContent = "radio_button_unchecked";
+                 b.querySelector('.check-icon').classList.remove('hidden');
+             });
+        });
+    </script>
+</body></html>

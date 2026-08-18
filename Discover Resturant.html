@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Discover Restaurants - Dastarkhān</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "inverse-surface": "#31302e",
+                        "tertiary": "#5a614a",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-tertiary-container": "#313824",
+                        "primary-fixed": "#ffdf9e",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "primary": "#735b25",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "outline": "#7e7668",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#b89b5e",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5",
+                        "outline-variant": "#d0c5b5",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#dee6c8",
+                        "secondary": "#695d44",
+                        "surface": "#fdf8f5",
+                        "on-background": "#1c1b1a",
+                        "on-secondary-container": "#6f6349",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .card-shadow {
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+        }
+        .chip-bg {
+            background-color: rgba(138, 146, 120, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased pb-24 md:pb-0">
+<!-- Top App Bar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md docked full-width top-0 sticky z-40">
+<div class="flex items-center gap-stack-sm text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">location_on</span>
+<h1 class="font-headline-md text-headline-md font-bold">Karachi, PK</h1>
+<button class="ml-2 bg-primary-container text-on-primary px-3 py-1.5 rounded-full hover:opacity-90 transition-all flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[18px]">map</span><span class="font-label-lg text-label-lg">Map View</span></button>
+</div>
+<div class="hover:opacity-80 transition-opacity">
+<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A sophisticated close-up portrait of a person suitable for a high-end dining concierge profile avatar. Warm, flattering lighting, soft depth of field, set against a luxurious, slightly muted background matching the ivory and muted gold aesthetic of the app. Premium quality, editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWXsK79dYIw6DHOcwf-s9Zn7lOD_owVWN-M2RgMhDbsAI0bHy9bRTVRvspQ4seKVlx--e8kdpqHoUd934UN5HyTGptrjEknZtyx0jBDXknqxcYK1qTWWmcww3uYI8C7zl5rpBo-lYq9vJnxhFKQ4kGacBds6IKFD__c8IGpJmgkFbKGMLUJ_qAdIxJ5A3BK27ciUvQrtQw6f6GMp6eH8UMKYUSvww9UUp4jit2gZO4B9dK4MD-I6vt">
+</div>
+</header>
+<!-- Main Content -->
+<main class="px-container-padding pt-stack-lg pb-section-gap">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-lg max-w-sm">Pakistani places worth gathering around.</h2>
+<!-- Filters / Quick Tags -->
+<div class="flex flex-col gap-3 mb-stack-md">
+<div class="flex gap-stack-sm overflow-x-auto pb-1 scrollbar-hide -mx-container-padding px-container-padding">
+<button class="text-primary font-label-lg text-label-lg px-4 py-2 rounded-full border border-primary whitespace-nowrap flex items-center gap-1 font-bold transition-all" style="background-color: rgb(253, 248, 230); transition: background-color 0.2s ease-in-out;"><span class="material-symbols-outlined text-sm" style="font-variation-settings: &quot;wght&quot; 600;">check</span>All</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Punjab</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Sindh</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">KPK</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Continental</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Desi</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Street Food</button>
+</div>
+<div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding"><button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">Under 500</button><button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">500-1500</button><button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">1500-3000</button><button class="bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">3000+</button></div>
+</div>
+<!-- Restaurant Grid/List -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Restaurant Card 1 -->
+<article class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
+<div class="relative h-64 w-full">
+<img alt="Haveli Restaurant exterior" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" data-alt="A breathtaking view of Haveli Restaurant in Lahore, overlooking the Badshahi Mosque at dusk. Warm, golden hour lighting illuminating the historic architecture. Diners are enjoying meals on a terrace. Premium, editorial photography style, conveying luxury and cultural heritage, fitting a high-end dining app. Ivory and muted gold tones dominant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-N3sZ_BCk5VFtATHaCWc9vilNvyR9_xdBxneokza5aIpkYBWtWM2lUwkq0AnFEov-Bp2kpXrxUCWOn2RWV4BSeWafwpJ33NpdNmjZSt0LAS_tFCCmghmSVKcv0zrDPRd3yz_BnQV9Jde9hrcrnpHNPUlsf9IegzcWeRG3qZhmu2_s4HPe4VZONLmy48Sn3diRG3mVn5C-agh0XY3oeMrEVUeGT-QoGgohdQ-IAPA74IXlVQ9HeWX7">
+<div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
+<span class="material-symbols-outlined text-primary text-[14px]" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="font-label-lg text-label-lg text-on-surface">4.8 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(120 reviews)</span></span>
+</div>
+<button class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">location_on</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Haveli Restaurant</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Lahore • Punjabi Pakistani • $$$</p>
+</div>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
+<span class="material-symbols-outlined text-[20px]">directions</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
+<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+</button>
+</div>
+</div>
+<div class="mb-stack-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-unit">Popular</p>
+<div class="flex flex-wrap gap-2">
+<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Chicken Karahi</span>
+<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Seekh Kebab</span>
+<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Naan</span>
+</div>
+</div>
+<div class="mt-auto pt-stack-sm border-t border-outline-variant/30 flex gap-stack-sm">
+<button class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
+<button class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
+</div>
+</div>
+</article>
+<!-- Example Card 2 (To show grid) -->
+<article class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
+<div class="relative h-64 w-full">
+<img alt="Kolachi Restaurant interior" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" data-alt="An elegant, dimly lit interior of a high-end Pakistani restaurant in Karachi. Focus on a beautifully set table with copper serving dishes, warm ambient lighting from ornate lamps. The atmosphere is sophisticated and inviting, matching the luxury ivory and gold theme. Professional culinary lifestyle photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1GxHh8jZZ8hfGYve-BngWCr78b09nXeGrBo8gVwlxDonqA1vGgD7NMoW8gc81UEs6U4T2JZNfZrpVjv9PU76tY2KTlc9np2wSUPmaPhi9fNM3-AwYyrjcCZQgwJnagdRZaHPhArKCoguTfm-eTDVKKAlQH45Lv2NEzwDmjOQ7kzD-QJG01fJXFs6OkSHDREc7y8_9QBJLNG27ef_puOuUJmBAt5N4jfCDIKh8jv_4daNy_Aw8KeH-">
+<div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
+<span class="material-symbols-outlined text-primary text-[14px]" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="font-label-lg text-label-lg text-on-surface">4.9 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(345 reviews)</span></span>
+</div>
+<button class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">location_on</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-stack-sm">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Kolachi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Karachi • Seafront Dining • $$$$</p>
+</div>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
+<span class="material-symbols-outlined text-[20px]">directions</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
+<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+</button>
+</div>
+</div>
+<div class="mb-stack-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-unit">Popular</p>
+<div class="flex flex-wrap gap-2">
+<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Peshawari Karahi</span>
+<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Malai Boti</span>
+</div>
+</div>
+<div class="mt-auto pt-stack-sm border-t border-outline-variant/30 flex gap-stack-sm">
+<button class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
+<button class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
+</div>
+</div>
+</article>
+</div>
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 md:hidden"><button class="bg-primary text-on-primary px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:opacity-90 transition-all border border-primary-fixed"><span class="material-symbols-outlined">search</span><span class="font-label-lg text-label-lg uppercase tracking-wider">Search this area</span></button></div></main>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm docked full-width rounded-t-xl md:hidden pb-4">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: &quot;FILL&quot; 1;">explore</span>
+<span class="font-label-sm text-label-sm font-bold">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">restaurant</span>
+<span class="font-label-sm text-label-sm">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+
+
+</body></html>

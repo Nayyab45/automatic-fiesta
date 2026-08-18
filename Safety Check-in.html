@@ -1,0 +1,217 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Safety Check-in - What Should We Eat?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#ddd9d6",
+                        "primary-fixed-dim": "#e2c382",
+                        "surface-variant": "#e6e2de",
+                        "inverse-primary": "#e2c382",
+                        "surface": "#fdf8f5",
+                        "surface-bright": "#fdf8f5",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary": "#735b25",
+                        "surface-container": "#f1ede9",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-low": "#f7f3ef",
+                        "on-primary-fixed-variant": "#59440f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "inverse-surface": "#31302e",
+                        "outline": "#7e7668",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#9aa287",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#ffdf9e",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-secondary-fixed": "#221b07",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e6e2de",
+                        "on-tertiary-fixed": "#171e0b",
+                        "on-secondary-container": "#6f6349",
+                        "on-background": "#1c1b1a",
+                        "outline-variant": "#d0c5b5",
+                        "tertiary": "#5a614a",
+                        "surface-tint": "#735b25",
+                        "primary-container": "#b89b5e",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary-container": "#313824",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-surface": "#1c1b1a",
+                        "secondary": "#695d44",
+                        "inverse-on-surface": "#f4f0ec",
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "section-gap": "48px",
+                        "stack-md": "16px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .glass-card {
+            background: rgba(253, 248, 245, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 216, 184, 0.4);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+        }
+        .btn-press:active {
+            transform: scale(0.98);
+            border-color: #B89B5E;
+        }
+        .map-gradient {
+            background: linear-gradient(180deg, rgba(253,248,245,0) 0%, rgba(253,248,245,1) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-md min-h-screen relative overflow-x-hidden pb-stack-lg">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface dark:bg-background border-b-[0.5px] border-secondary-container dark:border-on-surface-variant flex justify-between items-center px-container-padding py-stack-sm h-16 shadow-none">
+<button class="w-12 h-12 flex items-center justify-center -ml-2 text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim absolute left-1/2 transform -translate-x-1/2">Meal Check-in</h1>
+<div class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex items-center justify-center opacity-0 pointer-events-none">
+<!-- Empty trailing space to balance -->
+</div>
+</header>
+<main class="flex-1 w-full flex flex-col gap-stack-lg mt-unit">
+<!-- Map & Venue Section -->
+<section class="relative w-full">
+<div class="w-full h-[280px] bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A high-end, minimalist digital map view of Karachi's coastal area, specifically around Beach Avenue Phase 8 DHA. The map styling is premium, using warm beige and soft muted greens to represent landmasses, with thin, delicate Champagne-colored lines for roads. The ocean is a pale, calm cream. The overall aesthetic mimics a luxury travel publication. Lighting is soft and bright, light-mode style." data-location="Karachi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm90hqbdeoJUGGBebSgBQzVkTGXRqEMv96RMm-VVkxN2t8e2XTlHOaBDEVZlaR6TPz0ybpMFquc4FLO4L2yG_hB8k5GbezUSK3jV-AyK0eFC6BbuMwcFx3thIqjuZJ88UM0cFZZFNr2vl4EeGPfL0Cm5yL7npIDPc2Ep-DWe0QpB_Dqp4WAB5jBcTjW4U_Do7w41MGQO1KyYVdS3XshQw7oJ8n01Rtw-eFfP9IB4Mxw0cSQcx7HqjX">
+<div class="absolute inset-0 map-gradient"></div>
+<!-- Map Pin -->
+<div class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce" style="animation-duration: 2s;">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 border-2 border-surface">
+<span class="material-symbols-outlined text-surface" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-primary/40 mt-1 blur-[2px]"></div>
+</div>
+</div>
+<!-- Venue Glass Card -->
+<div class="px-container-padding -mt-16 relative z-10">
+<div class="glass-card rounded-xl p-gutter flex flex-col gap-stack-sm relative">
+<div class="absolute inset-0 rounded-xl border border-secondary-container pointer-events-none"></div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Kolachi Restaurant</h2>
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] mt-0.5">location_on</span>
+<p class="font-body-md text-body-md">Beach Avenue, Phase 8, DHA, Karachi</p>
+</div>
+<div class="w-full h-[0.5px] bg-secondary-container my-1"></div>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<p class="font-label-lg text-label-lg">Meetup Tonight, 8:00 PM</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Area -->
+<section class="px-container-padding flex flex-col items-center gap-stack-sm">
+<button class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    I've Arrived — Check In
+                </button>
+<div class="flex items-center gap-1.5 mt-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Not checked in</span>
+</div>
+</section>
+<!-- Emergency Section -->
+<section class="px-container-padding flex flex-col gap-stack-md mt-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface font-playfair border-b-[0.5px] border-secondary-container pb-2">Emergency Options</h3>
+<div class="flex flex-col gap-gutter">
+<button class="w-full h-[48px] rounded-lg border border-error/50 text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
+<span class="material-symbols-outlined">contact_emergency</span>
+                        Alert Emergency Contact
+                    </button>
+<button class="w-full h-[48px] rounded-lg border border-error text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
+<span class="material-symbols-outlined">local_phone</span>
+                        Call for Help
+                    </button>
+</div>
+</section>
+<!-- Info Note -->
+<section class="px-container-padding">
+<div class="bg-surface-container-low rounded-lg p-gutter border border-secondary-container flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">security</span>
+<p class="font-body-md text-body-md text-on-surface-variant flex-1">Your check-in status is shared with your emergency contact for your safety.</p>
+</div>
+</section>
+<!-- Secondary Action -->
+<section class="px-container-padding mt-stack-sm">
+<button class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined">logout</span>
+                    I've Left Safely — Check Out
+                </button>
+</section>
+<!-- Footer -->
+<section class="px-container-padding pb-stack-lg flex justify-center text-center mt-auto pt-section-gap">
+<p class="font-label-sm text-label-sm text-outline-variant max-w-[250px]">
+                    Check-in data is private and only used for safety purposes.
+                </p>
+</section>
+</main>
+</div>
+</body></html>

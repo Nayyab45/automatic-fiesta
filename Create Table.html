@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Create Dining Event</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "inverse-surface": "#31302e",
+                        "tertiary": "#5a614a",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-tertiary-container": "#313824",
+                        "primary-fixed": "#ffdf9e",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "primary": "#735b25",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "outline": "#7e7668",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#b89b5e",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5",
+                        "outline-variant": "#d0c5b5",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#dee6c8",
+                        "secondary": "#695d44",
+                        "surface": "#fdf8f5",
+                        "on-background": "#1c1b1a",
+                        "on-secondary-container": "#6f6349",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px",
+                        "gutter": "16px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    fontSize: {
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "title-lg": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.02em", fontWeight: "500" }],
+                        "label-lg": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fdf8f5; /* surface */
+            color: #1c1b1a; /* on-surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom Input Styles */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid #E8D8B8;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #b89b5e;
+            box-shadow: 0 0 0 2px rgba(184, 155, 94, 0.2);
+            outline: none;
+        }
+        
+        /* Soft Shadows */
+        .soft-card {
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased font-body-md text-body-md pb-section-gap selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar - Linear/Transactional Intent, Back Action -->
+<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface sticky top-0 z-40 bg-opacity-90 backdrop-blur-sm">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Create your table.</h1>
+<div class="w-12 h-12"></div> <!-- Spacer for balance -->
+</header>
+<main class="px-container-padding max-w-2xl mx-auto space-y-section-gap pt-stack-md">
+<!-- Section 1: Event Type (Chips) -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">Gathering Type</h2>
+<div class="flex flex-wrap gap-stack-sm"><button class="px-6 py-3 rounded-full border-[1.5px] border-primary-container bg-secondary-container/20 text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary-container">dinner_dining</span>
+<span class="font-bold">Dinner</span>
+</button>
+<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant">lunch_dining</span>
+<span>Lunch</span>
+</button>
+<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant">brunch_dining</span>
+<span>Brunch</span>
+</button>
+<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant">local_cafe</span>
+<span>Chai Meetup</span>
+</button></div>
+</section>
+<!-- Section 2: Details (Glassmorphism Cards) -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">The Details</h2>
+<div class="space-y-stack-sm">
+<!-- Restaurant Search -->
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary-container transition-colors">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl glass-input font-body-md text-on-surface placeholder:text-outline-variant" placeholder="Search upscale restaurants..." type="text">
+</div>
+<div class="grid grid-cols-2 gap-stack-sm">
+<!-- Date -->
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary-container transition-colors">calendar_month</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl glass-input font-body-md text-on-surface" type="date">
+</div>
+<!-- Time -->
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary-container transition-colors">schedule</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl glass-input font-body-md text-on-surface" type="time">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-stack-sm">
+<!-- Seats -->
+<div class="relative w-full group flex items-center bg-surface-container-low rounded-xl border border-outline-variant/30 px-4 py-3">
+<span class="material-symbols-outlined text-outline-variant mr-3">group</span>
+<div class="flex-grow">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Seats Available</label>
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-lg text-on-surface">
+<option>2 Guests</option>
+<option selected="">4 Guests</option>
+<option>6 Guests</option>
+<option>8+ Guests</option>
+</select>
+</div>
+</div>
+<!-- Privacy Toggle -->
+<div class="relative w-full group flex items-center justify-between bg-surface-container-low rounded-xl border border-outline-variant/30 px-4 py-3">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Visibility</label>
+<span class="font-body-lg text-on-surface block">Public</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Dining Preferences (Bento Grid) -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">Atmosphere &amp; Intent</h2>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-unit"><div class="bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-outline-variant text-[28px]">restaurant</span>
+<span class="font-label-lg text-label-lg text-on-surface">Casual Dinner</span>
+</div>
+<div class="bg-secondary-container/10 border-[1.5px] border-primary-container rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer transition-colors relative overflow-hidden">
+<span class="material-symbols-outlined text-primary-container text-[28px] z-10">forum</span>
+<span class="font-label-lg text-label-lg text-on-surface font-bold z-10">Social Conversation</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors md:col-span-1 col-span-2">
+<span class="material-symbols-outlined text-outline-variant text-[28px]">handshake</span>
+<span class="font-label-lg text-label-lg text-on-surface">Business Networking</span>
+</div></div>
+</section>
+<!-- Section 4: Description -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">A Note to Guests</h2>
+<div class="relative">
+<textarea class="w-full p-4 rounded-xl glass-input font-body-md text-on-surface resize-none" placeholder="Looking for people who enjoy authentic Pakistani food..." rows="4"></textarea>
+<span class="absolute bottom-4 right-4 font-label-sm text-label-sm text-outline-variant">0/200</span>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="pt-stack-lg pb-section-gap">
+<button class="w-full bg-primary-container text-on-primary py-4 rounded-xl font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] transform">
+                Create Table
+            </button>
+</section>
+</main>
+<script>
+  function setupSingleSelect(containerSelector, activeClasses, inactiveClasses) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    const buttons = container.querySelectorAll('button, .cursor-pointer');
+    
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => {
+          b.classList.remove(...activeClasses.split(' '));
+          b.classList.add(...inactiveClasses.split(' '));
+          const icon = b.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.remove('text-primary-container');
+            icon.classList.add('text-outline-variant');
+          }
+          const text = b.querySelector('span:not(.material-symbols-outlined)');
+          if (text) text.classList.remove('font-bold');
+        });
+        
+        btn.classList.add(...activeClasses.split(' '));
+        btn.classList.remove(...inactiveClasses.split(' '));
+        const activeIcon = btn.querySelector('.material-symbols-outlined');
+        if (activeIcon) {
+          activeIcon.classList.add('text-primary-container');
+          activeIcon.classList.remove('text-outline-variant');
+        }
+        const activeText = btn.querySelector('span:not(.material-symbols-outlined)');
+        if (activeText) activeText.classList.add('font-bold');
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupSingleSelect('section:nth-child(1) .flex-wrap', 'border-primary-container bg-secondary-container/20', 'border-outline-variant bg-transparent');
+    setupSingleSelect('section:nth-child(3) .grid', 'border-primary-container bg-secondary-container/10', 'border-outline-variant/40 bg-surface-container-low');
+  });
+</script></body></html>

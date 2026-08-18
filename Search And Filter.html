@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Search &amp; Filter - Pakistani Dining Concierge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#31302e",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f1ede9",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "outline": "#7e7668",
+                        "on-primary-fixed": "#261a00",
+                        "tertiary-container": "#9aa287",
+                        "surface": "#fdf8f5",
+                        "on-error": "#ffffff",
+                        "tertiary": "#5a614a",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec",
+                        "surface-container-high": "#ece7e4",
+                        "surface-bright": "#fdf8f5",
+                        "primary-fixed": "#ffdf9e",
+                        "on-primary-container": "#463300",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary-container": "#313824",
+                        "outline-variant": "#d0c5b5",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#e2c382",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "surface-tint": "#735b25",
+                        "primary-container": "#b89b5e",
+                        "secondary": "#695d44",
+                        "on-surface": "#1c1b1a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "surface-variant": "#e6e2de",
+                        "background": "#fdf8f5",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-secondary-container": "#6f6349",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-background": "#1c1b1a",
+                        "secondary-container": "#f1e1c0",
+                        "primary-fixed-dim": "#e2c382",
+                        "surface-container-highest": "#e6e2de",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "section-gap": "48px",
+                        "gutter": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fdf8f5;
+            color: #1c1b1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .filter-chip {
+            transition: all 0.2s ease;
+        }
+        .filter-chip.selected {
+            border-color: #b89b5e;
+            background-color: rgba(232, 216, 184, 0.3);
+            border-width: 1.5px;
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 2px;
+            background: #e8d8b8;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #b89b5e;
+            cursor: pointer;
+            border: 2px solid #fdf8f5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-[80px] md:pb-0 font-body-md text-body-md overflow-x-hidden">
+<!-- Top Navigation (Mobile & Desktop Header) -->
+<header class="sticky top-0 z-40 bg-surface dark:bg-surface w-full px-container-padding py-stack-md flex justify-between items-center flat no shadows transition-all duration-300">
+<div class="flex items-center gap-stack-sm hover:opacity-80 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Karachi, PK</h1>
+</div>
+<div class="hover:opacity-80 transition-opacity cursor-pointer">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of an elegant user in soft, warm lighting against a neutral, high-key background. The aesthetic is clean, modern, and high-end, featuring a subtle color palette of whites, muted golds, and deep charcoals. The image feels like a professional editorial headshot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqB3Lvszjl6SyEm_uuNtVz3SAwK8DCXhoxx2FqNMPenqJvPkqx4scJxTmx8zG4DmQVRV7KiAfIHFzgRxR3aR2k1w1hcrgtnqLfBXVH6N2GTh9-gtQv4crIu1voWpOJ6gH1j6uw0aJFJNJrvpg8nKBdheSTdaY3JVU0GgeWw2B9lokjGu--l6nqIdb6yCWPnBBRhr06CaaIPtQGu9nDIiDtBlKW31OqIw8i_qi6TrOnF2kGg8IJc0MG"/>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto w-full px-container-padding py-stack-lg">
+<!-- Search Bar -->
+<div class="mb-section-gap relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface border-b border-outline-variant focus:border-primary-container focus:ring-0 pl-12 pr-4 py-4 font-body-lg text-body-lg text-on-surface placeholder-on-surface-variant transition-colors outline-none rounded-t-sm shadow-[0_4px_16px_rgba(0,0,0,0.04)]" placeholder="Search Pakistani restaurants, dishes or people" type="text"/>
+</div>
+<!-- Filter Sections -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-section-gap">
+<!-- Left Column: Core Filters -->
+<div class="md:col-span-8 space-y-section-gap">
+<!-- City & Distance -->
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface">Location &amp; Proximity</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter">
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase">City</label>
+<select class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container py-2 text-on-surface focus:ring-0 outline-none">
+<option value="karachi">Karachi</option>
+<option value="lahore">Lahore</option>
+<option value="islamabad">Islamabad</option>
+</select>
+</div>
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase flex justify-between">
+<span>Distance</span>
+<span class="text-primary-container" id="distance-val">5 km</span>
+</label>
+<div class="pt-2">
+<input class="range-slider" max="25" min="1" oninput="document.getElementById('distance-val').innerText = this.value + ' km'" type="range" value="5"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Cuisine (Pakistani Regional) -->
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">restaurant</span>
+                        Regional Cuisine
+                    </h2>
+<div class="flex flex-wrap gap-stack-sm">
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Punjabi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container selected">Sindhi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Peshawari</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Balochi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Kashmiri</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Mughlai</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Karachi Street</button>
+</div>
+</section>
+<!-- Restaurant Style & Dining Time -->
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-section-gap">
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Experience</h2>
+<div class="space-y-stack-sm">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Fine Dining</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Casual Eatery</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Dhaba Style</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Rooftop / Outdoor</span>
+</label>
+</div>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dining Time</h2>
+<div class="space-y-stack-sm">
+<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<span>Date</span>
+<span class="text-on-surface-variant font-label-lg">Today, Oct 24</span>
+</button>
+<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<span>Time</span>
+<span class="text-on-surface-variant font-label-lg">20:00</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Secondary Filters & Actions -->
+<div class="md:col-span-4 space-y-section-gap">
+<!-- Price -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Price Tier</h2>
+<div class="flex rounded-md border border-outline-variant overflow-hidden">
+<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs</button>
+<button class="flex-1 py-2 bg-surface-container text-on-surface border-r border-outline-variant text-center font-label-lg border-b-2 border-primary-container">Rs Rs</button>
+<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs</button>
+<button class="flex-1 py-2 bg-surface text-on-surface hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs Rs</button>
+</div>
+</section>
+<!-- Rating -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Minimum Rating</h2>
+<div class="flex items-center gap-2">
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-outline-variant"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">star</span></button>
+<span class="ml-2 font-label-lg text-on-surface-variant">4.0+</span>
+</div>
+</section>
+<!-- Seating -->
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Available Seats</h2>
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">remove</span></button>
+<span class="font-title-lg text-on-surface">2 Guests</span>
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">add</span></button>
+</div>
+</section>
+<!-- Action Buttons -->
+<div class="pt-section-gap flex flex-col gap-stack-md">
+<button class="w-full bg-primary-container text-on-primary py-3 rounded-md font-label-lg uppercase tracking-wider hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+                        Show 42 Results
+                    </button>
+<button class="w-full border border-outline-variant text-on-surface py-3 rounded-md font-label-lg uppercase tracking-wider hover:bg-surface-container transition-colors">
+                        Reset Filters
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface dark:bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl md:hidden h-[72px]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 group" href="#">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-sm text-label-sm mt-1 font-semibold">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">restaurant</span>
+<span class="font-label-sm text-label-sm mt-1">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">chat_bubble</span>
+<span class="font-label-sm text-label-sm mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple chip selection toggle
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+    </script>
+</body></html>

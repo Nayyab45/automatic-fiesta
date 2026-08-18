@@ -1,0 +1,241 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Post-Dining Review - Dastarkhān</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#221b07",
+                        "error-container": "#ffdad6",
+                        "background": "#fdf8f5",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-container": "#6f6349",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#171e0b",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fdf8f5",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-primary-fixed-variant": "#59440f",
+                        "on-background": "#1c1b1a",
+                        "on-primary-container": "#463300",
+                        "outline-variant": "#d0c5b5",
+                        "surface-dim": "#ddd9d6",
+                        "primary-fixed-dim": "#e2c382",
+                        "primary-fixed": "#ffdf9e",
+                        "secondary-container": "#f1e1c0",
+                        "primary": "#735b25",
+                        "inverse-on-surface": "#f4f0ec",
+                        "tertiary": "#5a614a",
+                        "surface-bright": "#fdf8f5",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#735b25",
+                        "surface-container-high": "#ece7e4",
+                        "inverse-surface": "#31302e",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "surface-container-highest": "#e6e2de",
+                        "surface-container-low": "#f7f3ef",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e6e2de",
+                        "on-tertiary-container": "#313824",
+                        "surface-container": "#f1ede9",
+                        "secondary": "#695d44",
+                        "primary-container": "#b89b5e",
+                        "on-surface-variant": "#4d463a",
+                        "on-primary-fixed": "#261a00",
+                        "on-surface": "#1c1b1a",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "outline": "#7e7668",
+                        "tertiary-container": "#9aa287"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .star-rating .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            color: #d0c5b5; /* outline-variant */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .star-rating .material-symbols-outlined.active {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            color: #b89b5e; /* primary-container */
+        }
+        .chip-radio:checked + label {
+            border-color: #b89b5e;
+            background-color: rgba(184, 155, 94, 0.1);
+            color: #735b25;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col items-center justify-center p-4">
+<!-- Main Container -->
+<main class="w-full max-w-md bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden border border-surface-container-high relative">
+<!-- Header -->
+<header class="flex items-center justify-between px-container-padding py-stack-md border-b border-surface-container-high">
+<button aria-label="Close" class="text-on-surface-variant hover:opacity-80 transition-opacity" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="font-label-lg text-label-lg text-on-surface tracking-widest uppercase">Feedback</h1>
+<div class="w-6"></div> <!-- Spacer for balance -->
+</header>
+<!-- Content Canvas -->
+<div class="px-container-padding py-stack-lg flex flex-col gap-section-gap">
+<!-- Hero Section -->
+<section class="text-center">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-sm">How was your table?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your insights curate the Dastarkhān experience.</p>
+</section>
+<!-- Rating Categories -->
+<section class="flex flex-col gap-stack-md">
+<!-- Food Rating -->
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Food</span>
+<div class="star-rating flex gap-unit" data-category="food">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+<!-- Restaurant Rating -->
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Restaurant</span>
+<div class="star-rating flex gap-unit" data-category="restaurant">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+<!-- Conversation Rating -->
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Conversation</span>
+<div class="star-rating flex gap-unit" data-category="conversation">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+<!-- Overall Rating -->
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50 mt-stack-sm">
+<span class="font-title-lg text-title-lg text-primary">Overall experience</span>
+<div class="star-rating flex gap-unit" data-category="overall">
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+</div>
+</div>
+</section>
+<!-- Future Intent -->
+<section class="flex flex-col gap-stack-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Would you dine with this group again?</h3>
+<div class="flex gap-gutter">
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-yes" name="dine-again" type="radio" value="yes">
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-yes">Yes</label>
+</div>
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-maybe" name="dine-again" type="radio" value="maybe">
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-maybe">Maybe</label>
+</div>
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-no" name="dine-again" type="radio" value="no">
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-no">No</label>
+</div>
+</div>
+</section>
+<!-- Text Feedback -->
+<section class="flex flex-col gap-stack-sm">
+<label class="font-body-lg text-body-lg text-on-surface sr-only" for="review-text">Share your experience</label>
+<textarea class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container focus:ring-0 resize-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 p-2 transition-colors" id="review-text" placeholder="Share your experience..." rows="4"></textarea>
+</section>
+</div>
+<!-- Sticky Footer Action -->
+<div class="px-container-padding py-stack-md bg-surface border-t border-surface-container-high sticky bottom-0">
+<button class="w-full py-stack-md bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2" type="button">
+                Submit Review
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'wght' 300;">arrow_forward</span>
+</button>
+</div>
+</main>
+<script>
+        // Simple star rating logic for demonstration
+        document.querySelectorAll('.star-rating').forEach(ratingGroup => {
+            const stars = ratingGroup.querySelectorAll('span');
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    stars.forEach((s, i) => {
+                        if (i <= index) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body></html>

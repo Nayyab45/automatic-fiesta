@@ -1,0 +1,233 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Report User</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#31302e",
+                    "primary-fixed": "#ffdf9e",
+                    "background": "#fdf8f5",
+                    "primary": "#735b25",
+                    "inverse-on-surface": "#f4f0ec",
+                    "secondary-fixed-dim": "#d4c5a6",
+                    "on-surface-variant": "#4d463a",
+                    "secondary": "#695d44",
+                    "primary-container": "#b89b5e",
+                    "on-surface": "#1c1b1a",
+                    "surface": "#fdf8f5",
+                    "surface-variant": "#e6e2de",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#e2c382",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#dee6c8",
+                    "on-primary-fixed-variant": "#59440f",
+                    "surface-container-low": "#f7f3ef",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "outline": "#7e7668",
+                    "surface-container-high": "#ece7e4",
+                    "surface-container": "#f1ede9",
+                    "surface-tint": "#735b25",
+                    "tertiary": "#5a614a",
+                    "tertiary-fixed-dim": "#c2caad",
+                    "on-secondary-fixed": "#221b07",
+                    "primary-fixed-dim": "#e2c382",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#50462e",
+                    "on-tertiary-fixed-variant": "#424a34",
+                    "tertiary-container": "#9aa287",
+                    "on-primary-fixed": "#261a00",
+                    "outline-variant": "#d0c5b5",
+                    "surface-dim": "#ddd9d6",
+                    "on-tertiary-fixed": "#171e0b",
+                    "secondary-container": "#f1e1c0",
+                    "on-secondary-container": "#6f6349",
+                    "on-primary-container": "#463300",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#1c1b1a",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#f1e1c0",
+                    "surface-container-highest": "#e6e2de",
+                    "surface-bright": "#fdf8f5",
+                    "on-tertiary-container": "#313824"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "48px",
+                    "stack-md": "16px",
+                    "gutter": "16px",
+                    "container-padding": "24px",
+                    "stack-lg": "32px",
+                    "stack-sm": "8px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "label-lg": ["Inter"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "title-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        /* Hide scrollbar for cleaner UI on mobile */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #B89B5E;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #B89B5E;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md">
+<!-- Header (Nav Suppressed due to transactional nature) -->
+<header class="bg-background w-full top-0 sticky z-40 flex items-center px-container-padding py-stack-md pt-8">
+<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary mx-auto pr-8">Report Sami Khan</h1>
+</header>
+<main class="flex-grow px-container-padding pb-32">
+<!-- Context Profile -->
+<div class="flex items-center gap-4 mb-stack-lg bg-surface-container-low rounded-xl p-4 shadow-[0_4px_16px_0_rgba(0,0,0,0.04)]">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small, soft-focus profile picture of a young South Asian man with dark hair, smiling warmly in a well-lit cafe setting. The image is cropped in a perfect circle, matching the high-end, bright editorial aesthetic of the What Should We Eat social dining app, featuring subtle gold tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPtXCch5tQV_z1fXi4ySGJO-4b9RRa_hotzT0QQLleyB7DXZ91utLkM4iYSdX_bmybHr2zBgU-H0ik3AsIfLZJJUcZtPxID4dpcev6F0OGJyknhdoKRoy-OKAJ89qKJVoGDpFzMGRe5BbBGvtVMc79UWGifkRCaZlVuqeT4d7uiGGkkU0wCdUCGaRCb4JjVUgAHMcQrNVWl2uU_1dEjNeMUqry17EuYJGqz6i0tDqmmPRWodqZ2oLL">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant">Reporting Profile</p>
+<p class="font-title-lg text-title-lg text-on-surface">Sami Khan</p>
+</div>
+</div>
+<!-- Section Heading -->
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Why are you reporting this user?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg">Your report is anonymous. If you are in immediate danger, please contact local authorities.</p>
+<!-- Radio List -->
+<div class="flex flex-col gap-stack-sm mb-section-gap">
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Inappropriate behavior or messages</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Harassment or threats</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Fake profile / impersonation</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Solicitation or scam</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">No-show without notice</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Made me feel unsafe</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" id="other-reason" name="report_reason" type="radio">
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Other</span>
+</div>
+</label>
+</div>
+<!-- Details Textbox -->
+<div class="mb-section-gap">
+<label class="block font-title-lg text-title-lg mb-stack-sm text-on-surface" for="details">Add more details <span class="font-body-md text-on-surface-variant font-normal">(optional)</span></label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-colors resize-none shadow-inner" id="details" placeholder="Please provide any specific information that might help our review..." rows="4"></textarea>
+</div>
+<!-- Block Toggle -->
+<div class="flex items-start justify-between bg-surface-container-low p-4 rounded-xl mb-section-gap shadow-[0_4px_16px_0_rgba(0,0,0,0.04)]">
+<div class="pr-4">
+<h3 class="font-title-lg text-title-lg text-error">Also block this user</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">They won't be able to see your profile, send messages, or request dining with you.</p>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in mt-1">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-outline-variant appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0 checked:left-6 checked:border-primary-container peer" id="toggle" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 peer-checked:bg-error" for="toggle"></label>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Actions -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-6 flex flex-col gap-4 shadow-[0_-4px_24px_0_rgba(0,0,0,0.06)] z-50">
+<div class="flex items-center justify-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span class="font-label-sm text-label-sm">Reports are confidential. Our team reviews all reports within 24 hours.</span>
+</div>
+<button class="w-full bg-primary-container text-on-primary h-12 rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-md active:scale-95 active:bg-error transition-all">
+            Submit Report
+        </button>
+<button class="w-full text-on-surface-variant h-10 rounded-full font-label-lg text-label-lg flex items-center justify-center hover:bg-surface-variant/50 transition-colors">
+            Cancel
+        </button>
+</div>
+<script>
+        // Simple script to toggle visual state of block button based on checkbox
+        const toggle = document.getElementById('toggle');
+        const toggleLabel = document.querySelector('.toggle-label');
+        
+        toggle.addEventListener('change', function() {
+            if(this.checked) {
+                toggleLabel.style.backgroundColor = '#ba1a1a'; // error color
+            } else {
+                toggleLabel.style.backgroundColor = '#e6e2de'; // surface-variant
+            }
+        });
+    </script>
+</body></html>

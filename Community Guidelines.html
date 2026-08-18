@@ -1,0 +1,221 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Community Guidelines - What Should We Eat?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#5a614a",
+                        "inverse-primary": "#e2c382",
+                        "surface-tint": "#735b25",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f4f0ec",
+                        "on-error-container": "#93000a",
+                        "background": "#fdf8f5",
+                        "on-tertiary-fixed": "#171e0b",
+                        "primary": "#735b25",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-container-high": "#ece7e4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#4d463a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "outline": "#7e7668",
+                        "surface-container-low": "#f7f3ef",
+                        "secondary-container": "#f1e1c0",
+                        "surface-variant": "#e6e2de",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f1ede9",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "secondary-fixed": "#f1e1c0",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-fixed": "#dee6c8",
+                        "outline-variant": "#d0c5b5",
+                        "on-tertiary-container": "#313824",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#9aa287",
+                        "on-secondary-container": "#6f6349",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#463300",
+                        "on-primary-fixed": "#261a00",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "primary-container": "#b89b5e",
+                        "surface-bright": "#fdf8f5",
+                        "surface": "#fdf8f5",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#695d44",
+                        "surface-dim": "#ddd9d6",
+                        "inverse-surface": "#31302e",
+                        "primary-fixed": "#ffdf9e",
+                        "on-surface": "#1c1b1a",
+                        "on-background": "#1c1b1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(253, 248, 245, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 216, 184, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased font-body-md min-h-screen flex flex-col max-w-md mx-auto relative md:border-x md:border-surface-variant md:shadow-lg">
+<!-- Top Navigation -->
+<header class="w-full top-0 sticky bg-background flex items-center justify-between px-container-padding py-stack-md z-40">
+<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">Community Guidelines</h1>
+<div class="w-10"></div> <!-- Spacer for alignment -->
+</header>
+<main class="flex-grow px-container-padding pb-32">
+<!-- Intro Banner -->
+<section class="py-stack-lg flex flex-col items-center text-center">
+<div class="w-20 h-20 rounded-full bg-secondary-container flex items-center justify-center mb-stack-md text-primary">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">handshake</span>
+</div>
+<p class="font-title-lg text-title-lg text-on-surface mb-unit">Our community is built on trust.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Please read before joining a meal.</p>
+</section>
+<!-- Guidelines List -->
+<div class="flex flex-col gap-stack-md">
+<!-- Guideline 1 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Be Yourself</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Use real photos and accurate profile info.</p>
+</div>
+</div>
+<!-- Guideline 2 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Respect Everyone</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">No discrimination, harassment, or hate speech.</p>
+</div>
+</div>
+<!-- Guideline 3 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Meet Safely</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Public restaurants only, use check-in/check-out.</p>
+</div>
+</div>
+<!-- Guideline 4 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined">block</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">No Solicitation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">No sales, scams, or dating-app behavior.</p>
+</div>
+</div>
+<!-- Guideline 5 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Show Up</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Respect reservations, cancel properly if you can't attend.</p>
+</div>
+</div>
+<!-- Guideline 6 -->
+<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
+<span class="material-symbols-outlined">flag</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Report Concerns</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Use our tools to report or block users who break rules.</p>
+</div>
+</div>
+<!-- Serious Violation Card -->
+<div class="mt-stack-md bg-error-container/20 rounded-2xl p-stack-md border border-error/30 flex gap-stack-md items-start">
+<div class="bg-error/10 p-3 rounded-full text-error shrink-0">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-error mb-1">Zero Tolerance</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Harassment, threats, or scams lead to immediate account suspension.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Footer Actions -->
+<div class="fixed bottom-0 w-full max-w-md bg-surface-container-low/90 backdrop-blur-md pt-stack-md pb-container-padding px-container-padding border-t border-surface-variant/30 rounded-t-2xl z-50">
+<button class="w-full bg-primary-container text-on-primary rounded-full py-4 font-title-lg text-title-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all">
+            I Agree &amp; Continue
+        </button>
+<div class="mt-stack-md flex justify-center gap-4 font-label-sm text-label-sm text-on-surface-variant">
+<a class="underline decoration-outline-variant hover:text-primary transition-colors" href="#">Report a safety concern</a>
+<span>•</span>
+<a class="underline decoration-outline-variant hover:text-primary transition-colors" href="#">View full policy</a>
+</div>
+</div>
+</body></html>

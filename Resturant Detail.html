@@ -1,0 +1,286 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haveli Restaurant - Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "inverse-surface": "#31302e",
+                        "tertiary": "#5a614a",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-tertiary-container": "#313824",
+                        "primary-fixed": "#ffdf9e",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "primary": "#735b25",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "outline": "#7e7668",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#b89b5e",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5",
+                        "outline-variant": "#d0c5b5",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#dee6c8",
+                        "secondary": "#695d44",
+                        "surface": "#fdf8f5",
+                        "on-background": "#1c1b1a",
+                        "on-secondary-container": "#6f6349",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Smooth scrolling and hide scrollbar for horizontal lists */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(252, 250, 245, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(232, 216, 184, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased pb-[100px]">
+<!-- Top Navigation (Task-focused: Back button) -->
+<header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" id="main-header">
+<div class="flex justify-between items-center w-full px-container-padding py-stack-md glass shadow-sm">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
+</button>
+<div class="flex gap-2">
+<button aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">bookmark_border</span>
+</button>
+<button aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">share</span>
+</button>
+</div>
+</div>
+</header>
+<main class="w-full max-w-md mx-auto">
+<!-- Hero Section -->
+<section class="relative w-full h-[397px] bg-surface-variant">
+<div class="bg-cover bg-center w-full h-full" data-alt="A grand, beautifully lit exterior view of Haveli Restaurant in Lahore, Pakistan. The architecture is majestic, featuring traditional Mughal-inspired elements, intricate stonework, and warm, inviting lighting. The setting implies a high-end, cultural dining experience. The image is high-resolution, evoking a sense of heritage and luxury, aligning with a premium editorial aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-edeEaSVBubyEY0-Il7YZXEZLCmtrawh-Eyn-OjSsg6gglfPkUmtLa_yTZUwl2OJ_enXoBD3O0TSXOHNfcJrhDrFz6GlOsh_76BqJzHAY3X4EhpFP6mNBrIfmazkUmMnQSDKOyQ-bFzcHVN7_hP9t8xqxLfuSRFh7AdQwIn0MyLcpq6ni_lcZ6hWErq4QISrvTXsEOTRnfjrQNZA3JAgE_cO8fY_37fM_2e3ku54DP17xh2Q7Y0zv')"></div>
+<!-- Gradient Overlay for text readability -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<!-- Title & Basic Info -->
+<div class="absolute bottom-0 left-0 w-full px-container-padding pb-stack-md flex flex-col gap-unit">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Haveli Restaurant</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                            Lahore
+                        </p>
+</div>
+<div class="flex flex-col items-end">
+<div class="bg-primary-container text-on-primary font-label-lg text-label-lg px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined fill text-[14px]">star</span>
+                            4.8
+                        </div>
+</div>
+</div>
+<!-- Tags -->
+<div class="flex gap-2 mt-stack-sm flex-wrap">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded-full border border-tertiary/20">Traditional Punjabi</span>
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded-full border border-tertiary/20">Pakistani</span>
+</div>
+</div>
+</section>
+<!-- Content Canvas -->
+<div class="px-container-padding flex flex-col gap-section-gap py-stack-lg">
+<!-- About Section -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface">About</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Set against the backdrop of the historic Badshahi Mosque, Haveli Restaurant offers an unparalleled dining experience that blends rich heritage with culinary excellence. Discover authentic flavors crafted from generations-old recipes in a setting of majestic grandeur.
+                </p>
+</section>
+<!-- Popular Dishes (Horizontal Scroll) -->
+<section class="flex flex-col gap-stack-md">
+<div class="flex justify-between items-center">
+<h2 class="font-title-lg text-title-lg text-on-surface">Popular Dishes</h2>
+<button class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
+</div>
+<div class="flex gap-gutter overflow-x-auto hide-scrollbar pb-2 -mx-container-padding px-container-padding snap-x">
+<!-- Dish Card 1 -->
+<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A close-up, high-quality, editorial-style photograph of a sizzling Chicken Karahi. The dish is presented in a traditional metal wok, garnished with fresh green chilies, ginger juliennes, and coriander. The rich, vibrant red and brown gravy looks appetizing against a clean, warm linen background, highlighting premium dining." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgxwHEb-scErxpkoWBSguEMwunFqMsNm3bsXEMePb-Mjov2SKWmDHrddb6QGISHueZL-HM9a5znW3Bkz1yqpIVd0mzrd703fXJ18kJwHabOzulMMx6tK7CYc6Vfp7d_U1j1YmqfG2iQF_SfriYbrzeY0fZINhk0JhWmM7ohZUoySSS4wt-MRsvahYGADtYFp7nYd_K317yWLf_mhzivgfrrjVAr-gGl8OjEeeJCZwaAiGeIMWBxPqs">
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Chicken Karahi</h3>
+</div>
+</div>
+<!-- Dish Card 2 -->
+<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A beautifully plated portion of Mutton Karahi, shot in a bright, modern light-mode setting. Tender pieces of mutton are coated in a thick, spiced masala, served in a heavy copper bowl. The lighting is soft and natural, emphasizing the rich textures and premium quality of the traditional cuisine." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeuQReZdUaL4gt73hM1Gb5bMDhpcCzGqn7b7ng_ljb3250UjJD7ogBq322u7jLSChb19nCe3-4OcdaNb-fX6FErOTrmo4DEd0gXNBvn0WkR3pyYagVxIM682iJwbDrteWhIeHdVbAhVXWkXe_GgSd5XyWAZzQcjlS-cBQ9VGa4lHcGrDnJ-zhDrjIvmzEBWnu2oYY3rDnewemCbqSbY_X5hy0lLfJy3_7HiMBc74E1eihRfnU5dauf">
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Mutton Karahi</h3>
+</div>
+</div>
+<!-- Dish Card 3 -->
+<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="Elegant presentation of Seekh Kebabs on a minimalist ceramic platter. The perfectly grilled minced meat skewers show delicate char marks and are accompanied by fresh mint chutney and sliced red onions. The overall mood is sophisticated and appetizing, fitting a luxury dining context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClpr5QukQPnBEuFn7eXYRIq2rDDl9BxW1uUnz7YwapDc28YzvGbpVSA1HpURce3wisc5ztsaXity-_hnsKsUFCPryjgPR-PshG-FKl8eTAudYi9Dch-sBeURbx0pGEN8n7JfW6q0dNFHRlO1vH9khQHbIo58HF-iau0TbhPSdkqJ4yAjzMrdj2mX7n2KryO_fyAYUEFRXFtRv4968rhTI5FCBESjgpEo0u3XguDPV71y8DORa4FgXq">
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Seekh Kebab</h3>
+</div>
+</div>
+<!-- Dish Card 4 -->
+<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A lavish BBQ Platter showcasing an assortment of grilled meats including chicken tikka, malai boti, and lamb chops. Served on a rustic wooden board with elegant garnishes, the lighting highlights the succulent textures and smoky essence, set against a pristine, upscale dining environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9S2K_hqHdI-eQFxhRbW7_EgCIlMcQb5H6Vi7RJSptl-FvEYQ_fGGy4cKoI4JxI5qCEA_w_6sAsmZxxDUROnyF1yAd_oE3uNcT9mNLdiPASDyi6I-kDHeunPSSP9degDNscseVfZyYHXtOvydaAIEDgsanecXLIybrUbAg-GXvLLg0IXI80QJSFovaiMp77Vwu44B-vRdFBzllylauSJw1AxSD3ytGm4k_hD5L98DtfPCgP8RDoaRo">
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">BBQ Platter</h3>
+</div>
+</div>
+<!-- Dish Card 5 -->
+<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A refined serving of traditional Kheer (rice pudding) in a small, ornate clay bowl. The creamy dessert is meticulously garnished with crushed pistachios, almonds, and delicate silver leaf (varq). Shot with soft, bright light, it conveys a sense of culinary artistry and premium dessert experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7hkVvX2dD-_4sE8Nj_ylVGReP6UOjqdCbAsc7ujGVoPNPmMG4jzcwhquzNMxAvXvDbmOu38s-PbbRbNV0PlT2B1KmDsPkpHJp2filqb0itxCNH05GYmOGV3BnPotNpy3PRNgSvVWQqep4qc59g66gHmpTKizUcKK-fLF0dNJ_51PwtUaYW3UKoHQ1SejE_21_U8q2ATBQuvFKavIgUFEVxVGE00x0sg6kBn5yJ6a2YuutUZUXiLA6">
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Kheer</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Location Map -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Location</h2>
+<div class="w-full h-48 bg-surface-variant rounded-xl overflow-hidden shadow-sm relative border border-outline-variant/50">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-location="Lahore" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwNrMwsQIWKp8B4MrGQrf7ipRV2JEuFVGeUWWgrPWwOfEaIjZdH03z7jO1c4CZIwrZNSHgmhAaxVwvW8soHIZeM3y8AQkkFMzwbSHSGZnn1KHiHDZ2Wp-uWpDzvxOFK4PEQrEGCpI40YJGqms5iUe9W8ZU4DQHxd-ao82WqOZA2tKLHFK8QG5muxrBDLs6zZqmimtWNB6f4QxO8JbvY7xi8pI34aQy6vcdBZQrStPt-SnUQ7m8dTZt">
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl drop-shadow-md">location_on</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Fort Road Food Street, Shahi Mohallah Walled City, Lahore, Punjab.
+                </p>
+<button class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">directions</span>
+                    Get Directions
+                </button>
+</section>
+</div>
+</main>
+<!-- Fixed Bottom Actions -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/30 p-4 pb-safe z-40 shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
+<div class="max-w-md mx-auto">
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-full shadow-sm hover:opacity-90 transition-opacity">
+                Create Dining Event
+            </button>
+</div>
+</div>
+<script>
+        // Simple script to handle header background on scroll
+        const header = document.getElementById('main-header');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-sm');
+                header.querySelector('.glass').style.background = 'rgba(252, 250, 245, 0.9)';
+            } else {
+                header.classList.remove('shadow-sm');
+                header.querySelector('.glass').style.background = 'rgba(252, 250, 245, 0.7)';
+            }
+        });
+    </script>
+</body></html>

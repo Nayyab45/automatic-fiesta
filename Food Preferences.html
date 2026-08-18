@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Food Preferences</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#ece7e4",
+                        "on-primary-container": "#463300",
+                        "on-surface-variant": "#4d463a",
+                        "surface-container-low": "#f7f3ef",
+                        "inverse-surface": "#31302e",
+                        "tertiary": "#5a614a",
+                        "secondary-container": "#f1e1c0",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#e2c382",
+                        "on-tertiary-container": "#313824",
+                        "primary-fixed": "#ffdf9e",
+                        "surface-variant": "#e6e2de",
+                        "on-primary-fixed": "#261a00",
+                        "surface-container-highest": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "primary": "#735b25",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "outline": "#7e7668",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-fixed": "#221b07",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#b89b5e",
+                        "on-error": "#ffffff",
+                        "background": "#fdf8f5",
+                        "outline-variant": "#d0c5b5",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-tertiary-fixed": "#171e0b",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#dee6c8",
+                        "secondary": "#695d44",
+                        "surface": "#fdf8f5",
+                        "on-background": "#1c1b1a",
+                        "on-secondary-container": "#6f6349",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#59440f",
+                        "inverse-on-surface": "#f4f0ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .chip-default {
+            border: 1px solid theme('colors.outline-variant');
+            background-color: transparent;
+            color: theme('colors.on-surface-variant');
+            transition: all 0.3s ease;
+        }
+        .chip-selected {
+            border: 1px solid theme('colors.primary');
+            background-color: rgba(115, 91, 37, 0.1);
+            color: theme('colors.primary');
+            transition: all 0.3s ease;
+        }
+        .chip-default:active {
+            border-color: theme('colors.primary-container');
+            background-color: theme('colors.surface-container-high');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col items-center">
+<div class="w-full max-w-md bg-surface min-h-screen flex flex-col shadow-sm border-x border-outline-variant/30">
+<!-- Header Section -->
+<header class="pt-16 pb-stack-lg px-container-padding text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-sm">What do you love to eat?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Choose your Pakistani food preferences.</p>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-container-padding overflow-y-auto pb-32">
+<form id="preferences-form">
+<!-- Category: Pakistani Favorites -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+                        Pakistani Favorites
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Biryani</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Karahi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Nihari</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Haleem</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">BBQ</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Kebabs</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Handi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Qorma</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Pulao</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Sajji</button>
+</div>
+</section>
+<!-- Category: Regional -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">public</span>
+                        Regional
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Punjabi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Sindhi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Balochi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Pashtun</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Kashmiri</button>
+</div>
+</section>
+<!-- Category: Street Food -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">fastfood</span>
+                        Street Food
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Chaat</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Samosa</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Pakora</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Gol Gappay</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Bun Kebab</button>
+</div>
+</section>
+<!-- Category: Desserts -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cake</span>
+                        Desserts
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Kheer</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Gulab Jamun</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Jalebi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Kulfi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Gajar Ka Halwa</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Rabri</button>
+</div>
+</section>
+<!-- Category: Drinks -->
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">local_cafe</span>
+                        Drinks
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Chai</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Doodh Patti</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Kashmiri Chai</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Lassi</button>
+<button class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" onclick="toggleChip(this)" type="button">Falooda</button>
+</div>
+</section>
+</form>
+</main>
+<!-- Sticky Bottom Action -->
+<div class="fixed bottom-0 w-full max-w-md bg-surface border-t border-outline-variant/30 px-container-padding py-stack-md pb-8 z-50">
+<button class="w-full bg-primary-container text-on-primary font-title-lg text-title-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98]" type="button">
+                Continue
+            </button>
+</div>
+</div>
+<script>
+        function toggleChip(element) {
+            element.classList.toggle('chip-default');
+            element.classList.toggle('chip-selected');
+        }
+    </script>
+</body></html>

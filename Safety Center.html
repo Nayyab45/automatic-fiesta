@@ -1,0 +1,329 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Safety Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#221b07",
+                    "error-container": "#ffdad6",
+                    "background": "#fdf8f5",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#e2c382",
+                    "on-secondary-container": "#6f6349",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed": "#171e0b",
+                    "on-tertiary-fixed-variant": "#424a34",
+                    "on-secondary": "#ffffff",
+                    "surface": "#fdf8f5",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#dee6c8",
+                    "on-primary-fixed-variant": "#59440f",
+                    "on-background": "#1c1b1a",
+                    "on-primary-container": "#463300",
+                    "outline-variant": "#d0c5b5",
+                    "surface-dim": "#ddd9d6",
+                    "primary-fixed-dim": "#e2c382",
+                    "primary-fixed": "#ffdf9e",
+                    "secondary-container": "#f1e1c0",
+                    "primary": "#735b25",
+                    "inverse-on-surface": "#f4f0ec",
+                    "tertiary": "#5a614a",
+                    "surface-bright": "#fdf8f5",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#735b25",
+                    "surface-container-high": "#ece7e4",
+                    "inverse-surface": "#31302e",
+                    "on-secondary-fixed-variant": "#50462e",
+                    "surface-container-highest": "#e6e2de",
+                    "surface-container-low": "#f7f3ef",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#f1e1c0",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e6e2de",
+                    "on-tertiary-container": "#313824",
+                    "surface-container": "#f1ede9",
+                    "secondary": "#695d44",
+                    "primary-container": "#b89b5e",
+                    "on-surface-variant": "#4d463a",
+                    "on-primary-fixed": "#261a00",
+                    "on-surface": "#1c1b1a",
+                    "secondary-fixed-dim": "#d4c5a6",
+                    "tertiary-fixed-dim": "#c2caad",
+                    "outline": "#7e7668",
+                    "tertiary-container": "#9aa287"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "container-padding": "24px",
+                    "stack-sm": "8px",
+                    "unit": "4px",
+                    "gutter": "16px",
+                    "stack-lg": "32px",
+                    "section-gap": "48px"
+            },
+            "fontFamily": {
+                    "title-lg": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Playfair Display"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "display-lg": [
+                            "Playfair Display"
+                    ],
+                    "label-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "title-lg": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-sm": [
+                            "10px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "40px",
+                            {
+                                    "lineHeight": "48px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-lg": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .glass-card {
+            background: rgba(252, 250, 245, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(232, 216, 184, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col pb-safe md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md docked full-width top-0 sticky z-40">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity Active: scale-95 duration-150">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Safety Center</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a professional individual looking warmly into the camera, representing a user profile photo. The lighting is soft and natural, emphasizing approachability and trust within a premium dining application context. The background is slightly blurred with muted beige and gold tones to match a luxury editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA84NWyZguGfbKrJya-C0O5MvvdPsWeAtatcFuAvgR8uKcVsM-WvzGbHVJPiHRIk3hZmoNTch8jlcbAjvFCCoZKh5Cs5Rga-P5ggN22H0lJH1MqADJLLFiap9nT0mdhsOIJTl8tjlSAIXxl3ZGvixAJA1VHaRC8XCOgzwibdbsOoE4XSj9LPpnEMHUPrf2vTP86C7dexXJnWxRnGkqLpIA_0tj3tDdU_7ss_PKbvLcR0iIQN-GUoRMM">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-lg flex flex-col gap-section-gap">
+<!-- Hero Section -->
+<section class="flex flex-col gap-stack-md max-w-2xl">
+<h2 class="font-display-lg text-display-lg text-on-background">Dining should feel comfortable.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">We prioritize your safety and peace of mind with robust community standards and discrete control features designed for a secure, elegant experience.</p>
+</section>
+<!-- Bento Grid: Core Safety Features -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Verified Profiles -->
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Verified Profiles</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Mandatory identity checks ensure our community remains exclusive and accountable.</p>
+</div>
+</div>
+<!-- Identity Verification -->
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Identity Verification</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Secure, swift ID validation required for hosting and joining high-profile tables.</p>
+</div>
+</div>
+<!-- Community Guidelines -->
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Community Guidelines</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Read our standards for respectful interaction and elegant conduct at the table.</p>
+</div>
+<button class="mt-auto self-start text-primary font-label-lg text-label-lg hover:underline decoration-1 underline-offset-4">Read Guidelines</button>
+</div>
+</section>
+<!-- Asymmetric Layout: Check-in / Check-out & Preferences -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Check-in Feature Explanation (Spans 7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-container-padding flex flex-col md:flex-row gap-stack-lg border border-outline-variant/50">
+<div class="flex-1 flex flex-col gap-stack-md justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Discrete Check-in / Check-out</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-sm">
+                        Our real-time status feature lets connections know you've arrived safely or departed a venue. This tool is designed for personal accountability and peace of mind during social engagements.
+                    </p>
+<ul class="flex flex-col gap-stack-sm">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Share status only with approved contacts.</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Automatic check-out prompts upon leaving venue.</span>
+</li>
+</ul>
+</div>
+<div class="w-full md:w-1/3 aspect-[3/4] rounded-lg overflow-hidden relative">
+<img alt="Check-in illustration" class="w-full h-full object-cover" data-alt="A stylized, minimalist illustration showing a smartphone interface displaying a discrete 'Safe Check-in' confirmation screen against a blurred backdrop of an upscale dining environment. Soft ambient lighting highlights the device, conveying a sense of security and modern luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoeqZ235JumjlxBTQnZ9KC5eVnxWuplaLSR26HDSXX98ngih5I4BDHd5LCVv7tXbMibZhIYisiQQeh73lz4bQOsnM5xmLuwTzcrpfV9A6qn3AZ1e9srxZdyeiAiN5pz3eek6oWKewIZJLr1ktLJEvFMWHJ86q8teXY_yuCdawjjkswxbNN5uATSEsJWhjV7X_eAoBZTAHG4IgOmgMDNklkYStUvZEnFdfo_VBgq6eu_EDWP0Crofy2">
+</div>
+</div>
+<!-- Additional Options & Reporting (Spans 5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<!-- Preferences -->
+<div class="glass-card rounded-xl p-container-padding">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Table Preferences</h4>
+<div class="flex flex-col gap-stack-sm">
+<label class="flex items-center justify-between p-stack-sm hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">diversity_3</span>
+<span class="font-body-lg text-body-lg text-on-surface">Women-only Tables</span>
+</div>
+<input class="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-surface" type="checkbox">
+</label>
+<div class="h-[0.5px] w-full bg-outline-variant/30"></div>
+<label class="flex items-center justify-between p-stack-sm hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-body-lg text-body-lg text-on-surface">Friends-only Tables</span>
+</div>
+<input checked="" class="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-surface" type="checkbox">
+</label>
+</div>
+</div>
+<!-- Emergency Contact -->
+<div class="bg-error-container/20 border border-error/10 rounded-xl p-container-padding flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface">Emergency Contact</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Not configured</p>
+</div>
+</div>
+<button class="px-4 py-2 rounded-full border border-error text-error font-label-lg text-label-lg hover:bg-error/5 transition-colors">Setup</button>
+</div>
+</div>
+</section>
+<!-- Action Section: Report / Block -->
+<section class="border-t border-outline-variant/50 pt-section-gap mb-stack-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-lg">Account Actions</h3>
+<div class="flex flex-col md:flex-row gap-gutter">
+<button class="flex-1 py-4 px-6 rounded-xl border border-outline-variant flex items-center justify-center gap-2 text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">report</span>
+                    Report a User
+                </button>
+<button class="flex-1 py-4 px-6 rounded-xl border border-outline-variant flex items-center justify-center gap-2 text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">block</span>
+                    Manage Blocked Users
+                </button>
+</div>
+</section>
+</main>
+</body></html>

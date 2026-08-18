@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Profile - Ahmed Khan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#221b07",
+                        "error-container": "#ffdad6",
+                        "background": "#fdf8f5",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#e2c382",
+                        "on-secondary-container": "#6f6349",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#171e0b",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fdf8f5",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-primary-fixed-variant": "#59440f",
+                        "on-background": "#1c1b1a",
+                        "on-primary-container": "#463300",
+                        "outline-variant": "#d0c5b5",
+                        "surface-dim": "#ddd9d6",
+                        "primary-fixed-dim": "#e2c382",
+                        "primary-fixed": "#ffdf9e",
+                        "secondary-container": "#f1e1c0",
+                        "primary": "#735b25",
+                        "inverse-on-surface": "#f4f0ec",
+                        "tertiary": "#5a614a",
+                        "surface-bright": "#fdf8f5",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#735b25",
+                        "surface-container-high": "#ece7e4",
+                        "inverse-surface": "#31302e",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "surface-container-highest": "#e6e2de",
+                        "surface-container-low": "#f7f3ef",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e6e2de",
+                        "on-tertiary-container": "#313824",
+                        "surface-container": "#f1ede9",
+                        "secondary": "#695d44",
+                        "primary-container": "#b89b5e",
+                        "on-surface-variant": "#4d463a",
+                        "on-primary-fixed": "#261a00",
+                        "on-surface": "#1c1b1a",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "outline": "#7e7668",
+                        "tertiary-container": "#9aa287"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "container-padding": "24px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fdf8f5; /* surface */
+            color: #1c1b1a; /* on-surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Subtle selection glow for cards */
+        .glass-card {
+            background: rgba(253, 248, 245, 0.8);
+            backdrop-filter: blur(12px);
+            border: 0.5px solid rgba(232, 216, 184, 0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased font-sans pb-24 md:pb-0">
+<!-- TopAppBar for Desktop (Hidden on Mobile) -->
+<header class="hidden md:flex justify-between items-center w-full px-container-padding py-stack-md bg-surface flat no shadows sticky top-0 z-40 transition-transform">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<span class="font-headline-md text-headline-md text-primary">Karachi, PK</span>
+</div>
+<nav class="flex gap-8">
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="#">Home</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="#">Discover</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="#">Tables</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="#">Messages</a>
+<a class="text-primary font-bold font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="#">Profile</a>
+</nav>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A small circular avatar portrait of a modern South Asian man, professional yet approachable, set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrKW5HWbQCf2uh8HfV3PHEEODlQtplXRkXIWMiG4qBLghxeu-f1iUIR4lEADsCcvsnY3ABbmM_gO0yk5xCL9yYpCmO-cLZEsFTu875g4bi0ZGR5jZLY-9miG9AVS0ByuRxkRHp3UP-IYhLYBq0iQfZlhl_x0AsuujkMAj81e5tjmVNr13om3Fbi-L8w2dsnkcYHeM8nyLl7A1YNKMUacv1teznJc4Or1crydzoR-hABjGrETQ-20tR">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-4xl mx-auto px-container-padding pt-stack-lg md:pt-section-gap pb-section-gap">
+<!-- Profile Header Section -->
+<section class="flex flex-col md:flex-row items-center md:items-start gap-stack-lg mb-section-gap">
+<!-- Large Profile Image -->
+<div class="relative w-40 h-40 md:w-56 md:h-56 shrink-0 rounded-full overflow-hidden border-2 border-primary-container shadow-sm p-1">
+<img alt="Ahmed Khan" class="w-full h-full object-cover rounded-full" data-alt="A high-quality, professional portrait of a modern Pakistani man named Ahmed Khan. He is smiling warmly in a beautifully lit, upscale restaurant setting with a muted gold and soft ambient light aesthetic. The image exudes confidence and refined hospitality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOGcz7GSt7aultbp2Y34uqoKvZNh_oL0ZGOBrkRSGJ2Vpiw8ctX4IIQPZuAf4ElJInIjes3uzhyEigScvgITYPDB-0lVFQRZ77usR0KZGuz9OWqA-qh_lY4FsCTmMrgwJbpwjpFczHgloK3Wmd2grHdTPTDiVF9sVvZsDhczm7uQ3tYHsP5MFu2VpNZ-LYRnj7EP5cksTvDV3Svi6w9UFh9fWTZlK7uKt827QkItTVwOSZMTMjgOHw">
+<!-- Verification Badge overlay -->
+<div class="absolute bottom-2 right-4 bg-surface rounded-full p-1 shadow-sm">
+<span class="material-symbols-outlined fill text-primary-container text-2xl">verified</span>
+</div>
+</div>
+<!-- Profile Info & Actions -->
+<div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-unit flex items-center gap-2">
+                    Ahmed Khan
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm flex items-center justify-center md:justify-start gap-1">
+<span class="material-symbols-outlined text-sm">location_on</span> Karachi
+                 • 28 years</p>
+<p class="font-body-lg text-body-lg text-on-surface max-w-lg mb-stack-md leading-relaxed italic text-on-surface-variant">
+                    "Software engineer who loves late-night karahi, chai and good conversations."
+                </p>
+<!-- Action Buttons -->
+<div class="flex gap-stack-sm w-full md:w-auto mt-2">
+<button class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                        Edit Profile
+                    </button>
+<button class="flex-1 md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">settings</span> Preferences
+                    </button>
+</div>
+</div>
+</section>
+<!-- Bento Grid Layout for Details -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Stats Card -->
+<div class="md:col-span-4 glass-card rounded-xl p-stack-md flex flex-col justify-center items-center gap-stack-sm">
+<div class="flex gap-stack-lg w-full justify-around">
+<div class="text-center">
+<div class="font-headline-md text-headline-md text-primary">12</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Tables Joined</div>
+</div>
+<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="text-center">
+<div class="font-headline-md text-headline-md text-primary flex items-center justify-center gap-1">
+                            4.9 <span class="material-symbols-outlined fill text-sm text-primary-container">star</span>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Rating</div>
+</div>
+</div>
+</div>
+<!-- Favorite Foods -->
+<div class="md:col-span-8 glass-card rounded-xl p-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">restaurant_menu</span>
+                    Favorite Cuisines
+                </h3>
+<div class="flex flex-wrap gap-2 mt-stack-sm">
+<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Karahi</span>
+<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Biryani</span>
+<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Seekh Kebab</span>
+</div>
+</div>
+<!-- Interests -->
+<div class="md:col-span-12 glass-card rounded-xl p-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">favorite</span>
+                    Interests &amp; Vibes
+                </h3>
+<div class="flex flex-wrap gap-2 mt-stack-sm">
+<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Tech</span>
+<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Photography</span>
+<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Travel</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar for Mobile (Hidden on Desktop) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl h-16">
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-xl">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-xl">explore</span>
+<span class="font-label-sm text-label-sm">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-xl">restaurant</span>
+<span class="font-label-sm text-label-sm">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-xl">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<!-- Active Profile Tab -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" href="#">
+<span class="material-symbols-outlined fill mb-1 text-xl">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+
+
+</body></html>
