@@ -1,0 +1,170 @@
+<header class="sticky top-0 z-40 bg-surface dark:bg-surface w-full px-container-padding py-stack-md flex justify-between items-center flat no shadows transition-all duration-300">
+<div class="flex items-center gap-stack-sm hover:opacity-80 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Karachi, PK</h1>
+</div>
+<div class="hover:opacity-80 transition-opacity cursor-pointer">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of an elegant user in soft, warm lighting against a neutral, high-key background. The aesthetic is clean, modern, and high-end, featuring a subtle color palette of whites, muted golds, and deep charcoals. The image feels like a professional editorial headshot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqB3Lvszjl6SyEm_uuNtVz3SAwK8DCXhoxx2FqNMPenqJvPkqx4scJxTmx8zG4DmQVRV7KiAfIHFzgRxR3aR2k1w1hcrgtnqLfBXVH6N2GTh9-gtQv4crIu1voWpOJ6gH1j6uw0aJFJNJrvpg8nKBdheSTdaY3JVU0GgeWw2B9lokjGu--l6nqIdb6yCWPnBBRhr06CaaIPtQGu9nDIiDtBlKW31OqIw8i_qi6TrOnF2kGg8IJc0MG"/>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto w-full px-container-padding py-stack-lg">
+
+<div class="mb-section-gap relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface border-b border-outline-variant focus:border-primary-container focus:ring-0 pl-12 pr-4 py-4 font-body-lg text-body-lg text-on-surface placeholder-on-surface-variant transition-colors outline-none rounded-t-sm shadow-[0_4px_16px_rgba(0,0,0,0.04)]" placeholder="Search Pakistani restaurants, dishes or people" type="text"/>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-section-gap">
+
+<div class="md:col-span-8 space-y-section-gap">
+
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface">Location &amp; Proximity</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter">
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase">City</label>
+<select class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container py-2 text-on-surface focus:ring-0 outline-none">
+<option value="karachi">Karachi</option>
+<option value="lahore">Lahore</option>
+<option value="islamabad">Islamabad</option>
+</select>
+</div>
+<div>
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase flex justify-between">
+<span>Distance</span>
+<span class="text-primary-container" id="distance-val">5 km</span>
+</label>
+<div class="pt-2">
+<input class="range-slider" max="25" min="1" type="range" value="5"/>
+</div>
+</div>
+</div>
+</section>
+
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">restaurant</span>
+                        Regional Cuisine
+                    </h2>
+<div class="flex flex-wrap gap-stack-sm">
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Punjabi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container selected">Sindhi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Peshawari</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Balochi</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Kashmiri</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Mughlai</button>
+<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Karachi Street</button>
+</div>
+</section>
+
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-section-gap">
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Experience</h2>
+<div class="space-y-stack-sm">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Fine Dining</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Casual Eatery</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Dhaba Style</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
+<span class="text-on-surface group-hover:text-primary transition-colors">Rooftop / Outdoor</span>
+</label>
+</div>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dining Time</h2>
+<div class="space-y-stack-sm">
+<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<span>Date</span>
+<span class="text-on-surface-variant font-label-lg">Today, Oct 24</span>
+</button>
+<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<span>Time</span>
+<span class="text-on-surface-variant font-label-lg">20:00</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<div class="md:col-span-4 space-y-section-gap">
+
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Price Tier</h2>
+<div class="flex rounded-md border border-outline-variant overflow-hidden">
+<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs</button>
+<button class="flex-1 py-2 bg-surface-container text-on-surface border-r border-outline-variant text-center font-label-lg border-b-2 border-primary-container">Rs Rs</button>
+<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs</button>
+<button class="flex-1 py-2 bg-surface text-on-surface hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs Rs</button>
+</div>
+</section>
+
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Minimum Rating</h2>
+<div class="flex items-center gap-2">
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-outline-variant"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">star</span></button>
+<span class="ml-2 font-label-lg text-on-surface-variant">4.0+</span>
+</div>
+</section>
+
+<section class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">Available Seats</h2>
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">remove</span></button>
+<span class="font-title-lg text-on-surface">2 Guests</span>
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">add</span></button>
+</div>
+</section>
+
+<div class="pt-section-gap flex flex-col gap-stack-md">
+<button (click)="go('/discover-restaurants')" class="w-full bg-primary-container text-on-primary py-3 rounded-md font-label-lg uppercase tracking-wider hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+                        Show 42 Results
+                    </button>
+<button class="w-full border border-outline-variant text-on-surface py-3 rounded-md font-label-lg uppercase tracking-wider hover:bg-surface-container transition-colors">
+                        Reset Filters
+                    </button>
+</div>
+</div>
+</div>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface dark:bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl md:hidden h-[72px]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" routerLink="/home">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 group" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-sm text-label-sm mt-1 font-semibold">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" routerLink="/my-tables">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">restaurant</span>
+<span class="font-label-sm text-label-sm mt-1">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" routerLink="/messages">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">chat_bubble</span>
+<span class="font-label-sm text-label-sm mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors group" routerLink="/profile">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform duration-200">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>

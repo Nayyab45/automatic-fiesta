@@ -1,0 +1,32 @@
+<header class="px-container-padding py-stack-md flex justify-between items-center w-full bg-surface">
+<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 0, 'wght' 400;">arrow_back</span>
+</button>
+<div class="flex gap-2 items-center">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-6 h-2 rounded-full bg-primary-container"></div>
+</div>
+</header>
+
+<main class="flex-grow flex flex-col px-container-padding pt-stack-md pb-[120px] max-w-2xl mx-auto w-full">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-stack-lg">
+            Beyond food, what brings you to the table?
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-section-gap">
+            Select your interests to help us connect you with like-minded individuals and curate the perfect dining atmosphere.
+        </p>
+
+<div class="flex flex-wrap gap-stack-sm mb-stack-lg" id="interests-container">
+
+</div>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md px-container-padding py-stack-md border-t border-surface-variant z-50 flex justify-center pb-safe">
+<button (click)="go('/food-preferences')" class="w-full max-w-2xl bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full flex items-center justify-between hover:opacity-90 transition-opacity" id="continue-btn">
+<span>Continue</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 400;">arrow_forward</span>
+</button>
+</div>

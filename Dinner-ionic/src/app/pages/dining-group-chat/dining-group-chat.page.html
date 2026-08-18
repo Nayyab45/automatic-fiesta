@@ -1,0 +1,124 @@
+<header class="bg-surface flex-none pt-safe pb-stack-sm px-container-padding border-b border-surface-variant z-10 shadow-sm relative">
+<div class="flex items-center justify-between mt-4">
+<button (click)="goBack()" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-10 h-10 -ml-2">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<div class="flex-1 text-center px-4">
+<h1 class="font-headline-md text-headline-md text-primary truncate">Friday Dinner</h1>
+<p class="font-label-lg text-label-lg text-on-surface-variant truncate mt-1">Kolachi Restaurant • 8:00 PM</p>
+</div>
+
+<div class="flex -space-x-3 items-center justify-end min-w-[72px]">
+<img alt="Guest 1" class="w-8 h-8 rounded-full border-2 border-surface object-cover z-30" data-alt="A professional headshot of a South Asian man in a modern, well-lit environment. He has a warm, welcoming smile. The lighting is soft and natural, emphasizing high-end lifestyle aesthetics. The background is slightly blurred, featuring warm beige and muted gold tones consistent with a luxury dining application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0Ww2wUOtufyqQ0otTOjNFmHOV5CwO2PR8EDIfDPAftH4mpt73CUda8_LYQUkpwvp-z_dpAaMnHUOFce5-oB-Wy_zsuZ-1sZOhErbxsgM4RwlVJP4wwSPWkQ8sHhJ20ulYjR9xztaoPgrAzvf7uUOtoZVrNhDiGb5YC3s0h8FDEP5z6s99hH8dQMIycTINuonY7Nx0qAlMmMOlBw4Jkf-UuT91OL7iCT4SvtNchdUwTDbnyQxOmUEz"/>
+<img alt="Guest 2" class="w-8 h-8 rounded-full border-2 border-surface object-cover z-20" data-alt="A stylish headshot of a South Asian woman wearing contemporary elegant attire. She looks confident and approachable. The lighting is bright and clean, casting gentle shadows. The color palette includes creamy whites and warm neutral tones, fitting for a sophisticated, high-end profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCglZXP2dznYw6wHo0wppYMYBKnX35dpMaQ3iFwn2eSP0g2nv8px1xMY0xReKneXbQ9NoW31vtOGNfjcts_TRpXPeT-sZKzKEJQVMtOp0gPRA1zaWExaqh4r54wnadikE4_GAIgn06bLXajIaZC5dLvAR26NAowCPVoB10zouFcagKsdsnfg0QUg0VRV9A0kHuhMo8mUSDit5Mg-O-D_-QD1BeEaEBbBGEdyefujB7FTomo-WlivMWM"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center z-10">
+<span class="font-label-sm text-label-sm text-on-surface-variant">+2</span>
+</div>
+</div>
+</div>
+
+<div class="flex overflow-x-auto hide-scrollbar gap-stack-sm mt-stack-md pb-2">
+<button (click)="go('/restaurant-detail')" class="flex-none flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[18px] text-primary">restaurant</span>
+<span class="font-label-lg text-label-lg text-on-surface">View Restaurant</span>
+</button>
+<button (click)="go('/guest-list')" class="flex-none flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[18px] text-primary">group</span>
+<span class="font-label-lg text-label-lg text-on-surface">Guest List</span>
+</button>
+<button (click)="go('/restaurant-direction')" class="flex-none flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[18px] text-primary">directions</span>
+<span class="font-label-lg text-label-lg text-on-surface">Directions</span>
+</button>
+</div>
+</header>
+
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md pb-32">
+
+<div class="flex justify-center my-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-3 py-1 rounded-full">Today</span>
+</div>
+
+<div class="flex justify-center my-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-[80%]">Zainab created the event "Friday Dinner" at Kolachi</span>
+</div>
+
+<div class="flex gap-stack-sm items-end max-w-[85%]">
+<img alt="Zainab" class="w-8 h-8 rounded-full object-cover flex-none mb-1" data-alt="A high-quality profile photo of a person in a smart-casual outfit, set against a softly lit, upscale interior background. The image exudes a sense of hospitality and refinement. Subtle gold and champagne hues are present in the ambient lighting, perfectly aligning with a premium concierge service identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGI8Hn9QB3yC7M1l_TdwQ1NQY1wRoEMICk5VkuZ3XvkJlIZPPD6A_CVMUdoaBkPRafeVCZxSOh4pJna8lFQV5jj1UqEQa2TYkyRHheCVJHRZBk9vBZHJj1XEULsNwuNY6awNEpDqCQFpsghrain8Lquuqad-ao2G8C-ZBSw8SeA-djSQwvA_ZEj_sh3wr1DyfM_AUD7TwhR6nf6XbfAmdMSTnmdj31ASOiBm7psPinm6be58pWSar9"/>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2">Zainab, 10:42 AM</span>
+<div class="bg-surface-container-high px-4 py-3 rounded-2xl rounded-bl-none text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<p class="font-body-md text-body-md">Hey everyone! So excited for Friday. I've requested a table by the edge so we get the sea breeze.</p>
+</div>
+</div>
+</div>
+
+<div class="flex gap-stack-sm items-end max-w-[85%]">
+<img alt="Ali" class="w-8 h-8 rounded-full object-cover flex-none mb-1" data-alt="A professional headshot of a South Asian man in a modern, well-lit environment. He has a warm, welcoming smile. The lighting is soft and natural, emphasizing high-end lifestyle aesthetics. The background is slightly blurred, featuring warm beige and muted gold tones consistent with a luxury dining application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_PtFNKEd9m5wHsP3ftVfAVSXHVKpzpvcJjYdG_OhshJEQdESGR62nMxv9tEEqaNkIE9DlDnC_Zu0r7WN6dBneSP3ZKhotp2TnN4oUKBHma6PE0M5eSP7tlPEauzT5NShzrmvveEwBLfuhvH4qul_PwxBQ1I8p2zFLOVqLDoPvpIqHdSWC-m0OEBl_zGFOJj_6RbXttFPr03xYVPAhy7ofkB3x_zfus9Bs5A-DiBQpx2VnG8D-EvzF"/>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2">Ali, 11:05 AM</span>
+<div class="bg-surface-container-high px-4 py-3 rounded-2xl rounded-bl-none text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<p class="font-body-md text-body-md">Perfect. Has anyone tried their mutton karahi? I've heard it's incredible but usually takes about 45 mins to prepare fresh.</p>
+</div>
+</div>
+</div>
+
+<div class="flex gap-stack-sm items-end justify-end w-full mt-2">
+<div class="flex flex-col gap-1 items-end max-w-[80%]">
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-2">You, 11:12 AM</span>
+<div class="bg-primary-container px-4 py-3 rounded-2xl rounded-br-none text-on-primary-container shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+<p class="font-body-md text-body-md">I haven't, but that sounds amazing. Let's pre-order it so we don't have to wait. I can call the concierge line to add it to our reservation notes.</p>
+</div>
+</div>
+</div>
+
+<div class="flex gap-stack-sm items-end max-w-[85%] mt-2">
+<img alt="Sara" class="w-8 h-8 rounded-full object-cover flex-none mb-1" data-alt="A stylish headshot of a South Asian woman wearing contemporary elegant attire. She looks confident and approachable. The lighting is bright and clean, casting gentle shadows. The color palette includes creamy whites and warm neutral tones, fitting for a sophisticated, high-end profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcVEdZzdgM8bIHDOGVOYq426P7XEEWCNy2ezOEvhJLrLiEISfQggj_5nwSAYgsvIJmx1n9cYi3lnkR2e5EC7qzi77uueC68gXaP0JHDAbTo51BIgEUCc9jdOSR2eae50GrYJg-dGiYMjUkpXtAA8B540-_Vt7qVDYhDQ_MynRWAUP8XHYynfmGBbrPJnmTGDriV7z6kRUYedBpwDqNvsJVCMwXEB7Q6alcB5UgCh0tSerPAry7MtRS"/>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2">Sara, 11:15 AM</span>
+<div class="bg-surface-container-high px-4 py-3 rounded-2xl rounded-bl-none text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<p class="font-body-md text-body-md">Yes please! Add a plate of Peshawari chapli kebabs too while you're at it. 🤤</p>
+</div>
+</div>
+</div>
+</main>
+
+<div class="bg-surface border-t border-outline-variant/30 px-container-padding py-stack-sm pb-[calc(16px+env(safe-area-inset-bottom)+70px)] fixed bottom-0 left-0 w-full z-20">
+<div class="flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/50 focus-within:border-primary transition-colors">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/70 py-2" placeholder="Type a message..." type="text"/>
+<button class="text-primary hover:opacity-80 transition-opacity bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface docked full-width bottom-0 rounded-t-xl border-t border-outline-variant shadow-sm py-2">
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/home">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-sm text-label-sm">Discover</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/my-tables">
+<span class="material-symbols-outlined mb-1">restaurant</span>
+<span class="font-label-sm text-label-sm">Tables</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" routerLink="/messages">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-label-sm text-label-sm font-bold">Messages</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/profile">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>

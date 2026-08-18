@@ -1,0 +1,14 @@
+// Screen-specific styles for "Safety Center", carried over from the
+// original prototype (Safety Center.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .glass-card {
+            background: rgba(252, 250, 245, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(232, 216, 184, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }

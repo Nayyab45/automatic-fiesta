@@ -1,0 +1,129 @@
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md docked full-width top-0 sticky z-40">
+<div class="flex items-center gap-4">
+<button (click)="goBack()" class="hover:opacity-80 transition-opacity Active: scale-95 duration-150">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Safety Center</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a professional individual looking warmly into the camera, representing a user profile photo. The lighting is soft and natural, emphasizing approachability and trust within a premium dining application context. The background is slightly blurred with muted beige and gold tones to match a luxury editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA84NWyZguGfbKrJya-C0O5MvvdPsWeAtatcFuAvgR8uKcVsM-WvzGbHVJPiHRIk3hZmoNTch8jlcbAjvFCCoZKh5Cs5Rga-P5ggN22H0lJH1MqADJLLFiap9nT0mdhsOIJTl8tjlSAIXxl3ZGvixAJA1VHaRC8XCOgzwibdbsOoE4XSj9LPpnEMHUPrf2vTP86C7dexXJnWxRnGkqLpIA_0tj3tDdU_7ss_PKbvLcR0iIQN-GUoRMM"/>
+</div>
+</header>
+
+<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-lg flex flex-col gap-section-gap">
+
+<section class="flex flex-col gap-stack-md max-w-2xl">
+<h2 class="font-display-lg text-display-lg text-on-background">Dining should feel comfortable.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">We prioritize your safety and peace of mind with robust community standards and discrete control features designed for a secure, elegant experience.</p>
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Verified Profiles</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Mandatory identity checks ensure our community remains exclusive and accountable.</p>
+</div>
+</div>
+
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Identity Verification</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Secure, swift ID validation required for hosting and joining high-profile tables.</p>
+</div>
+</div>
+
+<div class="glass-card rounded-xl p-container-padding flex flex-col gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Community Guidelines</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Read our standards for respectful interaction and elegant conduct at the table.</p>
+</div>
+<button (click)="go('/community-guidelines')" class="mt-auto self-start text-primary font-label-lg text-label-lg hover:underline decoration-1 underline-offset-4">Read Guidelines</button>
+</div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+
+<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-container-padding flex flex-col md:flex-row gap-stack-lg border border-outline-variant/50">
+<div class="flex-1 flex flex-col gap-stack-md justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Discrete Check-in / Check-out</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-sm">
+                        Our real-time status feature lets connections know you've arrived safely or departed a venue. This tool is designed for personal accountability and peace of mind during social engagements.
+                    </p>
+<ul class="flex flex-col gap-stack-sm">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Share status only with approved contacts.</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Automatic check-out prompts upon leaving venue.</span>
+</li>
+</ul>
+</div>
+<div class="w-full md:w-1/3 aspect-[3/4] rounded-lg overflow-hidden relative">
+<img alt="Check-in illustration" class="w-full h-full object-cover" data-alt="A stylized, minimalist illustration showing a smartphone interface displaying a discrete 'Safe Check-in' confirmation screen against a blurred backdrop of an upscale dining environment. Soft ambient lighting highlights the device, conveying a sense of security and modern luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoeqZ235JumjlxBTQnZ9KC5eVnxWuplaLSR26HDSXX98ngih5I4BDHd5LCVv7tXbMibZhIYisiQQeh73lz4bQOsnM5xmLuwTzcrpfV9A6qn3AZ1e9srxZdyeiAiN5pz3eek6oWKewIZJLr1ktLJEvFMWHJ86q8teXY_yuCdawjjkswxbNN5uATSEsJWhjV7X_eAoBZTAHG4IgOmgMDNklkYStUvZEnFdfo_VBgq6eu_EDWP0Crofy2"/>
+</div>
+</div>
+
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+
+<div class="glass-card rounded-xl p-container-padding">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Table Preferences</h4>
+<div class="flex flex-col gap-stack-sm">
+<label class="flex items-center justify-between p-stack-sm hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">diversity_3</span>
+<span class="font-body-lg text-body-lg text-on-surface">Women-only Tables</span>
+</div>
+<input class="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</label>
+<div class="h-[0.5px] w-full bg-outline-variant/30"></div>
+<label class="flex items-center justify-between p-stack-sm hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-body-lg text-body-lg text-on-surface">Friends-only Tables</span>
+</div>
+<input checked="" class="form-checkbox h-5 w-5 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+</label>
+</div>
+</div>
+
+<div class="bg-error-container/20 border border-error/10 rounded-xl p-container-padding flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface">Emergency Contact</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Not configured</p>
+</div>
+</div>
+<button (click)="go('/emergency-contacts')" class="px-4 py-2 rounded-full border border-error text-error font-label-lg text-label-lg hover:bg-error/5 transition-colors">Setup</button>
+</div>
+</div>
+</section>
+
+<section class="border-t border-outline-variant/50 pt-section-gap mb-stack-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-lg">Account Actions</h3>
+<div class="flex flex-col md:flex-row gap-gutter">
+<button (click)="go('/report-users')" class="flex-1 py-4 px-6 rounded-xl border border-outline-variant flex items-center justify-center gap-2 text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">report</span>
+                    Report a User
+                </button>
+<button (click)="go('/blocked-users')" class="flex-1 py-4 px-6 rounded-xl border border-outline-variant flex items-center justify-center gap-2 text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">block</span>
+                    Manage Blocked Users
+                </button>
+</div>
+</section>
+</main>

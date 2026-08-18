@@ -1,0 +1,31 @@
+// Screen-specific styles for "Create Table", carried over from the
+// original prototype (Create Table.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: #fdf8f5; /* surface */
+            color: #1c1b1a; /* on-surface */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom Input Styles */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid #E8D8B8;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #b89b5e;
+            box-shadow: 0 0 0 2px rgba(184, 155, 94, 0.2);
+            outline: none;
+        }
+        
+        /* Soft Shadows */
+        .soft-card {
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+        }

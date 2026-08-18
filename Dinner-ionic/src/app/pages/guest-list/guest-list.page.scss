@@ -1,0 +1,10 @@
+// Screen-specific styles for "Guest List", carried over from the
+// original prototype (Guest List.html). Shared rules live in src/global.scss.
+
+body { background-color: #fdf8f5; color: #1c1b1a; }
+        .glass-card {
+            background: rgba(252, 250, 245, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(232, 216, 184, 0.3);
+        }

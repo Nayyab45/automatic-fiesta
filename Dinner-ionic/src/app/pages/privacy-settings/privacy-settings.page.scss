@@ -1,0 +1,39 @@
+// Screen-specific styles for "Privacy Settings", carried over from the
+// original prototype (Privacy Settings.html). Shared rules live in src/global.scss.
+
+.material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        /* Ambient shadow for cards */
+        .ambient-shadow {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }

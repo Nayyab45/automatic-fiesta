@@ -1,0 +1,18 @@
+// Screen-specific styles for "Safety Check-in", carried over from the
+// original prototype (Safety Check-in.html). Shared rules live in src/global.scss.
+
+body { font-family: 'Inter', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .glass-card {
+            background: rgba(253, 248, 245, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 216, 184, 0.4);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+        }
+        .btn-press:active {
+            transform: scale(0.98);
+            border-color: #B89B5E;
+        }
+        .map-gradient {
+            background: linear-gradient(180deg, rgba(253,248,245,0) 0%, rgba(253,248,245,1) 100%);
+        }

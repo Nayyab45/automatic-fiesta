@@ -1,0 +1,136 @@
+<header class="fixed top-0 w-full z-50 bg-surface flex justify-between items-center px-container-padding h-16 max-w-7xl mx-auto border-b-[0.5px] border-outline-variant">
+<button (click)="goBack()" aria-label="Go back" class="text-on-surface-variant hover:opacity-80 active:scale-95 duration-200 p-2 -ml-2">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface absolute left-1/2 -translate-x-1/2">Subscribe</h1>
+<div class="w-8"></div> 
+</header>
+<main class="flex-grow pt-24 pb-32 px-container-padding max-w-lg mx-auto w-full flex flex-col gap-stack-lg">
+
+<section class="bg-surface-container-lowest rounded-xl premium-card p-stack-md border-[0.5px] border-outline-variant">
+<div class="flex items-center gap-stack-sm mb-stack-md">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<h2 class="font-title-lg text-title-lg text-on-surface">Premium Membership</h2>
+</div>
+<div class="flex flex-col gap-stack-sm" id="planToggle">
+
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200 selected-ring">
+<div class="flex items-center gap-gutter">
+<input checked="" class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="monthly"/>
+<div>
+<span class="font-body-lg text-body-lg block">Monthly Plan</span>
+<span class="font-body-md text-body-md text-on-surface-variant">$9.99 / month</span>
+</div>
+</div>
+</label>
+
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200">
+<div class="flex items-center gap-gutter">
+<input class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="yearly"/>
+<div>
+<span class="font-body-lg text-body-lg block">Yearly Plan</span>
+<span class="font-body-md text-body-md text-on-surface-variant">$95.90 / year</span>
+</div>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-container font-label-sm text-label-sm px-2 py-1 rounded-full uppercase tracking-wider">Save 20%</span>
+</label>
+</div>
+</section>
+
+<section class="bg-surface-container-low rounded-xl p-stack-md premium-card">
+<h3 class="font-body-lg text-body-lg font-semibold mb-stack-sm">Premium Includes:</h3>
+<ul class="flex flex-col gap-stack-sm">
+<li class="flex items-start gap-stack-sm border-b-[0.5px] border-outline-variant pb-stack-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md">Unlimited event creation</span>
+</li>
+<li class="flex items-start gap-stack-sm border-b-[0.5px] border-outline-variant pb-stack-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md">Advanced discovery filters</span>
+</li>
+<li class="flex items-start gap-stack-sm border-b-[0.5px] border-outline-variant pb-stack-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md">See profile visitors</span>
+</li>
+<li class="flex items-start gap-stack-sm border-b-[0.5px] border-outline-variant pb-stack-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md">AI match recommendations</span>
+</li>
+<li class="flex items-start gap-stack-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md">Ad-free experience</span>
+</li>
+</ul>
+</section>
+
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface">Payment Method</h2>
+<div class="flex flex-col gap-stack-sm">
+
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer selected-ring">
+<div class="flex items-center gap-gutter">
+<input checked="" class="text-primary-container focus:ring-primary-container border-outline-variant" name="payment" type="radio" value="saved_card"/>
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="credit_card">credit_card</span>
+<span class="font-body-md text-body-md">Visa ending in 4242</span>
+</div>
+</div>
+</label>
+
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer">
+<div class="flex items-center gap-gutter">
+<input class="text-primary-container focus:ring-primary-container border-outline-variant" name="payment" type="radio" value="new_card"/>
+<span class="font-body-md text-body-md">Add New Card</span>
+</div>
+</label>
+</div>
+
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border-[0.5px] border-outline-variant flex flex-col gap-stack-md">
+<input class="premium-input font-body-md text-body-md w-full" placeholder="Card Number" type="text"/>
+<div class="flex gap-gutter">
+<input class="premium-input font-body-md text-body-md w-1/2" placeholder="MM/YY" type="text"/>
+<input class="premium-input font-body-md text-body-md w-1/2" placeholder="CVV" type="text"/>
+</div>
+</div>
+
+<details class="group">
+<summary class="flex justify-between items-center font-body-md text-body-md text-primary cursor-pointer list-none py-2 border-b-[0.5px] border-outline-variant">
+<span>Add Promo Code</span>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-200" data-icon="expand_more">expand_more</span>
+</summary>
+<div class="pt-stack-sm flex gap-gutter items-center">
+<input class="premium-input font-body-md text-body-md flex-grow" placeholder="Enter code" type="text"/>
+<button class="font-label-lg text-label-lg text-primary uppercase tracking-wide" type="button">Apply</button>
+</div>
+</details>
+</section>
+
+<section class="border-t-[0.5px] border-outline-variant pt-stack-md pb-stack-lg">
+<h3 class="font-title-lg text-title-lg mb-stack-sm">Order Summary</h3>
+<div class="flex flex-col gap-stack-sm">
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Subtotal</span>
+<span id="subtotalAmount">$9.99</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Tax</span>
+<span>$0.00</span>
+</div>
+<div class="flex justify-between font-title-lg text-title-lg mt-stack-sm pt-stack-sm border-t-[0.5px] border-outline-variant">
+<span>Total</span>
+<span id="totalAmount">$9.99</span>
+</div>
+</div>
+</section>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.05)] border-t-[0.5px] border-outline-variant px-container-padding py-stack-md pb-safe">
+<div class="max-w-lg mx-auto flex flex-col gap-stack-sm items-center">
+<button (click)="go('/subscribe-to-premium-success')" class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-4 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+<span id="btnText">Subscribe Now — $9.99/month</span>
+</button>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center opacity-80">
+                Cancel anytime. Renews automatically.
+            </p>
+</div>
+</div>

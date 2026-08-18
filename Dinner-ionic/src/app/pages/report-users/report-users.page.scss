@@ -1,0 +1,16 @@
+// Screen-specific styles for "Report User", carried over from the
+// original prototype (Report Users.html). Shared rules live in src/global.scss.
+
+/* Hide scrollbar for cleaner UI on mobile */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #B89B5E;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #B89B5E;
+        }

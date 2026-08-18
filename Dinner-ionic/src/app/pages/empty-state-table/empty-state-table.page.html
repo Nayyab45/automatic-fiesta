@@ -1,0 +1,107 @@
+<header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding py-stack-md z-40">
+<div class="flex items-center gap-gutter">
+<button (click)="goBack()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Tables</h1>
+</div>
+<div class="flex items-center gap-gutter">
+<button (click)="go('/search-filter')" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">tune</span>
+</button>
+</div>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding pb-section-gap relative overflow-hidden">
+
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23735b25\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+<div class="max-w-md w-full flex flex-col items-center text-center z-10 space-y-stack-lg">
+
+<div class="relative w-64 h-64 mb-stack-md flex items-center justify-center">
+
+<div class="absolute inset-0 bg-gradient-to-tr from-surface to-surface-container rounded-full opacity-60 blur-2xl"></div>
+
+<div class="relative w-48 h-48 rounded-full overflow-hidden shadow-sm" style="box-shadow: 0 4px 16px rgba(0,0,0,0.04); border: 0.5px solid #E8D8B8;">
+<img class="w-full h-full object-cover" data-alt="A highly detailed, elegant top-down view of a traditional Pakistani tea set arranged on a pristine white linen table. The set features muted brass and ceramic elements reflecting soft, diffused natural light in a bright, modern light-mode setting. The composition is minimalist and sophisticated, conveying a premium dining experience with a color palette of soft whites, muted gold accents, and subtle earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsOSS0DPprvCvL-r4VkGegsX5ep7NGw_SB8K-SD0cW0t0AwX23VRpjsHjY7ZrQOcj6sGOjXHFa1SXVSrSdJ_rDyfeijlVS7Q701fDHR2VJ-1qh1VUOpv--DNJiO8r1YJm-SoZcTwAVtQqsXeI3BrS28u0hImgsFW7CvHW6jsz0SCs4qukH7e9GZBxYcaFcu2n5vX7Uo4v1EJ3duw4twbqO7qidL4D8UDMPeGBKwrtsJweofMMl9Bda"/>
+</div>
+
+<div class="absolute bottom-4 right-8 w-12 h-12 bg-surface rounded-full shadow-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary-container" style="font-size: 24px;">local_cafe</span>
+</div>
+</div>
+
+<div class="space-y-stack-sm max-w-[280px]">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">
+                    No tables yet.
+                </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    Your next great meal could start here.
+                </p>
+</div>
+
+<div class="pt-stack-md w-full">
+<button (click)="go('/discover-restaurants')" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+                    Discover Tables
+                </button>
+</div>
+</div>
+</main>
+
+<nav class="docked full-width bottom-0 rounded-t-xl bg-surface border-t border-outline-variant shadow-sm hidden md:hidden z-50">
+<ul class="flex justify-around items-center w-full px-4 pb-safe pt-2">
+<li>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/home">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-sm text-label-sm">Discover</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary -mt-2 pt-4 px-3 active:scale-90 transition-transform duration-200" routerLink="/my-tables">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-label-sm text-label-sm font-bold">Tables</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/messages">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/profile">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</li>
+</ul>
+</nav>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface border-t border-outline-variant shadow-sm md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/home">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-sm text-label-sm">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary -mt-[9px] pt-[9px] w-12" routerLink="/my-tables">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-label-sm text-label-sm font-bold">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/messages">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/profile">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>

@@ -1,0 +1,33 @@
+// Screen-specific styles for "Home", carried over from the
+// original prototype (Home Screen.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: #fdf8f5; /* surface */
+            color: #1c1b1a; /* on-surface */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Soft lift shadow */
+        .soft-shadow {
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+        }
+
+        /* Glassmorphism hint for modals/scrims */
+        .glass-blur {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        /* Hide scrollbar for horizontal scrolling lists */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Interactive card subtle stroke on press (simulated with active) */
+        .interactive-card:active {
+            box-shadow: inset 0 0 0 1px #B89B5E;
+        }

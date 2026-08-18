@@ -1,0 +1,11 @@
+// Screen-specific styles for "Dietary Preferences", carried over from the
+// original prototype (Dietry Preferences.html). Shared rules live in src/global.scss.
+
+.chip-selected {
+            border-color: #b89b5e !important;
+            background-color: rgba(232, 216, 184, 0.2) !important;
+        }
+        .spice-selected {
+            border-color: #b89b5e !important;
+            background-color: rgba(232, 216, 184, 0.2) !important;
+        }

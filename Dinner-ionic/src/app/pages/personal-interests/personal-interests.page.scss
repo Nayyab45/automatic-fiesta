@@ -1,0 +1,10 @@
+// Screen-specific styles for "Personal Interests", carried over from the
+// original prototype (Personal Interest.html). Shared rules live in src/global.scss.
+
+body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .chip-selected {
+            border-color: #B89B5E !important;
+            background-color: rgba(232, 216, 184, 0.2) !important;
+        }

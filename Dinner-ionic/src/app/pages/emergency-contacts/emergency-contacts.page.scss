@@ -1,0 +1,33 @@
+// Screen-specific styles for "Emergency Contacts", carried over from the
+// original prototype (Emergency Contacts.html). Shared rules live in src/global.scss.
+
+body {
+              background-color: theme('colors.background');
+              color: theme('colors.on-background');
+          }
+          
+          /* Custom Forms overrides for the design system */
+          [type='text'], [type='email'], [type='url'], [type='password'], [type='number'], [type='date'], [type='datetime-local'], [type='month'], [type='search'], [type='tel'], [type='time'], [type='week'], [multiple], textarea, select {
+              background-color: transparent;
+              border-color: theme('colors.outline-variant');
+              border-width: 0 0 1px 0;
+              border-radius: 0;
+              padding-left: 0;
+              padding-right: 0;
+              box-shadow: none;
+          }
+          [type='text']:focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus {
+              border-color: theme('colors.primary-container');
+              box-shadow: none;
+              outline: none;
+              border-width: 0 0 1.5px 0;
+          }
+          
+          /* Toggle Switch Styles */
+          .toggle-checkbox:checked {
+              right: 0;
+              border-color: theme('colors.primary-container');
+          }
+          .toggle-checkbox:checked + .toggle-label {
+              background-color: theme('colors.primary-container');
+          }

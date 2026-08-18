@@ -1,0 +1,220 @@
+/**
+ * Global styles for Dastarkhān (What Should We Eat?)
+ * This file merges the shared design-system rules that were duplicated
+ * across all 38 original prototype screens. Page/screen-specific rules
+ * (glass-card variants, chip styles, sliders, etc.) live alongside each
+ * page component instead, so they stay scoped and easy to find.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimal Ionic core so ion-app / ion-router-outlet / ion-tabs / gestures
+   and platform utility classes work. Ionic's default color theming is not
+   used -- the Tailwind tokens above drive all visual design. */
+@import "@ionic/angular/css/core.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/display.css";
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+:root {
+  --ion-font-family: "Inter", sans-serif;
+  --ion-background-color: #fdf8f5;
+  --ion-text-color: #1c1b1a;
+}
+
+html,
+body {
+  background-color: theme("colors.surface");
+  color: theme("colors.on-surface");
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: max(884px, 100dvh);
+}
+
+ion-content {
+  --background: theme("colors.surface");
+  --color: theme("colors.on-surface");
+}
+
+/* Material Symbols Outlined baseline (variable font axes) */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  user-select: none;
+}
+.material-symbols-outlined.filled,
+.material-symbols-outlined.fill,
+.material-symbols-outlined.icon-filled,
+.material-symbols-outlined.icon-fill,
+.material-symbols-outlined[data-weight="fill"] {
+  font-variation-settings: "FILL" 1;
+}
+
+/* Safe-area helpers used throughout the prototypes */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+/* Soft "paper" lift shadow used on cards across the app */
+.soft-shadow,
+.card-shadow,
+.shadow-ambient {
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Glassmorphism hint for modals / scrims / bottom sheets */
+.glass-blur {
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* Hide scrollbar for horizontal scroll rails, but keep it scrollable */
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar,
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Thin gold scrollbar used on a few chat/detail screens */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d0c5b5;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b89b5e;
+}
+
+/* Interactive card subtle stroke on press */
+.interactive-card:active,
+.card-interaction:active {
+  box-shadow: inset 0 0 0 1px #b89b5e;
+}
+.card-interaction:active {
+  transform: scale(0.98);
+}
+.btn-press:active {
+  transform: scale(0.98);
+  border-color: #b89b5e;
+}
+
+/* Autofill + focus rings that match the premium aesthetic */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #fdf8f5 inset !important;
+  -webkit-text-fill-color: #1c1b1a !important;
+}
+
+/* Shared keyframes reused by a handful of screens (loading dots/waves,
+   bottom sheet slide-up, scrim fade-in, premium shimmer, map pulse) */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes wave {
+  0%,
+  100% {
+    height: 16px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 48px;
+    opacity: 1;
+  }
+}
+.animate-dot-1 {
+  animation: pulse-dot 1.5s infinite 0s;
+}
+.animate-dot-2 {
+  animation: pulse-dot 1.5s infinite 0.2s;
+}
+.animate-dot-3 {
+  animation: pulse-dot 1.5s infinite 0.4s;
+}
+.animate-dot-4 {
+  animation: pulse-dot 1.5s infinite 0.6s;
+}
+.animate-wave {
+  animation: wave 1.2s ease-in-out infinite;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

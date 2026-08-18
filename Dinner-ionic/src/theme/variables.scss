@@ -1,0 +1,46 @@
+/*
+ * Ionic CSS variables. The app's real visual design comes from the Tailwind
+ * tokens in tailwind.config.js (colors like "primary", "surface", etc. all
+ * map 1:1 to the Material-3-derived palette used across every screen of the
+ * original prototype). These Ionic variables are kept minimal, just enough
+ * so native Ionic overlays (alerts, action sheets, toasts) look consistent
+ * with the rest of the app if/when they're used.
+ */
+:root {
+  --ion-color-primary: #735b25;
+  --ion-color-primary-rgb: 115, 91, 37;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #654f21;
+  --ion-color-primary-tint: #816b3b;
+
+  --ion-color-secondary: #695d44;
+  --ion-color-secondary-rgb: 105, 93, 68;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #5c523c;
+  --ion-color-secondary-tint: #786e57;
+
+  --ion-color-tertiary: #5a614a;
+  --ion-color-tertiary-rgb: 90, 97, 74;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #4f5541;
+  --ion-color-tertiary-tint: #6b715c;
+
+  --ion-color-danger: #ba1a1a;
+  --ion-color-danger-rgb: 186, 26, 26;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #a41717;
+  --ion-color-danger-tint: #c23131;
+
+  --ion-background-color: #fdf8f5;
+  --ion-background-color-rgb: 253, 248, 245;
+  --ion-text-color: #1c1b1a;
+  --ion-text-color-rgb: 28, 27, 26;
+
+  --ion-toolbar-background: #fdf8f5;
+  --ion-item-background: #fdf8f5;
+  --ion-font-family: "Inter", sans-serif;
+}

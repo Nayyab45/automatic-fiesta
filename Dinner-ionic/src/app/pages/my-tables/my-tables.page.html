@@ -1,0 +1,115 @@
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md docked full-width top-0 sticky z-40 flat no shadows">
+<div class="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"><div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1 rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-[18px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-label-lg text-label-lg text-primary dark:text-primary-fixed-dim">Karachi, PK</span>
+</div></div>
+<div class="hover:opacity-80 transition-opacity cursor-pointer">
+<img alt="User profile photo" class="w-[40px] h-[40px] rounded-full object-cover border-2 border-surface-container-high" data-alt="A sophisticated, high-end portrait of an elegant individual enjoying a luxurious dining experience. The setting features subtle, warm ambient lighting typical of a high-end restaurant, emphasizing a refined and cultured aesthetic. Soft focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKEolhVX8Spy7skD3MPnHfojj17UHrTTheKzep5xCFLo152gIDC2p94CGQP5X_Eo1OV666Qgps_gl-ZKphcyjzqwQq-KnYxRg9E3-mMXywAQGdsVKwHPPYhDXF2YubWkGn6NFpQz8id4-GDXxy6PKxPwr65DzhNALPrmynFeivyR2l3mBqJvrgeZaBxd3Sm4h6QBM2y6h4m7ByoRN_tRIPFXSOg_9uJGpkhIFTnIrmPy0LnPGjm7wP"/>
+</div>
+</header>
+
+<main class="px-container-padding pt-stack-lg pb-section-gap max-w-4xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-stack-lg">Your dining plans</h1>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Upcoming</h2>
+<div class="flex flex-col gap-gutter">
+
+<div (click)="go('/dining-event-details')" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
+<div class="flex flex-col sm:flex-row">
+<div class="w-full sm:w-1/3 h-48 sm:h-auto">
+<img alt="Haveli Restaurant" class="w-full h-full object-cover border-r-[0.5px] border-surface-container-high" data-alt="A beautifully set dining table at a high-end Pakistani restaurant, featuring elegant tableware, subtle floral arrangements, and warm, inviting lighting. The atmosphere is sophisticated and ready for a luxurious Friday dinner." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1ls1xHTjidKxSUL3j4wNXc7fGEl9UzhtBTqfcxwq032LGWXTYQKfGPpPWg0_CQFYIXIwgy6KZqYrfQhUdOLpneH5WvZX2qA02kFgaTPdnZYYQ_a_srYQuVQcJBNh2lOfZIgHwK0p_pxuNzb5vm33ooQILl7HyCt1pYS7c5SVO3BROFStIr6mrkA9KU3FUCR0C6gXrPqbny-cIZgKNode48d-FrVYvznC_q6dF-rutk-joWOq0yUEq"/>
+</div>
+<div class="p-gutter flex flex-col justify-between flex-grow">
+<div>
+<div class="flex justify-between items-start mb-stack-sm">
+<span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">Friday Dinner</span>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm font-label-sm text-label-sm border border-primary-container">Confirmed</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-unit">Haveli Restaurant</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                    DHA Phase 6, Karachi
+                                </p>
+</div>
+<div class="flex items-center gap-gutter mt-stack-md pt-stack-md border-t-[0.5px] border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">schedule</span>
+<span class="font-body-lg text-body-lg text-on-surface">8:30 PM</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">group</span>
+<span class="font-body-lg text-body-lg text-on-surface">4 Guests</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Past</h2>
+<div class="flex flex-col gap-gutter opacity-80 hover:opacity-100 transition-opacity">
+
+<div (click)="go('/dining-event-details')" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
+<div class="p-gutter">
+<div class="flex justify-between items-start mb-stack-sm">
+<span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">Sunday Brunch</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">Oct 12, 2023</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Cafe Aylanto</h3>
+<div class="flex items-center gap-gutter mt-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">group</span>
+<span class="font-body-md text-body-md text-on-surface-variant">2 Guests</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">star</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Rated 5.0</span>
+</div>
+</div>
+</div>
+</div>
+
+<div (click)="go('/dining-event-details')" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
+<div class="p-gutter">
+<div class="flex justify-between items-start mb-stack-sm">
+<span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">Business Lunch</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">Sep 28, 2023</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Okra</h3>
+<div class="flex items-center gap-gutter mt-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">group</span>
+<span class="font-body-md text-body-md text-on-surface-variant">3 Guests</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<nav class="md:hidden bg-surface dark:bg-surface border-t border-outline-variant dark:border-outline shadow-sm fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface docked full-width bottom-0 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2" routerLink="/home">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined text-[24px]" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm mt-1">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 hover:text-primary transition-colors pb-2 scale-90 transition-transform duration-200" routerLink="/my-tables">
+<span class="material-symbols-outlined text-[24px]" data-icon="restaurant" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-label-sm text-label-sm mt-1">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2" routerLink="/messages">
+<span class="material-symbols-outlined text-[24px]" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-sm text-label-sm mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2" routerLink="/profile">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>

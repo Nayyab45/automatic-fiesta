@@ -1,0 +1,18 @@
+// Screen-specific styles for "Post-Dining Review", carried over from the
+// original prototype (Post Dinning Review.html). Shared rules live in src/global.scss.
+
+.star-rating .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            color: #d0c5b5; /* outline-variant */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .star-rating .material-symbols-outlined.active {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            color: #b89b5e; /* primary-container */
+        }
+        .chip-radio:checked + label {
+            border-color: #b89b5e;
+            background-color: rgba(184, 155, 94, 0.1);
+            color: #735b25;
+        }

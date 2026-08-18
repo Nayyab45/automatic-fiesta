@@ -1,0 +1,15 @@
+// Screen-specific styles for "Splash", carried over from the
+// original prototype (Splash Screen - Centered Action Mobile.html). Shared rules live in src/global.scss.
+
+.glass-panel {
+            background: rgba(252, 250, 245, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 216, 184, 0.4);
+        }
+        
+        html, body {
+            height: 100dvh;
+            margin: 0;
+            overflow: hidden;
+        }

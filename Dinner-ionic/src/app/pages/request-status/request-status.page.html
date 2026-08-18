@@ -1,0 +1,76 @@
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary-fixed-dim font-headline-md text-headline-md font-label-lg text-label-lg font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim docked full-width top-0 bg-surface dark:bg-surface flat no shadows flex justify-between items-center w-full px-container-padding py-stack-md sticky z-50">
+<div class="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-headline-md text-headline-md text-primary">Karachi, PK</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer border border-outline-variant/30">
+
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+</header>
+
+
+<main class="flex-grow px-container-padding pt-stack-lg pb-section-gap flex flex-col max-w-md mx-auto w-full">
+
+<div class="flex flex-col gap-stack-md text-center mt-section-gap mb-section-gap">
+<h1 class="font-display-lg text-display-lg text-on-background">Your seat is being considered.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px] mx-auto">Your request has been sent to the host.</p>
+</div>
+
+<div class="w-full aspect-video rounded-xl overflow-hidden relative mb-section-gap" style="box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.04);">
+<div class="w-full h-full bg-cover bg-center" data-alt="A beautifully set dining table in a high-end Pakistani restaurant, featuring elegant minimalist tableware, subtle warm lighting casting soft shadows on crisp linen, hinting at a luxurious and exclusive culinary experience. The color palette is warm, utilizing muted gold, cream, and deep charcoal, embodying a refined, modern editorial style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA3LRtAYM7RfoszwLHf6LqQT22o4FylinMyzjzszz9LeWJjO5_UUZiTatoR0rh-PAz9JhoZ09QaX0I9mKl0XuJ0QOFkOPPIhOIVvWn7F6vI0VjWjq-EAh1QDjZ0fyh2Z2SazEZGRLyUOdwAq3wJZLzM76ESCG3L_uu9h2rbArkgc4hovJIRPC9sXBUKJaUR5YuzM1ysT2QRTSMGJlB8NJOfqGpAJxamUKcknupi0GSnKol-SsHAimgF')"></div>
+
+<div class="absolute inset-0 border-[0.5px] border-on-background/5 rounded-xl pointer-events-none"></div>
+</div>
+
+<div class="flex flex-col gap-0 px-2 mt-4">
+
+<div class="flex gap-gutter relative min-h-[80px]">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-[18px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+
+<div class="w-[1.5px] h-full bg-primary-container absolute top-8 bottom-[-8px] left-[15px]"></div>
+</div>
+<div class="pb-stack-lg pt-1">
+<h3 class="font-title-lg text-title-lg text-on-background">Request Sent</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Details securely delivered to venue.</p>
+</div>
+</div>
+
+<div class="flex gap-gutter relative min-h-[80px]">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface border-[1.5px] border-primary flex items-center justify-center z-10">
+<div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
+</div>
+
+<div class="w-[1.5px] h-full absolute top-8 bottom-[-8px] left-[15px] border-l-[1.5px] border-dashed border-outline-variant"></div>
+</div>
+<div class="pb-stack-lg pt-1">
+<h3 class="font-title-lg text-title-lg text-on-background">Host Reviewing</h3>
+<p class="font-body-md text-body-md text-primary mt-1">Awaiting confirmation of availability.</p>
+</div>
+</div>
+
+<div class="flex gap-gutter relative min-h-[80px]">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface border-[1.5px] border-outline-variant flex items-center justify-center z-10">
+
+</div>
+</div>
+<div class="pt-1 opacity-50">
+<h3 class="font-title-lg text-title-lg text-on-background">Confirmed</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Table reserved for your party.</p>
+</div>
+</div>
+</div>
+
+
+<div class="mt-auto pt-section-gap pb-8">
+<button (click)="go('/dining-event-details')" class="w-full h-[48px] rounded-full border border-outline-variant text-on-background font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-surface-variant hover:border-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[18px]">restaurant</span>
+                View Table
+            </button>
+</div>
+</main>

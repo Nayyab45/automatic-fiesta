@@ -1,0 +1,92 @@
+<div class="absolute inset-0 z-0 select-none pointer-events-none filter blur-[4px] opacity-60">
+<div class="h-64 w-full" data-alt="A sophisticated, warmly lit interior of a high-end Pakistani restaurant in Karachi, featuring dark mahogany tables set with pristine white linen, sparkling crystal water glasses, and subtle ambient lighting from overhead modern chandeliers. The atmosphere is exclusive, serene, and inviting, captured with a shallow depth of field in a high-key, elegant style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApuTgkz_DQIbrkVptRSUKyhkOHYGP_PLNbeEPTJ6_eO-kPPJxUAgL32RAmYMuKjDsEEIz64xGK3zRp4qTKCXTV8eCL3sqeV7IO-UH0hAeO7q1H08it3Yj4NJi9nvE64CT7V46CHHOmTGuBlxKFGHBalfx9D6UgdVE_Kj4BO0F0WZk1kbJiKyyv4xThseek0CpQvAYFZUjxr6ApBLhLmg_Q4FSfRlkcEIdwnxYHXszjxJn9sovw8ng7')"></div>
+<div class="px-container-padding py-section-gap">
+<div class="w-2/3 h-8 bg-surface-variant rounded-md mb-stack-sm"></div>
+<div class="w-1/2 h-4 bg-surface-variant rounded-md mb-stack-lg"></div>
+<div class="w-full h-32 bg-surface-variant rounded-xl mb-section-gap"></div>
+<div class="w-full h-12 bg-primary-container rounded-full"></div>
+</div>
+</div>
+
+<div aria-hidden="true" class="fixed inset-0 z-40 bg-on-background/40 backdrop-blur-[5px] animate-fade-in"></div>
+
+<div aria-labelledby="bottom-sheet-title" aria-modal="true" class="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-[24px] shadow-[0_-4px_16px_rgba(0,0,0,0.04)] animate-slide-up flex flex-col max-h-[795px]" role="dialog">
+
+<div class="w-full flex justify-center pt-stack-sm pb-stack-sm cursor-grab">
+<div class="w-12 h-1.5 bg-surface-variant rounded-full"></div>
+</div>
+
+<div class="overflow-y-auto px-container-padding pb-section-gap">
+
+<div class="flex items-center justify-between mb-stack-lg pt-stack-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface" id="bottom-sheet-title">Join this table?</h2>
+<button (click)="goBack()" aria-label="Close" class="w-12 h-12 flex items-center justify-end text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+</div>
+
+<div class="bg-surface-container-lowest border-[0.5px] border-outline-variant/50 rounded-xl p-gutter mb-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
+<div class="flex items-start gap-gutter mb-stack-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A beautifully plated signature dish from a high-end restaurant, featuring delicately spiced grilled meat garnished with fresh herbs, resting on a pristine artisan ceramic plate. Soft, warm directional lighting highlights the textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26-OoGcWWVKhmP6SQhPKZIhqevYbR2aPHx1TLCemKJYXZ32E_mTuuN2f2aK8HrhG-AehzvG3BcV0Xoe3bu3-9wdn-sAfUvW7w1o281jPeRaGP27bsl6Zq6pB6IXyGpojysspAMdsQ3hN-42OrysYJwcEpqZN3ewsJB9y4o4wPKIbr_wyE4lk0kxlqGSQ84KeBMaK-TWWYEjd4UwK8fQcbGdInak8Z5rGpIliZXD4mhRT1x8Ibte8L"/>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Cafe Aylanto</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-unit">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                            Sat, 28 Oct • 8:30 PM
+                        </p>
+</div>
+</div>
+<div class="pt-stack-sm border-t-[0.5px] border-outline-variant/30 flex items-center gap-unit text-primary">
+<span class="material-symbols-outlined text-[18px]">chair</span>
+<span class="font-label-lg text-label-lg">2 seats available</span>
+</div>
+</div>
+
+<div class="mb-section-gap">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dining expectations</h3>
+<ul class="flex flex-col">
+
+<li class="flex items-start gap-gutter py-stack-md border-b-[0.5px] border-secondary-container">
+<div class="w-12 h-12 flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[24px]">payments</span>
+</div>
+<div class="flex flex-col justify-center min-h-[48px]">
+<span class="font-label-lg text-label-lg text-on-surface-variant mb-unit uppercase tracking-wider">Menu</span>
+<span class="font-body-lg text-body-lg text-on-surface">Individual payment</span>
+</div>
+</li>
+
+<li class="flex items-start gap-gutter py-stack-md border-b-[0.5px] border-secondary-container">
+<div class="w-12 h-12 flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[24px]">checkroom</span>
+</div>
+<div class="flex flex-col justify-center min-h-[48px]">
+<span class="font-label-lg text-label-lg text-on-surface-variant mb-unit uppercase tracking-wider">Dress</span>
+<span class="font-body-lg text-body-lg text-on-surface">Smart Casual</span>
+</div>
+</li>
+
+<li class="flex items-start gap-gutter py-stack-md">
+<div class="w-12 h-12 flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[24px]">how_to_reg</span>
+</div>
+<div class="flex flex-col justify-center min-h-[48px]">
+<span class="font-label-lg text-label-lg text-on-surface-variant mb-unit uppercase tracking-wider">Host approval</span>
+<span class="font-body-lg text-body-lg text-on-surface">Required</span>
+</div>
+</li>
+</ul>
+</div>
+
+<div class="mt-auto">
+<button (click)="go('/request-status')" class="w-full h-[48px] bg-primary-container text-white rounded-full font-label-lg text-label-lg uppercase tracking-wider hover:opacity-90 active:bg-surface-tint transition-all mb-stack-sm flex items-center justify-center">
+                    Send Request
+                </button>
+<p class="text-center font-body-md text-body-md text-on-surface-variant mt-stack-sm px-4">
+                    The host will review your profile before confirming.
+                </p>
+</div>
+</div>
+</div>

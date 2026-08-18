@@ -1,0 +1,18 @@
+// Screen-specific styles for "Privacy Policy", carried over from the
+// original prototype (Privacy Policy.html). Shared rules live in src/global.scss.
+
+body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Custom scrollbar for an elegant feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #d0c5b5; /* outline-variant */
+            border-radius: 10px;
+        }

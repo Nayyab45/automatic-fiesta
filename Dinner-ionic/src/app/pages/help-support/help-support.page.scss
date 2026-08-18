@@ -1,0 +1,25 @@
+// Screen-specific styles for "Help & Support", carried over from the
+// original prototype (Help And Support.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: #fdf8f5; /* surface */
+            color: #1c1b1a; /* on-surface */
+        }
+        /* Soft lift for cards as per guidelines */
+        .glass-card {
+            background-color: #ffffff; /* surface-container-lowest */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border-radius: 0.75rem; /* xl */
+        }
+        /* Input field bottom border style */
+        .input-bottom-line {
+            border: none;
+            border-bottom: 1px solid #e8d8b8; /* Light champagne */
+            background: transparent;
+            border-radius: 0;
+        }
+        .input-bottom-line:focus {
+            outline: none;
+            box-shadow: none;
+            border-bottom: 2px solid #b89b5e; /* Muted Gold */
+        }

@@ -1,0 +1,89 @@
+<div class="w-full max-w-md min-h-screen relative overflow-x-hidden pb-stack-lg">
+
+<header class="w-full top-0 sticky z-50 bg-surface dark:bg-background border-b-[0.5px] border-secondary-container dark:border-on-surface-variant flex justify-between items-center px-container-padding py-stack-sm h-16 shadow-none">
+<button (click)="goBack()" class="w-12 h-12 flex items-center justify-center -ml-2 text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim absolute left-1/2 transform -translate-x-1/2">Meal Check-in</h1>
+<div class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex items-center justify-center opacity-0 pointer-events-none">
+
+</div>
+</header>
+<main class="flex-1 w-full flex flex-col gap-stack-lg mt-unit">
+
+<section class="relative w-full">
+<div class="w-full h-[280px] bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A high-end, minimalist digital map view of Karachi's coastal area, specifically around Beach Avenue Phase 8 DHA. The map styling is premium, using warm beige and soft muted greens to represent landmasses, with thin, delicate Champagne-colored lines for roads. The ocean is a pale, calm cream. The overall aesthetic mimics a luxury travel publication. Lighting is soft and bright, light-mode style." data-location="Karachi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm90hqbdeoJUGGBebSgBQzVkTGXRqEMv96RMm-VVkxN2t8e2XTlHOaBDEVZlaR6TPz0ybpMFquc4FLO4L2yG_hB8k5GbezUSK3jV-AyK0eFC6BbuMwcFx3thIqjuZJ88UM0cFZZFNr2vl4EeGPfL0Cm5yL7npIDPc2Ep-DWe0QpB_Dqp4WAB5jBcTjW4U_Do7w41MGQO1KyYVdS3XshQw7oJ8n01Rtw-eFfP9IB4Mxw0cSQcx7HqjX"/>
+<div class="absolute inset-0 map-gradient"></div>
+
+<div class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce" style="animation-duration: 2s;">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 border-2 border-surface">
+<span class="material-symbols-outlined text-surface" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-primary/40 mt-1 blur-[2px]"></div>
+</div>
+</div>
+
+<div class="px-container-padding -mt-16 relative z-10">
+<div class="glass-card rounded-xl p-gutter flex flex-col gap-stack-sm relative">
+<div class="absolute inset-0 rounded-xl border border-secondary-container pointer-events-none"></div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Kolachi Restaurant</h2>
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] mt-0.5">location_on</span>
+<p class="font-body-md text-body-md">Beach Avenue, Phase 8, DHA, Karachi</p>
+</div>
+<div class="w-full h-[0.5px] bg-secondary-container my-1"></div>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<p class="font-label-lg text-label-lg">Meetup Tonight, 8:00 PM</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="px-container-padding flex flex-col items-center gap-stack-sm">
+<button (click)="go('/safety-center')" class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    I've Arrived — Check In
+                </button>
+<div class="flex items-center gap-1.5 mt-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Not checked in</span>
+</div>
+</section>
+
+<section class="px-container-padding flex flex-col gap-stack-md mt-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface font-playfair border-b-[0.5px] border-secondary-container pb-2">Emergency Options</h3>
+<div class="flex flex-col gap-gutter">
+<button (click)="go('/emergency-contacts')" class="w-full h-[48px] rounded-lg border border-error/50 text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
+<span class="material-symbols-outlined">contact_emergency</span>
+                        Alert Emergency Contact
+                    </button>
+<button class="w-full h-[48px] rounded-lg border border-error text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
+<span class="material-symbols-outlined">local_phone</span>
+                        Call for Help
+                    </button>
+</div>
+</section>
+
+<section class="px-container-padding">
+<div class="bg-surface-container-low rounded-lg p-gutter border border-secondary-container flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">security</span>
+<p class="font-body-md text-body-md text-on-surface-variant flex-1">Your check-in status is shared with your emergency contact for your safety.</p>
+</div>
+</section>
+
+<section class="px-container-padding mt-stack-sm">
+<button (click)="go('/safety-center')" class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined">logout</span>
+                    I've Left Safely — Check Out
+                </button>
+</section>
+
+<section class="px-container-padding pb-stack-lg flex justify-center text-center mt-auto pt-section-gap">
+<p class="font-label-sm text-label-sm text-outline-variant max-w-[250px]">
+                    Check-in data is private and only used for safety purposes.
+                </p>
+</section>
+</main>
+</div>

@@ -1,0 +1,9 @@
+// Screen-specific styles for "Full Community Policy", carried over from the
+// original prototype (Full Community Policy.html). Shared rules live in src/global.scss.
+
+.scrolling-content {
+            scroll-behavior: smooth;
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }

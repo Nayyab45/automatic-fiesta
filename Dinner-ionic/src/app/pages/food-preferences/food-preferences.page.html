@@ -1,0 +1,94 @@
+<div class="w-full max-w-md bg-surface min-h-screen flex flex-col shadow-sm border-x border-outline-variant/30">
+
+<header class="pt-16 pb-stack-lg px-container-padding text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-sm">What do you love to eat?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Choose your Pakistani food preferences.</p>
+</header>
+
+<main class="flex-grow px-container-padding overflow-y-auto pb-32">
+<form id="preferences-form">
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+                        Pakistani Favorites
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Biryani</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Karahi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Nihari</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Haleem</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">BBQ</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kebabs</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Handi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Qorma</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pulao</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Sajji</button>
+</div>
+</section>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">public</span>
+                        Regional
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Punjabi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Sindhi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Balochi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pashtun</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kashmiri</button>
+</div>
+</section>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">fastfood</span>
+                        Street Food
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Chaat</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Samosa</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pakora</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gol Gappay</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Bun Kebab</button>
+</div>
+</section>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cake</span>
+                        Desserts
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kheer</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gulab Jamun</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Jalebi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kulfi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gajar Ka Halwa</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Rabri</button>
+</div>
+</section>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">local_cafe</span>
+                        Drinks
+                    </h2>
+<div class="flex flex-wrap gap-2">
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Chai</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Doodh Patti</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kashmiri Chai</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Lassi</button>
+<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Falooda</button>
+</div>
+</section>
+</form>
+</main>
+
+<div class="fixed bottom-0 w-full max-w-md bg-surface border-t border-outline-variant/30 px-container-padding py-stack-md pb-8 z-50">
+<button (click)="go('/dietary-preferences')" class="w-full bg-primary-container text-on-primary font-title-lg text-title-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98]" type="button">
+                Continue
+            </button>
+</div>
+</div>

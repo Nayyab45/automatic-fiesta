@@ -1,0 +1,11 @@
+// Screen-specific styles for "Login", carried over from the
+// original prototype (Login.html). Shared rules live in src/global.scss.
+
+/* Custom styles for autofill and focus rings to match the premium aesthetic */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #fdf8f5 inset !important;
+            -webkit-text-fill-color: #1c1b1a !important;
+        }

@@ -1,0 +1,93 @@
+<header class="bg-background w-full top-0 sticky z-40 flex items-center px-container-padding py-stack-md pt-8">
+<button (click)="goBack()" aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary mx-auto pr-8">Report Sami Khan</h1>
+</header>
+<main class="flex-grow px-container-padding pb-32">
+
+<div class="flex items-center gap-4 mb-stack-lg bg-surface-container-low rounded-xl p-4 shadow-[0_4px_16px_0_rgba(0,0,0,0.04)]">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small, soft-focus profile picture of a young South Asian man with dark hair, smiling warmly in a well-lit cafe setting. The image is cropped in a perfect circle, matching the high-end, bright editorial aesthetic of the What Should We Eat social dining app, featuring subtle gold tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPtXCch5tQV_z1fXi4ySGJO-4b9RRa_hotzT0QQLleyB7DXZ91utLkM4iYSdX_bmybHr2zBgU-H0ik3AsIfLZJJUcZtPxID4dpcev6F0OGJyknhdoKRoy-OKAJ89qKJVoGDpFzMGRe5BbBGvtVMc79UWGifkRCaZlVuqeT4d7uiGGkkU0wCdUCGaRCb4JjVUgAHMcQrNVWl2uU_1dEjNeMUqry17EuYJGqz6i0tDqmmPRWodqZ2oLL"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant">Reporting Profile</p>
+<p class="font-title-lg text-title-lg text-on-surface">Sami Khan</p>
+</div>
+</div>
+
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Why are you reporting this user?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg">Your report is anonymous. If you are in immediate danger, please contact local authorities.</p>
+
+<div class="flex flex-col gap-stack-sm mb-section-gap">
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Inappropriate behavior or messages</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Harassment or threats</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Fake profile / impersonation</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Solicitation or scam</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">No-show without notice</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Made me feel unsafe</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="sr-only peer" id="other-reason" name="report_reason" type="radio"/>
+<div class="flex items-center p-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 shadow-sm peer-checked:bg-primary-container peer-checked:text-on-primary peer-checked:border-primary-container">
+<span class="font-body-lg text-body-lg">Other</span>
+</div>
+</label>
+</div>
+
+<div class="mb-section-gap">
+<label class="block font-title-lg text-title-lg mb-stack-sm text-on-surface" for="details">Add more details <span class="font-body-md text-on-surface-variant font-normal">(optional)</span></label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-colors resize-none shadow-inner" id="details" placeholder="Please provide any specific information that might help our review..." rows="4"></textarea>
+</div>
+
+<div class="flex items-start justify-between bg-surface-container-low p-4 rounded-xl mb-section-gap shadow-[0_4px_16px_0_rgba(0,0,0,0.04)]">
+<div class="pr-4">
+<h3 class="font-title-lg text-title-lg text-error">Also block this user</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">They won't be able to see your profile, send messages, or request dining with you.</p>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in mt-1">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-outline-variant appearance-none cursor-pointer transition-all duration-300 z-10 top-0 left-0 checked:left-6 checked:border-primary-container peer" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 peer-checked:bg-error" for="toggle"></label>
+</div>
+</div>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-6 flex flex-col gap-4 shadow-[0_-4px_24px_0_rgba(0,0,0,0.06)] z-50">
+<div class="flex items-center justify-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span class="font-label-sm text-label-sm">Reports are confidential. Our team reviews all reports within 24 hours.</span>
+</div>
+<button (click)="goBack()" class="w-full bg-primary-container text-on-primary h-12 rounded-full font-label-lg text-label-lg flex items-center justify-center shadow-md active:scale-95 active:bg-error transition-all">
+            Submit Report
+        </button>
+<button (click)="goBack()" class="w-full text-on-surface-variant h-10 rounded-full font-label-lg text-label-lg flex items-center justify-center hover:bg-surface-variant/50 transition-colors">
+            Cancel
+        </button>
+</div>

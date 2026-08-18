@@ -1,0 +1,19 @@
+// Screen-specific styles for "Food Preferences", carried over from the
+// original prototype (Food Preferences.html). Shared rules live in src/global.scss.
+
+.chip-default {
+            border: 1px solid theme('colors.outline-variant');
+            background-color: transparent;
+            color: theme('colors.on-surface-variant');
+            transition: all 0.3s ease;
+        }
+        .chip-selected {
+            border: 1px solid theme('colors.primary');
+            background-color: rgba(115, 91, 37, 0.1);
+            color: theme('colors.primary');
+            transition: all 0.3s ease;
+        }
+        .chip-default:active {
+            border-color: theme('colors.primary-container');
+            background-color: theme('colors.surface-container-high');
+        }

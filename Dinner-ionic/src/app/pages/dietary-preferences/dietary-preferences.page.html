@@ -1,0 +1,57 @@
+<header class="flex items-center px-container-padding py-stack-md bg-surface z-10 sticky top-0">
+<button (click)="goBack()" class="w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low rounded-full transition-colors -ml-3">
+<span class="material-symbols-outlined" data-icon="arrow_back" data-weight="regular">arrow_back</span>
+</button>
+<div class="flex-1 flex justify-center">
+<span class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-widest">Step 4 of 5</span>
+</div>
+<div class="w-12 h-12"></div> 
+</header>
+
+<main class="flex-1 px-container-padding py-stack-md flex flex-col overflow-y-auto pb-32">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-sm mt-stack-md">Anything we should know?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-section-gap">Select your dietary preferences to help us tailor your dining experience.</p>
+
+<section class="mb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dietary Needs</h2>
+<div class="flex flex-wrap gap-3">
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">No Preference</button>
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">Vegetarian</button>
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">Halal</button>
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">No Beef</button>
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">No Mutton</button>
+<button (click)="toggleClass($event, 'chip-selected')" class="chip preference-chip px-5 py-3 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md transition-all active:scale-95">No Dairy</button>
+</div>
+</section>
+
+<section class="mb-section-gap">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Spice Tolerance</h2>
+<div class="flex flex-col gap-unit">
+<button (click)="selectSpice($event)" class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98">
+<span class="font-body-lg text-body-lg text-on-surface">No Spicy Food</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button (click)="selectSpice($event)" class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98">
+<span class="font-body-lg text-body-lg text-on-surface">Mild Spice</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button (click)="selectSpice($event)" class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98">
+<span class="font-body-lg text-body-lg text-on-surface">Medium Spice</span>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button (click)="selectSpice($event)" class="spice-level-btn flex items-center justify-between p-stack-md rounded-xl border border-outline-variant bg-surface transition-all active:scale-98">
+<div class="flex items-center gap-2">
+<span class="font-body-lg text-body-lg text-on-surface">Extra Spicy</span>
+<span class="material-symbols-outlined text-error text-[18px]">local_fire_department</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant check-icon hidden" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+</div>
+</section>
+</main>
+
+<div class="fixed bottom-0 left-0 w-full md:max-w-md md:left-1/2 md:-translate-x-1/2 bg-surface border-t border-surface-container py-stack-md px-container-padding pb-safe shadow-[0_-4px_16px_rgba(0,0,0,0.02)] z-20">
+<button (click)="go('/home')" class="w-full bg-primary-container text-on-primary py-4 rounded-full font-label-lg text-label-lg uppercase tracking-widest hover:opacity-90 hover:shadow-md active:scale-95 transition-all shadow-[0_4px_16px_rgba(184,155,94,0.2)] cursor-pointer">
+            Continue
+        </button>
+</div>

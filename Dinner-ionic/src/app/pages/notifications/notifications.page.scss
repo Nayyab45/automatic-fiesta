@@ -1,0 +1,7 @@
+// Screen-specific styles for "Notifications", carried over from the
+// original prototype (Notifications.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }

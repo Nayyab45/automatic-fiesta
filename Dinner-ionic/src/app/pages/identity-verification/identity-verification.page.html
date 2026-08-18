@@ -1,0 +1,74 @@
+<div class="w-full max-w-md bg-surface min-h-screen relative overflow-hidden flex flex-col md:shadow-2xl md:border md:border-outline-variant/30">
+
+<header class="bg-surface w-full top-0 sticky z-40 border-b-[0.5px] border-outline-variant flat no shadows flex justify-between items-center px-container-padding py-stack-sm h-16">
+<button (click)="goBack()" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform p-2 -ml-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Verification</h1>
+</header>
+
+<main class="flex-1 px-container-padding py-stack-lg flex flex-col gap-stack-lg overflow-y-auto">
+
+<div class="flex flex-col items-center justify-center text-center mt-stack-md mb-stack-sm">
+<div class="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center mb-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] relative">
+<span class="material-symbols-outlined text-outline text-[48px]" data-icon="shield_person" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-unit">Not Verified</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">We need to verify your identity to ensure a safe dining community.</p>
+</div>
+
+<div class="bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-stack-md border border-outline-variant/50">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-stack-md">Verification Steps</h3>
+<ul class="flex flex-col">
+<li class="flex items-start gap-stack-md py-stack-sm relative group">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant z-10 border border-outline-variant/30 group-hover:border-primary-container transition-colors">
+<span class="font-label-lg text-label-lg">1</span>
+</div>
+<div class="flex-col pt-1 pb-stack-sm w-full border-b-[0.5px] border-secondary-container">
+<span class="font-body-lg text-body-lg text-on-surface block">Upload government ID</span>
+</div>
+</li>
+<li class="flex items-start gap-stack-md py-stack-sm relative group">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant z-10 border border-outline-variant/30 group-hover:border-primary-container transition-colors">
+<span class="font-label-lg text-label-lg">2</span>
+</div>
+<div class="flex-col pt-1 pb-stack-sm w-full border-b-[0.5px] border-secondary-container">
+<span class="font-body-lg text-body-lg text-on-surface block">Take a selfie for face match</span>
+</div>
+</li>
+<li class="flex items-start gap-stack-md py-stack-sm relative group">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant z-10 border border-outline-variant/30 group-hover:border-primary-container transition-colors">
+<span class="font-label-lg text-label-lg">3</span>
+</div>
+<div class="flex-col pt-1 pb-stack-sm w-full">
+<span class="font-body-lg text-body-lg text-on-surface block">Submit for review</span>
+</div>
+</li>
+</ul>
+</div>
+
+<div class="flex justify-center items-center gap-stack-md text-on-surface-variant/70 mt-stack-sm">
+<div class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-[16px]" data-icon="lock">lock</span>
+<span class="font-label-sm text-label-sm">Secure</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<div class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-[16px]" data-icon="visibility_off">visibility_off</span>
+<span class="font-label-sm text-label-sm">Private</span>
+</div>
+</div>
+<div class="flex-1"></div> 
+</main>
+
+<footer class="px-container-padding pb-stack-lg pt-stack-sm bg-surface/90 backdrop-blur-md border-t-[0.5px] border-outline-variant/30 fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 z-50">
+<button class="w-full bg-primary-container text-on-primary h-[48px] rounded-lg font-label-lg text-label-lg shadow-sm hover:opacity-90 active:border active:border-primary transition-all flex items-center justify-center mb-stack-sm">
+                Start Verification
+            </button>
+<p class="text-center font-body-md text-body-md text-on-surface-variant/80 text-[12px] leading-relaxed">
+                Verification usually takes 24–48 hours
+            </p>
+</footer>
+
+<div class="h-[120px] w-full shrink-0"></div>
+</div>

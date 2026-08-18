@@ -1,0 +1,142 @@
+<header class="md:hidden flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface sticky top-0 z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">Karachi, PK</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A small, circular profile picture of an elegant South Asian man with short dark hair, wearing a crisp white button-down shirt, softly lit in a warm, sophisticated setting. The aesthetic is high-end, premium lifestyle." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgmLMdnbkQBCQmIUDSlGgsvlPJYWm2tF6moUpVQflT6gyp6B4IN2szNQMWd72ry7Oxkp_d32vq46QZlBTq3S6YQ_0BLuN_XEA0Yp73IcjMaThK1wKMwuRkf6_SJhUun9F0ZSKHZN_e20hUVwqDR1FiH_E2dMDTLXU24b8AWTw9tSlhpPqXLC1MUfDDnvYayLOqT1nqBR8_EDiRnVJnkU8Yj_NN6WYViR8Wh2Etk_fWdcXbsb0FgtPt"/>
+</div>
+</header>
+
+<main class="flex-1 w-full max-w-md mx-auto px-container-padding pt-stack-sm pb-section-gap flex flex-col gap-section-gap md:max-w-4xl md:grid md:grid-cols-4 md:gap-gutter">
+
+<section class="col-span-4 flex flex-col gap-unit">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Good evening, Ahmed</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Where will you dine tonight?</p>
+</section>
+
+<section class="col-span-4 flex flex-col gap-stack-md">
+<div class="flex justify-between items-end">
+<h2 class="font-title-lg text-title-lg text-on-surface">Tonight's Tables</h2>
+<a (click)="go('/my-tables')" class="font-label-lg text-label-lg text-primary uppercase tracking-widest hover:opacity-80 transition-opacity">View All</a>
+</div>
+
+<div class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col">
+
+<div class="w-full h-48 relative border-b-[0.5px] border-outline-variant">
+<img alt="Karahi" class="w-full h-full object-cover" data-alt="A beautifully plated serving of traditional Pakistani Karahi in an authentic copper wok, resting on a polished dark wood table. Warm, low-key lighting highlights the rich spices and fresh cilantro garnish, creating a premium, inviting culinary atmosphere suitable for a luxury dining app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiBPDgMsJuovrK_CfetabF4cpyHMosKPtDmqGpTXPtpf46rJ-VHSxMr-tDPTLjgM1W907MUkVtFKFibr-acyJKJ7bmqlxAjLpBaLABF-w-m5EXlQ6FwJm9_6aC_o5KhnzdPTncRwt9joxW6VMPgao_nnaH6HDvXkZdJ4x0Zm13Aa5Nf0WDHRVattzSv-LG5HtB9TzuaLXwvEheAikHAEXwQUWJM74gvHkIm0Fn4l3AYNTsxGR8rhXY"/>
+
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-stack-md left-stack-md right-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-primary">Karahi &amp; Conversations</h3>
+</div>
+</div>
+
+<div class="p-stack-md flex flex-col gap-stack-sm bg-surface">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">restaurant</span>
+<span class="font-body-md text-body-md font-medium">The Desi Table</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-md text-body-md">DHA Lahore</span>
+</div>
+<div class="flex justify-between items-center mt-unit">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-body-md text-body-md font-medium">8:00 PM</span>
+</div>
+<div class="px-2 py-1 bg-tertiary/10 rounded text-tertiary font-label-sm text-label-sm uppercase">
+                            2 seats remaining
+                        </div>
+</div>
+<div class="mt-stack-md w-full pt-stack-sm border-t-[0.5px] border-[#E8D8B8]">
+<button (click)="go('/dining-event-details')" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg uppercase tracking-widest py-3 rounded-lg hover:opacity-90 transition-opacity">
+                            View Table
+                        </button>
+</div>
+</div>
+</div>
+</section>
+
+<section class="col-span-4 flex flex-col gap-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">People You May Enjoy Dining With</h2>
+
+<div class="flex overflow-x-auto no-scrollbar gap-stack-md pb-stack-sm -mx-container-padding px-container-padding md:mx-0 md:px-0">
+
+<div class="flex-none w-64 rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant p-stack-md flex flex-col gap-stack-sm interactive-card">
+<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-outline-variant">
+<img alt="Sara Ahmed" class="w-full h-full object-cover" data-alt="A portrait of an elegant young South Asian woman, a professional architect, smiling warmly. She is wearing sophisticated, modern modest attire. The background is slightly blurred, showing a modern interior. The lighting is soft and flattering, fitting a premium networking aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCywtRf0cnDQbB8HrAMbUiHeSy-07mcp7hJ7Z0Sbe59VxFAMow9NvpXYq0fX0rzW-rDqRfUJaOGR2rj-dp7966PyiqbikEWB6lKZzH671U-FKU1ckNfXZ9pnXO9BaGgN_uWengXFEsQVPGJ0v8XjtdV2124xx9siZQP-Xes0_zd5gD5yGNeLQ6O3EasGWg0yPOvzIL3nkJVZcd6CVfzXxbgQ_aEFazJmEzblpEScJYDNycaClbntu79"/>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-lg text-body-lg font-medium text-on-surface">Sara Ahmed</h3>
+<span class="font-body-md text-body-md text-on-surface-variant">Architect</span>
+</div>
+</div>
+<div class="flex flex-col gap-unit mt-unit">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Interests</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded">Karahi</span>
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded">Chai</span>
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded">BBQ</span>
+</div>
+</div>
+<div class="mt-auto pt-stack-sm flex justify-between items-center">
+<span class="font-label-lg text-label-lg text-primary font-bold">91% Match</span>
+<button class="w-8 h-8 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+
+<div class="flex-none w-64 rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant p-stack-md flex flex-col gap-stack-sm interactive-card">
+<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-outline-variant">
+<img alt="Tariq Khan" class="w-full h-full object-cover" data-alt="A portrait of an distinguished older South Asian gentleman with a neat beard, wearing a tailored linen jacket. He looks approachable and cultured. Soft, natural light illuminates his face against a minimalist, warm-toned background, suitable for a luxury concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAou0ylUvf9ML--gKqwz7shsjqF_yBhcHv5u1QNgPlki6KhGOVbu8BksPBEOaWsBIPuno9ayIRUzA8-k8R552QHk5zzmK0p64YecybS2i7ZGESg37251e2QPLzfqL0fCQ965lxy0mUUQXJGflM5hhOiVsvtgP7Vf2wDJGHK2f1jWY3fBgsfTeiHm5JX3NPaxpcZEb5mGuIBX1EmS1zihGLEaLboglo3ULRSlezJTWGWNTBVuWip5VEP"/>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-lg text-body-lg font-medium text-on-surface">Tariq Khan</h3>
+<span class="font-body-md text-body-md text-on-surface-variant">Art Curator</span>
+</div>
+</div>
+<div class="flex flex-col gap-unit mt-unit">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Interests</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded">Peshawari</span>
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded">Fine Dining</span>
+</div>
+</div>
+<div class="mt-auto pt-stack-sm flex justify-between items-center">
+<span class="font-label-lg text-label-lg text-primary font-bold">85% Match</span>
+<button class="w-8 h-8 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant shadow-sm rounded-t-xl h-[72px]">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 w-16 h-full hover:opacity-80 transition-opacity active:scale-90 duration-200" routerLink="/home">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 h-full hover:text-primary transition-colors" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-sm text-label-sm">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 h-full hover:text-primary transition-colors" routerLink="/my-tables">
+<span class="material-symbols-outlined mb-1">restaurant</span>
+<span class="font-label-sm text-label-sm">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 h-full hover:text-primary transition-colors" routerLink="/messages">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 h-full hover:text-primary transition-colors" routerLink="/profile">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>

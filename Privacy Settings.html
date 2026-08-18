@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Privacy Settings - What Should We Eat?</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#1c1b1a",
+                        "on-primary-container": "#463300",
+                        "on-tertiary-container": "#313824",
+                        "on-primary-fixed-variant": "#59440f",
+                        "on-secondary-fixed": "#221b07",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e6e2de",
+                        "inverse-primary": "#e2c382",
+                        "primary": "#735b25",
+                        "tertiary": "#5a614a",
+                        "on-surface-variant": "#4d463a",
+                        "surface-bright": "#fdf8f5",
+                        "inverse-surface": "#31302e",
+                        "outline-variant": "#d0c5b5",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#171e0b",
+                        "primary-container": "#b89b5e",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#9aa287",
+                        "surface-container-low": "#f7f3ef",
+                        "on-background": "#1c1b1a",
+                        "surface": "#fdf8f5",
+                        "primary-fixed-dim": "#e2c382",
+                        "surface-container": "#f1ede9",
+                        "surface-tint": "#735b25",
+                        "surface-variant": "#e6e2de",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "primary-fixed": "#ffdf9e",
+                        "on-primary-fixed": "#261a00",
+                        "background": "#fdf8f5",
+                        "secondary-container": "#f1e1c0",
+                        "surface-dim": "#ddd9d6",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ece7e4",
+                        "error": "#ba1a1a",
+                        "secondary": "#695d44",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f4f0ec",
+                        "outline": "#7e7668",
+                        "on-secondary-container": "#6f6349",
+                        "on-tertiary-fixed-variant": "#424a34"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "section-gap": "48px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "container-padding": "24px"
+                    },
+                    fontFamily: {
+                        "label-lg": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "label-lg": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "title-lg": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "600" }],
+                        "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.02em", fontWeight: "500" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        /* Ambient shadow for cards */
+        .ambient-shadow {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg antialiased min-h-screen flex flex-col items-center">
+<!-- Mobile Container -->
+<div class="w-full max-w-md min-h-screen bg-surface flex flex-col relative pb-safe">
+<!-- TopAppBar (Customized for sub-page intent, suppressing global nav) -->
+<header class="w-full top-0 sticky bg-surface z-50 flex justify-between items-center px-container-padding py-stack-sm border-b-[0.5px] border-outline-variant">
+<button aria-label="Go back" class="text-on-surface hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center w-12 h-12 -ml-3 rounded-full">
+<span class="material-symbols-outlined text-[24px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">Privacy</h1>
+<div class="w-12 h-12 flex items-center justify-center -mr-3">
+<img alt="What Should We Eat Logo" class="w-8 h-8 object-contain opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFzjnWwD_7ltVKHcAph4bX2dqlhrE613bbBaL4Uw2Sqi7FqRs04HP3C6iYX1Z5vX7dPD036chJPObjxGbA1doeLPgDelAWdoBbVVV0M5-6YBKG2CPSO4c1zN1NV9jrdnqSmYTMvYJZdQx5Ra1-NfQPuKbjRpL5HVTuxtR8GwM1KacSz4No4ZQwfEfBzuym-tF7QaqRQU6W1MLiXMCOrUo1NoWsQN48qr_Tu77yie7wbc12IJ08rQmAdDc0269cZ6vFsA"/>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-container-padding py-section-gap flex flex-col gap-stack-lg">
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px]">
+                Control what information you share with the community and dining establishments.
+            </p>
+<!-- Visibility Section -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-title-lg text-title-lg text-primary">Visibility</h2>
+<div class="bg-surface-container-lowest rounded-xl ambient-shadow border border-outline-variant/30 flex flex-col overflow-hidden">
+<!-- Toggle Item 1 -->
+<div class="flex justify-between items-center px-gutter py-4 border-b border-outline-variant/30">
+<div class="flex flex-col pr-4">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Show my profile to nearby users</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">Allow others to invite you to dining tables.</span>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0 z-10" id="toggle1" name="toggle1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle1"></label>
+</div>
+</div>
+<!-- Toggle Item 2 -->
+<div class="flex justify-between items-center px-gutter py-4 border-b border-outline-variant/30">
+<div class="flex flex-col pr-4">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Show mutual interests</span>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0 z-10" id="toggle2" name="toggle2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle2"></label>
+</div>
+</div>
+<!-- Toggle Item 3 -->
+<div class="flex justify-between items-center px-gutter py-4 border-b border-outline-variant/30">
+<div class="flex flex-col pr-4">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Show online status</span>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0 z-10" id="toggle3" name="toggle3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle3"></label>
+</div>
+</div>
+<!-- Toggle Item 4 -->
+<div class="flex justify-between items-center px-gutter py-4">
+<div class="flex flex-col pr-4">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Profile View History</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">Allow others to see when I've viewed their profile.</span>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0 z-10" id="toggle4" name="toggle4" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle4"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Location Section -->
+<section class="flex flex-col gap-stack-md mt-4">
+<h2 class="font-title-lg text-title-lg text-primary">Location</h2>
+<div class="bg-surface-container-lowest rounded-xl ambient-shadow border border-outline-variant/30 p-gutter flex flex-col gap-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-1" data-icon="location_on">location_on</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Location sharing precision</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">Determine how accurately restaurants and nearby diners can see your location.</span>
+</div>
+</div>
+<div class="relative mt-2">
+<select class="w-full appearance-none bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-4 pr-10 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors">
+<option value="approximate">Approximate (Recommended)</option>
+<option value="exact">Exact</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</section>
+<div class="mt-8 flex justify-center">
+<button class="bg-primary-container text-on-primary rounded-full px-8 py-3 font-label-lg text-label-lg w-full max-w-[200px] hover:opacity-90 active:scale-[0.98] transition-all">
+                    Save Changes
+                </button>
+</div>
+</main>
+</div>
+</body></html>

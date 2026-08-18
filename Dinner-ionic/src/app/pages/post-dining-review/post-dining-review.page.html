@@ -1,0 +1,95 @@
+<main class="w-full max-w-md bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden border border-surface-container-high relative">
+
+<header class="flex items-center justify-between px-container-padding py-stack-md border-b border-surface-container-high">
+<button (click)="goBack()" aria-label="Close" class="text-on-surface-variant hover:opacity-80 transition-opacity" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="font-label-lg text-label-lg text-on-surface tracking-widest uppercase">Feedback</h1>
+<div class="w-6"></div> 
+</header>
+
+<div class="px-container-padding py-stack-lg flex flex-col gap-section-gap">
+
+<section class="text-center">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-sm">How was your table?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your insights curate the Dastarkhān experience.</p>
+</section>
+
+<section class="flex flex-col gap-stack-md">
+
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Food</span>
+<div class="star-rating flex gap-unit" data-category="food">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Restaurant</span>
+<div class="star-rating flex gap-unit" data-category="restaurant">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50">
+<span class="font-body-lg text-body-lg text-on-surface">Conversation</span>
+<div class="star-rating flex gap-unit" data-category="conversation">
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+<span class="material-symbols-outlined text-2xl">star</span>
+</div>
+</div>
+
+<div class="flex items-center justify-between pb-stack-sm border-b border-surface-variant/50 mt-stack-sm">
+<span class="font-title-lg text-title-lg text-primary">Overall experience</span>
+<div class="star-rating flex gap-unit" data-category="overall">
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+<span class="material-symbols-outlined text-3xl">star</span>
+</div>
+</div>
+</section>
+
+<section class="flex flex-col gap-stack-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Would you dine with this group again?</h3>
+<div class="flex gap-gutter">
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-yes" name="dine-again" type="radio" value="yes"/>
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-yes">Yes</label>
+</div>
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-maybe" name="dine-again" type="radio" value="maybe"/>
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-maybe">Maybe</label>
+</div>
+<div class="flex-1">
+<input class="chip-radio hidden" id="dine-no" name="dine-again" type="radio" value="no"/>
+<label class="block w-full text-center py-stack-sm px-container-padding rounded-full border border-outline-variant font-label-lg text-label-lg text-on-surface-variant cursor-pointer transition-colors duration-200" for="dine-no">No</label>
+</div>
+</div>
+</section>
+
+<section class="flex flex-col gap-stack-sm">
+<label class="font-body-lg text-body-lg text-on-surface sr-only" for="review-text">Share your experience</label>
+<textarea class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container focus:ring-0 resize-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 p-2 transition-colors" id="review-text" placeholder="Share your experience..." rows="4"></textarea>
+</section>
+</div>
+
+<div class="px-container-padding py-stack-md bg-surface border-t border-surface-container-high sticky bottom-0">
+<button (click)="go('/my-tables')" class="w-full py-stack-md bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2" type="button">
+                Submit Review
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'wght' 300;">arrow_forward</span>
+</button>
+</div>
+</main>

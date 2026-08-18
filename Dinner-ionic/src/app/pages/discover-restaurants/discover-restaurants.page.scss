@@ -1,0 +1,9 @@
+// Screen-specific styles for "Discover Restaurants", carried over from the
+// original prototype (Discover Resturant.html). Shared rules live in src/global.scss.
+
+.card-shadow {
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+        }
+        .chip-bg {
+            background-color: rgba(138, 146, 120, 0.1);
+        }

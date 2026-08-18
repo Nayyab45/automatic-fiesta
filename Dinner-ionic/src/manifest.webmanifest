@@ -1,0 +1,11 @@
+{
+  "name": "Dastarkhān - What Should We Eat?",
+  "short_name": "Dastarkhān",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf8f5",
+  "theme_color": "#735b25",
+  "icons": [
+    { "src": "assets/icon/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
