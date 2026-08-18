@@ -1,13 +1,15 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Welcome - Value Proposition</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com" rel="preconnect">
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
           darkMode: "class",
@@ -203,77 +205,22 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+</head>
 <body class="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-hidden antialiased">
-<!-- Decorative Background Elements -->
-<div class="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary-container opacity-5 rounded-full blur-[100px] pointer-events-none z-0"></div>
-<div class="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-tertiary opacity-5 rounded-full blur-[80px] pointer-events-none z-0"></div>
-<main class="flex-grow flex flex-col px-container-padding pt-stack-lg pb-section-gap md:max-w-md md:mx-auto w-full relative z-10 h-screen justify-between">
-<!-- Top Section: Visual & Header -->
-<div class="flex flex-col gap-stack-lg animate-[fadeIn_0.8s_ease-out]">
-<!-- Hero Image Placeholder (Bento Style) -->
-<div class="w-full aspect-[4/3] rounded-2xl overflow-hidden relative shadow-sm border border-outline-variant/30">
-<div class="bg-cover bg-center w-full h-full transform transition-transform hover:scale-105 duration-700" data-alt="A sophisticated top-down view of a beautifully set dining table featuring authentic Pakistani cuisine, such as delicate biryani and fresh naan, arranged on elegant minimalist ceramic plates. The lighting is warm, natural, and inviting, creating a high-end editorial aesthetic. The color palette emphasizes rich earthy tones against a pristine white linen tablecloth, conveying a premium culinary experience." style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAipUcDvJ7GsNBNYH-3oCFtC1Le1BvD7FPpKa2X0n108HQlFYUECXQspStm2tCtMVcabPNwjMZA9Mxq7BLYyqDVftF_LzhjS1PaScaHeeAKmIW-qT3_JUPL2hxO4O5yCLwugWUh5bRJUw9FQAGOdOkO4n5DO3BOiZVltqgDG1TQBuhlxfYKZCYgJG0bXP1diKVr55WdbUj9lCxGoOS7DURPtYFO9DNDps3rzqX0Ys_ClWURnGV7GFeeVJW55nTb3bGaCw&quot;);"></div>
-<!-- Subtle overlay to ensure text contrast if added later, or just for atmospheric depth -->
-<div class="absolute inset-0 bg-gradient-to-t from-surface/80 via-transparent to-transparent"></div>
+<main class="flex-grow flex flex-col w-full h-screen relative z-10 md:max-w-md md:mx-auto bg-surface">
+<!-- Top Section: Visual Full Bleed -->
+<div class="w-full h-[65%] relative animate-[fadeIn_0.8s_ease-out] overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transform transition-transform hover:scale-105 duration-700" data-alt="A sophisticated top-down view of a beautifully set dining table featuring authentic Pakistani cuisine" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAipUcDvJ7GsNBNYH-3oCFtC1Le1BvD7FPpKa2X0n108HQlFYUECXQspStm2tCtMVcabPNwjMZA9Mxq7BLYyqDVftF_LzhjS1PaScaHeeAKmIW-qT3_JUPL2hxO4O5yCLwugWUh5bRJUw9FQAGOdOkO4n5DO3BOiZVltqgDG1TQBuhlxfYKZCYgJG0bXP1diKVr55WdbUj9lCxGoOS7DURPtYFO9DNDps3rzqX0Ys_ClWURnGV7GFeeVJW55nTb3bGaCw");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
 </div>
 <!-- Typography -->
-<div class="flex flex-col gap-stack-sm text-center px-4">
+<div class="flex flex-col justify-center h-[35%] gap-stack-md text-center px-container-padding pb-section-gap relative z-20 animate-[fadeIn_1s_ease-out]">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">
                     Your next meal could introduce you to someone new.
                 </h1>
 <p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-[280px] mx-auto">
                     Discover great Pakistani food and meet people who enjoy sharing the table.
                 </p>
-</div>
-</div>
-<!-- Middle Section: Value Props -->
-<div class="flex flex-col gap-stack-md mt-stack-lg">
-<!-- Prop 1: Discover -->
-<div class="glass-card rounded-xl p-stack-md flex items-center gap-stack-md transform transition-all hover:translate-y-[-2px] hover:shadow-md">
-<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary-container border border-outline-variant/20">
-<span class="material-symbols-outlined icon-fill text-2xl" data-icon="restaurant">restaurant</span>
-</div>
-<div class="flex flex-col">
-<span class="font-title-lg text-[16px] leading-[24px] text-on-surface">Discover</span>
-<span class="font-body-md text-body-md text-on-surface-variant">Curated Pakistani restaurants.</span>
-</div>
-</div>
-<!-- Prop 2: Connect -->
-<div class="glass-card rounded-xl p-stack-md flex items-center gap-stack-md transform transition-all hover:translate-y-[-2px] hover:shadow-md">
-<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary-container border border-outline-variant/20">
-<span class="material-symbols-outlined icon-fill text-2xl" data-icon="group">group</span>
-</div>
-<div class="flex flex-col">
-<span class="font-title-lg text-[16px] leading-[24px] text-on-surface">Connect</span>
-<span class="font-body-md text-body-md text-on-surface-variant">Find similar food interests.</span>
-</div>
-</div>
-<!-- Prop 3: Dine -->
-<div class="glass-card rounded-xl p-stack-md flex items-center gap-stack-md transform transition-all hover:translate-y-[-2px] hover:shadow-md">
-<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary-container border border-outline-variant/20">
-<span class="material-symbols-outlined icon-fill text-2xl" data-icon="celebration">celebration</span>
-</div>
-<div class="flex flex-col">
-<span class="font-title-lg text-[16px] leading-[24px] text-on-surface">Dine</span>
-<span class="font-body-md text-body-md text-on-surface-variant">Share meaningful meals.</span>
-</div>
-</div>
-</div>
-<!-- Bottom Section: CTA -->
-<div class="mt-auto pt-section-gap w-full flex flex-col gap-stack-md pb-safe">
-<!-- Progress Indicators -->
-<div class="flex justify-center gap-2 mb-4">
-<div class="w-2 h-2 rounded-full bg-outline-variant transition-colors"></div>
-<div class="w-8 h-2 rounded-full bg-primary-container transition-all"></div>
-<div class="w-2 h-2 rounded-full bg-outline-variant transition-colors"></div>
-</div>
-<button class="w-full h-14 bg-primary-container text-on-primary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-primary-container/90 active:bg-primary-container/80 transition-colors shadow-sm relative overflow-hidden group">
-<span class="relative z-10 uppercase tracking-widest">Continue</span>
-<span class="material-symbols-outlined relative z-10 text-xl" data-icon="arrow_forward">arrow_forward</span>
-<!-- Subtle button hover effect -->
-<div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-in-out"></div>
-</button>
 </div>
 </main>
 <!-- Inline Animations definition -->
@@ -282,14 +229,12 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* Ensures iOS safe area padding for the bottom */
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .pb-safe {
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-        }
     </style>
-
-
+<script>
+    // Automatically redirect the user after 30 seconds
+    setTimeout(() => {
+        // window.location.href = 'NEXT_SCREEN_URL_HERE';
+        console.log('Redirecting to the next screen...');
+    }, 30000);
+</script>
 </body></html>

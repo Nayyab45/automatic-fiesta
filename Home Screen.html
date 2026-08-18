@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Home - Dastarkhān</title>
@@ -151,12 +151,16 @@
 </div>
 </header>
 <!-- Main Content -->
-<main class="flex-1 w-full max-w-md mx-auto px-container-padding pt-stack-sm pb-section-gap flex flex-col gap-section-gap md:max-w-4xl md:grid md:grid-cols-4 md:gap-gutter">
+<main class="flex-1 w-full max-w-md mx-auto px-container-padding pt-stack-sm pb-section-gap flex flex-col gap-section-gap md:max-w-4xl md:grid md:grid-cols-4 md:gap-gutter pb-32 overflow-y-auto">
 <!-- Header Section -->
 <section class="col-span-4 flex flex-col gap-unit">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Good evening, Ahmed</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant">Where will you dine tonight?</p>
-</section>
+<div class="flex bg-surface-container-low p-1 rounded-lg mt-stack-md w-full max-w-sm">
+  <button class="flex-1 py-2 px-4 rounded-md bg-surface soft-shadow text-primary font-label-lg text-label-lg uppercase tracking-widest transition-all">AI Matching</button>
+  <button class="flex-1 py-2 px-4 rounded-md text-on-surface-variant font-label-lg text-label-lg uppercase tracking-widest hover:text-primary transition-colors">Restaurants</button>
+  <button class="flex-1 py-2 px-4 rounded-md text-on-surface-variant font-label-lg text-label-lg uppercase tracking-widest hover:text-primary transition-colors">People</button>
+<button class="flex-1 py-2 px-4 rounded-md text-on-surface-variant font-label-lg text-label-lg uppercase tracking-widest hover:text-primary transition-colors">Find Tables</button></div></section>
 <!-- Tonight's Tables Section -->
 <section class="col-span-4 flex flex-col gap-stack-md">
 <div class="flex justify-between items-end">
@@ -164,7 +168,18 @@
 <a class="font-label-lg text-label-lg text-primary uppercase tracking-widest hover:opacity-80 transition-opacity" href="#">View All</a>
 </div>
 <!-- Premium Dining Card -->
-<div class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col">
+<div class="relative w-full rounded-xl bg-surface-container border-2 border-dashed border-primary/30 p-stack-md flex flex-col items-center justify-center gap-stack-sm interactive-card mb-stack-md">
+  <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+    <span class="material-symbols-outlined text-[32px]">add_circle</span>
+  </div>
+  <div class="text-center">
+    <h3 class="font-title-lg text-title-lg text-primary">Host a Table</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant">Create your own dining event and invite others</p>
+  </div>
+  <button class="mt-unit px-6 py-2 bg-primary text-on-primary font-label-lg text-label-lg uppercase tracking-widest rounded-full hover:opacity-90 transition-opacity">
+    Create Table
+  </button>
+</div><div class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col">
 <!-- Image Header -->
 <div class="w-full h-48 relative border-b-[0.5px] border-outline-variant">
 <img alt="Karahi" class="w-full h-full object-cover" data-alt="A beautifully plated serving of traditional Pakistani Karahi in an authentic copper wok, resting on a polished dark wood table. Warm, low-key lighting highlights the rich spices and fresh cilantro garnish, creating a premium, inviting culinary atmosphere suitable for a luxury dining app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiBPDgMsJuovrK_CfetabF4cpyHMosKPtDmqGpTXPtpf46rJ-VHSxMr-tDPTLjgM1W907MUkVtFKFibr-acyJKJ7bmqlxAjLpBaLABF-w-m5EXlQ6FwJm9_6aC_o5KhnzdPTncRwt9joxW6VMPgao_nnaH6HDvXkZdJ4x0Zm13Aa5Nf0WDHRVattzSv-LG5HtB9TzuaLXwvEheAikHAEXwQUWJM74gvHkIm0Fn4l3AYNTsxGR8rhXY">
@@ -283,4 +298,8 @@
 <span class="font-label-sm text-label-sm">Profile</span>
 </a>
 </nav>
+
+
+
+
 </body></html>

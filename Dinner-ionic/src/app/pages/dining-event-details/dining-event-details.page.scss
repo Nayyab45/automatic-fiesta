@@ -1,12 +1,10 @@
 // Screen-specific styles for "Dining Event Details", carried over from the
 // original prototype (Dinning Event Details.html). Shared rules live in src/global.scss.
 
-@layer utilities {
-            .pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
-            .pt-safe { padding-top: env(safe-area-inset-top, 24px); }
-            
-            /* Material Symbol Font settings */
-            .material-symbols-outlined {
-                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            }
-        }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
+.pt-safe { padding-top: env(safe-area-inset-top, 24px); }
+
+/* Material Symbol Font settings */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>What Should We Eat? - Explore Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e6e2de",
+                    "on-primary-container": "#463300",
+                    "on-tertiary-fixed-variant": "#424a34",
+                    "background": "#fdf8f5",
+                    "error-container": "#ffdad6",
+                    "secondary": "#695d44",
+                    "on-background": "#1c1b1a",
+                    "primary-fixed": "#ffdf9e",
+                    "tertiary-container": "#9aa287",
+                    "tertiary-fixed": "#dee6c8",
+                    "surface-dim": "#ddd9d6",
+                    "on-surface-variant": "#4d463a",
+                    "surface-container-low": "#f7f3ef",
+                    "on-primary-fixed": "#261a00",
+                    "inverse-primary": "#e2c382",
+                    "surface-container": "#f1ede9",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#221b07",
+                    "on-tertiary-fixed": "#171e0b",
+                    "outline": "#7e7668",
+                    "surface-tint": "#735b25",
+                    "outline-variant": "#d0c5b5",
+                    "inverse-surface": "#31302e",
+                    "inverse-on-surface": "#f4f0ec",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#313824",
+                    "surface-bright": "#fdf8f5",
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#6f6349",
+                    "on-surface": "#1c1b1a",
+                    "secondary-fixed": "#f1e1c0",
+                    "on-secondary-fixed-variant": "#50462e",
+                    "secondary-fixed-dim": "#d4c5a6",
+                    "surface": "#fdf8f5",
+                    "tertiary": "#5a614a",
+                    "surface-container-high": "#ece7e4",
+                    "on-error": "#ffffff",
+                    "primary": "#735b25",
+                    "secondary-container": "#f1e1c0",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e6e2de",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#e2c382",
+                    "tertiary-fixed-dim": "#c2caad",
+                    "primary-container": "#b89b5e",
+                    "on-primary-fixed-variant": "#59440f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "container-padding": "24px",
+                    "unit": "4px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px",
+                    "gutter": "16px",
+                    "section-gap": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-lg": ["Inter"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"],
+                    "title-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-lg antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface sticky top-0 z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">Karachi, PK</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant shadow-sm">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a smiling young South Asian professional dining at an upscale restaurant, warm ambient lighting, elegant casual attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLTxX-nya1P7YgxtUZLm52aPccuZK9Ps4mcWkC-Va8kwHMwiPdbP0dRYh9CezVXThhQUBTXnY0zguYW2bEW1lweez51bwX3KPWGYPRjvr12GiGctEADjV7J0RpQhXcrsiu75Wtrojb_slIqqbQt-nOSHPmBJSdZGjfi-j0TKo36_WXzAgNMsNaxqdLIHQNlFy-hFB_JK3MLbRN4gw_OsZCu7VZC0ZpiIkcWD8UENCwul0l6xk_Pa0S"/>
+</div>
+</header>
+<main class="space-y-section-gap pt-stack-md">
+<div class="px-container-padding space-y-stack-md">
+<!-- Search Bar -->
+<section>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-b border-outline-variant py-4 pl-12 pr-4 font-body-md text-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-0 transition-colors bg-transparent shadow-none rounded-none" placeholder="Search dishes, restaurants, or people" type="text"/>
+</div>
+</section>
+<!-- Quick Navigation Tags -->
+<section>
+<div class="flex overflow-x-auto no-scrollbar gap-stack-sm pb-2">
+<button class="flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Halal</button>
+<button class="flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Vegetarian</button>
+<button class="flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Fine Dining</button>
+<button class="flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Street Food</button>
+<button class="flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Nearby Me</button>
+</div>
+</section>
+</div>
+<!-- Featured Dishes -->
+<section class="space-y-stack-md">
+<div class="px-container-padding flex justify-between items-end">
+<h2 class="font-headline-lg text-title-lg text-on-surface">Featured Dishes</h2>
+<a class="font-label-lg text-primary hover:text-primary-container transition-colors" href="#">See All</a>
+</div>
+<div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
+<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
+<div class="h-40 w-full overflow-hidden">
+<img alt="Nihari" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJcFe5jzU5c4Brmv_vlc7NZylHGGCPyUytvxVsFIBZKLfqbnVjKocHlyeHsG2f9VzvPtIP4AkzFejxEM7VB6xocoHxqjBqJStFA1kcPrsv8vMnQQTOygPM4PVYvHrgVNTdM9MBqhB8EyjQQ3uUhLjtqp_sQr_g69gBGaJg-3QIimmzgED7JEInHGEo1N-RVRUapaxgoFeRF3u6tVBGp0eMMWBPypaxcHpsMPAsRyRe7Jr0vp03bjpT"/>
+</div>
+<div class="p-4 space-y-1">
+<div class="flex justify-between items-start">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Beef Nihari</h3>
+<span class="font-label-lg text-primary">Rs 850</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Slow-cooked beef stew with spices</p>
+<div class="flex items-center gap-1 pt-2">
+<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-on-surface">4.8</span>
+<span class="font-label-sm text-on-surface-variant ml-1">· Javed Nihari</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
+<div class="h-40 w-full overflow-hidden">
+<img alt="Biryani" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyaPbO9Aq7P6CZCm6yKXElRgzADr7ZzYNajxG2GTyBVtHJJXpgfT2QUsBC63G9mj3qtSkg4uuJqHjA35Ttrk_-Vsq9zmH2HZx8xQkAyHWpJl108MoxB4A8WHG0OlIFSg0cWMyliXIRkfnOdwDfC4Gn545XbOWaAhwUPgEx4hiHoRc0KstcAo1Nihc5pkC5Xg7YOwJZJAkKkYaJLguwWYKyfnm9qhFJKU5EolQNLIUxxFcsPjz6a4Ji"/>
+</div>
+<div class="p-4 space-y-1">
+<div class="flex justify-between items-start">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Chicken Biryani</h3>
+<span class="font-label-lg text-primary">Rs 450</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Spiced rice mixed with tender chicken</p>
+<div class="flex items-center gap-1 pt-2">
+<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-on-surface">4.9</span>
+<span class="font-label-sm text-on-surface-variant ml-1">· Student Biryani</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
+<div class="h-40 w-full overflow-hidden">
+<img alt="Karahi" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNb0ViTDNA-Rd8kGbm9kT4oZ5hMhe8rIexDB2YDJm6wSLSnk8spww8B58AMw-lKGquabmCBi-NmzYaFPeCHSdJaIb7SUxwBO_1oruK6cHUCvR3Xx-i04MfH14kETP1mJQsaKSwdC-5RcHllVbrmODu4ZjPuTBaTWIPzzmBAwD-hLNNr3PptQ90thMndCySyOZo_f657jThlxFh_4tIoDB27YkPpP5cMfhQF9SSkB37tAXVPa_6scPG"/>
+</div>
+<div class="p-4 space-y-1">
+<div class="flex justify-between items-start">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Mutton Karahi</h3>
+<span class="font-label-lg text-primary">Rs 1800</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Wok-cooked mutton with tomatoes</p>
+<div class="flex items-center gap-1 pt-2">
+<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-on-surface">4.7</span>
+<span class="font-label-sm text-on-surface-variant ml-1">· Kolachi</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Top-Rated Restaurants -->
+<section class="space-y-stack-md bg-surface-container-low py-stack-md">
+<div class="px-container-padding flex justify-between items-end">
+<h2 class="font-headline-lg text-title-lg text-on-surface">Top-Rated Restaurants</h2>
+<a class="font-label-lg text-primary hover:text-primary-container transition-colors" href="#">See All</a>
+</div>
+<div class="px-container-padding space-y-gutter">
+<div class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
+<div class="h-24 w-24 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Kolachi" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwFLWt0KfNBAg6AjyuT0SONQjN2iXAcUAuphRfcFyjgEStd-FFFxBUhCCRDudZTMDh5tiiU1Hr7GUQJurnD2vARRAti2e7-OU70Z7Nh5Qz53nQ16yFWEputq9s8OWwQDvii4fMkQcr_mvfwyG252tppcYMqZzSYnTqc2Zlh3bjMhaiUILWtYSV8AXC5PjhwS1930kAz0ux2Q3-H2NHumT19Dy4g9auhs7Ahx7YTewKILwyVFTlWFlc"/>
+</div>
+<div class="flex-1 py-1">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface mb-1">Kolachi</h3>
+<p class="font-body-md text-on-surface-variant text-sm mb-2">Pakistani · BBQ · Seaside</p>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 bg-tertiary-container/20 px-2 py-0.5 rounded text-tertiary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm font-bold">4.8</span>
+</div>
+<span class="font-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">directions_walk</span> 2.5 km</span>
+</div>
+</div>
+</div>
+<div class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
+<div class="h-24 w-24 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Xander's" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnRfWMXtZULLasq97TnexrGq-RjojFZrwpoB800T7UwPagSRacgRyS_mcMPS5uVFRJHxrVS3WPEE3yW1fq0eJvKyWSmB-lTDD9NruiwXTIH3YjhD7HCY4EToDJa-MMdfpzIpZKWKsjyTY2DKQumPJoVpaRJ_vV5Qo3bHFg9h1pC_GZy5WwFMSlnAYUnkp9CbVX3mFM99cKNyEJeK8ENXIBkBeZecW6BFPP0KkZTTPBXCNIyvKPzSS6"/>
+</div>
+<div class="flex-1 py-1">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface mb-1">Xander's</h3>
+<p class="font-body-md text-on-surface-variant text-sm mb-2">Cafe · Continental · Desserts</p>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 bg-tertiary-container/20 px-2 py-0.5 rounded text-tertiary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm font-bold">4.7</span>
+</div>
+<span class="font-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">directions_walk</span> 1.2 km</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- People to Meet -->
+<section class="space-y-stack-md pb-section-gap">
+<div class="px-container-padding flex justify-between items-end">
+<h2 class="font-headline-lg text-title-lg text-on-surface">People to Meet</h2>
+<a class="font-label-lg text-primary hover:text-primary-container transition-colors" href="#">See All</a>
+</div>
+<div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
+<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
+<img alt="Ali" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_VLewOf7U6ze1QlYq2FqjnRfP5rSaAvCXlqxqyfVmz7_07q5J4Ua5OzlEeKhXkXlhemZDil7zvxog8u1ew8bFhR0oy2TdBZRrNvCdZqr_yh43-x-Fs3vF4x_rJsv7c3IQk4jW-fjFXhfj1OvvEljwspzl0A6L34vVxwGKjcTMAHZ5PKbtwn6TkAEWECAM0vv78FZiABpVt1Cz4fIbddC7csLSdTygAHUNEP6twbdT2Xrhsmb3rVt-"/>
+</div>
+<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Ali R.</h3>
+<p class="font-label-sm text-primary text-center mb-2">Top Reviewer</p>
+<div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px]">favorite</span> 4 mutual
+</div>
+</div>
+<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
+<img alt="Zara" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZvKv48Yl6eg2Ot-ud9LrswVbgR7tM3uM0s4pbbMRGNoGb1XpuddELWfSWiq68zn4r6-OHnUK7IO2x5DtO4JHgEe0i_j2ToMXABuvdMZsCGhYqrEb99xmjp0dAXVPf92c0hz5nBhQIf6ykZj0T3ZznnaEbmtFl-vfAtYTMeJtw6JUB6XOPGSttpy9s6Y1mquNH4VFTBOys5LBBJepu_lkofEQW725P96uiPZvyMi2mKY6Q8oT3QSmH"/>
+</div>
+<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Zara M.</h3>
+<p class="font-label-sm text-primary text-center mb-2">Cafe Explorer</p>
+<div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px]">favorite</span> 2 mutual
+</div>
+</div>
+<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
+<img alt="Omar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9HPyLZ4iws-jK1NnU_ptsjExRF5dvKi06meDXIbpWqwpNa9pOhmRS4HWTX-rKedcxpara_d6RGok7CQMUFYvd3_Yb0gXvVDiqDWbNZZMNKPr6kUSd_RezpHx5RdBamzpU9TDgCRys0slb3RogHQlo_0OrzK0lpVni7ri10h0a4zl1hQpaDb_SH_v3Ghg3Ufzrs0wnZGOKBOr3UjSjFJlEHXx-eq2ld48uYhncnEI2wno12i6_ls3q"/>
+</div>
+<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Omar K.</h3>
+<p class="font-label-sm text-primary text-center mb-2">BBQ Enthusiast</p>
+<div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px]">favorite</span> 6 mutual
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl md:hidden pb-4">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-sm text-label-sm font-bold">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">restaurant</span>
+<span class="font-label-sm text-label-sm">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Face Verification - What Should We Eat?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e6e2de",
+                        "tertiary-container": "#9aa287",
+                        "surface-container": "#f1ede9",
+                        "on-error": "#ffffff",
+                        "tertiary": "#5a614a",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#6f6349",
+                        "primary-fixed": "#ffdf9e",
+                        "tertiary-fixed-dim": "#c2caad",
+                        "outline-variant": "#d0c5b5",
+                        "on-tertiary-container": "#313824",
+                        "on-secondary-fixed": "#221b07",
+                        "secondary-fixed-dim": "#d4c5a6",
+                        "surface": "#fdf8f5",
+                        "background": "#fdf8f5",
+                        "on-primary-fixed-variant": "#59440f",
+                        "on-primary-fixed": "#261a00",
+                        "on-background": "#1c1b1a",
+                        "on-surface": "#1c1b1a",
+                        "surface-tint": "#735b25",
+                        "on-surface-variant": "#4d463a",
+                        "on-secondary-fixed-variant": "#50462e",
+                        "primary-fixed-dim": "#e2c382",
+                        "inverse-primary": "#e2c382",
+                        "primary": "#735b25",
+                        "surface-container-low": "#f7f3ef",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#dee6c8",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#463300",
+                        "surface-container-highest": "#e6e2de",
+                        "on-tertiary-fixed": "#171e0b",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#f1e1c0",
+                        "on-tertiary-fixed-variant": "#424a34",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fdf8f5",
+                        "outline": "#7e7668",
+                        "secondary": "#695d44",
+                        "secondary-container": "#f1e1c0",
+                        "inverse-on-surface": "#f4f0ec",
+                        "primary-container": "#b89b5e",
+                        "surface-container-high": "#ece7e4",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#ddd9d6",
+                        "inverse-surface": "#31302e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "section-gap": "48px",
+                        "unit": "4px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "label-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "title-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .pulse-ring {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: .5;
+                transform: scale(1.05);
+            }
+        }
+
+        .camera-overlay {
+            mask-image: radial-gradient(ellipse at center, transparent 45%, black 60%);
+            -webkit-mask-image: -webkit-radial-gradient(ellipse at center, transparent 45%, black 60%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased h-screen flex flex-col w-full max-w-md mx-auto relative overflow-hidden">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background flex items-center justify-between px-container-padding py-stack-md z-10">
+<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity active:scale-95 flex items-center justify-center p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">What Should We Eat?</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center px-container-padding py-stack-lg relative z-0 mt-stack-md">
+<!-- Headers -->
+<div class="text-center w-full mb-section-gap">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-sm">Let's verify it's you</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
+                Position your face within the frame and make sure you're in a well-lit area.
+            </p>
+</div>
+<!-- Camera Viewfinder -->
+<div class="relative w-64 h-80 flex items-center justify-center mb-stack-lg">
+<!-- Simulated Camera Feed (Image) -->
+<div class="absolute inset-0 rounded-[100px] overflow-hidden bg-surface-container-low shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border-[1.5px] border-primary-container z-0 flex items-center justify-center">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply filter blur-sm" data-alt="A softly lit, out-of-focus background representing a blurred view from a front-facing mobile camera. The scene suggests a warm, elegant interior space with gentle natural light and subtle champagne tones. The aesthetic is clean, premium, and sophisticated, acting as a backdrop for a face verification step in a luxury dining app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGjj2nZsQ6Wxcd37yshBGiHr6oz4rwSutF1jm2GgQHoa6yVzklrSv966VLYRAq00EzaLyTHdDyyltPZ272DJNnvd_IrDRHL8Mi4nmQriamPihXD3TMxyPuf7Ln0k51HZzYTGBCLuQvlnYFvNgTLCa9uPijfzPQtb8bz9aB8NSe7-E6cpplnHzGRGHkrYDRfyuSgKXogTRjS2jQUAbV3wFrWoSFNr6rbxjhUsPxBDJHyQnVkRVZEE9m"/>
+<!-- Inner alignment guide -->
+<div class="w-40 h-56 rounded-full border border-dashed border-primary/40 absolute z-10 pulse-ring"></div>
+</div>
+<!-- Overlay Scrim to mimic cutout -->
+<div class="absolute -inset-10 bg-background/30 camera-overlay pointer-events-none z-10"></div>
+</div>
+<!-- Status Indicator -->
+<div class="flex items-center justify-center space-x-2 bg-surface-container-high px-4 py-2 rounded-full shadow-sm mb-auto">
+<span class="material-symbols-outlined text-primary-container text-[18px]" data-icon="face" style="font-variation-settings: 'FILL' 1;">face</span>
+<span class="font-label-sm text-label-sm text-on-surface">Ready to capture</span>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<footer class="w-full px-container-padding pb-section-gap pt-stack-md bg-gradient-to-t from-background via-background to-transparent relative z-20 flex flex-col items-center">
+<button class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] flex items-center justify-center space-x-2 hover:opacity-90 active:scale-[0.98] transition-all duration-200 border-[1px] border-primary-container/50 mb-stack-md">
+<span class="material-symbols-outlined" data-icon="camera" style="font-variation-settings: 'FILL' 1;">camera</span>
+<span>Capture</span>
+</button>
+<div class="flex items-center space-x-2 opacity-70">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" data-icon="lock" style="font-variation-settings: 'FILL' 0;">lock</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-[260px]">
+                Your data is encrypted and used only for identity verification.
+            </p>
+</div>
+</footer>
+<!-- No Navigation Shell (Transactional Intent) -->
+</body></html>

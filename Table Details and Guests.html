@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Table Details - What Should We Eat?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#e6e2de",
+                      "on-tertiary-fixed": "#171e0b",
+                      "on-tertiary-container": "#313824",
+                      "tertiary-fixed-dim": "#c2caad",
+                      "surface-bright": "#fdf8f5",
+                      "error": "#ba1a1a",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed-dim": "#d4c5a6",
+                      "on-surface-variant": "#4d463a",
+                      "surface-container-highest": "#e6e2de",
+                      "on-primary-container": "#463300",
+                      "tertiary-fixed": "#dee6c8",
+                      "outline-variant": "#d0c5b5",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#59440f",
+                      "secondary-container": "#f1e1c0",
+                      "inverse-on-surface": "#f4f0ec",
+                      "primary": "#735b25",
+                      "on-surface": "#1c1b1a",
+                      "primary-fixed": "#ffdf9e",
+                      "primary-fixed-dim": "#e2c382",
+                      "on-secondary-fixed": "#221b07",
+                      "surface-container-high": "#ece7e4",
+                      "tertiary-container": "#9aa287",
+                      "surface-container": "#f1ede9",
+                      "background": "#fdf8f5",
+                      "outline": "#7e7668",
+                      "surface-tint": "#735b25",
+                      "on-secondary-fixed-variant": "#50462e",
+                      "inverse-surface": "#31302e",
+                      "primary-container": "#b89b5e",
+                      "inverse-primary": "#e2c382",
+                      "surface-container-low": "#f7f3ef",
+                      "on-tertiary": "#ffffff",
+                      "secondary-fixed": "#f1e1c0",
+                      "on-tertiary-fixed-variant": "#424a34",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6f6349",
+                      "on-primary-fixed": "#261a00",
+                      "surface": "#fdf8f5",
+                      "tertiary": "#5a614a",
+                      "on-background": "#1c1b1a",
+                      "secondary": "#695d44",
+                      "surface-dim": "#ddd9d6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "32px",
+                      "container-padding": "24px",
+                      "section-gap": "48px",
+                      "gutter": "16px",
+                      "stack-md": "16px",
+                      "unit": "4px",
+                      "stack-sm": "8px"
+              },
+              "fontFamily": {
+                      "title-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg-mobile": ["Playfair Display"],
+                      "headline-md": ["Playfair Display"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-lg": ["Inter"],
+                      "headline-lg": ["Playfair Display"],
+                      "display-lg": ["Playfair Display"]
+              },
+              "fontSize": {
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.surface'); color: theme('colors.on-surface'); }
+    </style>
+</head>
+<body class="antialiased pb-[100px]">
+<!-- TopAppBar (Adapted from Shared Components JSON for Detail View) -->
+<header class="w-full top-0 sticky bg-surface/95 backdrop-blur-sm z-40 flex justify-between items-center px-container-padding h-16 transition-all duration-300">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface">Bella Notte</h1>
+<button aria-label="Share" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-on-surface" data-icon="ios_share">ios_share</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="w-full max-w-2xl mx-auto">
+<!-- Hero Image -->
+<div class="w-full h-72 relative">
+<img alt="Restaurant Table Setting" class="w-full h-full object-cover" data-alt="A beautifully arranged dining table at a high-end Italian restaurant in Islamabad. The scene features crisp white linen tablecloths, sparkling crystal wine glasses, and gleaming silver cutlery set alongside elegant white porcelain plates. Warm, ambient lighting from glowing candles casts a soft, inviting glow over the table, creating an intimate and premium atmosphere. In the background, subtly out of focus, are rich mahogany wood accents and soft golden ambient light, perfectly capturing the luxurious, warm aesthetic of a premium dining concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5cvFjrFN1JkTEPm6gda53pv9yJzJ9mIfBV5Q0vhWjEtXtERtYZle6CZPgVId7fIw21RaPVLM9fM8wVubtWXUBs64sgIbcb_J2B1bTvJlBP5d2_ZWjv-kXBinsNc1jmrKMV5B5jjI5U2oG7_BfXltJTaRTwBt4w3k9gRb5KUM_FM_5jMgGC_6h6npx3ri83UzVw8jeEkCcaEUOZUALXS-0NWtkreH-MtsAwILswZqiO6RQUwUiXDAd"/>
+<!-- Subtle gradient to blend into surface -->
+<div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface to-transparent"></div>
+</div>
+<div class="px-container-padding -mt-stack-lg relative z-10">
+<!-- Event Info Section -->
+<div class="bg-surface-container-low rounded-2xl p-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-white/50 backdrop-blur-md">
+<span class="inline-block bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full mb-stack-sm uppercase tracking-wider">Dinner Service</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-md leading-tight">Saturday Night Italian Feast</h2>
+<div class="flex flex-col gap-stack-sm mt-stack-md">
+<div class="flex items-center gap-stack-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-md text-body-md">Oct 12, 8:00 PM</span>
+</div>
+<div class="flex items-center gap-stack-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="location_on">location_on</span>
+<span class="font-body-md text-body-md">F-6 Markaz, Islamabad</span>
+</div>
+</div>
+</div>
+<!-- Restaurant Preview -->
+<div class="mt-stack-lg">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm">The Venue</h3>
+<div class="flex items-center justify-between bg-surface-container rounded-xl p-stack-md border-[0.5px] border-outline-variant/30">
+<div>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Bella Notte</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="flex items-center text-primary-container font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span> 4.8
+                            </span>
+<span class="text-outline text-[10px]">•</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Italian Fine Dining</span>
+</div>
+</div>
+<button class="px-4 py-2 rounded-full border border-secondary-container text-on-surface font-label-lg text-label-lg hover:bg-surface-variant/30 transition-colors">
+                        View Menu
+                    </button>
+</div>
+</div>
+<!-- Guest List -->
+<div class="mt-section-gap">
+<div class="flex justify-between items-baseline mb-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface">Who's at the table</h3>
+<span class="font-label-lg text-label-lg text-on-surface-variant">4/6 Seats Filled</span>
+</div>
+<div class="flex flex-col gap-unit">
+<!-- Guest 1 -->
+<div class="flex items-center justify-between p-stack-sm rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border-[0.5px] border-transparent hover:border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<img alt="Ahmed" class="w-12 h-12 rounded-full object-cover border border-outline-variant/20" data-alt="A professional headshot of a stylish South Asian man in his early 30s, smiling warmly. He is wearing a tailored navy blazer over a crisp white shirt. The background is a soft, blurred warm beige tone. The lighting is soft and flattering, creating a premium, inviting, and trustworthy appearance suitable for a high-end social networking profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGOyL6lpNaBsQZo7Zm-7GEZuT2kDMdUePehQcN-AInVHdHXMdlVAB4kr4jydNcNZ3pfQTKbLz_NsJoXtc_Ns3LsUbXnFTZJfKZfusssuv_AhekvQ8un79-9MHqyS-g9kYzFoI00GcFgABWfQNN9NPd2cSVeUHwullP3fQRknvYpmq1DB-9jLNhmBdyKPn-XG_2AykJQJAfE3wD3G-XzFD3rmlje6lrOdxpeeoJCHYuvnekva1xhRWi"/>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Ahmed</p>
+</div>
+</div>
+<span class="bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full border border-secondary-container/30">Loves Pasta</span>
+</div>
+<div class="h-[0.5px] w-full bg-outline-variant/30 ml-16"></div>
+<!-- Guest 2 -->
+<div class="flex items-center justify-between p-stack-sm rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border-[0.5px] border-transparent hover:border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<img alt="Sarah" class="w-12 h-12 rounded-full object-cover border border-outline-variant/20" data-alt="A beautifully lit portrait of a young South Asian woman with elegant styling, smiling gently. She has soft, dark hair and is wearing a modern, understated beige silk blouse. The background is a clean, creamy white, bathed in soft natural light that highlights her features. The aesthetic is sophisticated, polished, and perfectly suited for a luxury lifestyle app profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANLqNMN5sVNGbVwbtjrBGlGdOCLmvgKP6YZKt1o_nSZ14ng7WQ3YVMf3vkaHprKY-xACJ8LCSSb-i1_JFBzotDJwmVVOBgO1XFG_IeW1-Zk6YT8ecqiNOKzCI8j62lvaxe9On7S89llkwZaYaROfUMy_r1MMCbMhhmcSs4Xwx5miDUOOkTc9POmG8Fqf7q6fxiO4zvblFECMxFd72kyXLvJ_hmLZp3x556rEjzVbxsqhChq-wfLTTk"/>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Sarah</p>
+</div>
+</div>
+<span class="bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full border border-secondary-container/30">Digital Nomad</span>
+</div>
+<div class="h-[0.5px] w-full bg-outline-variant/30 ml-16"></div>
+<!-- Guest 3 -->
+<div class="flex items-center justify-between p-stack-sm rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border-[0.5px] border-transparent hover:border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<img alt="Zeeshan" class="w-12 h-12 rounded-full object-cover border border-outline-variant/20" data-alt="A high-quality profile picture of a South Asian man with a neatly trimmed beard, exuding confidence and warmth. He is dressed in a smart-casual olive green shirt. The lighting is cinematic yet soft, illuminating his face against a slightly darker, warm-toned blurred background. The overall mood is approachable, modern, and refined." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1nv7QH3jcWaDAqTGdyNjisIsY4hs31xcENQM0wc6T0L1EAGde9a92Dir1vk5Mxd6PqBEgmz_Uj2T30O3Y19GLtVwRZvb46XGLe2_Q_Nfj6XCMFIGR6j0Fup_zT4S6Ocd-VcPDLtXNgINTtZYc2gFC6x_LCpXCSAcArsM4mBC-jF1yxl99PgFhD_UvifuS-Qhp2b5rr4B-EptQW_ZSxG7IPLdThbpjKM0qga9Ts_gbk210t4hHSLo_"/>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Zeeshan</p>
+</div>
+</div>
+</div>
+<div class="h-[0.5px] w-full bg-outline-variant/30 ml-16"></div>
+<!-- Guest 4 -->
+<div class="flex items-center justify-between p-stack-sm rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer border-[0.5px] border-transparent hover:border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<img alt="Maryam" class="w-12 h-12 rounded-full object-cover border border-outline-variant/20" data-alt="An elegant, professional portrait of a South Asian woman in her late 20s. She is smiling radiantly and wearing a stylish muted gold top that complements her warm skin tone. The background is a soft, out-of-focus cafe interior with warm lighting. The image feels high-end, friendly, and perfectly aligned with a premium social dining aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbp6ZKSWFxG78F5wO-lY7N9YO084K53KpGg9vCZVj_fhcL0WieMuK3A9dv4Cjk-PSu6ycWrMlXOAPHmSxx0vNWYssL4kkNaRqg0ujREZ6SJY9nTtVzyNeEw3z3eK07Wmij9pQIFwgzQ3KdZSWJVZEfuO3WJyu7M-hqmWLhkAyMBV-kyz1syRdJ3PNjNd90sWdjNoGl9tbuvpTb_JCfA9MgqQ03hDNd-VQCLqhhZErpcGj2IE-t9vX8"/>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Maryam</p>
+</div>
+</div>
+</div>
+<div class="h-[0.5px] w-full bg-outline-variant/30 ml-16"></div>
+<!-- Empty Seats -->
+<div class="flex items-center gap-stack-md p-stack-sm opacity-50">
+<div class="w-12 h-12 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant" data-icon="chair">chair</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic">Available Seat</p>
+</div>
+<div class="flex items-center gap-stack-md p-stack-sm opacity-50">
+<div class="w-12 h-12 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant" data-icon="chair">chair</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic">Available Seat</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md px-container-padding py-stack-md z-50 border-t-[0.5px] border-outline-variant/20 shadow-[0_-8px_24px_rgba(0,0,0,0.02)]">
+<div class="max-w-2xl mx-auto flex items-center justify-between">
+<div>
+<p class="font-title-lg text-title-lg text-on-surface">Rs. 8,500</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Per Person</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-label-lg text-label-lg px-8 py-4 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity active:scale-95 duration-150 shadow-sm">
+                Request a Seat
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>
