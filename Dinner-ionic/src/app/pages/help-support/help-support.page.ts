@@ -12,6 +12,21 @@ import { Router, RouterLink } from '@angular/router';
 export class HelpSupportPage {
   readonly pageTitle = "Help & Support";
 
+  readonly faqs = [
+    {
+      question: 'How do I cancel a meetup?',
+      answer: "Open the table from My Tables, tap the meetup, then choose Cancel Reservation. Guests you've invited will be notified automatically.",
+    },
+    {
+      question: 'How does check-in work?',
+      answer: "When you arrive at the restaurant, open the dining event and tap Check In. This lets your table's host and guests know you've arrived.",
+    },
+    {
+      question: 'How do I report someone?',
+      answer: 'Go to their profile or the dining event, tap the report icon, and choose a reason. Our safety team reviews every report.',
+    },
+  ];
+  openFaqIndex: number | null = null;
 
   constructor(private router: Router, private location: Location) {}
 
@@ -23,4 +38,11 @@ export class HelpSupportPage {
     this.location.back();
   }
 
+  toggleFaq(index: number): void {
+    this.openFaqIndex = this.openFaqIndex === index ? null : index;
+  }
+
+  emailSupport(): void {
+    window.location.href = 'mailto:support@whatshouldweeat.com';
+  }
 }

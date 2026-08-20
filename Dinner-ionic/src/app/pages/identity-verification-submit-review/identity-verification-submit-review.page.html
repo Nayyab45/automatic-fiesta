@@ -1,0 +1,68 @@
+<header class="w-full top-0 sticky bg-surface z-40 px-gutter py-4 flex items-center shadow-[0_1px_0_rgba(208,197,181,0.5)]">
+<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors group focus:outline-none focus:ring-2 focus:ring-primary/50">
+<span class="material-symbols-outlined text-on-surface group-hover:text-primary transition-colors">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile flex-1 text-center pr-12 text-on-surface">Identity Verification</h1>
+</header>
+
+<main class="flex-1 flex flex-col items-center px-container-padding py-section-gap max-w-lg mx-auto w-full">
+
+<div class="mb-stack-lg relative flex justify-center items-center">
+<div class="absolute inset-0 bg-primary-container opacity-10 rounded-full blur-2xl scale-150 animate-pulse"></div>
+<div class="w-32 h-32 bg-surface-container rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant relative z-10">
+<span class="material-symbols-outlined icon-fill text-6xl text-primary-container drop-shadow-md">verified</span>
+</div>
+</div>
+
+<div class="text-center mb-section-gap space-y-stack-sm w-full">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary tracking-tight">Everything looks great!</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[400px] mx-auto px-4">
+                Your ID and face verification have been successfully captured. You're one step away from joining our verified community of food enthusiasts.
+            </p>
+</div>
+
+<div class="w-full bg-surface-container-lowest rounded-xl p-gutter shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant mb-stack-md flex flex-col gap-4">
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">badge</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">National ID</span>
+</div>
+<div class="flex items-center gap-2 text-tertiary">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Captured</span>
+<span class="material-symbols-outlined icon-fill text-lg">check_circle</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">face</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">Face Match</span>
+</div>
+<div class="flex items-center gap-2 text-tertiary">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Ready</span>
+<span class="material-symbols-outlined icon-fill text-lg">check_circle</span>
+</div>
+</div>
+</div>
+
+<div class="flex items-start gap-2 px-4 mb-section-gap opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mt-0.5">info</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-left leading-relaxed">
+                Verification helps us maintain a safe, authentic dining community and ensures your reservations are secure.
+            </p>
+</div>
+
+<div class="w-full mt-auto pt-stack-lg">
+<button (click)="go('/identity-verification')" class="w-full h-14 bg-primary-container text-on-primary hover:bg-primary transition-colors rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(184,155,94,0.3)] active:scale-[0.98]">
+<span>SUBMIT FOR REVIEW</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+<p class="text-center font-label-sm text-label-sm text-outline mt-stack-sm flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                Our team typically reviews submissions within 24 hours.
+            </p>
+</div>
+</main>

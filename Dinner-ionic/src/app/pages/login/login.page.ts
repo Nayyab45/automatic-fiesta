@@ -11,9 +11,13 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class LoginPage {
   readonly pageTitle = "Login";
-
+  passwordVisible = false;
 
   constructor(private router: Router, private location: Location) {}
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
 
   go(path: string): void {
     this.router.navigateByUrl(path);

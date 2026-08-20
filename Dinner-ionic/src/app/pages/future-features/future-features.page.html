@@ -1,16 +1,16 @@
 <header class="w-full top-0 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant/30 sticky flex justify-between items-center px-gutter h-16">
-<button aria-label="Menu" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -ml-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+<button (click)="goBack()" aria-label="Menu" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -ml-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
 </button>
 <h1 class="text-title-lg font-display-lg italic text-primary dark:text-primary-fixed-dim text-center flex-1 mx-4 truncate">
             What Should We Eat?
         </h1>
-<button aria-label="User Profile" class="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-1 -mr-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden w-10 h-10 border border-outline-variant/30">
+<button (click)="go('/profile')" aria-label="User Profile" class="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-1 -mr-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden w-10 h-10 border border-outline-variant/30">
 <img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A macro portrait of an elegant dining setting, out of focus background, warm candle light, creating a sophisticated and luxurious avatar placeholder image for a fine dining app. The lighting is moody yet warm, highlighting metallic gold accents and crisp white linens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWXmugmIkbAEPmozDJjATka3mEp1Bg_gcvavEAWZOSnFVMJmKQ0CmiORL5jrTpgZpVmhtvm6ALHJ_vFnqR1x24R72jqZqh6RZebERtyfIGzCrPqSq8UA0lBeGw5biEy-Lki_DQWoz2yvvr--raYlWfM8S_5eQN3mipyqiHWdfJAu7FxVWrsRGzfi2c0Auk534BR4h60bDc9ME7-b9SKRlB1C-EY7gXQKzLPLw3Cz_KIcWz6ircyqyt"/>
 </button>
 </header>
 
-<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-lg md:py-section-gap flex flex-col gap-section-gap">
+<main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-lg md:py-section-gap flex flex-col gap-section-gap pb-32 md:pb-section-gap">
 
 <section class="flex flex-col items-center text-center max-w-3xl mx-auto gap-stack-md">
 <h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary">
@@ -144,21 +144,21 @@
 </main>
 
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim shadow-[0_-4px_16px_rgba(0,0,0,0.04)] z-50 rounded-t-xl md:hidden border-t-0">
-<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
+<a routerLink="/discover-restaurants" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
 <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">explore</span>
 <span class="text-label-sm font-label-sm">Discover</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
+</a>
+<a routerLink="/my-tables" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
 <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
 <span class="text-label-sm font-label-sm">Events</span>
-</button>
+</a>
 
-<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-secondary-container/30 rounded-full px-4 py-1 active:scale-95 transition-transform focus:outline-none">
+<a routerLink="/discover-people" class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-secondary-container/30 rounded-full px-4 py-1 active:scale-95 transition-transform focus:outline-none">
 <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">group</span>
 <span class="text-label-sm font-label-sm">Circles</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
+</a>
+<a routerLink="/profile" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:text-primary transition-colors py-1 px-2 focus:outline-none">
 <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
 <span class="text-label-sm font-label-sm">Profile</span>
-</button>
+</a>
 </nav>

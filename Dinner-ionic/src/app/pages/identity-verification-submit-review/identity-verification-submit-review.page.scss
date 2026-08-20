@@ -1,0 +1,12 @@
+// Screen-specific styles for "Identity Verification - Review", carried over from the
+// original prototype (Identity Verifcation- Submit for Review.html). Shared rules live in src/global.scss.
+
+.material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }

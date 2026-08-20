@@ -1,7 +1,7 @@
 <header class="sticky top-0 z-40 bg-surface dark:bg-surface w-full px-container-padding py-stack-md flex justify-between items-center flat no shadows transition-all duration-300">
-<div class="flex items-center gap-stack-sm hover:opacity-80 transition-opacity cursor-pointer">
+<div (click)="go('/select-location')" class="flex items-center gap-stack-sm hover:opacity-80 transition-opacity cursor-pointer" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
-<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Karachi, PK</h1>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">{{ cityService.label() }}</h1>
 </div>
 <div class="hover:opacity-80 transition-opacity cursor-pointer">
 <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
@@ -9,7 +9,7 @@
 </div>
 </div>
 </header>
-<main class="max-w-4xl mx-auto w-full px-container-padding py-stack-lg">
+<main class="max-w-4xl mx-auto w-full px-container-padding py-stack-lg pb-32">
 
 <div class="mb-section-gap relative">
 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -51,13 +51,7 @@
                         Regional Cuisine
                     </h2>
 <div class="flex flex-wrap gap-stack-sm">
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Punjabi</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container selected">Sindhi</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Peshawari</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Balochi</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Kashmiri</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Mughlai</button>
-<button class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">Karachi Street</button>
+<button *ngFor="let cuisine of cuisines" (click)="toggleCuisine(cuisine)" [class.selected]="selectedCuisines.has(cuisine)" class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">{{ cuisine }}</button>
 </div>
 </section>
 
@@ -87,14 +81,16 @@
 <div>
 <h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dining Time</h2>
 <div class="space-y-stack-sm">
-<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<button (click)="dateInput.showPicker ? dateInput.showPicker() : dateInput.click()" class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
 <span>Date</span>
-<span class="text-on-surface-variant font-label-lg">Today, Oct 24</span>
+<span class="text-on-surface-variant font-label-lg">{{ selectedDate }}</span>
 </button>
-<button class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
+<input #dateInput (change)="onDateChange($event)" class="sr-only" type="date"/>
+<button (click)="timeInput.showPicker ? timeInput.showPicker() : timeInput.click()" class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
 <span>Time</span>
-<span class="text-on-surface-variant font-label-lg">20:00</span>
+<span class="text-on-surface-variant font-label-lg">{{ selectedTime }}</span>
 </button>
+<input #timeInput (change)="onTimeChange($event)" class="sr-only" type="time"/>
 </div>
 </div>
 </div>
@@ -106,31 +102,24 @@
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Price Tier</h2>
 <div class="flex rounded-md border border-outline-variant overflow-hidden">
-<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs</button>
-<button class="flex-1 py-2 bg-surface-container text-on-surface border-r border-outline-variant text-center font-label-lg border-b-2 border-primary-container">Rs Rs</button>
-<button class="flex-1 py-2 bg-surface text-on-surface border-r border-outline-variant hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs</button>
-<button class="flex-1 py-2 bg-surface text-on-surface hover:bg-surface-container transition-colors text-center font-label-lg">Rs Rs Rs Rs</button>
+<button *ngFor="let tier of priceTiers; let i = index" (click)="selectPriceTier(i)" [class.bg-surface-container]="priceTierIndex === i" [class.bg-surface]="priceTierIndex !== i" [class.border-b-2]="priceTierIndex === i" [class.border-primary-container]="priceTierIndex === i" class="flex-1 py-2 text-on-surface border-r border-outline-variant last:border-r-0 hover:bg-surface-container transition-colors text-center font-label-lg">{{ tier }}</button>
 </div>
 </section>
 
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Minimum Rating</h2>
 <div class="flex items-center gap-2">
-<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
-<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
-<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
-<button class="text-primary-container"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span></button>
-<button class="text-outline-variant"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">star</span></button>
-<span class="ml-2 font-label-lg text-on-surface-variant">4.0+</span>
+<button *ngFor="let star of stars" (click)="setRating(star)" [class.text-primary-container]="star <= ratingValue" [class.text-outline-variant]="star > ratingValue"><span class="material-symbols-outlined" [style.font-variation-settings]="star <= ratingValue ? '\'FILL\' 1' : '\'FILL\' 0'">star</span></button>
+<span class="ml-2 font-label-lg text-on-surface-variant">{{ ratingValue }}.0+</span>
 </div>
 </section>
 
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Available Seats</h2>
 <div class="flex items-center justify-between border-b border-outline-variant pb-2">
-<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">remove</span></button>
-<span class="font-title-lg text-on-surface">2 Guests</span>
-<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">add</span></button>
+<button (click)="decrementGuests()" class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">remove</span></button>
+<span class="font-title-lg text-on-surface">{{ guestCount }} Guest{{ guestCount === 1 ? '' : 's' }}</span>
+<button (click)="incrementGuests()" class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary-container"><span class="material-symbols-outlined text-sm">add</span></button>
 </div>
 </section>
 
@@ -138,7 +127,7 @@
 <button (click)="go('/discover-restaurants')" class="w-full bg-primary-container text-on-primary py-3 rounded-md font-label-lg uppercase tracking-wider hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
                         Show 42 Results
                     </button>
-<button class="w-full border border-outline-variant text-on-surface py-3 rounded-md font-label-lg uppercase tracking-wider hover:bg-surface-container transition-colors">
+<button (click)="resetFilters()" class="w-full border border-outline-variant text-on-surface py-3 rounded-md font-label-lg uppercase tracking-wider hover:bg-surface-container transition-colors">
                         Reset Filters
                     </button>
 </div>

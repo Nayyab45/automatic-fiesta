@@ -1,0 +1,17 @@
+// Screen-specific styles for "Explore Menu", carried over from the
+// original prototype (Explore Menu.html). Shared rules live in src/global.scss.
+
+.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+.chip-selected {
+    background-color: rgba(184, 155, 94, 0.2) !important;
+    border-color: #b89b5e !important;
+    color: #735b25 !important;
+    font-weight: 700;
+}

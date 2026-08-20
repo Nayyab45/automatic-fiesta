@@ -11,9 +11,19 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class SafetyCheckinPage {
   readonly pageTitle = "Safety Check-in";
-
+  checkedIn = false;
 
   constructor(private router: Router, private location: Location) {}
+
+  checkIn(): void {
+    this.checkedIn = true;
+  }
+
+  checkOut(): void {
+    if (!this.checkedIn) return;
+    this.checkedIn = false;
+    this.go('/safety-center');
+  }
 
   go(path: string): void {
     this.router.navigateByUrl(path);
@@ -23,4 +33,7 @@ export class SafetyCheckinPage {
     this.location.back();
   }
 
+  callForHelp(): void {
+    window.location.href = 'tel:1122';
+  }
 }

@@ -99,9 +99,10 @@
 <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-200" data-icon="expand_more">expand_more</span>
 </summary>
 <div class="pt-stack-sm flex gap-gutter items-center">
-<input class="premium-input font-body-md text-body-md flex-grow" placeholder="Enter code" type="text"/>
-<button class="font-label-lg text-label-lg text-primary uppercase tracking-wide" type="button">Apply</button>
+<input #promoInput class="premium-input font-body-md text-body-md flex-grow" placeholder="Enter code" type="text"/>
+<button (click)="applyPromo(promoInput)" class="font-label-lg text-label-lg text-primary uppercase tracking-wide" type="button">Apply</button>
 </div>
+<p *ngIf="promoMessage" class="pt-unit font-label-sm text-label-sm" [class.text-error]="discount === 0">{{ promoMessage }}</p>
 </details>
 </section>
 
@@ -110,7 +111,11 @@
 <div class="flex flex-col gap-stack-sm">
 <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
 <span>Subtotal</span>
-<span id="subtotalAmount">$9.99</span>
+<span id="subtotalAmount">${{ subtotal.toFixed(2) }}</span>
+</div>
+<div *ngIf="discount > 0" class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Discount</span>
+<span>-${{ discount.toFixed(2) }}</span>
 </div>
 <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
 <span>Tax</span>
@@ -118,7 +123,7 @@
 </div>
 <div class="flex justify-between font-title-lg text-title-lg mt-stack-sm pt-stack-sm border-t-[0.5px] border-outline-variant">
 <span>Total</span>
-<span id="totalAmount">$9.99</span>
+<span id="totalAmount">${{ total.toFixed(2) }}</span>
 </div>
 </div>
 </section>

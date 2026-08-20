@@ -7,3 +7,16 @@
         .chip-bg {
             background-color: rgba(138, 146, 120, 0.1);
         }
+
+.filter-chip-check {
+    display: none;
+}
+.filter-chip-selected {
+    border-color: #b89b5e !important;
+    color: #b89b5e !important;
+    background-color: rgb(253, 248, 230) !important;
+    font-weight: 700;
+}
+.filter-chip-selected .filter-chip-check {
+    display: inline-block;
+}

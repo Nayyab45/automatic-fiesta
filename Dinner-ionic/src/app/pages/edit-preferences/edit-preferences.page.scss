@@ -35,3 +35,14 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+.chip-selected {
+    border-width: 2px !important;
+    border-color: #b89b5e !important;
+    background-color: rgba(232, 216, 184, 0.35) !important;
+    color: #735b25 !important;
+}
+.segment-selected {
+    background-color: rgba(232, 216, 184, 0.35) !important;
+    color: #735b25 !important;
+}

@@ -1,11 +1,9 @@
-<div class="w-full max-w-md bg-surface min-h-screen flex flex-col shadow-sm border-x border-outline-variant/30">
-
-<header class="pt-16 pb-stack-lg px-container-padding text-center">
+<header class="pt-16 pb-stack-lg px-container-padding text-center md:max-w-md md:mx-auto">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-sm">What do you love to eat?</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant">Choose your Pakistani food preferences.</p>
 </header>
 
-<main class="flex-grow px-container-padding overflow-y-auto pb-32">
+<main class="flex-grow min-h-0 overflow-y-auto px-container-padding pb-32 md:max-w-md md:mx-auto md:w-full">
 <form id="preferences-form">
 
 <section class="mb-section-gap">
@@ -86,9 +84,8 @@
 </form>
 </main>
 
-<div class="fixed bottom-0 w-full max-w-md bg-surface border-t border-outline-variant/30 px-container-padding py-stack-md pb-8 z-50">
+<div class="fixed bottom-0 left-0 w-full md:max-w-md md:left-1/2 md:-translate-x-1/2 bg-surface border-t border-outline-variant/30 px-container-padding py-stack-md pb-8 z-50">
 <button (click)="go('/dietary-preferences')" class="w-full bg-primary-container text-on-primary font-title-lg text-title-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98]" type="button">
                 Continue
             </button>
-</div>
 </div>

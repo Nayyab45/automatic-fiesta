@@ -11,7 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class RestaurantDetailPage {
   readonly pageTitle = "Restaurant Detail";
-
+  saved = false;
 
   constructor(private router: Router, private location: Location) {}
 
@@ -23,4 +23,16 @@ export class RestaurantDetailPage {
     this.location.back();
   }
 
+  toggleSave(): void {
+    this.saved = !this.saved;
+  }
+
+  share(): void {
+    const shareData = { title: 'Haveli Restaurant', text: 'Check out Haveli Restaurant', url: window.location.href };
+    if (navigator.share) {
+      navigator.share(shareData).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareData.url).catch(() => {});
+    }
+  }
 }

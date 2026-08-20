@@ -1,7 +1,7 @@
 <header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface full-width top-0 z-40 sticky">
-<div class="flex items-center gap-unit cursor-pointer hover:opacity-80 transition-opacity">
+<div (click)="go('/select-location')" class="flex items-center gap-unit cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
-<h2 class="font-headline-md text-headline-md text-primary tracking-tight">Karachi, PK</h2>
+<h2 class="font-headline-md text-headline-md text-primary tracking-tight">{{ cityService.label() }}</h2>
 <span class="material-symbols-outlined text-primary text-[18px]">keyboard_arrow_down</span>
 </div>
 <button class="w-10 h-10 rounded-full overflow-hidden border border-secondary-container hover:opacity-80 transition-opacity flex-shrink-0">
@@ -9,7 +9,7 @@
 </button>
 </header>
 
-<main class="flex-1 px-container-padding pb-section-gap pt-stack-md">
+<main class="flex-1 px-container-padding pb-32 pt-stack-md">
 
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-md tracking-tight">Conversations</h1>
 

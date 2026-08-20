@@ -1,0 +1,39 @@
+<div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] px-container-padding">
+<div class="w-full max-w-sm bg-surface rounded-[24px] p-stack-lg shadow-[0_16px_48px_-12px_rgba(0,0,0,0.35)]">
+
+<div class="flex items-center justify-center mb-stack-md">
+<div class="w-14 h-14 rounded-full flex items-center justify-center" [class.bg-error]="destructive" [class.bg-opacity-10]="destructive" [class.bg-secondary-container]="!destructive">
+<span class="material-symbols-outlined text-[28px]" [class.text-error]="destructive" [class.text-primary]="!destructive">
+{{ destructive ? 'warning' : 'help' }}
+</span>
+</div>
+</div>
+
+<h2 class="font-headline-md text-headline-md text-on-surface text-center mb-stack-sm">{{ title }}</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-stack-lg">{{ message }}</p>
+
+<div class="flex gap-stack-sm">
+<button (click)="cancel.emit()" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg py-3 rounded-full hover:bg-surface-container transition-colors">
+    {{ cancelLabel }}
+</button>
+<button
+  (click)="confirm.emit()"
+  class="flex-1 font-label-lg text-label-lg py-3 rounded-full transition-colors"
+  [class.bg-error]="destructive"
+  [class.text-on-error]="destructive"
+  [class.hover:opacity-90]="destructive"
+  [class.bg-primary-container]="!destructive"
+  [class.text-on-primary]="!destructive"
+>
+    {{ confirmLabel }}
+</button>
+</div>
+</div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>

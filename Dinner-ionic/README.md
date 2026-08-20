@@ -1,9 +1,16 @@
 # Dastarkhān — "What Should We Eat?" (Ionic 8 + Angular)
 
-This is the Ionic 8 / Angular 18 conversion of the 38 static HTML prototype
+This is the Ionic 8 / Angular 18 conversion of the static HTML prototype
 screens in the original `Project1` folder. Every screen has been turned into
 a real, routed, standalone Angular component, wired together into a
 click-through app you can run in a browser or package for iOS/Android later.
+
+The project now has **56 screens / 56 routes** — the original 39, plus 11
+Stitch-generated screens added in a second pass (Explore Menu, the 4-step
+Identity Verification flow, Manage Account, Emergency Contacts, Safety
+Check-in, Future Features, Premium Membership + subscribe flow), plus 6 more
+screens converted or re-converted in a third pass (see "Latest update"
+below).
 
 ## Getting started
 
@@ -33,11 +40,54 @@ ionic capacitor add android
 
 ## What was converted
 
-All 50 screens (`AI Matching.html`, `Home Screen.html`, `Login.html`, …) are
+All 56 screens (`AI Matching.html`, `Home Screen.html`, `Login.html`, …) are
 now standalone Angular components under `src/app/pages/<screen-id>/`, each
 with its own `.page.ts`, `.page.html`, and `.page.scss`. Routing lives in
 `src/app/app.routes.ts` — the app boots at `/splash` and every screen is
 reachable at its own URL (e.g. `/login`, `/home`, `/dining-event-details`).
+
+### Latest update (6 changed HTML files)
+
+This pass picked up 6 files that were newly added or redesigned since the
+last conversion:
+
+- **Explore Menu** (`/explore-menu`) — new page, now the real destination
+  for "View Menu" from both Restaurant Detail and Table Details.
+- **Identity Verification** was redesigned into a real 4-step flow: Start
+  Verification (`/identity-verification`) → ID Upload
+  (`/identity-verification-id-upload`, which also has its own alternate
+  bottom nav wired up) → Face Verification (`/face-verification`) → Submit
+  for Review (`/identity-verification-submit-review`) → back to the status
+  page.
+- **Manage Account** (`/manage-account`) — new page, now the real
+  destination for Settings → "Account" (including its "Log Out" button).
+- **Table Details and Guests** (`/table-details-guests`) — new page, with
+  "View Menu" and "Request a Seat" wired up. **Nothing currently links to
+  this screen from elsewhere in the app** — it was added standalone. If it's
+  meant to replace or be reachable from `dining-event-details` (or
+  somewhere else), let me know and I'll wire it in.
+- **Home Screen** was redesigned — added a new "Create Table" button
+  (`/create-table`).
+- **Settings** was redesigned — added "Emergency Contact"
+  (`/emergency-contacts`) and "Future Features" (`/future-features`) rows;
+  "Account" now points at the new Manage Account page; "Dining Preferences"
+  now points at `/edit-preferences` (the full preferences editor) instead of
+  the onboarding-only `/food-preferences`, since `/edit-preferences` would
+  otherwise have become unreachable.
+- **Dining Event Details** was redesigned — added a "Safety Check-in" button
+  (`/safety-checkin`).
+- **Welcome Screen** was redesigned into a passive, full-bleed hero screen
+  with no buttons. It ports the original inline script's auto-redirect
+  intent into an Angular `ngOnInit` that navigates to `/signup` after 30
+  seconds.
+
+**`Profile.html` was intentionally skipped this pass.** Its current content
+on disk is a near-duplicate of `Home Screen.html` (same title, same
+segmented-control/card layout) — almost certainly an accidental overwrite
+rather than the real profile screen. Converting it would have destroyed the
+working `profile` page that's already in the app, so it was left untouched
+and the old `profile` route/component are still intact. Please re-save the
+correct Profile.html content and it'll be picked up on the next pass.
 
 The visual design was **not** rebuilt in Ionic's default components. The
 original mockups already used a fully custom Tailwind-based design system
@@ -52,7 +102,7 @@ Ionic/Capacitor foundation for shipping as a native app later.
 ### Design tokens
 
 `tailwind.config.js` merges the color/spacing/type-scale tokens that were
-duplicated (and, in a couple of files, extended) across all 50 prototypes,
+duplicated (and, in a couple of files, extended) across all 56 prototypes,
 so every page renders with pixel-identical styling to the original. Shared
 CSS (safe-area padding, the soft card shadow, scrollbar hiding, autofill
 styling, shared `@keyframes`, etc.) lives once in `src/global.scss`;
@@ -94,12 +144,15 @@ places) — it's easy to change: every navigation call is a plain
   `src/assets/icon/logo.png` you provided.
 - **Not build-verified here.** Because this sandbox couldn't reach the npm
   registry, `npm install` / `ng build` need to be run on your machine to
-  confirm a clean compile (the 11 newest pages were written straight into
-  your already-installed project, so a quick `npm start` is the fastest way
-  to check them). The TypeScript in every generated file was syntax-checked
-  locally, and all 50 internal route targets were verified to resolve to a
-  real page, but a full Angular compiler pass (template
+  confirm a clean compile (all new/changed pages were written straight into
+  your already-installed `Dinner-ionic` project, so a quick `npm start` is
+  the fastest way to check them). The TypeScript in every generated file was
+  syntax-checked locally, and all 56 internal route targets were verified to
+  resolve to a real page, but a full Angular compiler pass (template
   type-checking) hasn't been run.
+- **`Profile.html`** needs to be re-saved with the real profile content —
+  see the "Latest update" note above. **`table-details-guests`** has no
+  incoming link yet — let me know how it should be wired in.
 
 ## Project structure
 
@@ -107,7 +160,7 @@ places) — it's easy to change: every navigation call is a plain
 src/
   app/
     app.component.ts       # ion-app + ion-router-outlet shell
-    app.routes.ts           # all 50 routes + splash redirect
+    app.routes.ts           # all 56 routes + splash redirect
     pages/
       splash/
       loading/
@@ -159,6 +212,12 @@ src/
       help-support/
       subscribe-to-premium/
       subscribe-to-premium-success/
+      explore-menu/
+      identity-verification-id-upload/
+      face-verification/
+      identity-verification-submit-review/
+      manage-account/
+      table-details-guests/
   assets/icon/logo.png
   global.scss
   theme/variables.scss

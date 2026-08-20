@@ -1,11 +1,11 @@
 <header class="px-container-padding py-stack-lg flex items-center justify-between sticky top-0 bg-background/90 backdrop-blur-md z-40">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary">Notifications</h1>
-<button aria-label="Mark all as read" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
-<span class="material-symbols-outlined text-outline">done_all</span>
+<button (click)="markAllAsRead()" aria-label="Mark all as read" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" [class.text-primary]="hasUnread" [class.text-outline]="!hasUnread">done_all</span>
 </button>
 </header>
 
-<main class="px-container-padding flex-1 flex flex-col gap-stack-lg max-w-3xl mx-auto w-full">
+<main class="px-container-padding flex-1 flex flex-col gap-stack-lg max-w-3xl mx-auto w-full pb-32">
 <div class="flex flex-col gap-0">
 
 <div class="flex items-start gap-gutter py-stack-md border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
@@ -21,7 +21,7 @@
 </p>
 <p class="font-body-md text-body-md text-outline">2m ago</p>
 </div>
-<div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+<div *ngIf="hasUnread" class="w-2 h-2 rounded-full bg-primary mt-2"></div>
 </div>
 
 <div class="flex items-start gap-gutter py-stack-md border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
@@ -37,7 +37,7 @@
 </p>
 <p class="font-body-md text-body-md text-outline">1h ago</p>
 </div>
-<div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+<div *ngIf="hasUnread" class="w-2 h-2 rounded-full bg-primary mt-2"></div>
 </div>
 
 <div class="flex items-start gap-gutter py-stack-md border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors cursor-pointer group">
@@ -75,24 +75,24 @@
 </main>
 
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant/30 shadow-sm rounded-t-xl" style="padding-bottom: env(safe-area-inset-bottom);">
-<button class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
+<a routerLink="/home" class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
+</a>
+<a routerLink="/discover-restaurants" class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
 <span class="material-symbols-outlined">explore</span>
 <span class="font-label-sm text-label-sm mt-1">Discover</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
+</a>
+<a routerLink="/my-tables" class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
 <span class="material-symbols-outlined">restaurant</span>
 <span class="font-label-sm text-label-sm mt-1">Tables</span>
-</button>
-<button class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 pb-2 scale-90 transition-transform duration-200">
+</a>
+<a routerLink="/messages" class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 pb-2 scale-90 transition-transform duration-200">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
 <span class="font-label-sm text-label-sm mt-1 font-bold">Messages</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
+</a>
+<a routerLink="/profile" class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors pb-2">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
-</button>
+</a>
 </nav>

@@ -1,0 +1,4 @@
+// Screen-specific styles for "Table Details", carried over from the
+// original prototype (Table Details and Guests.html). Shared rules live in src/global.scss.
+
+body { background-color: theme('colors.surface'); color: theme('colors.on-surface'); }

@@ -11,7 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class NotificationsPage {
   readonly pageTitle = "Notifications";
-
+  hasUnread = true;
 
   constructor(private router: Router, private location: Location) {}
 
@@ -23,4 +23,7 @@ export class NotificationsPage {
     this.location.back();
   }
 
+  markAllAsRead(): void {
+    this.hasUnread = false;
+  }
 }

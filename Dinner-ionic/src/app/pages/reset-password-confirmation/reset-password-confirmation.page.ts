@@ -11,7 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class ResetPasswordConfirmationPage {
   readonly pageTitle = "Reset Password Sent";
-
+  resent = false;
 
   constructor(private router: Router, private location: Location) {}
 
@@ -23,4 +23,11 @@ export class ResetPasswordConfirmationPage {
     this.location.back();
   }
 
+  resend(): void {
+    this.resent = true;
+  }
+
+  openEmailApp(): void {
+    window.location.href = 'mailto:';
+  }
 }

@@ -14,3 +14,10 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+.chip-selected {
+    border-width: 1.5px !important;
+    border-color: #b89b5e !important;
+    background-color: rgba(232, 216, 184, 0.2) !important;
+    color: #735b25 !important;
+}

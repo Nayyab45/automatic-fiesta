@@ -29,3 +29,26 @@ body {
         .soft-card {
             box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
         }
+
+.gathering-type-selected {
+    border-width: 1.5px !important;
+    border-color: #b89b5e !important;
+    background-color: rgba(232, 216, 184, 0.2) !important;
+}
+.gathering-type-selected .gathering-type-icon {
+    color: #b89b5e !important;
+}
+.gathering-type-selected .gathering-type-label {
+    font-weight: 700;
+}
+.atmosphere-selected {
+    border-width: 1.5px !important;
+    border-color: #b89b5e !important;
+    background-color: rgba(232, 216, 184, 0.1) !important;
+}
+.atmosphere-selected .atmosphere-icon {
+    color: #b89b5e !important;
+}
+.atmosphere-selected .atmosphere-label {
+    font-weight: 700;
+}

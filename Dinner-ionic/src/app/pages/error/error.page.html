@@ -1,0 +1,21 @@
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding pb-section-gap text-center min-h-[100dvh]">
+
+<div class="relative w-40 h-40 mb-stack-lg flex items-center justify-center">
+<div class="absolute inset-0 bg-gradient-to-tr from-surface to-surface-container rounded-full opacity-60 blur-2xl"></div>
+<div class="relative w-32 h-32 rounded-full bg-surface-container-lowest border border-outline-variant/50 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary" style="font-size: 56px;">{{ content.icon }}</span>
+</div>
+</div>
+
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-sm">{{ content.title }}</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[300px] mb-section-gap">{{ content.message }}</p>
+
+<div class="w-full max-w-xs flex flex-col gap-stack-sm">
+<button (click)="retry()" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full shadow-sm hover:opacity-90 active:scale-[0.98] transition-all duration-200 uppercase tracking-widest">
+    Try Again
+</button>
+<button (click)="go('/home')" class="w-full bg-secondary-container border border-[#E8D8B8] text-on-surface font-label-lg text-label-lg py-4 px-6 rounded-full hover:opacity-90 active:scale-[0.98] transition-all duration-200 uppercase tracking-widest">
+    Back to Home
+</button>
+</div>
+</main>

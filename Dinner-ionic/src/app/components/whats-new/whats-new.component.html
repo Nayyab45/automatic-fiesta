@@ -1,0 +1,38 @@
+<div class="fixed inset-0 z-[999] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out] px-container-padding pb-[env(safe-area-inset-bottom,24px)] md:pb-0">
+<div class="w-full max-w-md bg-surface rounded-t-[28px] md:rounded-[28px] p-6 pt-7 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.35)] max-h-[85vh] overflow-y-auto">
+
+<div class="flex items-center justify-center mb-stack-sm">
+<img alt="What Should We Eat Logo" class="h-10 w-auto object-contain" src="assets/icon/logo.png"/>
+</div>
+
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface text-center mb-1">
+    What's New
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-stack-lg">
+    Here's what we've added to make your dining experience even better.
+</p>
+
+<ul class="flex flex-col gap-stack-md mb-stack-lg">
+<li *ngFor="let item of items" class="flex items-start gap-3">
+<div class="shrink-0 w-11 h-11 rounded-full bg-secondary-container/50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">{{ item.icon }}</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-on-surface leading-tight">{{ item.title }}</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug mt-0.5">{{ item.description }}</p>
+</div>
+</li>
+</ul>
+
+<button (click)="close()" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full shadow-sm hover:opacity-90 active:scale-[0.98] transition-all duration-200 uppercase tracking-widest">
+    Got It
+</button>
+</div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>

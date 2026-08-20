@@ -23,8 +23,18 @@ export class ProfileCreationPage {
   };
 
   cities: { value: string; label: string }[] = [];
+  favoriteFoods = ['Karahi', 'Biryani', 'Seekh Kebab'];
 
   constructor(private router: Router, private location: Location) {}
+
+  addFavoriteFood(): void {
+    const value = window.prompt('Add a favorite food');
+    if (value?.trim()) this.favoriteFoods.push(value.trim());
+  }
+
+  removeFavoriteFood(index: number): void {
+    this.favoriteFoods.splice(index, 1);
+  }
 
   go(path: string): void {
     this.router.navigateByUrl(path);

@@ -2,7 +2,7 @@
   "name": "dastarkhan",
   "version": "1.0.0",
   "author": "What Should We Eat?",
-  "description": "Dastarkhān - a premium Pakistani communal dining companion app.",
+  "description": "What Should We Eat? - a premium Pakistani communal dining companion app.",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -35,6 +35,7 @@
     "@angular-devkit/build-angular": "^18.2.0",
     "@angular/cli": "^18.2.0",
     "@angular/compiler-cli": "^18.2.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "8.5.0",
     "@ionic/cli": "^7.2.0",
     "@tailwindcss/container-queries": "^0.1.1",

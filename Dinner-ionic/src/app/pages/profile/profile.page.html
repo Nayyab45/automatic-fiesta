@@ -1,21 +1,21 @@
 <header class="hidden md:flex justify-between items-center w-full px-container-padding py-stack-md bg-surface flat no shadows sticky top-0 z-40 transition-transform">
-<div class="flex items-center gap-2">
+<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary">location_on</span>
-<span class="font-headline-md text-headline-md text-primary">Karachi, PK</span>
+<span class="font-headline-md text-headline-md text-primary">{{ cityService.label() }}</span>
 </div>
 <nav class="flex gap-8">
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="javascript:void(0)">Home</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="javascript:void(0)">Discover</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="javascript:void(0)">Tables</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="javascript:void(0)">Messages</a>
-<a class="text-primary font-bold font-label-lg text-label-lg hover:opacity-80 transition-opacity" href="javascript:void(0)">Profile</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/home">Home</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/discover-restaurants">Discover</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/my-tables">Tables</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/messages">Messages</a>
+<a class="text-primary font-bold font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/profile">Profile</a>
 </nav>
 <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
 <img alt="User Profile" class="w-full h-full object-cover" data-alt="A small circular avatar portrait of a modern South Asian man, professional yet approachable, set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrKW5HWbQCf2uh8HfV3PHEEODlQtplXRkXIWMiG4qBLghxeu-f1iUIR4lEADsCcvsnY3ABbmM_gO0yk5xCL9yYpCmO-cLZEsFTu875g4bi0ZGR5jZLY-9miG9AVS0ByuRxkRHp3UP-IYhLYBq0iQfZlhl_x0AsuujkMAj81e5tjmVNr13om3Fbi-L8w2dsnkcYHeM8nyLl7A1YNKMUacv1teznJc4Or1crydzoR-hABjGrETQ-20tR"/>
 </div>
 </header>
 
-<main class="max-w-4xl mx-auto px-container-padding pt-stack-lg md:pt-section-gap pb-section-gap">
+<main class="max-w-4xl mx-auto px-container-padding pt-stack-lg md:pt-section-gap pb-32 md:pb-section-gap">
 
 <section class="flex flex-col md:flex-row items-center md:items-start gap-stack-lg mb-section-gap">
 

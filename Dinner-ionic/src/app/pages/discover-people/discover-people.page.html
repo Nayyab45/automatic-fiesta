@@ -18,19 +18,19 @@
 </div>
 
 <div class="flex overflow-x-auto hide-scrollbar gap-unit py-unit -mx-container-padding px-container-padding">
-<button class="flex items-center gap-2 px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
+<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
                     Age: 25-35
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
+<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
                     Interests
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
+<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
                     Cuisine
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
+<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
                     Distance: &lt;5km
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
@@ -103,26 +103,26 @@
 </main>
 
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant rounded-t-xl shadow-sm h-[72px]">
-<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
+<a routerLink="/home" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
-</button>
-<button class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 scale-90 transition-transform duration-200">
+</a>
+<a routerLink="/discover-restaurants" class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 scale-90 transition-transform duration-200">
 <span class="material-symbols-outlined filled">explore</span>
 <span class="font-label-sm text-label-sm mt-1 font-bold">Discover</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
+</a>
+<a routerLink="/my-tables" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
 <span class="material-symbols-outlined">restaurant</span>
 <span class="font-label-sm text-label-sm mt-1">Tables</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
+</a>
+<a routerLink="/messages" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
 <span class="material-symbols-outlined">chat_bubble</span>
 <span class="font-label-sm text-label-sm mt-1">Messages</span>
-</button>
-<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
+</a>
+<a routerLink="/profile" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
-</button>
+</a>
 </nav>
 
 <div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end opacity-0 pointer-events-none transition-opacity duration-300" id="filterOverlay">
@@ -155,11 +155,11 @@
 <div class="flex flex-col gap-stack-md">
 <h3 class="font-title-lg text-title-lg text-on-background">Interests</h3>
 <div class="flex flex-wrap gap-3">
-<button class="px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Foodie</button>
-<button class="px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Coffee Lover</button>
-<button class="px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Live Music</button>
-<button class="px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Fine Dining</button>
-<button class="px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Street Food</button>
+<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Foodie</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Coffee Lover</button>
+<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Live Music</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Fine Dining</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Street Food</button>
 </div>
 </div>
 
@@ -177,7 +177,7 @@
 </div>
 </div>
 <div class="p-container-padding border-t-[0.5px] border-outline-variant bg-surface pb-safe mt-auto">
-<button class="w-full bg-primary-container text-on-primary py-4 rounded-lg font-title-lg text-title-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm">
+<button (click)="goBack()" class="w-full bg-primary-container text-on-primary py-4 rounded-lg font-title-lg text-title-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm">
                     Apply Filters
                 </button>
 </div>

@@ -16,12 +16,12 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">Select the regional flavors you enjoy most.</p>
 </div>
 <div class="flex flex-wrap gap-stack-sm">
-<button class="px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors">Punjabi</button>
-<button class="px-4 py-2 rounded-full border-2 border-primary-container bg-secondary-container text-on-secondary-container font-label-lg text-label-lg transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check</span> Sindhi</button>
-<button class="px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors">Peshawari</button>
-<button class="px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors">Balochi</button>
-<button class="px-4 py-2 rounded-full border-2 border-primary-container bg-secondary-container text-on-secondary-container font-label-lg text-label-lg transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check</span> Mughlai</button>
-<button class="px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors">Kashmiri</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Punjabi</button>
+<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check">check</span>Sindhi</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Peshawari</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Balochi</button>
+<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check">check</span>Mughlai</button>
+<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Kashmiri</button>
 </div>
 </section>
 
@@ -33,9 +33,9 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">How hot do you like your food?</p>
 </div>
 <div class="flex rounded-lg overflow-hidden border border-outline-variant">
-<button class="flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors border-r border-outline-variant">Mild</button>
-<button class="flex-1 py-3 text-center font-label-lg text-label-lg bg-secondary-container text-on-secondary-container transition-colors border-r border-outline-variant shadow-sm relative z-10">Medium</button>
-<button class="flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors">Spicy</button>
+<button (click)="selectSegment($event)" class="segment-btn flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors border-r border-outline-variant">Mild</button>
+<button (click)="selectSegment($event)" class="segment-btn segment-selected flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface transition-colors border-r border-outline-variant shadow-sm relative z-10">Medium</button>
+<button (click)="selectSegment($event)" class="segment-btn flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors">Spicy</button>
 </div>
 </section>
 
@@ -89,11 +89,11 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">When do you usually eat out?</p>
 </div>
 <div class="grid grid-cols-2 gap-stack-sm">
-<button class="py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<button (click)="toggleChip($event)" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-[20px] text-on-surface-variant">sunny</span> Lunch
                     </button>
-<button class="py-3 px-4 rounded-lg border-2 border-primary-container bg-secondary-container text-on-secondary-container font-body-md text-body-md flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px] text-primary">dark_mode</span> Dinner</button>
-<button class="py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors col-span-2">
+<button (click)="toggleChip($event)" class="chip chip-selected py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px] text-primary">dark_mode</span> Dinner</button>
+<button (click)="toggleChip($event)" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors col-span-2">
 <span class="material-symbols-outlined text-[20px] text-on-surface-variant">wb_twilight</span> Late Night (Post 10 PM)
                     </button>
 </div>

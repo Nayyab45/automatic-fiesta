@@ -23,4 +23,17 @@ export class CreateTablePage {
     this.location.back();
   }
 
+  selectGatheringType(event: Event): void {
+    const selected = event.currentTarget as HTMLElement;
+    const group = selected.parentElement?.querySelectorAll('.gathering-type-btn') ?? [];
+    group.forEach((btn) => btn.classList.remove('gathering-type-selected'));
+    selected.classList.add('gathering-type-selected');
+  }
+
+  selectAtmosphere(event: Event): void {
+    const selected = event.currentTarget as HTMLElement;
+    const group = selected.parentElement?.querySelectorAll('.atmosphere-card') ?? [];
+    group.forEach((card) => card.classList.remove('atmosphere-selected'));
+    selected.classList.add('atmosphere-selected');
+  }
 }

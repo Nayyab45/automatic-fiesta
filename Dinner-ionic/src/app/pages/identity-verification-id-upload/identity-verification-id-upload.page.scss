@@ -1,0 +1,9 @@
+// Screen-specific styles for "Identity Verification - ID Upload", carried over from the
+// original prototype (Identity Verification - ID upload.html). Shared rules live in src/global.scss.
+
+body {
+            background-color: #fdf8f5; /* bg-background */
+        }
+        .ambient-shadow {
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+        }

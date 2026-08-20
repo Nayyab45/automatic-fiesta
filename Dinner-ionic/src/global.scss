@@ -1,5 +1,5 @@
 /**
- * Global styles for Dastarkhān (What Should We Eat?)
+ * Global styles for What Should We Eat?
  * This file merges the shared design-system rules that were duplicated
  * across all 38 original prototype screens. Page/screen-specific rules
  * (glass-card variants, chip styles, sliders, etc.) live alongside each
@@ -36,12 +36,44 @@ body {
 }
 
 body {
-  min-height: max(884px, 100dvh);
+  /* Was `min-height: max(884px, 100dvh)`, a leftover from the fixed-canvas
+     prototype export. On any real device shorter than 884px that forced the
+     fixed-position app shell taller than the actual viewport, so its bottom
+     slice sat below the fold with no way to scroll to it. Match the real
+     viewport instead. */
+  min-height: 100dvh;
 }
 
 ion-content {
   --background: theme("colors.surface");
   --color: theme("colors.on-surface");
+}
+
+/* None of these screens use <ion-content> -- they're plain scrollable pages.
+   Ionic's base CSS pins <body> with position:fixed + overflow:hidden (it expects
+   ion-content's own internal scroller to handle scrolling), which silently clips
+   any page taller than the viewport instead of letting it scroll.
+
+   The scroll container has to be <main>, not the "ion-page" host itself: Ionic
+   gives ion-page `contain: layout size style`, which makes it the containing
+   block for any `position: fixed` descendant (CSS containment spec). Every
+   page's bottom tab bar and several headers rely on position:fixed to stay
+   pinned to the viewport -- if ion-page were the thing that scrolls, those
+   "fixed" elements would scroll along with it instead of staying put. Making
+   <main> (a plain element, not a containing block) the scroll container keeps
+   header/nav outside the scrolling region, so they stay visually pinned while
+   only the content in between scrolls. */
+.ion-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.ion-page > main {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* Material Symbols Outlined baseline (variable font axes) */

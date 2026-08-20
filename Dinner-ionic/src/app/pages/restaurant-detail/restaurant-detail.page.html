@@ -4,10 +4,10 @@
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
 </button>
 <div class="flex gap-2">
-<button aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">bookmark_border</span>
+<button (click)="toggleSave()" aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">{{ saved ? 'bookmark' : 'bookmark_border' }}</span>
 </button>
-<button aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<button (click)="share()" aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">share</span>
 </button>
 </div>
@@ -56,7 +56,7 @@
 <section class="flex flex-col gap-stack-md">
 <div class="flex justify-between items-center">
 <h2 class="font-title-lg text-title-lg text-on-surface">Popular Dishes</h2>
-<button class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
+<button (click)="go('/explore-menu')" class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
 </div>
 <div class="flex gap-gutter overflow-x-auto hide-scrollbar pb-2 -mx-container-padding px-container-padding snap-x">
 

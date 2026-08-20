@@ -73,19 +73,11 @@
                         <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-primary">edit</span>
 </label>
 <div class="flex flex-wrap gap-1.5">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">
-                            Karahi
-                            <span class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface">close</span>
+<span *ngFor="let food of favoriteFoods; let i = index" class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">
+                            {{ food }}
+                            <span (click)="removeFavoriteFood(i)" class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface">close</span>
 </span>
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">
-                            Biryani
-                            <span class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface">close</span>
-</span>
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">
-                            Seekh Kebab
-                            <span class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface">close</span>
-</span>
-<button class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-sm text-[11px]" type="button">
+<button (click)="addFavoriteFood()" class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-sm text-[11px]" type="button">
 <span class="material-symbols-outlined text-[14px] mr-0.5">add</span> Add More
                         </button>
 </div>

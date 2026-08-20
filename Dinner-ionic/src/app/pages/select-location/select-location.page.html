@@ -1,0 +1,29 @@
+<header class="w-full top-0 sticky bg-surface z-40 flex items-center px-container-padding h-16 border-b border-outline-variant/30">
+<button (click)="goBack()" aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors -ml-2">
+<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Select City</h1>
+</header>
+
+<main class="px-container-padding pt-stack-lg pb-section-gap max-w-md mx-auto w-full">
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg">
+    Choose your city to see restaurants, tables and people dining near you.
+</p>
+
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<ul class="divide-y divide-secondary-container/50">
+<li *ngFor="let city of cityService.cities">
+<button (click)="selectCity(city.name)" class="w-full flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors text-left group">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">location_on</span>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">{{ city.name }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ city.region }}</p>
+</div>
+</div>
+<span *ngIf="cityService.current() === city.name" class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+</li>
+</ul>
+</div>
+</main>

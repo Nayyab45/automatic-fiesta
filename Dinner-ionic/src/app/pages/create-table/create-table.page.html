@@ -9,21 +9,21 @@
 
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">Gathering Type</h2>
-<div class="flex flex-wrap gap-stack-sm"><button class="px-6 py-3 rounded-full border-[1.5px] border-primary-container bg-secondary-container/20 text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-primary-container">dinner_dining</span>
-<span class="font-bold">Dinner</span>
+<div class="flex flex-wrap gap-stack-sm"><button (click)="selectGatheringType($event)" class="gathering-type-btn gathering-type-selected px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant gathering-type-icon">dinner_dining</span>
+<span class="gathering-type-label">Dinner</span>
 </button>
-<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-outline-variant">lunch_dining</span>
-<span>Lunch</span>
+<button (click)="selectGatheringType($event)" class="gathering-type-btn px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant gathering-type-icon">lunch_dining</span>
+<span class="gathering-type-label">Lunch</span>
 </button>
-<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-outline-variant">brunch_dining</span>
-<span>Brunch</span>
+<button (click)="selectGatheringType($event)" class="gathering-type-btn px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant gathering-type-icon">brunch_dining</span>
+<span class="gathering-type-label">Brunch</span>
 </button>
-<button class="px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-outline-variant">local_cafe</span>
-<span>Chai Meetup</span>
+<button (click)="selectGatheringType($event)" class="gathering-type-btn px-6 py-3 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-lg text-label-lg hover:border-primary-container/50 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline-variant gathering-type-icon">local_cafe</span>
+<span class="gathering-type-label">Chai Meetup</span>
 </button></div>
 </section>
 
@@ -78,17 +78,17 @@
 
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">Atmosphere &amp; Intent</h2>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-unit"><div class="bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors">
-<span class="material-symbols-outlined text-outline-variant text-[28px]">restaurant</span>
-<span class="font-label-lg text-label-lg text-on-surface">Casual Dinner</span>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-unit"><div (click)="selectAtmosphere($event)" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-outline-variant text-[28px] atmosphere-icon">restaurant</span>
+<span class="font-label-lg text-label-lg text-on-surface atmosphere-label">Casual Dinner</span>
 </div>
-<div class="bg-secondary-container/10 border-[1.5px] border-primary-container rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer transition-colors relative overflow-hidden">
-<span class="material-symbols-outlined text-primary-container text-[28px] z-10">forum</span>
-<span class="font-label-lg text-label-lg text-on-surface font-bold z-10">Social Conversation</span>
+<div (click)="selectAtmosphere($event)" class="atmosphere-card atmosphere-selected bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer transition-colors relative overflow-hidden">
+<span class="material-symbols-outlined text-outline-variant text-[28px] z-10 atmosphere-icon">forum</span>
+<span class="font-label-lg text-label-lg text-on-surface z-10 atmosphere-label">Social Conversation</span>
 </div>
-<div class="bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors md:col-span-1 col-span-2">
-<span class="material-symbols-outlined text-outline-variant text-[28px]">handshake</span>
-<span class="font-label-lg text-label-lg text-on-surface">Business Networking</span>
+<div (click)="selectAtmosphere($event)" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors md:col-span-1 col-span-2">
+<span class="material-symbols-outlined text-outline-variant text-[28px] atmosphere-icon">handshake</span>
+<span class="font-label-lg text-label-lg text-on-surface atmosphere-label">Business Networking</span>
 </div></div>
 </section>
 

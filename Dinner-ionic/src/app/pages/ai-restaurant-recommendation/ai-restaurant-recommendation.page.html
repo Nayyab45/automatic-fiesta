@@ -1,7 +1,7 @@
 <header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface top-0 z-40 md:hidden sticky">
-<div class="flex items-center gap-2">
+<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
-<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Karachi, PK</span>
+<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">{{ cityService.label() }}</span>
 </div>
 <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
 <img alt="User profile photo" class="w-full h-full object-cover" data-alt="A portrait photo of a sophisticated young professional diner looking at the camera, wearing an elegant smart-casual outfit in a warm, warmly lit high-end restaurant setting with muted gold accents. The image embodies a modern, luxurious editorial photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZXQuLu93uM2Is0omaSYoOEYZMTmOmXWjgx24Sspmqp3hQak4rjeuA2h_eqZ_65GU83i3SIyYJPS5BIDVsA4aZFD9vaMOwhZMUs-MH0XS1y1cmr3TnZi01q_IHCxlGtaEZhKEQup0Z2-nepTWUcNsbRVztBV36w3fTIuc6wAriP1IqXI27_Jy-yqg6Kuh0O_HbrhU04Z58YtRQwz4Z_UTimXPjg0YYLUZ_h_Bj8QBCLXvfHjL9c8Z5"/>
@@ -11,7 +11,7 @@
 <nav class="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant px-container-padding py-section-gap z-50">
 <div class="mb-section-gap flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-display-lg" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="font-display-lg text-headline-md text-primary tracking-tighter">Dastarkhān</span>
+<span class="font-display-lg text-headline-md text-primary tracking-tighter">What Should We Eat?</span>
 </div>
 <ul class="flex flex-col gap-stack-lg flex-grow">
 <li>

@@ -1,0 +1,80 @@
+<header class="bg-background w-full top-0 sticky z-40 bg-background flex items-center px-gutter h-16 w-full">
+<button (click)="goBack()" class="mr-4 text-on-surface-variant hover:bg-surface-container-high transition-colors active:opacity-80 transition-opacity p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Verify Your Identity</h1>
+</header>
+<main class="px-container-padding py-stack-md flex flex-col gap-section-gap pb-32">
+
+<section>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                To ensure the safety of our community, please upload a clear photo of your Government-issued National ID.
+            </p>
+</section>
+
+<section class="flex flex-col gap-stack-lg">
+
+<div class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px]">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
+<h3 class="font-title-lg text-title-lg text-on-surface mt-2">Front of ID</h3>
+<p class="font-body-md text-body-md text-primary font-medium">Tap to Upload</p>
+</div>
+
+<div class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px]">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
+<h3 class="font-title-lg text-title-lg text-on-surface mt-2">Back of ID</h3>
+<p class="font-body-md text-body-md text-primary font-medium">Tap to Upload</p>
+</div>
+</section>
+
+<section class="flex flex-col gap-stack-lg">
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase tracking-wider">Guidelines</h4>
+<ul class="flex flex-col gap-unit">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Ensure all details are readable</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">No glare or blur</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">All four corners are visible</span>
+</li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase tracking-wider">Accepted IDs</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    National ID Card, Passport, or Driving License.
+                </p>
+</div>
+</section>
+
+<section class="mt-stack-md pb-container-padding">
+<button (click)="go('/face-verification')" class="w-full bg-primary-container text-on-primary rounded-full py-4 font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2">
+                Submit for Verification
+            </button>
+</section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center bg-surface px-4 pb-4 z-50 bg-surface shadow-[0_-4px_16px_0_rgba(0,0,0,0.04)] shadow-sm md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-all active:scale-95 duration-200" routerLink="/discover-restaurants">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-all active:scale-95 duration-200" routerLink="/my-tables">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-label-sm text-label-sm mt-1">Bookings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold border-t-2 border-primary pt-2 hover:text-primary transition-all active:scale-95 duration-200" routerLink="/identity-verification">
+<span class="material-symbols-outlined" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-label-sm mt-1">Verify</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-all active:scale-95 duration-200" routerLink="/profile">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>

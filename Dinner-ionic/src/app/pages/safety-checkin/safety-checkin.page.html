@@ -42,13 +42,17 @@
 </section>
 
 <section class="px-container-padding flex flex-col items-center gap-stack-sm">
-<button (click)="go('/safety-center')" class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
+<button *ngIf="!checkedIn" (click)="checkIn()" class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                     I've Arrived — Check In
                 </button>
+<button *ngIf="checkedIn" disabled class="w-full h-[56px] rounded-full bg-primary-container/50 text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg cursor-not-allowed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Checked In
+                </button>
 <div class="flex items-center gap-1.5 mt-2">
-<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Not checked in</span>
+<div class="w-2 h-2 rounded-full" [class.bg-outline-variant]="!checkedIn" [class.bg-tertiary]="checkedIn"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">{{ checkedIn ? 'Checked in' : 'Not checked in' }}</span>
 </div>
 </section>
 
@@ -59,7 +63,7 @@
 <span class="material-symbols-outlined">contact_emergency</span>
                         Alert Emergency Contact
                     </button>
-<button class="w-full h-[48px] rounded-lg border border-error text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
+<button (click)="callForHelp()" class="w-full h-[48px] rounded-lg border border-error text-error flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 hover:bg-error-container/20 btn-press">
 <span class="material-symbols-outlined">local_phone</span>
                         Call for Help
                     </button>
@@ -74,7 +78,7 @@
 </section>
 
 <section class="px-container-padding mt-stack-sm">
-<button (click)="go('/safety-center')" class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200 opacity-60 cursor-not-allowed">
+<button (click)="checkOut()" [disabled]="!checkedIn" class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200" [class.opacity-60]="!checkedIn" [class.cursor-not-allowed]="!checkedIn">
 <span class="material-symbols-outlined">logout</span>
                     I've Left Safely — Check Out
                 </button>

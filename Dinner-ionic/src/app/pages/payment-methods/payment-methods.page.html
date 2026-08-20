@@ -1,0 +1,60 @@
+<header class="w-full top-0 sticky bg-surface z-40 flex items-center px-container-padding h-16 border-b border-outline-variant/30">
+<button (click)="goBack()" aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors -ml-2">
+<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Payment Methods</h1>
+</header>
+
+<main class="px-container-padding pt-stack-lg pb-section-gap max-w-md mx-auto w-full flex flex-col gap-section-gap">
+
+<section class="flex flex-col gap-stack-md" *ngIf="paymentService.paymentMethods().length > 0">
+<div class="bg-surface rounded-xl ambient-shadow card-inner-stroke overflow-hidden flex flex-col divide-y divide-secondary-container/50">
+<div *ngFor="let card of paymentService.paymentMethods()" class="flex items-center justify-between p-stack-md">
+<div class="flex items-center gap-gutter">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">{{ card.brand }} •••• {{ card.last4 }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-unit">Expires {{ card.expiry }}</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span *ngIf="card.isDefault" class="font-label-sm text-label-sm text-primary uppercase bg-secondary-container/50 py-1 px-2 rounded-md">Default</span>
+<button *ngIf="!card.isDefault" (click)="paymentService.setDefault(card.id)" class="font-label-sm text-label-sm text-primary uppercase hover:underline py-1 px-2">Make Default</button>
+<button (click)="paymentService.removeCard(card.id)" aria-label="Remove card" class="w-9 h-9 flex items-center justify-center rounded-full text-error hover:bg-error/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+
+<section *ngIf="paymentService.paymentMethods().length === 0 && !showAddCard" class="flex flex-col items-center text-center gap-stack-sm py-section-gap">
+<span class="material-symbols-outlined text-outline-variant" style="font-size: 48px;">credit_card_off</span>
+<p class="font-body-lg text-body-lg text-on-surface-variant">No payment methods saved yet.</p>
+</section>
+
+<section *ngIf="!showAddCard">
+<button (click)="openAddCard()" class="w-full border border-dashed border-primary-container text-primary font-label-lg text-label-lg py-4 rounded-xl hover:bg-secondary-container/20 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                Add Payment Method
+            </button>
+</section>
+
+<section *ngIf="showAddCard" class="bg-surface rounded-xl ambient-shadow card-inner-stroke p-stack-md flex flex-col gap-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface">Add Card</h3>
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Card Number</label>
+<input [(ngModel)]="cardNumber" class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container py-2 text-on-surface focus:ring-0 outline-none font-body-lg text-body-lg" maxlength="19" placeholder="1234 5678 9012 3456" type="text"/>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Expiry (MM/YY)</label>
+<input [(ngModel)]="cardExpiry" class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container py-2 text-on-surface focus:ring-0 outline-none font-body-lg text-body-lg" maxlength="5" placeholder="08/27" type="text"/>
+</div>
+<div class="flex gap-stack-sm mt-stack-sm">
+<button (click)="cancelAddCard()" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:bg-surface-container transition-colors">Cancel</button>
+<button (click)="saveCard()" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Save Card</button>
+</div>
+</section>
+</main>

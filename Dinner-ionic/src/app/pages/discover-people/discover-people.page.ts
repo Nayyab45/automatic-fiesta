@@ -23,4 +23,7 @@ export class DiscoverPeoplePage {
     this.location.back();
   }
 
+  toggleChip(event: Event): void {
+    (event.currentTarget as HTMLElement).classList.toggle('chip-selected');
+  }
 }

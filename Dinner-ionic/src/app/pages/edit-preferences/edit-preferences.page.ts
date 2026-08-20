@@ -23,4 +23,16 @@ export class EditPreferencesPage {
     this.location.back();
   }
 
+  toggleChip(event: Event): void {
+    const el = event.currentTarget as HTMLElement;
+    el.classList.toggle('chip-selected');
+    el.querySelector('.chip-check')?.classList.toggle('hidden');
+  }
+
+  selectSegment(event: Event): void {
+    const selected = event.currentTarget as HTMLElement;
+    const group = selected.parentElement?.querySelectorAll('.segment-btn') ?? [];
+    group.forEach((btn) => btn.classList.remove('segment-selected'));
+    selected.classList.add('segment-selected');
+  }
 }

@@ -81,15 +81,25 @@
 </div>
 </div>
 </div>
+
+<div *ngFor="let msg of ownMessages" class="flex gap-stack-sm items-end justify-end w-full mt-2">
+<div class="flex flex-col gap-1 items-end max-w-[80%]">
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-2">You, {{ msg.time }}</span>
+<div class="bg-primary-container px-4 py-3 rounded-2xl rounded-br-none text-on-primary-container shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+<p class="font-body-md text-body-md">{{ msg.text }}</p>
+</div>
+</div>
+</div>
 </main>
 
 <div class="bg-surface border-t border-outline-variant/30 px-container-padding py-stack-sm pb-[calc(16px+env(safe-area-inset-bottom)+70px)] fixed bottom-0 left-0 w-full z-20">
 <div class="flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/50 focus-within:border-primary transition-colors">
-<button class="text-on-surface-variant hover:text-primary transition-colors">
+<button (click)="attachInput.click()" aria-label="Attach file" class="text-on-surface-variant hover:text-primary transition-colors">
 <span class="material-symbols-outlined text-[20px]">add_circle</span>
 </button>
-<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/70 py-2" placeholder="Type a message..." type="text"/>
-<button class="text-primary hover:opacity-80 transition-opacity bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center">
+<input #attachInput (change)="attachFile($event)" class="sr-only" type="file"/>
+<input #messageInput (keyup.enter)="sendMessage(messageInput)" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/70 py-2" placeholder="Type a message..." type="text"/>
+<button (click)="sendMessage(messageInput)" aria-label="Send message" class="text-primary hover:opacity-80 transition-opacity bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center">
 <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">send</span>
 </button>
 </div>
