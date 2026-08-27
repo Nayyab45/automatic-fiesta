@@ -18,13 +18,17 @@
 <p class="font-body-md text-body-md text-on-surface-variant">Sign in to continue your dining journey.</p>
 </div>
 
-<form (submit)="$event.preventDefault()" class="flex flex-col gap-stack-md w-full">
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-stack-md w-full">
+
+@if (errorMessage()) {
+<p class="font-body-md text-body-md text-error" role="alert">{{ errorMessage() }}</p>
+}
 
 <div class="flex flex-col gap-unit group">
 <label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors" for="email">Email Address</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-0 text-outline-variant group-focus-within:text-primary transition-colors" style="font-size: 20px;">mail</span>
-<input class="w-full h-12 bg-transparent border-0 border-b-[1.5px] border-outline-variant focus:border-primary focus:ring-0 pl-8 pr-2 font-body-lg text-body-lg text-on-surface transition-colors placeholder:text-outline-variant/50" id="email" placeholder="name@example.com" required="" type="email"/>
+<input formControlName="email" class="w-full h-12 bg-transparent border-0 border-b-[1.5px] border-outline-variant focus:border-primary focus:ring-0 pl-8 pr-2 font-body-lg text-body-lg text-on-surface transition-colors placeholder:text-outline-variant/50" id="email" placeholder="name@example.com" type="email"/>
 </div>
 </div>
 
@@ -32,7 +36,7 @@
 <label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors" for="password">Password</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-0 text-outline-variant group-focus-within:text-primary transition-colors" style="font-size: 20px;">lock</span>
-<input [type]="passwordVisible ? 'text' : 'password'" class="w-full h-12 bg-transparent border-0 border-b-[1.5px] border-outline-variant focus:border-primary focus:ring-0 pl-8 pr-10 font-body-lg text-body-lg text-on-surface transition-colors placeholder:text-outline-variant/50" id="password" placeholder="••••••••" required=""/>
+<input formControlName="password" [type]="passwordVisible ? 'text' : 'password'" class="w-full h-12 bg-transparent border-0 border-b-[1.5px] border-outline-variant focus:border-primary focus:ring-0 pl-8 pr-10 font-body-lg text-body-lg text-on-surface transition-colors placeholder:text-outline-variant/50" id="password" placeholder="••••••••"/>
 <button (click)="togglePasswordVisibility()" aria-label="Toggle password visibility" class="absolute right-0 text-outline-variant hover:text-on-surface transition-colors focus:outline-none" type="button">
 <span class="material-symbols-outlined" style="font-size: 20px;">{{ passwordVisible ? 'visibility' : 'visibility_off' }}</span>
 </button>
@@ -43,8 +47,8 @@
 <a (click)="go('/reset-password')" class="font-label-sm text-label-sm text-primary hover:text-primary-fixed-dim transition-colors py-2">Forgot Password?</a>
 </div>
 
-<button (click)="go('/loading')" class="w-full h-12 mt-stack-sm bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full flex items-center justify-center gap-unit hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-[0.98] shadow-sm" type="submit">
-<span class="">Sign In</span>
+<button [disabled]="submitting()" class="w-full h-12 mt-stack-sm bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full flex items-center justify-center gap-unit hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-[0.98] shadow-sm disabled:opacity-60" type="submit">
+<span class="">{{ submitting() ? 'Signing In…' : 'Sign In' }}</span>
 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_right_alt</span>
 </button>
 </form>

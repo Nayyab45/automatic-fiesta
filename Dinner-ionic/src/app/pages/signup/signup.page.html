@@ -8,32 +8,36 @@
 </header>
 
 <div class="bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-8 border border-outline-variant/30">
-<form action="#" class="flex flex-col gap-stack-md" method="POST">
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-stack-md">
+
+@if (errorMessage()) {
+<p class="font-body-md text-body-md text-error" role="alert">{{ errorMessage() }}</p>
+}
 
 <div class="input-floating rounded-lg border border-secondary-fixed-dim focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all">
-<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="name" name="name" placeholder=" " required="" type="text"/>
+<input formControlName="name" class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="name" placeholder=" " type="text"/>
 <label class="font-body-md text-body-md" for="name">Full Name</label>
 </div>
 
 <div class="input-floating rounded-lg border border-secondary-fixed-dim focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all">
-<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="email" name="email" placeholder=" " required="" type="email"/>
+<input formControlName="email" class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="email" placeholder=" " type="email"/>
 <label class="font-body-md text-body-md" for="email">Email Address</label>
 </div>
 
 <div class="input-floating rounded-lg border border-secondary-fixed-dim focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all">
-<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="password" name="password" placeholder=" " required="" type="password"/>
+<input formControlName="password" class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="password" placeholder=" " type="password"/>
 <label class="font-body-md text-body-md" for="password">Password</label>
 </div>
 
 <div class="flex items-center gap-2 mt-2">
-<input class="rounded border-outline text-primary-container focus:ring-primary-container w-4 h-4 bg-transparent cursor-pointer" id="terms" name="terms" required="" type="checkbox"/>
+<input formControlName="terms" class="rounded border-outline text-primary-container focus:ring-primary-container w-4 h-4 bg-transparent cursor-pointer" id="terms" type="checkbox"/>
 <label class="font-label-sm text-label-sm text-on-surface-variant cursor-pointer" for="terms">
                         I agree to the <a (click)="go('/terms-of-service')" class="text-primary hover:underline">Terms of Service</a> &amp; <a (click)="go('/privacy-policy')" class="text-primary hover:underline">Privacy Policy</a>
 </label>
 </div>
 
-<button (click)="go('/profile-creation')" class="mt-stack-sm w-full h-12 bg-primary-container text-on-primary rounded-lg font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2" type="submit">
-                    Create Account
+<button [disabled]="submitting()" class="mt-stack-sm w-full h-12 bg-primary-container text-on-primary rounded-lg font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2 disabled:opacity-60" type="submit">
+                    {{ submitting() ? 'Creating Account…' : 'Create Account' }}
                     <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
 </form>

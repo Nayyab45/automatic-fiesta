@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './services/auth.guard';
 
 // Each route lazy-loads its standalone page component, generated 1:1 from
 // the original prototype screens (see /docs in the project root README).
@@ -16,7 +17,11 @@ export const routes: Routes = [
   { path: 'personal-interests', loadComponent: () => import('./pages/personal-interests/personal-interests.page').then((m) => m.PersonalInterestsPage) },
   { path: 'food-preferences', loadComponent: () => import('./pages/food-preferences/food-preferences.page').then((m) => m.FoodPreferencesPage) },
   { path: 'dietary-preferences', loadComponent: () => import('./pages/dietary-preferences/dietary-preferences.page').then((m) => m.DietaryPreferencesPage) },
-  { path: 'home', loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage) },
+  {
+    path: 'home',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+  },
   { path: 'discover-restaurants', loadComponent: () => import('./pages/discover-restaurants/discover-restaurants.page').then((m) => m.DiscoverRestaurantsPage) },
   { path: 'discover-people', loadComponent: () => import('./pages/discover-people/discover-people.page').then((m) => m.DiscoverPeoplePage) },
   { path: 'search-filter', loadComponent: () => import('./pages/search-filter/search-filter.page').then((m) => m.SearchFilterPage) },
