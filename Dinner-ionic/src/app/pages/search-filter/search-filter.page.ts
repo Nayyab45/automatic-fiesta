@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-search-filter',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, BottomNavComponent],
   templateUrl: './search-filter.page.html',
   styleUrl: './search-filter.page.scss',
 })
-export class SearchFilterPage {
+export class SearchFilterPage extends BasePage {
   readonly pageTitle = "Search & Filter";
 
   readonly cuisines = ['Punjabi', 'Sindhi', 'Peshawari', 'Balochi', 'Kashmiri', 'Mughlai', 'Karachi Street'];
@@ -23,15 +25,28 @@ export class SearchFilterPage {
   guestCount = 2;
   selectedDate = 'Today, Oct 24';
   selectedTime = '20:00';
+  readonly cityService = inject(LocationService);
 
-  constructor(private router: Router, private location: Location, public cityService: LocationService) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
+  /**
+   * Open a native date/time picker.
+   *
+   * `showPicker()` is missing on older Android WebViews and Safari < 16, so it
+   * has to be feature-detected -- but the DOM typings declare it as always
+   * present, which strictTemplates (rightly) flags as a condition that is
+   * always true. Hence the runtime `typeof` check here rather than in the
+   * template. It can also throw if the call is not tied to a user gesture, so
+   * fall back to `click()` either way.
+   */
+  openPicker(input: HTMLInputElement): void {
+    if (typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+        return;
+      } catch {
+        /* not allowed in this context -- fall through to the click fallback */
+      }
+    }
+    input.click();
   }
 
   toggleCuisine(name: string): void {

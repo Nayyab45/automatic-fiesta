@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 import { PaymentService } from '../../services/payment.service';
 
 @Component({
@@ -11,26 +12,13 @@ import { PaymentService } from '../../services/payment.service';
   templateUrl: './payment-methods.page.html',
   styleUrl: './payment-methods.page.scss',
 })
-export class PaymentMethodsPage {
+export class PaymentMethodsPage extends BasePage {
   readonly pageTitle = 'Payment Methods';
 
   showAddCard = false;
   cardNumber = '';
   cardExpiry = '';
-
-  constructor(
-    private router: Router,
-    private location: Location,
-    public paymentService: PaymentService,
-  ) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
+  readonly paymentService = inject(PaymentService);
 
   openAddCard(): void {
     this.showAddCard = true;

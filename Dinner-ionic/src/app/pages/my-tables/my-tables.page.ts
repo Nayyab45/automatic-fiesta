@@ -1,27 +1,18 @@
-import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-my-tables',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, BottomNavComponent],
   templateUrl: './my-tables.page.html',
   styleUrl: './my-tables.page.scss',
 })
-export class MyTablesPage {
+export class MyTablesPage extends BasePage {
   readonly pageTitle = "My Tables";
-
-
-  constructor(private router: Router, private location: Location, public cityService: LocationService) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
+  readonly cityService = inject(LocationService);
 }

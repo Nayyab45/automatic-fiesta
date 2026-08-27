@@ -15,5 +15,7 @@ export class ConfirmDialogComponent {
   @Input() destructive = false;
 
   @Output() confirm = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
+  // Named `cancelled`, not `cancel`: `cancel` is a standard DOM event name,
+  // so an output called that shadows the native event on the host element.
+  @Output() cancelled = new EventEmitter<void>();
 }

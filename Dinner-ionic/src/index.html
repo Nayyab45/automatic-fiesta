@@ -10,10 +10,10 @@
   <link rel="apple-touch-icon" href="assets/icon/logo.png" />
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <!-- Inter, Playfair Display, DM Sans and the Material Symbols icon font are
+       self-hosted (see the "styles" array in angular.json). They must NOT be
+       loaded from fonts.googleapis.com: in a packaged Capacitor build with no
+       network, every icon would render as its literal ligature text. -->
 </head>
 <body class="bg-surface text-on-surface">
   <app-root></app-root>

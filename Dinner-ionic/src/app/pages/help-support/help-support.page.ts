@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-help-support',
@@ -9,7 +10,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './help-support.page.html',
   styleUrl: './help-support.page.scss',
 })
-export class HelpSupportPage {
+export class HelpSupportPage extends BasePage {
   readonly pageTitle = "Help & Support";
 
   readonly faqs = [
@@ -27,16 +28,6 @@ export class HelpSupportPage {
     },
   ];
   openFaqIndex: number | null = null;
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
 
   toggleFaq(index: number): void {
     this.openFaqIndex = this.openFaqIndex === index ? null : index;

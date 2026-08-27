@@ -15,7 +15,7 @@
 <li *ngFor="let city of cityService.cities">
 <button (click)="selectCity(city.name)" class="w-full flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors text-left group">
 <div class="flex items-center gap-gutter">
-<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">location_on</span>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">place</span>
 <div>
 <p class="font-body-lg text-body-lg text-on-surface">{{ city.name }}</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant">{{ city.region }}</p>

@@ -39,7 +39,7 @@
 
 <button (click)="editFullName()" class="w-full flex items-center justify-between p-stack-md border-b-[0.5px] border-[#E8D8B8] hover:bg-surface-container-low interaction-stroke transition-all text-left group">
 <div class="flex items-center gap-gutter">
-<span class="material-symbols-outlined text-primary/70" data-icon="person_outline">person_outline</span>
+<span class="material-symbols-outlined text-primary/70" data-icon="person_outline">person</span>
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant">Full Name</p>
 <p class="font-body-lg text-body-lg text-on-surface mt-unit group-hover:text-primary transition-colors">{{ fullName }}</p>
@@ -145,6 +145,6 @@
   message="This permanently deletes your profile, tables, and dining history. This action cannot be undone."
   confirmLabel="Delete Account"
   [destructive]="true"
-  (cancel)="showDeleteConfirm = false"
+  (cancelled)="showDeleteConfirm = false"
   (confirm)="confirmDeleteAccount()"
 ></app-confirm-dialog>

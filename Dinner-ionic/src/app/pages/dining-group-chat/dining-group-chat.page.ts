@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
+import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 
 interface ChatMessage {
   text: string;
@@ -10,23 +12,13 @@ interface ChatMessage {
 @Component({
   selector: 'app-dining-group-chat',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, BottomNavComponent],
   templateUrl: './dining-group-chat.page.html',
   styleUrl: './dining-group-chat.page.scss',
 })
-export class DiningGroupChatPage {
+export class DiningGroupChatPage extends BasePage {
   readonly pageTitle = "Dining Group Chat";
   ownMessages: ChatMessage[] = [];
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
 
   private timeNow(): string {
     return new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });

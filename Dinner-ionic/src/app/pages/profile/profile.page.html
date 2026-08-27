@@ -1,6 +1,6 @@
 <header class="hidden md:flex justify-between items-center w-full px-container-padding py-stack-md bg-surface flat no shadows sticky top-0 z-40 transition-transform">
 <div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary">location_on</span>
+<span class="material-symbols-outlined text-primary">place</span>
 <span class="font-headline-md text-headline-md text-primary">{{ cityService.label() }}</span>
 </div>
 <nav class="flex gap-8">
@@ -32,7 +32,7 @@
                     Ahmed Khan
                 </h1>
 <p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm flex items-center justify-center md:justify-start gap-1">
-<span class="material-symbols-outlined text-sm">location_on</span> Karachi
+<span class="material-symbols-outlined text-sm">place</span> Karachi
                  • 28 years</p>
 <p class="font-body-lg text-body-lg text-on-surface max-w-lg mb-stack-md leading-relaxed italic text-on-surface-variant">
                     "Software engineer who loves late-night karahi, chai and good conversations."
@@ -93,26 +93,4 @@
 </section>
 </main>
 
-<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl h-16">
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/home">
-<span class="material-symbols-outlined mb-1 text-xl">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1 text-xl">explore</span>
-<span class="font-label-sm text-label-sm">Discover</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1 text-xl">restaurant</span>
-<span class="font-label-sm text-label-sm">Tables</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/messages">
-<span class="material-symbols-outlined mb-1 text-xl">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-</a>
-
-<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" routerLink="/profile">
-<span class="material-symbols-outlined fill mb-1 text-xl">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="profile"></app-bottom-nav>

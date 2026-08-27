@@ -1,0 +1,6 @@
+www/
+android/
+.angular/
+node_modules/
+src/theme/fonts/
+package-lock.json

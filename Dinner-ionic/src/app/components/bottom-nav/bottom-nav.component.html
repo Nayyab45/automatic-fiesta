@@ -1,0 +1,24 @@
+<nav
+  class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant shadow-sm rounded-t-xl"
+  aria-label="Primary"
+>
+  <a
+    *ngFor="let item of items"
+    [routerLink]="item.link"
+    [attr.aria-current]="item.tab === active ? 'page' : null"
+    class="flex flex-col items-center justify-center pt-2 w-16 h-full transition-colors"
+    [class.text-primary]="item.tab === active"
+    [class.dark:text-primary-fixed-dim]="item.tab === active"
+    [class.border-t-2]="item.tab === active"
+    [class.border-primary]="item.tab === active"
+    [class.text-on-surface-variant]="item.tab !== active"
+    [class.hover:text-primary]="item.tab !== active"
+  >
+    <span
+      class="material-symbols-outlined mb-1"
+      [style.font-variation-settings]="item.tab === active ? '\'FILL\' 1' : null"
+      >{{ item.icon }}</span
+    >
+    <span class="font-label-sm text-label-sm">{{ item.label }}</span>
+  </a>
+</nav>

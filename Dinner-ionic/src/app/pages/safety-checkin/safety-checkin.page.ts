@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-safety-checkin',
@@ -9,11 +10,9 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './safety-checkin.page.html',
   styleUrl: './safety-checkin.page.scss',
 })
-export class SafetyCheckinPage {
+export class SafetyCheckinPage extends BasePage {
   readonly pageTitle = "Safety Check-in";
   checkedIn = false;
-
-  constructor(private router: Router, private location: Location) {}
 
   checkIn(): void {
     this.checkedIn = true;
@@ -23,14 +22,6 @@ export class SafetyCheckinPage {
     if (!this.checkedIn) return;
     this.checkedIn = false;
     this.go('/safety-center');
-  }
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 
   callForHelp(): void {

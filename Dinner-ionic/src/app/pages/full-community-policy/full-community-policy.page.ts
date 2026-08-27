@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-full-community-policy',
@@ -9,18 +10,6 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './full-community-policy.page.html',
   styleUrl: './full-community-policy.page.scss',
 })
-export class FullCommunityPolicyPage {
+export class FullCommunityPolicyPage extends BasePage {
   readonly pageTitle = "Full Community Policy";
-
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
 }

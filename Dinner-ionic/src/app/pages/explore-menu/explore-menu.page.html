@@ -1,6 +1,6 @@
 <header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface sticky top-0 z-40">
 <div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
 <h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityService.label() }}</h1>
 </div>
 <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant shadow-sm">
@@ -169,25 +169,4 @@
 </section>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl md:hidden pb-4">
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
-<span class="font-label-sm text-label-sm font-bold">Discover</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1">restaurant</span>
-<span class="font-label-sm text-label-sm">Tables</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" routerLink="/messages">
-<span class="material-symbols-outlined mb-1">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors hover:opacity-80" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="discover"></app-bottom-nav>

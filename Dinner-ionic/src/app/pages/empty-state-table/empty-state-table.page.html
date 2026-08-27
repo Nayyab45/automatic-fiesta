@@ -22,7 +22,7 @@
 <div class="absolute inset-0 bg-gradient-to-tr from-surface to-surface-container rounded-full opacity-60 blur-2xl"></div>
 
 <div class="relative w-48 h-48 rounded-full overflow-hidden shadow-sm" style="box-shadow: 0 4px 16px rgba(0,0,0,0.04); border: 0.5px solid #E8D8B8;">
-<img class="w-full h-full object-cover" data-alt="A highly detailed, elegant top-down view of a traditional Pakistani tea set arranged on a pristine white linen table. The set features muted brass and ceramic elements reflecting soft, diffused natural light in a bright, modern light-mode setting. The composition is minimalist and sophisticated, conveying a premium dining experience with a color palette of soft whites, muted gold accents, and subtle earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsOSS0DPprvCvL-r4VkGegsX5ep7NGw_SB8K-SD0cW0t0AwX23VRpjsHjY7ZrQOcj6sGOjXHFa1SXVSrSdJ_rDyfeijlVS7Q701fDHR2VJ-1qh1VUOpv--DNJiO8r1YJm-SoZcTwAVtQqsXeI3BrS28u0hImgsFW7CvHW6jsz0SCs4qukH7e9GZBxYcaFcu2n5vX7Uo4v1EJ3duw4twbqO7qidL4D8UDMPeGBKwrtsJweofMMl9Bda"/>
+<img alt="" class="w-full h-full object-cover" data-alt="A highly detailed, elegant top-down view of a traditional Pakistani tea set arranged on a pristine white linen table. The set features muted brass and ceramic elements reflecting soft, diffused natural light in a bright, modern light-mode setting. The composition is minimalist and sophisticated, conveying a premium dining experience with a color palette of soft whites, muted gold accents, and subtle earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsOSS0DPprvCvL-r4VkGegsX5ep7NGw_SB8K-SD0cW0t0AwX23VRpjsHjY7ZrQOcj6sGOjXHFa1SXVSrSdJ_rDyfeijlVS7Q701fDHR2VJ-1qh1VUOpv--DNJiO8r1YJm-SoZcTwAVtQqsXeI3BrS28u0hImgsFW7CvHW6jsz0SCs4qukH7e9GZBxYcaFcu2n5vX7Uo4v1EJ3duw4twbqO7qidL4D8UDMPeGBKwrtsJweofMMl9Bda"/>
 </div>
 
 <div class="absolute bottom-4 right-8 w-12 h-12 bg-surface rounded-full shadow-sm flex items-center justify-center border border-outline-variant">
@@ -83,25 +83,4 @@
 </ul>
 </nav>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface border-t border-outline-variant shadow-sm md:hidden">
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1">explore</span>
-<span class="font-label-sm text-label-sm">Discover</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary -mt-[9px] pt-[9px] w-12" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="font-label-sm text-label-sm font-bold">Tables</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/messages">
-<span class="material-symbols-outlined mb-1">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="tables"></app-bottom-nav>

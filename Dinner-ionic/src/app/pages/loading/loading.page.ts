@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-loading',
@@ -9,19 +10,8 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './loading.page.html',
   styleUrl: './loading.page.scss',
 })
-export class LoadingPage implements OnInit {
+export class LoadingPage extends BasePage implements OnInit {
   readonly pageTitle = "Loading";
-
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
 
   ngOnInit(): void {
     // The prototype's loading screen is a transient step; auto-advance to

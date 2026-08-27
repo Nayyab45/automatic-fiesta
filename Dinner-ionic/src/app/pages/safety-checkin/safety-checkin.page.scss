@@ -1,8 +1,8 @@
 // Screen-specific styles for "Safety Check-in", carried over from the
 // original prototype (Safety Check-in.html). Shared rules live in src/global.scss.
 
-body { font-family: 'Inter', sans-serif; }
-        .font-playfair { font-family: 'Playfair Display', serif; }
+body { font-family: 'Inter Variable', 'Inter', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display Variable', 'Playfair Display', serif; }
         .glass-card {
             background: rgba(253, 248, 245, 0.85);
             backdrop-filter: blur(12px);

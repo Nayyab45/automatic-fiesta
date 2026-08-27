@@ -46,7 +46,7 @@
 <div class="flex justify-between items-center">
 <h3 class="font-headline-md text-headline-md text-on-background">Sami, 28</h3>
 <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">location_on</span>
+<span class="material-symbols-outlined text-[14px]">place</span>
                                 1.2 km away
                             </span>
 </div>
@@ -77,7 +77,7 @@
 <div class="flex justify-between items-center">
 <h3 class="font-headline-md text-headline-md text-on-background">Zara, 31</h3>
 <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">location_on</span>
+<span class="material-symbols-outlined text-[14px]">place</span>
                                 3.5 km away
                             </span>
 </div>
@@ -102,28 +102,7 @@
 </section>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant rounded-t-xl shadow-sm h-[72px]">
-<a routerLink="/home" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
-<span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm mt-1">Home</span>
-</a>
-<a routerLink="/discover-restaurants" class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 scale-90 transition-transform duration-200">
-<span class="material-symbols-outlined filled">explore</span>
-<span class="font-label-sm text-label-sm mt-1 font-bold">Discover</span>
-</a>
-<a routerLink="/my-tables" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
-<span class="material-symbols-outlined">restaurant</span>
-<span class="font-label-sm text-label-sm mt-1">Tables</span>
-</a>
-<a routerLink="/messages" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
-<span class="material-symbols-outlined">chat_bubble</span>
-<span class="font-label-sm text-label-sm mt-1">Messages</span>
-</a>
-<a routerLink="/profile" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2">
-<span class="material-symbols-outlined">person</span>
-<span class="font-label-sm text-label-sm mt-1">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="discover"></app-bottom-nav>
 
 <div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end opacity-0 pointer-events-none transition-opacity duration-300" id="filterOverlay">
 <div class="bg-surface rounded-t-[24px] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] transform translate-y-full transition-transform duration-300 max-h-[751px] flex flex-col" id="filterSheet">

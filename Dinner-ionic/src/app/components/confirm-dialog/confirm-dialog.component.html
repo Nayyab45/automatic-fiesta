@@ -13,7 +13,7 @@
 <p class="font-body-md text-body-md text-on-surface-variant text-center mb-stack-lg">{{ message }}</p>
 
 <div class="flex gap-stack-sm">
-<button (click)="cancel.emit()" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg py-3 rounded-full hover:bg-surface-container transition-colors">
+<button (click)="cancelled.emit()" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg py-3 rounded-full hover:bg-surface-container transition-colors">
     {{ cancelLabel }}
 </button>
 <button

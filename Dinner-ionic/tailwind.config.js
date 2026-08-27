@@ -5,10 +5,10 @@
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
   darkMode: "class",
-  // Tailwind normally strips unused utility classes it can't see referenced
-  // literally in a file. Because pages are generated from static prototype
-  // HTML, keep everything so nothing is accidentally purged.
-  safelist: [{ pattern: /.*/ }],
+  // Every class this app uses appears as a literal string in a template or in
+  // a page's .ts (the classList.add/toggle calls), both of which the `content`
+  // glob above scans -- so normal purging is safe. Do not re-add a catch-all
+  // safelist: it emitted the entire utility universe as a 12 MB stylesheet.
   theme: {
     extend: {
       colors: {
@@ -79,17 +79,17 @@ module.exports = {
         "margin-mobile": "20px",
       },
       fontFamily: {
-        "display-lg": ["Playfair Display"],
-        display: ["Playfair Display"],
-        "headline-lg": ["Playfair Display"],
-        "headline-lg-mobile": ["Playfair Display"],
-        "headline-md": ["Playfair Display"],
-        "title-lg": ["Inter"],
-        "body-lg": ["Inter"],
-        "body-md": ["Inter"],
-        body: ["DM Sans"],
-        "label-lg": ["Inter"],
-        "label-sm": ["Inter"],
+        "display-lg": ["Playfair Display Variable", "Playfair Display", "serif"],
+        display: ["Playfair Display Variable", "Playfair Display", "serif"],
+        "headline-lg": ["Playfair Display Variable", "Playfair Display", "serif"],
+        "headline-lg-mobile": ["Playfair Display Variable", "Playfair Display", "serif"],
+        "headline-md": ["Playfair Display Variable", "Playfair Display", "serif"],
+        "title-lg": ["Inter Variable", "Inter", "sans-serif"],
+        "body-lg": ["Inter Variable", "Inter", "sans-serif"],
+        "body-md": ["Inter Variable", "Inter", "sans-serif"],
+        body: ["DM Sans Variable", "DM Sans", "sans-serif"],
+        "label-lg": ["Inter Variable", "Inter", "sans-serif"],
+        "label-sm": ["Inter Variable", "Inter", "sans-serif"],
       },
       fontSize: {
         "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }],

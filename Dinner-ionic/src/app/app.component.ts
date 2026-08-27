@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { RouterOutlet } from '@angular/router';
 import { NetworkService } from './services/network.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, IonApp, IonRouterOutlet],
+  imports: [CommonModule, RouterOutlet],
   template: `
     <div
       *ngIf="!network.isOnline()"
@@ -16,9 +16,7 @@ import { NetworkService } from './services/network.service';
       <span class="material-symbols-outlined text-[18px]">wifi_off</span>
       You're offline
     </div>
-    <ion-app>
-      <ion-router-outlet [animated]="false"></ion-router-outlet>
-    </ion-app>
+    <router-outlet></router-outlet>
   `,
 })
 export class AppComponent {

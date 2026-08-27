@@ -28,13 +28,20 @@
               { "glob": "**/*", "input": "src/assets", "output": "assets" },
               { "glob": "manifest.webmanifest", "input": "src", "output": "" }
             ],
-            "styles": ["src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource-variable/playfair-display/index.css",
+              "node_modules/@fontsource-variable/dm-sans/index.css",
+              "src/theme/icons.scss",
+              "src/global.scss",
+              "src/theme/variables.scss"
+            ],
             "scripts": []
           },
           "configurations": {
             "production": {
               "budgets": [
-                { "type": "initial", "maximumWarning": "8mb", "maximumError": "15mb" },
+                { "type": "initial", "maximumWarning": "1mb", "maximumError": "2mb" },
                 { "type": "anyComponentStyle", "maximumWarning": "8kb", "maximumError": "16kb" }
               ],
               "outputHashing": "all"

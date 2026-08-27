@@ -1,7 +1,7 @@
 <header class="bg-surface dark:bg-surface w-full top-0 z-40 sticky shadow-sm">
 <div class="flex justify-between items-center w-full px-container-padding py-stack-md mx-auto max-w-7xl">
 <div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Current Location</span>
 <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityService.label() }}</span>
@@ -51,7 +51,7 @@
 <div class="absolute bottom-0 left-0 p-6 w-full">
 <h2 class="font-headline-md text-headline-md text-white">Ali Raza<span class="material-symbols-outlined text-[20px] text-primary-fixed ml-2 align-middle" style='font-variation-settings: "FILL" 1;'>verified</span></h2>
 <p class="font-body-md text-body-md text-white/80 flex items-center gap-1 mt-1">
-<span class="material-symbols-outlined text-[16px]">location_on</span> DHA Phase 6, Karachi
+<span class="material-symbols-outlined text-[16px]">place</span> DHA Phase 6, Karachi
                         </p>
 </div>
 </div>
@@ -158,26 +158,4 @@
 </section>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl md:hidden h-20">
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 hover:text-primary transition-colors" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 w-16 active:scale-90 transition-transform duration-200" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
-<span class="font-label-sm text-label-sm font-bold">Discover</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 hover:text-primary transition-colors" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1">restaurant</span>
-<span class="font-label-sm text-label-sm">Tables</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 hover:text-primary transition-colors relative" routerLink="/messages">
-<span class="material-symbols-outlined mb-1">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 w-16 hover:text-primary transition-colors" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="discover"></app-bottom-nav>

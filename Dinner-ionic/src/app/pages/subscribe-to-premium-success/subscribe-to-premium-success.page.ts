@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-subscribe-to-premium-success',
@@ -9,18 +10,6 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './subscribe-to-premium-success.page.html',
   styleUrl: './subscribe-to-premium-success.page.scss',
 })
-export class SubscribeToPremiumSuccessPage {
+export class SubscribeToPremiumSuccessPage extends BasePage {
   readonly pageTitle = "Premium Confirmation";
-
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
 }

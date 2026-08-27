@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 import { LocationService } from '../../services/location.service';
 
 @Component({
@@ -10,22 +11,9 @@ import { LocationService } from '../../services/location.service';
   templateUrl: './select-location.page.html',
   styleUrl: './select-location.page.scss',
 })
-export class SelectLocationPage {
+export class SelectLocationPage extends BasePage {
   readonly pageTitle = 'Select Location';
-
-  constructor(
-    private router: Router,
-    private location: Location,
-    public cityService: LocationService,
-  ) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
+  readonly cityService = inject(LocationService);
 
   selectCity(name: string): void {
     this.cityService.setCity(name);

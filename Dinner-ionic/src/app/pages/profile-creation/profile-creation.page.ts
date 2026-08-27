@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-profile-creation',
@@ -9,7 +10,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './profile-creation.page.html',
   styleUrl: './profile-creation.page.scss',
 })
-export class ProfileCreationPage {
+export class ProfileCreationPage extends BasePage {
   readonly pageTitle = "Profile Creation";
 
   private readonly citiesByProvince: Record<string, string[]> = {
@@ -25,8 +26,6 @@ export class ProfileCreationPage {
   cities: { value: string; label: string }[] = [];
   favoriteFoods = ['Karahi', 'Biryani', 'Seekh Kebab'];
 
-  constructor(private router: Router, private location: Location) {}
-
   addFavoriteFood(): void {
     const value = window.prompt('Add a favorite food');
     if (value?.trim()) this.favoriteFoods.push(value.trim());
@@ -34,14 +33,6 @@ export class ProfileCreationPage {
 
   removeFavoriteFood(index: number): void {
     this.favoriteFoods.splice(index, 1);
-  }
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 
   onProvinceChange(event: Event): void {

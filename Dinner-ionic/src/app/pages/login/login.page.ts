@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-login',
@@ -9,22 +10,11 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss',
 })
-export class LoginPage {
+export class LoginPage extends BasePage {
   readonly pageTitle = "Login";
   passwordVisible = false;
-
-  constructor(private router: Router, private location: Location) {}
 
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
 }

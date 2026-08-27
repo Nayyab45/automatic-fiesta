@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-post-dining-review',
@@ -9,18 +10,6 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './post-dining-review.page.html',
   styleUrl: './post-dining-review.page.scss',
 })
-export class PostDiningReviewPage {
+export class PostDiningReviewPage extends BasePage {
   readonly pageTitle = "Post-Dining Review";
-
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
 }

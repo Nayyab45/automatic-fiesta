@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 @Component({
   selector: 'app-identity-verification',
@@ -9,18 +10,6 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './identity-verification.page.html',
   styleUrl: './identity-verification.page.scss',
 })
-export class IdentityVerificationPage {
+export class IdentityVerificationPage extends BasePage {
   readonly pageTitle = "Identity Verification";
-
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -10,7 +11,7 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
   templateUrl: './manage-account.page.html',
   styleUrl: './manage-account.page.scss',
 })
-export class ManageAccountPage {
+export class ManageAccountPage extends BasePage {
   readonly pageTitle = "Manage Account";
   showDeleteConfirm = false;
 
@@ -19,16 +20,6 @@ export class ManageAccountPage {
   phone = '+92 300 1234567';
   twoFactorEnabled = true;
   avatarUrl = '';
-
-  constructor(private router: Router, private location: Location) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
 
   confirmDeleteAccount(): void {
     this.showDeleteConfirm = false;

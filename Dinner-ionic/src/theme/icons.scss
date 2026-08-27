@@ -1,0 +1,38 @@
+/**
+ * Material Symbols icon font, self-hosted and subset.
+ *
+ * Replaces both the old fonts.googleapis.com <link> (which left every icon
+ * rendering as its literal ligature text in an offline/packaged build) and the
+ * full 3.96 MB font from the `material-symbols` package. `tools/subset-icons.py`
+ * cuts that down to only the icons the templates actually reference (~135 KB).
+ *
+ * Adding a new icon to a template? Run `npm run build:icons` to regenerate the
+ * subset -- `npm run build` verifies this for you and fails if it is stale.
+ */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 100 700;
+  /* `block`, not `swap`: a fallback face would flash the raw ligature text
+     ("restaurant_menu") before the icon font arrives. */
+  font-display: block;
+  src: url("./fonts/material-symbols-outlined-subset.woff2") format("woff2");
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga";
+}

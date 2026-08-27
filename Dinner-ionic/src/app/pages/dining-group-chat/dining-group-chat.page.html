@@ -105,30 +105,4 @@
 </div>
 </div>
 
-<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface docked full-width bottom-0 rounded-t-xl border-t border-outline-variant shadow-sm py-2">
-
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1">explore</span>
-<span class="font-label-sm text-label-sm">Discover</span>
-</a>
-
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1">restaurant</span>
-<span class="font-label-sm text-label-sm">Tables</span>
-</a>
-
-<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" routerLink="/messages">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
-<span class="font-label-sm text-label-sm font-bold">Messages</span>
-</a>
-
-<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="messages"></app-bottom-nav>

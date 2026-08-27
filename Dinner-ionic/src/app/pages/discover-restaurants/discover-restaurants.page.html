@@ -1,7 +1,7 @@
 <header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md docked full-width top-0 sticky z-40">
 <div class="flex items-center gap-stack-sm">
 <div (click)="go('/select-location')" class="flex items-center gap-stack-sm text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity cursor-pointer" role="button" tabindex="0">
-<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>location_on</span>
+<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>place</span>
 <h1 class="font-headline-md text-headline-md font-bold">{{ cityService.label() }}</h1>
 </div>
 <button (click)="go('/restaurant-direction')" class="ml-2 bg-primary-container text-on-primary px-3 py-1.5 rounded-full hover:opacity-90 transition-all flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[18px]">map</span><span class="font-label-lg text-label-lg">Map View</span></button>
@@ -41,7 +41,7 @@
 <span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>
 <span class="font-label-lg text-label-lg text-on-surface">4.8 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(120 reviews)</span></span>
 </div>
-<button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">location_on</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
+<button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">place</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
 <div class="p-stack-md flex-1 flex flex-col">
 <div class="flex justify-between items-start mb-stack-sm">
 <div>
@@ -53,7 +53,7 @@
 <span class="material-symbols-outlined text-[20px]">directions</span>
 </button>
 <button (click)="toggleSave($event)" aria-label="Save restaurant" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
-<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+<span class="material-symbols-outlined text-[20px]">bookmark</span>
 </button>
 </div>
 </div>
@@ -79,7 +79,7 @@
 <span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>
 <span class="font-label-lg text-label-lg text-on-surface">4.9 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(345 reviews)</span></span>
 </div>
-<button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">location_on</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
+<button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">place</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
 <div class="p-stack-md flex-1 flex flex-col">
 <div class="flex justify-between items-start mb-stack-sm">
 <div>
@@ -91,7 +91,7 @@
 <span class="material-symbols-outlined text-[20px]">directions</span>
 </button>
 <button (click)="toggleSave($event)" aria-label="Save restaurant" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
-<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+<span class="material-symbols-outlined text-[20px]">bookmark</span>
 </button>
 </div>
 </div>
@@ -111,25 +111,4 @@
 </div>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-surface border-t border-outline-variant dark:border-outline shadow-sm docked full-width rounded-t-xl md:hidden pb-4">
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-primary pt-2 scale-90 transition-transform duration-200 w-16" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1" style='font-variation-settings: "FILL" 1;'>explore</span>
-<span class="font-label-sm text-label-sm font-bold">Discover</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1">restaurant</span>
-<span class="font-label-sm text-label-sm">Tables</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/messages">
-<span class="material-symbols-outlined mb-1">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-primary transition-colors w-16" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
+<app-bottom-nav active="discover"></app-bottom-nav>

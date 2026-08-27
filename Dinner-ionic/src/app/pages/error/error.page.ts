@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { BasePage } from '../base.page';
 
 type ErrorType = 'not-found' | 'offline' | 'generic';
 
@@ -22,7 +23,7 @@ const CONTENT: Record<ErrorType, ErrorContent> = {
     message: 'Check your internet connection and try again.',
   },
   generic: {
-    icon: 'error_outline',
+    icon: 'error',
     title: 'Something Went Wrong',
     message: 'An unexpected error occurred. Please try again.',
   },
@@ -35,23 +36,9 @@ const CONTENT: Record<ErrorType, ErrorContent> = {
   templateUrl: './error.page.html',
   styleUrl: './error.page.scss',
 })
-export class ErrorPage implements OnInit {
+export class ErrorPage extends BasePage implements OnInit {
   readonly pageTitle = 'Error';
   content: ErrorContent = CONTENT['not-found'];
-
-  constructor(
-    private router: Router,
-    private location: Location,
-    private route: ActivatedRoute,
-  ) {}
-
-  go(path: string): void {
-    this.router.navigateByUrl(path);
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
 
   ngOnInit(): void {
     const type = (this.route.snapshot.queryParamMap.get('type') as ErrorType) || 'not-found';
