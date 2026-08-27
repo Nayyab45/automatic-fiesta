@@ -8,12 +8,6 @@
 </div>
 </div>
 
-<nav class="hidden md:flex gap-8 items-center">
-<a class="text-on-surface-variant hover:text-primary transition-colors font-label-lg text-label-lg" routerLink="/home">Home</a>
-<a class="text-primary font-bold transition-colors font-label-lg text-label-lg border-b-2 border-primary pb-1" routerLink="/discover-restaurants">Discover</a>
-<a class="text-on-surface-variant hover:text-primary transition-colors font-label-lg text-label-lg" routerLink="/my-tables">Tables</a>
-<a class="text-on-surface-variant hover:text-primary transition-colors font-label-lg text-label-lg" routerLink="/messages">Messages</a>
-</nav>
 <div class="flex items-center gap-4">
 <button (click)="go('/search-filter')" aria-label="Search" class="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container transition-colors">
 <span class="material-symbols-outlined text-on-surface">search</span>
@@ -37,40 +31,29 @@
             </p>
 </section>
 
-<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-stack-lg max-w-5xl mx-auto w-full">
+<section *ngIf="!loading() && match() as m" class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-stack-lg max-w-5xl mx-auto w-full">
 
 <div class="lg:col-span-7 bg-surface rounded-xl shadow-soft-lift border border-surface-variant overflow-hidden flex flex-col relative group">
 
 <div class="absolute top-4 right-4 z-10 bg-primary-container text-on-primary-container font-label-lg text-label-lg px-3 py-1 rounded-full shadow-sm flex items-center gap-1 backdrop-blur-md bg-opacity-90">
 <span class="material-symbols-outlined text-[16px]">stars</span>
-                    94% Match
+                    {{ m.score }}% Match
                 </div>
-<div class="h-64 md:h-80 w-full relative">
-<img alt="Ali Raza" class="w-full h-full object-cover" data-alt="A candid, warm portrait of a well-dressed South Asian man named Ali Raza in a high-end restaurant setting. The lighting is soft and inviting, emphasizing a premium lifestyle. Natural tones, elegant ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnSe_F2Mp8BnuT3gT-GQA_WIANUTP175_9q-za0Z3-YPS8gi395mRy4dscWYkv4y0kQUl12MyyUxAU7NfxGI5AsSd3UoByACjqxssXWWyk58udt79QcGTFBMGehZ7OgVKwHcRCNI_3V1Uq-tlj5s00x05P1rgJp16VX6a7Sak-u52tCXtYWE8Ft_YubtVPbdfnDUFSJbOXXLhkPXfN1rRvfCpbTLvVFiw59aePK_06F9AO8fatAYTZ"/>
+<div class="h-64 md:h-80 w-full relative bg-tertiary-container/30 flex items-center justify-center">
+<span class="font-display-lg text-display-lg text-tertiary">{{ m.name.charAt(0) }}</span>
 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 <div class="absolute bottom-0 left-0 p-6 w-full">
-<h2 class="font-headline-md text-headline-md text-white">Ali Raza<span class="material-symbols-outlined text-[20px] text-primary-fixed ml-2 align-middle" style='font-variation-settings: "FILL" 1;'>verified</span></h2>
-<p class="font-body-md text-body-md text-white/80 flex items-center gap-1 mt-1">
-<span class="material-symbols-outlined text-[16px]">place</span> DHA Phase 6, Karachi
+<h2 class="font-headline-md text-headline-md text-white">{{ m.name }}<span *ngIf="m.verified" class="material-symbols-outlined text-[20px] text-primary-fixed ml-2 align-middle" style='font-variation-settings: "FILL" 1;'>verified</span></h2>
+<p *ngIf="m.city" class="font-body-md text-body-md text-white/80 flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">place</span> {{ m.city }}
                         </p>
 </div>
 </div>
 <div class="p-6 flex flex-col gap-6 bg-surface">
-<div class="grid grid-cols-2 gap-4">
-<div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Dining Style</span>
-<span class="font-title-lg text-title-lg text-on-background">Fine Dining</span>
-</div>
-<div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Conversation</span>
-<span class="font-title-lg text-title-lg text-on-background">Art &amp; Tech</span>
-</div>
-</div>
+<p *ngIf="m.bio" class="font-body-lg text-body-lg text-on-surface-variant">{{ m.bio }}</p>
 <hr class="border-outline-variant/30"/>
 <div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label-lg text-label-lg">Seafood Lover</span>
-<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label-lg text-label-lg">Weekend Brunch</span>
-<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label-lg text-label-lg">Photography</span>
+<span *ngFor="let interest of m.interests" class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label-lg text-label-lg">{{ interest.name }}</span>
 </div>
 <button (click)="go('/discover-people')" class="mt-2 w-full bg-primary-container hover:bg-primary text-on-primary-container hover:text-white transition-colors duration-300 py-3 rounded-lg font-label-lg text-label-lg uppercase tracking-wider">
                         View Match Profile
@@ -86,76 +69,48 @@
                         Why You Match
                     </h3><div class="bg-white/50 rounded-lg p-4 border border-primary/20 mb-2">
 <div class="flex justify-between items-center mb-3">
-<span class="font-label-lg text-label-lg text-primary uppercase tracking-wider">AI Match Credibility</span>
-<span class="font-title-lg text-title-lg text-primary">98%</span>
+<span class="font-label-lg text-label-lg text-primary uppercase tracking-wider">Match Score</span>
+<span class="font-title-lg text-title-lg text-primary">{{ m.score }}%</span>
 </div>
 <div class="flex flex-col gap-2">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
-<span class="font-body-md text-body-md text-on-surface">Verified Identity: Government ID confirmed</span>
+<span class="font-body-md text-body-md text-on-surface">{{ m.verified ? 'Identity verified' : 'Identity not yet verified' }}</span>
 </div>
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-2" *ngIf="m.rating">
 <span class="material-symbols-outlined text-primary text-[18px]">star</span>
-<span class="font-body-md text-body-md text-on-surface">Historical Success: 4.9/5 partner rating</span>
+<span class="font-body-md text-body-md text-on-surface">Hosted with a {{ m.rating }}/5 rating</span>
 </div>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[18px]">task_alt</span>
-<span class="font-body-md text-body-md text-on-surface">Profile Completeness: 100% detailed</span>
+<span class="font-body-md text-body-md text-on-surface">{{ m.tablesJoinedCount }} table{{ m.tablesJoinedCount === 1 ? '' : 's' }} joined</span>
 </div>
 </div>
 </div>
 <ul class="flex flex-col gap-4 mt-2">
-<li class="flex gap-4 items-start">
-<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-on-secondary-container text-sm">restaurant</span>
-</div>
-<div>
-<p class="font-label-lg text-label-lg text-on-background">Shared Palate</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">Both of you frequently book modern coastal and fusion cuisine in DHA.</p>
-</div>
-</li>
-<li class="flex gap-4 items-start">
+<li *ngFor="let reason of m.reasons" class="flex gap-4 items-start">
 <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-on-secondary-container text-sm">handshake</span>
 </div>
 <div>
-<p class="font-label-lg text-label-lg text-on-background">Common Interests</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">Strong alignment in startup tech and contemporary art discussions.</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">{{ reason }}</p>
 </div>
 </li>
-<li class="flex gap-4 items-start">
+<li *ngIf="m.reasons.length === 0" class="flex gap-4 items-start">
 <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-on-secondary-container text-sm">near_me</span>
+<span class="material-symbols-outlined text-on-secondary-container text-sm">explore</span>
 </div>
 <div>
-<p class="font-label-lg text-label-lg text-on-background">Proximity</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">You both prefer dining out within a 5km radius of Clifton &amp; DHA.</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">A new face on the platform — say hello!</p>
 </div>
 </li>
 </ul>
 </div>
-
-<div (click)="go('/ai-restaurant-recommendation')" class="bg-surface rounded-xl border border-surface-variant shadow-soft-lift overflow-hidden group cursor-pointer" role="button" tabindex="0">
-<div class="p-4 bg-surface-container-high border-b border-surface-variant flex justify-between items-center">
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Perfect Setting</span>
-<span class="material-symbols-outlined text-on-surface-variant text-[18px]">arrow_forward</span>
-</div>
-<div class="flex p-4 gap-4 items-center">
-<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-<img alt="Restaurant Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautifully plated dish at a high-end modern coastal restaurant in Karachi. Warm ambient lighting, elegant table setting, sophisticated fine dining atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLxuxaigE7i1aS50MQGz8hMj-LvtyZ3JaROILlfkLE0WABjI_litCi2Q8rYZpbvLl5G-V5LUkNyC6g-QFavVRk3GQxArvj89_VifwPg8c_b7wA_Y0EKI4AOXcBptGJJEVSNL8XMsHlbRK6U2r1K2c-comFg4zBwhWb6Ae1yTl_moLAnoj1eEaWJZ3rT7JP61MTuO6ciYGHYAPy_iTq5y9Uf8zBM5CKERLIexcyk-BXYLG2i-s8FnsE"/>
-</div>
-<div class="flex flex-col">
-<h4 class="font-title-lg text-title-lg text-on-background">Okra</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Mediterranean • Zamzama</p>
-<div class="flex items-center gap-1 mt-1 text-primary">
-<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm text-label-sm">Highly Recommended for First Meets</span>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Finding your best match…</p>
+<p *ngIf="!loading() && !match()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No matches yet — check back soon.</p>
 </main>
 
 <app-bottom-nav active="discover"></app-bottom-nav>

@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-profile-creation',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './profile-creation.page.html',
   styleUrl: './profile-creation.page.scss',
 })
 export class ProfileCreationPage extends BasePage {
-  readonly pageTitle = "Profile Creation";
+  readonly pageTitle = 'Profile Creation';
+  private readonly profileService = inject(ProfileService);
 
   private readonly citiesByProvince: Record<string, string[]> = {
     punjab: ['Lahore', 'Faisalabad', 'Multan', 'Rawalpindi', 'Gujranwala'],
@@ -23,8 +26,25 @@ export class ProfileCreationPage extends BasePage {
     ajk: ['Muzaffarabad', 'Mirpur', 'Rawalakot'],
   };
 
-  cities: { value: string; label: string }[] = [];
-  favoriteFoods = ['Karahi', 'Biryani', 'Seekh Kebab'];
+  cities: string[] = [];
+  favoriteFoods: string[] = [];
+  name = '';
+  age: number | null = null;
+  province = '';
+  city = '';
+  bio = '';
+  readonly submitting = signal(false);
+
+  constructor() {
+    super();
+    this.profileService.me().subscribe(({ profile }) => {
+      this.name = profile.name;
+      this.age = profile.age;
+      this.city = profile.city ?? '';
+      this.bio = profile.bio ?? '';
+      this.favoriteFoods = profile.favoriteFoods;
+    });
+  }
 
   addFavoriteFood(): void {
     const value = window.prompt('Add a favorite food');
@@ -37,7 +57,19 @@ export class ProfileCreationPage extends BasePage {
 
   onProvinceChange(event: Event): void {
     const province = (event.target as HTMLSelectElement).value;
-    const list = this.citiesByProvince[province] ?? [];
-    this.cities = list.map((city) => ({ value: city.toLowerCase().replace(/ /g, '-'), label: city }));
+    this.cities = this.citiesByProvince[province] ?? [];
+  }
+
+  submit(): void {
+    if (this.submitting()) return;
+    this.submitting.set(true);
+
+    this.profileService.updateMe({ age: this.age ?? undefined, bio: this.bio, city: this.city, province: this.province }).subscribe({
+      next: () => this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go('/personal-interests')),
+      error: () => {
+        this.submitting.set(false);
+        this.go('/personal-interests');
+      },
+    });
   }
 }

@@ -1,48 +1,43 @@
-<header class="hidden md:flex justify-between items-center w-full px-container-padding py-stack-md bg-surface flat no shadows sticky top-0 z-40 transition-transform">
+<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface sticky top-0 z-40">
 <div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary">place</span>
 <span class="font-headline-md text-headline-md text-primary">{{ cityService.label() }}</span>
 </div>
-<nav class="flex gap-8">
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/home">Home</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/discover-restaurants">Discover</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/my-tables">Tables</a>
-<a class="text-on-surface-variant font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/messages">Messages</a>
-<a class="text-primary font-bold font-label-lg text-label-lg hover:opacity-80 transition-opacity" routerLink="/profile">Profile</a>
-</nav>
-<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
-<img alt="User Profile" class="w-full h-full object-cover" data-alt="A small circular avatar portrait of a modern South Asian man, professional yet approachable, set against a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrKW5HWbQCf2uh8HfV3PHEEODlQtplXRkXIWMiG4qBLghxeu-f1iUIR4lEADsCcvsnY3ABbmM_gO0yk5xCL9yYpCmO-cLZEsFTu875g4bi0ZGR5jZLY-9miG9AVS0ByuRxkRHp3UP-IYhLYBq0iQfZlhl_x0AsuujkMAj81e5tjmVNr13om3Fbi-L8w2dsnkcYHeM8nyLl7A1YNKMUacv1teznJc4Or1crydzoR-hABjGrETQ-20tR"/>
-</div>
+<button (click)="go('/settings')" aria-label="Settings" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined">settings</span>
+</button>
 </header>
 
-<main class="max-w-4xl mx-auto px-container-padding pt-stack-lg md:pt-section-gap pb-32 md:pb-section-gap">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading profile…</p>
+
+<main *ngIf="!loading() && profile() as p" class="max-w-4xl mx-auto px-container-padding pt-stack-lg md:pt-section-gap pb-32 md:pb-section-gap">
 
 <section class="flex flex-col md:flex-row items-center md:items-start gap-stack-lg mb-section-gap">
 
-<div class="relative w-40 h-40 md:w-56 md:h-56 shrink-0 rounded-full overflow-hidden border-2 border-primary-container shadow-sm p-1">
-<img alt="Ahmed Khan" class="w-full h-full object-cover rounded-full" data-alt="A high-quality, professional portrait of a modern Pakistani man named Ahmed Khan. He is smiling warmly in a beautifully lit, upscale restaurant setting with a muted gold and soft ambient light aesthetic. The image exudes confidence and refined hospitality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOGcz7GSt7aultbp2Y34uqoKvZNh_oL0ZGOBrkRSGJ2Vpiw8ctX4IIQPZuAf4ElJInIjes3uzhyEigScvgITYPDB-0lVFQRZ77usR0KZGuz9OWqA-qh_lY4FsCTmMrgwJbpwjpFczHgloK3Wmd2grHdTPTDiVF9sVvZsDhczm7uQ3tYHsP5MFu2VpNZ-LYRnj7EP5cksTvDV3Svi6w9UFh9fWTZlK7uKt827QkItTVwOSZMTMjgOHw"/>
+<div class="relative w-40 h-40 md:w-56 md:h-56 shrink-0 rounded-full overflow-hidden border-2 border-primary-container shadow-sm p-1 bg-tertiary-container/30 flex items-center justify-center">
+<span class="font-display-lg text-display-lg text-tertiary">{{ p.name.charAt(0) }}</span>
 
-<div class="absolute bottom-2 right-4 bg-surface rounded-full p-1 shadow-sm">
+<div *ngIf="p.verified" class="absolute bottom-2 right-4 bg-surface rounded-full p-1 shadow-sm">
 <span class="material-symbols-outlined fill text-primary-container text-2xl">verified</span>
 </div>
 </div>
 
 <div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
 <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-unit flex items-center gap-2">
-                    Ahmed Khan
+                    {{ p.name }}
                 </h1>
-<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm flex items-center justify-center md:justify-start gap-1">
-<span class="material-symbols-outlined text-sm">place</span> Karachi
-                 • 28 years</p>
-<p class="font-body-lg text-body-lg text-on-surface max-w-lg mb-stack-md leading-relaxed italic text-on-surface-variant">
-                    "Software engineer who loves late-night karahi, chai and good conversations."
+<p *ngIf="p.city || p.age" class="font-body-md text-body-md text-on-surface-variant mb-stack-sm flex items-center justify-center md:justify-start gap-1">
+<span class="material-symbols-outlined text-sm">place</span> {{ p.city }}
+                 <ng-container *ngIf="p.age"> • {{ p.age }} years</ng-container></p>
+<p *ngIf="p.bio" class="font-body-lg text-body-lg text-on-surface max-w-lg mb-stack-md leading-relaxed italic text-on-surface-variant">
+                    "{{ p.bio }}"
                 </p>
 
-<div class="flex gap-stack-sm w-full md:w-auto mt-2">
+<div *ngIf="isOwnProfile()" class="flex gap-stack-sm w-full md:w-auto mt-2">
 <button (click)="go('/profile-creation')" class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
                         Edit Profile
                     </button>
-<button (click)="go('/settings')" class="flex-1 md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<button (click)="go('/edit-preferences')" class="flex-1 md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-sm">settings</span> Preferences
                     </button>
 </div>
@@ -54,40 +49,36 @@
 <div class="md:col-span-4 glass-card rounded-xl p-stack-md flex flex-col justify-center items-center gap-stack-sm">
 <div class="flex gap-stack-lg w-full justify-around">
 <div class="text-center">
-<div class="font-headline-md text-headline-md text-primary">12</div>
+<div class="font-headline-md text-headline-md text-primary">{{ p.tablesJoinedCount }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Tables Joined</div>
 </div>
 <div class="w-px bg-outline-variant opacity-50"></div>
 <div class="text-center">
 <div class="font-headline-md text-headline-md text-primary flex items-center justify-center gap-1">
-                            4.9 <span class="material-symbols-outlined fill text-sm text-primary-container">star</span>
+                            {{ p.rating ?? '—' }} <span *ngIf="p.rating" class="material-symbols-outlined fill text-sm text-primary-container">star</span>
 </div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Rating</div>
 </div>
 </div>
 </div>
 
-<div class="md:col-span-8 glass-card rounded-xl p-stack-md">
+<div class="md:col-span-8 glass-card rounded-xl p-stack-md" *ngIf="p.favoriteFoods.length > 0">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-container">restaurant_menu</span>
-                    Favorite Cuisines
+                    Favorite Foods
                 </h3>
 <div class="flex flex-wrap gap-2 mt-stack-sm">
-<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Karahi</span>
-<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Biryani</span>
-<span class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">Seekh Kebab</span>
+<span *ngFor="let food of p.favoriteFoods" class="px-4 py-2 bg-tertiary/10 text-tertiary font-label-lg text-label-lg rounded-full border border-tertiary/20">{{ food }}</span>
 </div>
 </div>
 
-<div class="md:col-span-12 glass-card rounded-xl p-stack-md">
+<div class="md:col-span-12 glass-card rounded-xl p-stack-md" *ngIf="p.interests.length > 0">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-container">favorite</span>
                     Interests &amp; Vibes
                 </h3>
 <div class="flex flex-wrap gap-2 mt-stack-sm">
-<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Tech</span>
-<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Photography</span>
-<span class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">Travel</span>
+<span *ngFor="let interest of p.interests" class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-lg border border-outline-variant/30">{{ interest.name }}</span>
 </div>
 </div>
 </section>

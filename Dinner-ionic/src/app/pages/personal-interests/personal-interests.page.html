@@ -20,13 +20,14 @@
         </p>
 
 <div class="flex flex-wrap gap-stack-sm mb-stack-lg" id="interests-container">
-
+<button *ngFor="let interest of interests()" (click)="toggle(interest.id)" type="button" [class.chip-selected]="isSelected(interest.id)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface text-on-surface font-body-md text-body-md hover:bg-surface-variant transition-colors flex items-center gap-1">
+<span *ngIf="isSelected(interest.id)" class="material-symbols-outlined text-[16px]">check</span>{{ interest.name }}</button>
 </div>
 </main>
 
 <div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md px-container-padding py-stack-md border-t border-surface-variant z-50 flex justify-center pb-safe">
-<button (click)="go('/food-preferences')" class="w-full max-w-2xl bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full flex items-center justify-between hover:opacity-90 transition-opacity" id="continue-btn">
-<span>Continue</span>
+<button (click)="continue()" [disabled]="submitting()" class="w-full max-w-2xl bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full flex items-center justify-between hover:opacity-90 transition-opacity disabled:opacity-60" id="continue-btn">
+<span>{{ submitting() ? 'Saving…' : 'Continue' }}</span>
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 400;">arrow_forward</span>
 </button>
 </div>

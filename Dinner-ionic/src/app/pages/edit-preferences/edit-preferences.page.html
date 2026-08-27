@@ -16,12 +16,7 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">Select the regional flavors you enjoy most.</p>
 </div>
 <div class="flex flex-wrap gap-stack-sm">
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Punjabi</button>
-<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check">check</span>Sindhi</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Peshawari</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Balochi</button>
-<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check">check</span>Mughlai</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[16px] chip-check hidden">check</span>Kashmiri</button>
+<button *ngFor="let cuisine of cuisines" (click)="toggleCuisine(cuisine)" [class.chip-selected]="isCuisineSelected(cuisine)" class="chip px-4 py-2 rounded-full border border-primary-container bg-surface text-primary font-label-lg text-label-lg hover:bg-surface-variant transition-colors flex items-center gap-1"><span *ngIf="isCuisineSelected(cuisine)" class="material-symbols-outlined text-[16px] chip-check">check</span>{{ cuisine }}</button>
 </div>
 </section>
 
@@ -33,9 +28,7 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">How hot do you like your food?</p>
 </div>
 <div class="flex rounded-lg overflow-hidden border border-outline-variant">
-<button (click)="selectSegment($event)" class="segment-btn flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors border-r border-outline-variant">Mild</button>
-<button (click)="selectSegment($event)" class="segment-btn segment-selected flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface transition-colors border-r border-outline-variant shadow-sm relative z-10">Medium</button>
-<button (click)="selectSegment($event)" class="segment-btn flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors">Spicy</button>
+<button *ngFor="let level of spiceOptions" (click)="selectSpice(level)" [class.segment-selected]="spice === level" class="segment-btn flex-1 py-3 text-center font-label-lg text-label-lg bg-surface text-on-surface hover:bg-surface-variant transition-colors border-r border-outline-variant last:border-r-0">{{ level }}</button>
 </div>
 </section>
 
@@ -47,17 +40,9 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">Any specific dietary needs?</p>
 </div>
 <div class="space-y-stack-sm">
-<label class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-variant cursor-pointer transition-colors bg-secondary-container">
-<input checked="" class="w-5 h-5 text-primary-container border-outline rounded focus:ring-primary-container" type="checkbox"/>
-<span class="font-body-lg text-body-lg text-on-surface">Halal (Strict)</span>
-</label>
-<label class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface hover:bg-surface-variant cursor-pointer transition-colors">
-<input class="w-5 h-5 text-primary-container border-outline rounded focus:ring-primary-container" type="checkbox"/>
-<span class="font-body-lg text-body-lg text-on-surface">Vegetarian</span>
-</label>
-<label class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface hover:bg-surface-variant cursor-pointer transition-colors">
-<input class="w-5 h-5 text-primary-container border-outline rounded focus:ring-primary-container" type="checkbox"/>
-<span class="font-body-lg text-body-lg text-on-surface">Gluten-Free Options</span>
+<label *ngFor="let option of dietaryOptions" class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-variant cursor-pointer transition-colors" [class.bg-secondary-container]="isDietarySelected(option)" [class.bg-surface]="!isDietarySelected(option)">
+<input [checked]="isDietarySelected(option)" (change)="toggleDietary(option)" class="w-5 h-5 text-primary-container border-outline rounded focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-lg text-body-lg text-on-surface">{{ option }}</span>
 </label>
 </div>
 </section>
@@ -70,10 +55,10 @@
 <h2 class="font-title-lg text-title-lg text-on-surface">Maximum Distance</h2>
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">How far are you willing to travel?</p>
 </div>
-<span class="font-label-lg text-label-lg text-primary">15 km</span>
+<span class="font-label-lg text-label-lg text-primary">{{ maxDistanceKm }} km</span>
 </div>
 <div class="pt-4 pb-2">
-<input class="custom-slider" id="distanceRange" max="50" min="1" type="range" value="15"/>
+<input [value]="maxDistanceKm" (input)="onDistanceChange($event)" class="custom-slider" id="distanceRange" max="50" min="1" type="range"/>
 <div class="flex justify-between mt-2">
 <span class="font-label-sm text-label-sm text-on-surface-variant">1 km</span>
 <span class="font-label-sm text-label-sm text-on-surface-variant">50 km</span>
@@ -89,20 +74,20 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">When do you usually eat out?</p>
 </div>
 <div class="grid grid-cols-2 gap-stack-sm">
-<button (click)="toggleChip($event)" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-[20px] text-on-surface-variant">sunny</span> Lunch
+<button (click)="toggleDiningTime('Lunch')" [class.chip-selected]="isDiningTimeSelected('Lunch')" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]" [class.text-primary]="isDiningTimeSelected('Lunch')" [class.text-on-surface-variant]="!isDiningTimeSelected('Lunch')">sunny</span> Lunch
                     </button>
-<button (click)="toggleChip($event)" class="chip chip-selected py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px] text-primary">dark_mode</span> Dinner</button>
-<button (click)="toggleChip($event)" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors col-span-2">
-<span class="material-symbols-outlined text-[20px] text-on-surface-variant">wb_twilight</span> Late Night (Post 10 PM)
+<button (click)="toggleDiningTime('Dinner')" [class.chip-selected]="isDiningTimeSelected('Dinner')" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px]" [class.text-primary]="isDiningTimeSelected('Dinner')" [class.text-on-surface-variant]="!isDiningTimeSelected('Dinner')">dark_mode</span> Dinner</button>
+<button (click)="toggleDiningTime('Late Night')" [class.chip-selected]="isDiningTimeSelected('Late Night')" class="chip py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors col-span-2">
+<span class="material-symbols-outlined text-[20px]" [class.text-primary]="isDiningTimeSelected('Late Night')" [class.text-on-surface-variant]="!isDiningTimeSelected('Late Night')">wb_twilight</span> Late Night (Post 10 PM)
                     </button>
 </div>
 </section>
 </main>
 
 <div class="fixed bottom-0 left-0 w-full md:absolute md:bottom-0 bg-surface border-t border-outline-variant shadow-[0_-4px_16px_rgba(0,0,0,0.05)] px-container-padding py-stack-md z-20 pb-safe">
-<button (click)="go('/profile')" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 active:scale-[0.98] duration-150">
-                Save Preferences
+<button (click)="save()" [disabled]="submitting()" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 active:scale-[0.98] duration-150 disabled:opacity-60">
+                {{ submitting() ? 'Saving…' : 'Save Preferences' }}
             </button>
 </div>
 </div>

@@ -12,16 +12,7 @@
                         Pakistani Favorites
                     </h2>
 <div class="flex flex-wrap gap-2">
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Biryani</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Karahi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Nihari</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Haleem</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">BBQ</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kebabs</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Handi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Qorma</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pulao</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Sajji</button>
+<button *ngFor="let food of pakistaniFavorites" (click)="toggleChip(food)" [class.chip-selected]="isSelected(food)" [class.chip-default]="!isSelected(food)" class="font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">{{ food }}</button>
 </div>
 </section>
 
@@ -31,11 +22,7 @@
                         Regional
                     </h2>
 <div class="flex flex-wrap gap-2">
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Punjabi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Sindhi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Balochi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pashtun</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kashmiri</button>
+<button *ngFor="let food of regional" (click)="toggleChip(food)" [class.chip-selected]="isSelected(food)" [class.chip-default]="!isSelected(food)" class="font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">{{ food }}</button>
 </div>
 </section>
 
@@ -45,11 +32,7 @@
                         Street Food
                     </h2>
 <div class="flex flex-wrap gap-2">
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Chaat</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Samosa</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Pakora</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gol Gappay</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Bun Kebab</button>
+<button *ngFor="let food of streetFood" (click)="toggleChip(food)" [class.chip-selected]="isSelected(food)" [class.chip-default]="!isSelected(food)" class="font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">{{ food }}</button>
 </div>
 </section>
 
@@ -59,12 +42,7 @@
                         Desserts
                     </h2>
 <div class="flex flex-wrap gap-2">
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kheer</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gulab Jamun</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Jalebi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kulfi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Gajar Ka Halwa</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Rabri</button>
+<button *ngFor="let food of desserts" (click)="toggleChip(food)" [class.chip-selected]="isSelected(food)" [class.chip-default]="!isSelected(food)" class="font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">{{ food }}</button>
 </div>
 </section>
 
@@ -74,18 +52,14 @@
                         Drinks
                     </h2>
 <div class="flex flex-wrap gap-2">
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Chai</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Doodh Patti</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Kashmiri Chai</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Lassi</button>
-<button (click)="toggleChip($event)" class="chip-default font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">Falooda</button>
+<button *ngFor="let food of drinks" (click)="toggleChip(food)" [class.chip-selected]="isSelected(food)" [class.chip-default]="!isSelected(food)" class="font-body-md text-body-md px-4 py-2 rounded-full cursor-pointer select-none" type="button">{{ food }}</button>
 </div>
 </section>
 </form>
 </main>
 
 <div class="fixed bottom-0 left-0 w-full md:max-w-md md:left-1/2 md:-translate-x-1/2 bg-surface border-t border-outline-variant/30 px-container-padding py-stack-md pb-8 z-50">
-<button (click)="go('/dietary-preferences')" class="w-full bg-primary-container text-on-primary font-title-lg text-title-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98]" type="button">
-                Continue
+<button (click)="continue()" [disabled]="submitting()" class="w-full bg-primary-container text-on-primary font-title-lg text-title-lg py-4 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] disabled:opacity-60" type="button">
+                {{ submitting() ? 'Saving…' : 'Continue' }}
             </button>
 </div>
