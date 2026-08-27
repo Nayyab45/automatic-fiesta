@@ -1,13 +1,29 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
 
+// Routes reachable without being signed in. Every other route requires auth
+// (see the `.map()` below) now that a real user/session model exists.
+const publicPaths = new Set([
+  'splash',
+  'loading',
+  'login',
+  'signup',
+  'reset-password',
+  'reset-password-confirmation',
+  'terms-of-service',
+  'privacy-policy',
+  'community-guidelines',
+  'full-community-policy',
+  'error',
+]);
+
 // Each route lazy-loads its standalone page component, generated 1:1 from
 // the original prototype screens (see /docs in the project root README).
 //
 // Record-scoped screens are registered twice: once bare and once with `/:id`.
 // The bare form keeps today's hard-coded prototype links working; the `/:id`
 // form is what real data will use. Read the value via `BasePage.routeId`.
-export const routes: Routes = [
+const routeDefinitions: Routes = [
   { path: '', redirectTo: 'splash', pathMatch: 'full' },
   { path: 'splash', loadComponent: () => import('./pages/splash/splash.page').then((m) => m.SplashPage) },
   { path: 'loading', loadComponent: () => import('./pages/loading/loading.page').then((m) => m.LoadingPage) },
@@ -17,11 +33,7 @@ export const routes: Routes = [
   { path: 'personal-interests', loadComponent: () => import('./pages/personal-interests/personal-interests.page').then((m) => m.PersonalInterestsPage) },
   { path: 'food-preferences', loadComponent: () => import('./pages/food-preferences/food-preferences.page').then((m) => m.FoodPreferencesPage) },
   { path: 'dietary-preferences', loadComponent: () => import('./pages/dietary-preferences/dietary-preferences.page').then((m) => m.DietaryPreferencesPage) },
-  {
-    path: 'home',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
-  },
+  { path: 'home', loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage) },
   { path: 'discover-restaurants', loadComponent: () => import('./pages/discover-restaurants/discover-restaurants.page').then((m) => m.DiscoverRestaurantsPage) },
   { path: 'discover-people', loadComponent: () => import('./pages/discover-people/discover-people.page').then((m) => m.DiscoverPeoplePage) },
   { path: 'search-filter', loadComponent: () => import('./pages/search-filter/search-filter.page').then((m) => m.SearchFilterPage) },
@@ -85,3 +97,12 @@ export const routes: Routes = [
   { path: 'error', loadComponent: () => import('./pages/error/error.page').then((m) => m.ErrorPage) },
   { path: '**', loadComponent: () => import('./pages/error/error.page').then((m) => m.ErrorPage) },
 ];
+
+function isPublic(path: string | undefined): boolean {
+  if (path === undefined || path === '' || path === '**') return true;
+  return publicPaths.has(path.split('/')[0]);
+}
+
+export const routes: Routes = routeDefinitions.map((route) =>
+  isPublic(route.path) ? route : { ...route, canActivate: [authGuard] },
+);

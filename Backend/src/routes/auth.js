@@ -3,13 +3,16 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
+import { toCamel } from '../lib/serialize.js';
+import { requireFields } from '../lib/validate.js';
 
 export const authRouter = Router();
 
 const TOKEN_TTL = '7d';
 
 function toPublicUser(row) {
-  return { id: row.id, name: row.name, email: row.email };
+  const { id, name, email } = toCamel(row);
+  return { id, name, email };
 }
 
 function signToken(user) {
@@ -21,8 +24,9 @@ function signToken(user) {
 authRouter.post('/signup', (req, res) => {
   const { name, email, password } = req.body ?? {};
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'Name, email, and password are required' });
+  const missingFieldsError = requireFields(req.body, ['name', 'email', 'password']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
   }
   if (password.length < 8) {
     return res.status(400).json({ message: 'Password must be at least 8 characters' });
@@ -46,8 +50,9 @@ authRouter.post('/signup', (req, res) => {
 authRouter.post('/login', (req, res) => {
   const { email, password } = req.body ?? {};
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
+  const missingFieldsError = requireFields(req.body, ['email', 'password']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
   }
 
   const normalizedEmail = String(email).trim().toLowerCase();
@@ -65,5 +70,5 @@ authRouter.get('/me', requireAuth, (req, res) => {
   if (!row) {
     return res.status(404).json({ message: 'User not found' });
   }
-  res.json({ user: row });
+  res.json({ user: toPublicUser(row) });
 });
