@@ -1,4 +1,4 @@
-<header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding py-stack-md z-40">
+<header class="sticky top-0 bg-surface flex justify-between items-center w-full px-container-padding py-stack-md z-40">
 <div class="flex items-center gap-gutter">
 <button (click)="goBack()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-container">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
@@ -47,40 +47,5 @@
 </div>
 </div>
 </main>
-
-<nav class="docked full-width bottom-0 rounded-t-xl bg-surface border-t border-outline-variant shadow-sm hidden md:hidden z-50">
-<ul class="flex justify-around items-center w-full px-4 pb-safe pt-2">
-<li>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/home">
-<span class="material-symbols-outlined mb-1">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-</li>
-<li>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined mb-1">explore</span>
-<span class="font-label-sm text-label-sm">Discover</span>
-</a>
-</li>
-<li>
-<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary -mt-2 pt-4 px-3 active:scale-90 transition-transform duration-200" routerLink="/my-tables">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="font-label-sm text-label-sm font-bold">Tables</span>
-</a>
-</li>
-<li>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/messages">
-<span class="material-symbols-outlined mb-1">chat_bubble</span>
-<span class="font-label-sm text-label-sm">Messages</span>
-</a>
-</li>
-<li>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors py-2 px-3" routerLink="/profile">
-<span class="material-symbols-outlined mb-1">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</li>
-</ul>
-</nav>
 
 <app-bottom-nav active="tables"></app-bottom-nav>

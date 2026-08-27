@@ -25,22 +25,22 @@
 </button>
 </div>
 
-<div class="bg-surface-container-lowest border-[0.5px] border-outline-variant/50 rounded-xl p-gutter mb-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
+<div *ngIf="table() as t" class="bg-surface-container-lowest border-[0.5px] border-outline-variant/50 rounded-xl p-gutter mb-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
 <div class="flex items-start gap-gutter mb-stack-sm">
 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-surface-variant">
-<img alt="" class="w-full h-full object-cover" data-alt="A beautifully plated signature dish from a high-end restaurant, featuring delicately spiced grilled meat garnished with fresh herbs, resting on a pristine artisan ceramic plate. Soft, warm directional lighting highlights the textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26-OoGcWWVKhmP6SQhPKZIhqevYbR2aPHx1TLCemKJYXZ32E_mTuuN2f2aK8HrhG-AehzvG3BcV0Xoe3bu3-9wdn-sAfUvW7w1o281jPeRaGP27bsl6Zq6pB6IXyGpojysspAMdsQ3hN-42OrysYJwcEpqZN3ewsJB9y4o4wPKIbr_wyE4lk0kxlqGSQ84KeBMaK-TWWYEjd4UwK8fQcbGdInak8Z5rGpIliZXD4mhRT1x8Ibte8L"/>
+<img [alt]="t.restaurant.name" class="w-full h-full object-cover" [src]="t.restaurant.photoUrl"/>
 </div>
 <div>
-<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Cafe Aylanto</h3>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">{{ t.restaurant.name }}</h3>
 <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-unit">
 <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                            Sat, 28 Oct • 8:30 PM
+                            {{ t.dateTime | date: 'EEE, d MMM • h:mm a' }}
                         </p>
 </div>
 </div>
 <div class="pt-stack-sm border-t-[0.5px] border-outline-variant/30 flex items-center gap-unit text-primary">
 <span class="material-symbols-outlined text-[18px]">chair</span>
-<span class="font-label-lg text-label-lg">2 seats available</span>
+<span class="font-label-lg text-label-lg">{{ t.seatsTotal - t.guestCount }} seats available</span>
 </div>
 </div>
 
@@ -81,8 +81,9 @@
 </div>
 
 <div class="mt-auto">
-<button (click)="go('/request-status')" class="w-full h-[48px] bg-primary-container text-white rounded-full font-label-lg text-label-lg uppercase tracking-wider hover:opacity-90 active:bg-surface-tint transition-all mb-stack-sm flex items-center justify-center">
-                    Send Request
+<p *ngIf="errorMessage()" class="text-error font-body-md text-body-md text-center mb-stack-sm" role="alert">{{ errorMessage() }}</p>
+<button (click)="sendRequest()" [disabled]="submitting()" class="w-full h-[48px] bg-primary-container text-white rounded-full font-label-lg text-label-lg uppercase tracking-wider hover:opacity-90 active:bg-surface-tint transition-all mb-stack-sm flex items-center justify-center disabled:opacity-60">
+                    {{ submitting() ? 'Sending…' : 'Send Request' }}
                 </button>
 <p class="text-center font-body-md text-body-md text-on-surface-variant mt-stack-sm px-4">
                     The host will review your profile before confirming.

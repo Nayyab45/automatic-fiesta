@@ -55,6 +55,7 @@ const routeDefinitions: Routes = [
   { path: 'request-status', loadComponent: () => import('./pages/request-status/request-status.page').then((m) => m.RequestStatusPage) },
   { path: 'request-status/:id', loadComponent: () => import('./pages/request-status/request-status.page').then((m) => m.RequestStatusPage) },
   { path: 'check-in', loadComponent: () => import('./pages/check-in/check-in.page').then((m) => m.CheckInPage) },
+  { path: 'check-in/:id', loadComponent: () => import('./pages/check-in/check-in.page').then((m) => m.CheckInPage) },
   { path: 'post-dining-review', loadComponent: () => import('./pages/post-dining-review/post-dining-review.page').then((m) => m.PostDiningReviewPage) },
   { path: 'post-dining-review/:id', loadComponent: () => import('./pages/post-dining-review/post-dining-review.page').then((m) => m.PostDiningReviewPage) },
   { path: 'dining-group-chat', loadComponent: () => import('./pages/dining-group-chat/dining-group-chat.page').then((m) => m.DiningGroupChatPage) },

@@ -65,7 +65,7 @@
 </div>
 <div class="mt-auto pt-stack-sm border-t border-outline-variant/30 flex gap-stack-sm">
 <button (click)="go('/restaurant-detail/' + restaurant.id)" class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
-<button (click)="go('/create-table')" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
+<button (click)="go('/create-table?restaurantId=' + restaurant.id)" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
 </div>
 </div>
 </article>

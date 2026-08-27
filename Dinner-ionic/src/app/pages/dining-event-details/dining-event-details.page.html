@@ -1,6 +1,15 @@
+<main *ngIf="loading()" class="px-container-padding py-section-gap text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">Loading event…</p>
+</main>
+
+<main *ngIf="!loading() && !table()" class="px-container-padding py-section-gap text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">Event not found.</p>
+</main>
+
+<ng-container *ngIf="!loading() && table() as t">
 <header class="relative w-full h-[380px]">
 
-<div class="absolute inset-0 bg-cover bg-center w-full h-full" data-alt="A high-end, atmospheric photograph of a luxurious Pakistani restaurant interior. Warm, ambient lighting illuminates intricately carved wooden screens, plush velvet seating, and brass accents. The table is elegantly set with fine dining ware, hinting at a sophisticated culinary experience. The overall mood is inviting, exclusive, and culturally rich, captured in a modern editorial style with soft focus in the background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-fq7T10N-FzRkJDtj6M6H7GGl_3GKr01hqr_sFB6UaNNTyUJqUwUtwMVu5s2eBOBL-dDacmfcmP9lgx_v4EJy_rPJqLzR5XSqIiT5uiu2kABwN8GMBPJ4zGL17MwrmR1MwHp5UPW3hV19wKyXHVA_EKldhSnW0pK62TW4Bp24_bOAM9BxjKO2ERGJH2i0V9vllvbAf2xb4Z1hU5-Hnlusb37Aw2A7cSBHZScP0tP68jdy-zeDa7oG')"></div>
+<div class="absolute inset-0 bg-cover bg-center w-full h-full" [style.background-image]="'url(' + t.restaurant.photoUrl + ')'"></div>
 
 <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/60 to-transparent"></div>
 
@@ -14,10 +23,10 @@
 <main class="relative z-10 -mt-16 px-container-padding pb-[120px] space-y-section-gap">
 
 <section class="space-y-stack-md">
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">An Evening of Pakistani Flavours</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">{{ t.title }}</h1>
 <div class="flex items-center space-x-unit text-primary font-label-lg text-label-lg uppercase tracking-wider">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="">Haveli Restaurant</span>
+<span class="">{{ t.restaurant.name }}</span>
 </div>
 </section>
 
@@ -31,66 +40,50 @@
 </div>
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Date</p>
-<p class="font-title-lg text-title-lg text-on-surface">Fri, 21 Aug</p>
+<p class="font-title-lg text-title-lg text-on-surface">{{ t.dateTime | date: 'EEE, d MMM' }}</p>
 </div>
 </div>
 <div class="text-right">
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Time</p>
-<p class="font-title-lg text-title-lg text-on-surface">8:00 PM</p>
+<p class="font-title-lg text-title-lg text-on-surface">{{ t.dateTime | date: 'shortTime' }}</p>
 </div>
 </div>
 
 <div class="pt-unit">
 <div class="flex justify-between items-end mb-3">
 <span class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Table Status</span>
-<span class="font-title-lg text-title-lg text-primary">4 <span class="font-body-md text-body-md text-on-surface-variant font-normal">/ 6 Filled</span></span>
+<span class="font-title-lg text-title-lg text-primary">{{ t.guestCount }} <span class="font-body-md text-body-md text-on-surface-variant font-normal">/ {{ t.seatsTotal }} Filled</span></span>
 </div>
 
 <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
-<div class="h-full bg-primary-container w-[66.6%] rounded-full transition-all duration-1000 ease-out"></div>
+<div class="h-full bg-primary-container rounded-full transition-all duration-1000 ease-out" [style.width.%]="(t.guestCount / t.seatsTotal) * 100"></div>
 </div>
 </div>
 </section>
 
-<section class="space-y-stack-sm">
+<section class="space-y-stack-sm" *ngIf="t.note">
 <h2 class="font-headline-md text-headline-md text-on-surface">The Experience</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                A relaxed evening designed for culinary enthusiasts. We will explore a curated menu featuring regional specialties, emphasizing authentic preparation methods and communal dining. Expect engaging conversation and an exploration of rich spices in a deeply hospitable atmosphere.
-            </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">{{ t.note }}</p>
 </section>
 
 <section class="space-y-stack-md">
 <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
 <h2 class="font-headline-md text-headline-md text-on-surface">The Guest List</h2>
-<span (click)="go('/table-details-guests')" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0">4 Attending</span>
+<span (click)="go('/table-details-guests/' + t.id)" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0">{{ t.guestCount }} Attending</span>
 </div>
 <div class="flex items-center pt-2">
-<div class="flex -space-x-3 overflow-hidden">
-<img alt="" class="inline-block h-12 w-12 rounded-full ring-2 ring-surface object-cover" data-alt="A professional headshot of a South Asian man in his 30s with a warm smile, wearing a casual linen shirt. Background is a soft, light-toned minimalist surface. High quality editorial lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDS1dhJsKtrTJuT3yGeq0g7e7DJlUZqY3irCMVhfEQMTPMo48LE9PFOpSBcGxIEmKYOg7CAM6iow16nc8KUt2BjCLu3WD4gNKZqIEupKbZxhWQB08eZWk0v4udGjTwfCvamMMefCk9oXO7PKFt--CpehI1dSh6DckK8vehXUkbAG388ksqM1E8YcFhz3M6uS-bOv-MzlOIo_jJoIOercy1y8VVBHOpVKFL5THn06W4uO2V7Mj2D8Sjb"/>
-<img alt="" class="inline-block h-12 w-12 rounded-full ring-2 ring-surface object-cover" data-alt="A portrait of a sophisticated South Asian woman with elegant style, wearing a subtle silk scarf, smiling softly. Warm, natural lighting aligns with a high-end, premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGWgEDaku4EmoRwfXOafPqSf6YYPRQuIjERoRGVNw5PpP92Gvm8wNg_F2zc2cNE7BsIXeOk3Cj9oSD6ZrUW_WqGp1QVv19UHwJs9zKhY2fbkquWOL7CbZ9_oipqnjXyY3JLc7WviXqJZVj6oNi3KPN7M0Phut9dQtwOQgshn25opfl438ZvI_3kw1nzQdc3fJQlwxBjzNijNGFXLjh6_f2NHbsg-ZPUxJsrPjyMWDR8bGOPC7PYaan"/>
-<img alt="" class="inline-block h-12 w-12 rounded-full ring-2 ring-surface object-cover" data-alt="A close-up portrait of a young man with short dark hair and a neat beard, wearing smart-casual attire. He looks friendly and approachable in a well-lit, contemporary setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYPq-sWxONayvsUjANCawrr7QA9M-cpyBYA5QFG3gTxXKIEzVHw2Shc6_1YUucBrLyAI7lOFtcAq3M_v_lEe9n9ixOakVdTY8h9_Kq7MjsFESSnDMb_6Gx7ZnM9wHbjGhhleA6XaJeOwLYFj0L8I_HtpxWGIUq1btQAbmKjHfCRJMdCnBj-lQoTaPWR8IA8zS-H8xoxjVw8UPXoABxn1xNyFS70IoA8RclAODQcCO0el3co1pE14g_"/>
-<img alt="" class="inline-block h-12 w-12 rounded-full ring-2 ring-surface object-cover" data-alt="A vibrant portrait of a woman in her late 20s with long dark hair, wearing a stylish minimalist top. The mood is relaxed and inviting against a clean, warm background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYH9CEeItn_pgk7CHQSha1jgfbOx_XRLV9NDO8JIfvGgEN8c_yMDPzwaR0mN8aeI4d7NjoryfgFRCW5dNu_BFeV2U_g01SYKdvcmumSMhCNdzGiU0_aOby_l64sMdOQnJMaBvC27c04Gkn7WTGIxwSPe62iI9j3b6buYvEXpH-MNUGHoEXbo1iFiONmaVTPL77wQjTbbEB-KJk0dowVmZfX2C3RPXo03-Er9dPUE4P2D8443mMeE__"/>
-</div>
-
-<div class="ml-4 h-12 w-12 rounded-full ring-1 ring-outline-variant border-2 border-surface border-dashed bg-surface-container-lowest flex items-center justify-center relative">
+<div class="h-12 w-12 rounded-full ring-1 ring-outline-variant border-2 border-surface border-dashed bg-surface-container-lowest flex items-center justify-center relative">
 <span class="material-symbols-outlined text-outline text-[20px]">add</span>
 </div>
 <span class="ml-3 font-label-lg text-label-lg text-primary italic">Join them</span>
 </div>
 </section>
-
-<section class="space-y-stack-sm pb-8">
-<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Shared Interests</h3>
-<div class="flex flex-wrap gap-2 pt-2">
-<span class="px-4 py-2 rounded-full bg-tertiary-container/15 text-tertiary font-label-lg text-label-lg border border-tertiary-container/30 backdrop-blur-sm">Technology</span>
-<span class="px-4 py-2 rounded-full bg-tertiary-container/15 text-tertiary font-label-lg text-label-lg border border-tertiary-container/30 backdrop-blur-sm">Architecture</span>
-</div>
-</section>
 </main>
 
 <div class="fixed bottom-0 left-0 w-full z-50 bg-surface/95 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe shadow-[0_-8px_24px_rgba(0,0,0,0.03)] pb-8" style="padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 2px + 32px);"><button (click)="go('/safety-checkin')" class="w-full h-12 mb-3 bg-secondary-container/30 text-primary font-label-lg text-label-lg rounded-xl flex items-center justify-center space-x-2 border border-outline-variant/30 transition-all active:scale-[0.98]"><span class="material-symbols-outlined text-[20px]">verified_user</span><span>Safety Check-in</span></button>
-<button (click)="go('/request-seat')" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl flex items-center justify-center space-x-2 shadow-sm transition-all active:scale-[0.98] active:bg-primary">
+<button *ngIf="!t.isHost" (click)="go('/request-seat/' + t.id)" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl flex items-center justify-center space-x-2 shadow-sm transition-all active:scale-[0.98] active:bg-primary">
 <span class="">Request a Seat</span>
 <span class="material-symbols-outlined text-[20px]">chair_alt</span>
 </button>
 </div>
+</ng-container>

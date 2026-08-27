@@ -1,8 +1,9 @@
 <main class="w-full max-w-md mx-auto flex flex-col gap-section-gap">
 
+<ng-container *ngIf="!loading() && table() as t">
 <header class="text-center space-y-stack-sm">
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary">You're here.</h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant">Welcome to Haveli Restaurant</p>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary">{{ checkedIn() ? "You're here." : 'Ready to check in?' }}</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Welcome to {{ t.restaurant.name }}</p>
 </header>
 
 <div class="bg-surface rounded-xl p-container-padding shadow-[0_4px_16px_rgba(0,0,0,0.04)] relative">
@@ -10,10 +11,10 @@
 
 <div class="flex items-center justify-between py-stack-sm border-b border-secondary-fixed-dim border-opacity-30">
 <div class="flex items-center gap-gutter">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">restaurant</span>
 <span class="font-body-md text-body-md text-on-surface">Table</span>
 </div>
-<span class="font-title-lg text-title-lg text-primary">4</span>
+<span class="font-title-lg text-title-lg text-primary">{{ t.title }}</span>
 </div>
 
 <div class="flex items-center justify-between py-stack-sm border-b border-secondary-fixed-dim border-opacity-30">
@@ -21,7 +22,7 @@
 <span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">person</span>
 <span class="font-body-md text-body-md text-on-surface">Host</span>
 </div>
-<span class="font-title-lg text-title-lg text-on-surface">Zainab</span>
+<span class="font-title-lg text-title-lg text-on-surface">{{ t.host.name }}</span>
 </div>
 
 <div class="flex items-center justify-between py-stack-sm">
@@ -29,19 +30,27 @@
 <span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">group</span>
 <span class="font-body-md text-body-md text-on-surface">Guest count</span>
 </div>
-<span class="font-title-lg text-title-lg text-on-surface">6</span>
+<span class="font-title-lg text-title-lg text-on-surface">{{ t.guestCount }}</span>
 </div>
 </div>
 </div>
 
 <div class="flex flex-col gap-stack-md">
-<button (click)="go('/dining-event-details')" class="w-full min-h-[48px] bg-primary-container text-on-primary font-title-lg text-title-lg rounded-full py-3 px-6 shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+<button *ngIf="!checkedIn()" (click)="checkIn()" class="w-full min-h-[48px] bg-primary-container text-on-primary font-title-lg text-title-lg rounded-full py-3 px-6 shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
 <span class="material-symbols-outlined">how_to_reg</span>
                 Check In
+            </button>
+<button *ngIf="checkedIn()" (click)="go('/dining-event-details/' + t.id)" class="w-full min-h-[48px] bg-primary-container text-on-primary font-title-lg text-title-lg rounded-full py-3 px-6 shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                Checked In
             </button>
 <button (click)="go('/dining-group-chat')" class="w-full min-h-[48px] border border-secondary-fixed text-on-surface font-title-lg text-title-lg rounded-full py-3 px-6 hover:bg-surface-container-low transition-colors flex justify-center items-center gap-2">
 <span class="material-symbols-outlined">call</span>
                 Contact Host
             </button>
 </div>
+</ng-container>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+<p *ngIf="!loading() && !table()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No table selected.</p>
 </main>

@@ -11,35 +11,47 @@
 <main class="px-container-padding pt-stack-lg pb-32 max-w-4xl mx-auto">
 <h1 class="font-display-lg text-display-lg text-on-surface mb-stack-lg">Your dining plans</h1>
 
-<section class="mb-section-gap">
+<p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">Loading your tables…</p>
+
+<div *ngIf="!loading() && tables().length === 0" class="flex flex-col items-center text-center gap-stack-md py-section-gap">
+<span class="material-symbols-outlined text-primary-container" style="font-size: 48px;">local_cafe</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">No tables yet.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your next great meal could start here.</p>
+<button (click)="go('/discover-restaurants')" class="bg-primary-container text-on-primary font-label-lg text-label-lg py-3 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+                Discover Tables
+            </button>
+</div>
+
+<section *ngIf="upcoming().length > 0" class="mb-section-gap">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Upcoming</h2>
 <div class="flex flex-col gap-gutter">
 
-<div (click)="go('/dining-event-details')" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
+<div *ngFor="let table of upcoming()" (click)="go('/dining-event-details/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
 <div class="flex flex-col sm:flex-row">
 <div class="w-full sm:w-1/3 h-48 sm:h-auto">
-<img alt="Haveli Restaurant" class="w-full h-full object-cover border-r-[0.5px] border-surface-container-high" data-alt="A beautifully set dining table at a high-end Pakistani restaurant, featuring elegant tableware, subtle floral arrangements, and warm, inviting lighting. The atmosphere is sophisticated and ready for a luxurious Friday dinner." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1ls1xHTjidKxSUL3j4wNXc7fGEl9UzhtBTqfcxwq032LGWXTYQKfGPpPWg0_CQFYIXIwgy6KZqYrfQhUdOLpneH5WvZX2qA02kFgaTPdnZYYQ_a_srYQuVQcJBNh2lOfZIgHwK0p_pxuNzb5vm33ooQILl7HyCt1pYS7c5SVO3BROFStIr6mrkA9KU3FUCR0C6gXrPqbny-cIZgKNode48d-FrVYvznC_q6dF-rutk-joWOq0yUEq"/>
+<img [alt]="table.restaurant.name" class="w-full h-full object-cover border-r-[0.5px] border-surface-container-high" [src]="table.restaurant.photoUrl"/>
 </div>
 <div class="p-gutter flex flex-col justify-between flex-grow">
 <div>
 <div class="flex justify-between items-start mb-stack-sm">
-<span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">Friday Dinner</span>
-<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm font-label-sm text-label-sm border border-primary-container">Confirmed</span>
+<span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">{{ table.gatheringType }}</span>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm font-label-sm text-label-sm border border-primary-container">{{ table.isHost ? 'Hosting' : 'Confirmed' }}</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-unit">Haveli Restaurant</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-unit">{{ table.restaurant.name }}</h3>
 <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]">place</span>
-                                    DHA Phase 6, Karachi
+                                    {{ table.restaurant.address }}
                                 </p>
 </div>
 <div class="flex items-center gap-gutter mt-stack-md pt-stack-md border-t-[0.5px] border-outline-variant">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-outline">schedule</span>
-<span class="font-body-lg text-body-lg text-on-surface">8:30 PM</span>
+<span class="font-body-lg text-body-lg text-on-surface">{{ table.dateTime | date: 'medium' }}</span>
 </div>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-outline">group</span>
-<span class="font-body-lg text-body-lg text-on-surface">4 Guests</span>
+<span class="font-body-lg text-body-lg text-on-surface">{{ table.guestCount }} Guest{{ table.guestCount === 1 ? '' : 's' }}</span>
 </div>
 </div>
 </div>
@@ -47,81 +59,32 @@
 </div>
 </div>
 
-<div (click)="go('/table-details-guests')" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
-<div class="flex flex-col sm:flex-row">
-<div class="w-full sm:w-1/3 h-48 sm:h-auto">
-<img alt="Bella Notte" class="w-full h-full object-cover border-r-[0.5px] border-surface-container-high" data-alt="A beautifully arranged dining table at a high-end Italian restaurant in Islamabad, crisp white linen and candlelight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5cvFjrFN1JkTEPm6gda53pv9yJzJ9mIfBV5Q0vhWjEtXtERtYZle6CZPgVId7fIw21RaPVLM9fM8wVubtWXUBs64sgIbcb_J2B1bTvJlBP5d2_ZWjv-kXBinsNc1jmrKMV5B5jjI5U2oG7_BfXltJTaRTwBt4w3k9gRb5KUM_FM_5jMgGC_6h6npx3ri83UzVw8jeEkCcaEUOZUALXS-0NWtkreH-MtsAwILswZqiO6RQUwUiXDAd"/>
-</div>
-<div class="p-gutter flex flex-col justify-between flex-grow">
-<div>
-<div class="flex justify-between items-start mb-stack-sm">
-<span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">Saturday Night Italian Feast</span>
-<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm font-label-sm text-label-sm border border-primary-container">Confirmed</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-unit">Bella Notte</h3>
-<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">place</span>
-                                    F-6 Markaz, Islamabad
-                                </p>
-</div>
-<div class="flex items-center gap-gutter mt-stack-md pt-stack-md border-t-[0.5px] border-outline-variant">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-outline">schedule</span>
-<span class="font-body-lg text-body-lg text-on-surface">Oct 12, 8:00 PM</span>
-</div>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-outline">group</span>
-<span class="font-body-lg text-body-lg text-on-surface">3 Guests</span>
-</div>
-</div>
-</div>
-</div>
-</div>
 </section>
 
-<section>
+<section *ngIf="past().length > 0">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Past</h2>
 <div class="flex flex-col gap-gutter opacity-80 hover:opacity-100 transition-opacity">
 
-<div (click)="go('/dining-event-details')" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
+<div *ngFor="let table of past()" (click)="go(table.hasReviewed ? '/dining-event-details/' + table.id : '/post-dining-review/' + table.id)" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
 <div class="p-gutter">
 <div class="flex justify-between items-start mb-stack-sm">
-<span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">Sunday Brunch</span>
-<span class="text-on-surface-variant font-label-sm text-label-sm">Oct 12, 2023</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">{{ table.gatheringType }}</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">{{ table.dateTime | date: 'mediumDate' }}</span>
 </div>
-<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Cafe Aylanto</h3>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">{{ table.restaurant.name }}</h3>
 <div class="flex items-center gap-gutter mt-stack-md">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-outline text-[18px]">group</span>
-<span class="font-body-md text-body-md text-on-surface-variant">2 Guests</span>
+<span class="font-body-md text-body-md text-on-surface-variant">{{ table.guestCount }} Guest{{ table.guestCount === 1 ? '' : 's' }}</span>
 </div>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-outline text-[18px]">star</span>
-<span class="font-body-md text-body-md text-on-surface-variant">Rated 5.0</span>
+<div class="flex items-center gap-2" [class.text-primary]="!table.hasReviewed">
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="font-body-md text-body-md">{{ table.hasReviewed ? 'Reviewed' : 'Leave a review' }}</span>
 </div>
 </div>
 </div>
 </div>
 
-<div (click)="go('/post-dining-review')" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
-<div class="p-gutter">
-<div class="flex justify-between items-start mb-stack-sm">
-<span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">Business Lunch</span>
-<span class="text-on-surface-variant font-label-sm text-label-sm">Sep 28, 2023</span>
-</div>
-<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Okra</h3>
-<div class="flex items-center gap-gutter mt-stack-md">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-outline text-[18px]">group</span>
-<span class="font-body-md text-body-md text-on-surface-variant">3 Guests</span>
-</div>
-<div class="flex items-center gap-2 text-primary">
-<span class="material-symbols-outlined text-[18px]">star</span>
-<span class="font-body-md text-body-md">Leave a review</span>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
 </main>

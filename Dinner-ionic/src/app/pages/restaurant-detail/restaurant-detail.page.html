@@ -86,7 +86,7 @@
 
 <div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/30 p-4 pb-safe z-40 shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
 <div class="max-w-md mx-auto">
-<button (click)="go('/create-table')" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-full shadow-sm hover:opacity-90 transition-opacity">
+<button (click)="go('/create-table?restaurantId=' + restaurant()?.id)" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-full shadow-sm hover:opacity-90 transition-opacity">
                 Create Dining Event
             </button>
 </div>

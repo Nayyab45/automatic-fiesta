@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth.js';
 import { restaurantsRouter } from './routes/restaurants.js';
+import { tablesRouter, seatRequestsRouter } from './routes/tables.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -15,6 +16,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/restaurants', restaurantsRouter);
+app.use('/api/tables', tablesRouter);
+app.use('/api/seat-requests', seatRequestsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

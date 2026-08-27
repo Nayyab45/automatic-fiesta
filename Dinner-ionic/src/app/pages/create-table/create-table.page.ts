@@ -1,29 +1,83 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
+import { Restaurant, RestaurantService } from '../../services/restaurant.service';
+import { DiningTableService } from '../../services/dining-table.service';
 
 @Component({
   selector: 'app-create-table',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './create-table.page.html',
   styleUrl: './create-table.page.scss',
 })
 export class CreateTablePage extends BasePage {
-  readonly pageTitle = "Create Table";
+  readonly pageTitle = 'Create Table';
+  private readonly restaurantService = inject(RestaurantService);
+  private readonly tableService = inject(DiningTableService);
 
-  selectGatheringType(event: Event): void {
-    const selected = event.currentTarget as HTMLElement;
-    const group = selected.parentElement?.querySelectorAll('.gathering-type-btn') ?? [];
-    group.forEach((btn) => btn.classList.remove('gathering-type-selected'));
-    selected.classList.add('gathering-type-selected');
+  readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
+  readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
+  readonly restaurants = signal<Restaurant[]>([]);
+  readonly submitting = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+
+  gatheringType = 'Dinner';
+  atmosphere = 'Social Conversation';
+  restaurantId: number | null = null;
+  date = '';
+  time = '';
+  seatsTotal = 4;
+  visibility = true;
+  note = '';
+
+  constructor() {
+    super();
+    const restaurantIdParam = this.route.snapshot.queryParamMap.get('restaurantId');
+    this.restaurantId = restaurantIdParam ? Number(restaurantIdParam) : null;
+    this.restaurantService.list().subscribe(({ restaurants }) => {
+      this.restaurants.set(restaurants);
+      if (!this.restaurantId && restaurants.length > 0) {
+        this.restaurantId = restaurants[0].id;
+      }
+    });
   }
 
-  selectAtmosphere(event: Event): void {
-    const selected = event.currentTarget as HTMLElement;
-    const group = selected.parentElement?.querySelectorAll('.atmosphere-card') ?? [];
-    group.forEach((card) => card.classList.remove('atmosphere-selected'));
-    selected.classList.add('atmosphere-selected');
+  selectGatheringType(type: string): void {
+    this.gatheringType = type;
+  }
+
+  selectAtmosphere(atmosphere: string): void {
+    this.atmosphere = atmosphere;
+  }
+
+  submit(): void {
+    if (!this.restaurantId || !this.date || !this.time || this.submitting()) {
+      this.errorMessage.set('Please pick a restaurant, date, and time.');
+      return;
+    }
+
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.tableService
+      .create({
+        restaurantId: this.restaurantId,
+        gatheringType: this.gatheringType,
+        dateTime: `${this.date}T${this.time}`,
+        seatsTotal: this.seatsTotal,
+        visibility: this.visibility ? 'public' : 'private',
+        atmosphere: this.atmosphere,
+        note: this.note,
+      })
+      .subscribe({
+        next: ({ table }) => this.go(`/guest-list/${table.id}`),
+        error: () => {
+          this.submitting.set(false);
+          this.errorMessage.set('Could not create the table. Please try again.');
+        },
+      });
   }
 }
