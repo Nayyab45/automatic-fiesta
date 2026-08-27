@@ -13,95 +13,55 @@
 </div>
 </div>
 </header>
-<main class="w-full max-w-md mx-auto">
+<main class="w-full max-w-md mx-auto" *ngIf="!loading() && restaurant() as r">
 
 <section class="relative w-full h-[397px] bg-surface-variant">
-<div class="bg-cover bg-center w-full h-full" data-alt="A grand, beautifully lit exterior view of Haveli Restaurant in Lahore, Pakistan. The architecture is majestic, featuring traditional Mughal-inspired elements, intricate stonework, and warm, inviting lighting. The setting implies a high-end, cultural dining experience. The image is high-resolution, evoking a sense of heritage and luxury, aligning with a premium editorial aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-edeEaSVBubyEY0-Il7YZXEZLCmtrawh-Eyn-OjSsg6gglfPkUmtLa_yTZUwl2OJ_enXoBD3O0TSXOHNfcJrhDrFz6GlOsh_76BqJzHAY3X4EhpFP6mNBrIfmazkUmMnQSDKOyQ-bFzcHVN7_hP9t8xqxLfuSRFh7AdQwIn0MyLcpq6ni_lcZ6hWErq4QISrvTXsEOTRnfjrQNZA3JAgE_cO8fY_37fM_2e3ku54DP17xh2Q7Y0zv')"></div>
+<div class="bg-cover bg-center w-full h-full" [style.background-image]="'url(' + r.photoUrl + ')'"></div>
 
 <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
 
 <div class="absolute bottom-0 left-0 w-full px-container-padding pb-stack-md flex flex-col gap-unit">
 <div class="flex justify-between items-end">
 <div>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Haveli Restaurant</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">{{ r.name }}</h1>
 <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
 <span class="material-symbols-outlined text-[16px] text-primary">place</span>
-                            Lahore
+                            {{ r.city }}
                         </p>
 </div>
 <div class="flex flex-col items-end">
 <div class="bg-primary-container text-on-primary font-label-lg text-label-lg px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
 <span class="material-symbols-outlined fill text-[14px]">star</span>
-                            4.8
+                            {{ r.rating }}
                         </div>
 </div>
 </div>
 
 <div class="flex gap-2 mt-stack-sm flex-wrap">
-<span class="px-3 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded-full border border-tertiary/20">Traditional Punjabi</span>
-<span class="px-3 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded-full border border-tertiary/20">Pakistani</span>
+<span *ngFor="let tag of cuisineTags()" class="px-3 py-1 bg-tertiary/10 text-tertiary font-label-sm text-label-sm rounded-full border border-tertiary/20">{{ tag }}</span>
 </div>
 </div>
 </section>
 
 <div class="px-container-padding flex flex-col gap-section-gap py-stack-lg">
 
-<section class="flex flex-col gap-stack-sm">
+<section class="flex flex-col gap-stack-sm" *ngIf="r.description">
 <h2 class="font-title-lg text-title-lg text-on-surface">About</h2>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                    Set against the backdrop of the historic Badshahi Mosque, Haveli Restaurant offers an unparalleled dining experience that blends rich heritage with culinary excellence. Discover authentic flavors crafted from generations-old recipes in a setting of majestic grandeur.
-                </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ r.description }}</p>
 </section>
 
-<section class="flex flex-col gap-stack-md">
+<section class="flex flex-col gap-stack-md" *ngIf="r.dishes.length > 0">
 <div class="flex justify-between items-center">
 <h2 class="font-title-lg text-title-lg text-on-surface">Popular Dishes</h2>
 <button (click)="go('/explore-menu')" class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
 </div>
 <div class="flex gap-gutter overflow-x-auto hide-scrollbar pb-2 -mx-container-padding px-container-padding snap-x">
-
-<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
+<div *ngFor="let dish of r.dishes" class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
 <div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img alt="" class="w-full h-full object-cover" data-alt="A close-up, high-quality, editorial-style photograph of a sizzling Chicken Karahi. The dish is presented in a traditional metal wok, garnished with fresh green chilies, ginger juliennes, and coriander. The rich, vibrant red and brown gravy looks appetizing against a clean, warm linen background, highlighting premium dining." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgxwHEb-scErxpkoWBSguEMwunFqMsNm3bsXEMePb-Mjov2SKWmDHrddb6QGISHueZL-HM9a5znW3Bkz1yqpIVd0mzrd703fXJ18kJwHabOzulMMx6tK7CYc6Vfp7d_U1j1YmqfG2iQF_SfriYbrzeY0fZINhk0JhWmM7ohZUoySSS4wt-MRsvahYGADtYFp7nYd_K317yWLf_mhzivgfrrjVAr-gGl8OjEeeJCZwaAiGeIMWBxPqs"/>
+<img [alt]="dish.name" class="w-full h-full object-cover" [src]="dish.photoUrl"/>
 </div>
 <div>
-<h3 class="font-label-lg text-label-lg text-on-surface truncate">Chicken Karahi</h3>
-</div>
-</div>
-
-<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
-<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img alt="" class="w-full h-full object-cover" data-alt="A beautifully plated portion of Mutton Karahi, shot in a bright, modern light-mode setting. Tender pieces of mutton are coated in a thick, spiced masala, served in a heavy copper bowl. The lighting is soft and natural, emphasizing the rich textures and premium quality of the traditional cuisine." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeuQReZdUaL4gt73hM1Gb5bMDhpcCzGqn7b7ng_ljb3250UjJD7ogBq322u7jLSChb19nCe3-4OcdaNb-fX6FErOTrmo4DEd0gXNBvn0WkR3pyYagVxIM682iJwbDrteWhIeHdVbAhVXWkXe_GgSd5XyWAZzQcjlS-cBQ9VGa4lHcGrDnJ-zhDrjIvmzEBWnu2oYY3rDnewemCbqSbY_X5hy0lLfJy3_7HiMBc74E1eihRfnU5dauf"/>
-</div>
-<div>
-<h3 class="font-label-lg text-label-lg text-on-surface truncate">Mutton Karahi</h3>
-</div>
-</div>
-
-<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
-<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img alt="" class="w-full h-full object-cover" data-alt="Elegant presentation of Seekh Kebabs on a minimalist ceramic platter. The perfectly grilled minced meat skewers show delicate char marks and are accompanied by fresh mint chutney and sliced red onions. The overall mood is sophisticated and appetizing, fitting a luxury dining context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClpr5QukQPnBEuFn7eXYRIq2rDDl9BxW1uUnz7YwapDc28YzvGbpVSA1HpURce3wisc5ztsaXity-_hnsKsUFCPryjgPR-PshG-FKl8eTAudYi9Dch-sBeURbx0pGEN8n7JfW6q0dNFHRlO1vH9khQHbIo58HF-iau0TbhPSdkqJ4yAjzMrdj2mX7n2KryO_fyAYUEFRXFtRv4968rhTI5FCBESjgpEo0u3XguDPV71y8DORa4FgXq"/>
-</div>
-<div>
-<h3 class="font-label-lg text-label-lg text-on-surface truncate">Seekh Kebab</h3>
-</div>
-</div>
-
-<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
-<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img alt="" class="w-full h-full object-cover" data-alt="A lavish BBQ Platter showcasing an assortment of grilled meats including chicken tikka, malai boti, and lamb chops. Served on a rustic wooden board with elegant garnishes, the lighting highlights the succulent textures and smoky essence, set against a pristine, upscale dining environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9S2K_hqHdI-eQFxhRbW7_EgCIlMcQb5H6Vi7RJSptl-FvEYQ_fGGy4cKoI4JxI5qCEA_w_6sAsmZxxDUROnyF1yAd_oE3uNcT9mNLdiPASDyi6I-kDHeunPSSP9degDNscseVfZyYHXtOvydaAIEDgsanecXLIybrUbAg-GXvLLg0IXI80QJSFovaiMp77Vwu44B-vRdFBzllylauSJw1AxSD3ytGm4k_hD5L98DtfPCgP8RDoaRo"/>
-</div>
-<div>
-<h3 class="font-label-lg text-label-lg text-on-surface truncate">BBQ Platter</h3>
-</div>
-</div>
-
-<div class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
-<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img alt="" class="w-full h-full object-cover" data-alt="A refined serving of traditional Kheer (rice pudding) in a small, ornate clay bowl. The creamy dessert is meticulously garnished with crushed pistachios, almonds, and delicate silver leaf (varq). Shot with soft, bright light, it conveys a sense of culinary artistry and premium dessert experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7hkVvX2dD-_4sE8Nj_ylVGReP6UOjqdCbAsc7ujGVoPNPmMG4jzcwhquzNMxAvXvDbmOu38s-PbbRbNV0PlT2B1KmDsPkpHJp2filqb0itxCNH05GYmOGV3BnPotNpy3PRNgSvVWQqep4qc59g66gHmpTKizUcKK-fLF0dNJ_51PwtUaYW3UKoHQ1SejE_21_U8q2ATBQuvFKavIgUFEVxVGE00x0sg6kBn5yJ6a2YuutUZUXiLA6"/>
-</div>
-<div>
-<h3 class="font-label-lg text-label-lg text-on-surface truncate">Kheer</h3>
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">{{ dish.name }}</h3>
 </div>
 </div>
 </div>
@@ -109,15 +69,10 @@
 
 <section class="flex flex-col gap-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Location</h2>
-<div class="w-full h-48 bg-surface-variant rounded-xl overflow-hidden shadow-sm relative border border-outline-variant/50">
-<img alt="Map showing the restaurant location in Lahore" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-location="Lahore" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwNrMwsQIWKp8B4MrGQrf7ipRV2JEuFVGeUWWgrPWwOfEaIjZdH03z7jO1c4CZIwrZNSHgmhAaxVwvW8soHIZeM3y8AQkkFMzwbSHSGZnn1KHiHDZ2Wp-uWpDzvxOFK4PEQrEGCpI40YJGqms5iUe9W8ZU4DQHxd-ao82WqOZA2tKLHFK8QG5muxrBDLs6zZqmimtWNB6f4QxO8JbvY7xi8pI34aQy6vcdBZQrStPt-SnUQ7m8dTZt"/>
-<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full h-48 bg-surface-variant rounded-xl overflow-hidden shadow-sm relative border border-outline-variant/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary text-4xl drop-shadow-md">place</span>
 </div>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant">
-                    Fort Road Food Street, Shahi Mohallah Walled City, Lahore, Punjab.
-                </p>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ r.address }}</p>
 <button (click)="go('/restaurant-direction')" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-[20px]">directions</span>
                     Get Directions
@@ -125,6 +80,9 @@
 </section>
 </div>
 </main>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading restaurant…</p>
+<p *ngIf="!loading() && !restaurant()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Restaurant not found.</p>
 
 <div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/30 p-4 pb-safe z-40 shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
 <div class="max-w-md mx-auto">

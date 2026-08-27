@@ -7,7 +7,7 @@
 <img alt="User profile photo" class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a smiling young South Asian professional dining at an upscale restaurant, warm ambient lighting, elegant casual attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLTxX-nya1P7YgxtUZLm52aPccuZK9Ps4mcWkC-Va8kwHMwiPdbP0dRYh9CezVXThhQUBTXnY0zguYW2bEW1lweez51bwX3KPWGYPRjvr12GiGctEADjV7J0RpQhXcrsiu75Wtrojb_slIqqbQt-nOSHPmBJSdZGjfi-j0TKo36_WXzAgNMsNaxqdLIHQNlFy-hFB_JK3MLbRN4gw_OsZCu7VZC0ZpiIkcWD8UENCwul0l6xk_Pa0S"/>
 </div>
 </header>
-<main class="space-y-section-gap pt-stack-md pb-32">
+<main class="space-y-section-gap pt-stack-md pb-32 max-w-2xl mx-auto w-full">
 <div class="px-container-padding space-y-stack-md">
 
 <section>
@@ -34,54 +34,20 @@
 <a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
-<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
+<div *ngFor="let dish of featuredDishes()" class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
 <div class="h-40 w-full overflow-hidden">
-<img alt="Nihari" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJcFe5jzU5c4Brmv_vlc7NZylHGGCPyUytvxVsFIBZKLfqbnVjKocHlyeHsG2f9VzvPtIP4AkzFejxEM7VB6xocoHxqjBqJStFA1kcPrsv8vMnQQTOygPM4PVYvHrgVNTdM9MBqhB8EyjQQ3uUhLjtqp_sQr_g69gBGaJg-3QIimmzgED7JEInHGEo1N-RVRUapaxgoFeRF3u6tVBGp0eMMWBPypaxcHpsMPAsRyRe7Jr0vp03bjpT"/>
+<img [alt]="dish.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" [src]="dish.photoUrl"/>
 </div>
 <div class="p-4 space-y-1">
 <div class="flex justify-between items-start">
-<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Beef Nihari</h3>
-<span class="font-label-lg text-primary">Rs 850</span>
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface">{{ dish.name }}</h3>
+<span class="font-label-lg text-primary">Rs {{ dish.price }}</span>
 </div>
-<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Slow-cooked beef stew with spices</p>
+<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">{{ dish.description }}</p>
 <div class="flex items-center gap-1 pt-2">
 <span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm text-on-surface">4.8</span>
-<span class="font-label-sm text-on-surface-variant ml-1">· Javed Nihari</span>
-</div>
-</div>
-</div>
-<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
-<div class="h-40 w-full overflow-hidden">
-<img alt="Biryani" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyaPbO9Aq7P6CZCm6yKXElRgzADr7ZzYNajxG2GTyBVtHJJXpgfT2QUsBC63G9mj3qtSkg4uuJqHjA35Ttrk_-Vsq9zmH2HZx8xQkAyHWpJl108MoxB4A8WHG0OlIFSg0cWMyliXIRkfnOdwDfC4Gn545XbOWaAhwUPgEx4hiHoRc0KstcAo1Nihc5pkC5Xg7YOwJZJAkKkYaJLguwWYKyfnm9qhFJKU5EolQNLIUxxFcsPjz6a4Ji"/>
-</div>
-<div class="p-4 space-y-1">
-<div class="flex justify-between items-start">
-<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Chicken Biryani</h3>
-<span class="font-label-lg text-primary">Rs 450</span>
-</div>
-<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Spiced rice mixed with tender chicken</p>
-<div class="flex items-center gap-1 pt-2">
-<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm text-on-surface">4.9</span>
-<span class="font-label-sm text-on-surface-variant ml-1">· Student Biryani</span>
-</div>
-</div>
-</div>
-<div class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
-<div class="h-40 w-full overflow-hidden">
-<img alt="Karahi" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNb0ViTDNA-Rd8kGbm9kT4oZ5hMhe8rIexDB2YDJm6wSLSnk8spww8B58AMw-lKGquabmCBi-NmzYaFPeCHSdJaIb7SUxwBO_1oruK6cHUCvR3Xx-i04MfH14kETP1mJQsaKSwdC-5RcHllVbrmODu4ZjPuTBaTWIPzzmBAwD-hLNNr3PptQ90thMndCySyOZo_f657jThlxFh_4tIoDB27YkPpP5cMfhQF9SSkB37tAXVPa_6scPG"/>
-</div>
-<div class="p-4 space-y-1">
-<div class="flex justify-between items-start">
-<h3 class="font-title-lg text-body-lg font-bold text-on-surface">Mutton Karahi</h3>
-<span class="font-label-lg text-primary">Rs 1800</span>
-</div>
-<p class="font-body-md text-on-surface-variant text-sm line-clamp-1">Wok-cooked mutton with tomatoes</p>
-<div class="flex items-center gap-1 pt-2">
-<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm text-on-surface">4.7</span>
-<span class="font-label-sm text-on-surface-variant ml-1">· Kolachi</span>
+<span class="font-label-sm text-on-surface">{{ dish.rating }}</span>
+<span class="font-label-sm text-on-surface-variant ml-1">· {{ dish.restaurantName }}</span>
 </div>
 </div>
 </div>
@@ -94,35 +60,19 @@
 <a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
 </div>
 <div class="px-container-padding space-y-gutter">
-<div class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
+<div *ngFor="let restaurant of topRatedRestaurants()" (click)="go('/restaurant-detail/' + restaurant.id)" (keydown.enter)="go('/restaurant-detail/' + restaurant.id)" role="button" tabindex="0" class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
 <div class="h-24 w-24 rounded-md overflow-hidden flex-shrink-0">
-<img alt="Kolachi" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwFLWt0KfNBAg6AjyuT0SONQjN2iXAcUAuphRfcFyjgEStd-FFFxBUhCCRDudZTMDh5tiiU1Hr7GUQJurnD2vARRAti2e7-OU70Z7Nh5Qz53nQ16yFWEputq9s8OWwQDvii4fMkQcr_mvfwyG252tppcYMqZzSYnTqc2Zlh3bjMhaiUILWtYSV8AXC5PjhwS1930kAz0ux2Q3-H2NHumT19Dy4g9auhs7Ahx7YTewKILwyVFTlWFlc"/>
+<img [alt]="restaurant.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" [src]="restaurant.photoUrl"/>
 </div>
 <div class="flex-1 py-1">
-<h3 class="font-title-lg text-body-lg font-bold text-on-surface mb-1">Kolachi</h3>
-<p class="font-body-md text-on-surface-variant text-sm mb-2">Pakistani · BBQ · Seaside</p>
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface mb-1">{{ restaurant.name }}</h3>
+<p class="font-body-md text-on-surface-variant text-sm mb-2">{{ restaurant.cuisineTags.split(',').join(' · ') }}</p>
 <div class="flex items-center gap-3">
 <div class="flex items-center gap-1 bg-tertiary-container/20 px-2 py-0.5 rounded text-tertiary">
 <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm font-bold">4.8</span>
+<span class="font-label-sm font-bold">{{ restaurant.rating }}</span>
 </div>
-<span class="font-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">directions_walk</span> 2.5 km</span>
-</div>
-</div>
-</div>
-<div class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
-<div class="h-24 w-24 rounded-md overflow-hidden flex-shrink-0">
-<img alt="Xander's" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnRfWMXtZULLasq97TnexrGq-RjojFZrwpoB800T7UwPagSRacgRyS_mcMPS5uVFRJHxrVS3WPEE3yW1fq0eJvKyWSmB-lTDD9NruiwXTIH3YjhD7HCY4EToDJa-MMdfpzIpZKWKsjyTY2DKQumPJoVpaRJ_vV5Qo3bHFg9h1pC_GZy5WwFMSlnAYUnkp9CbVX3mFM99cKNyEJeK8ENXIBkBeZecW6BFPP0KkZTTPBXCNIyvKPzSS6"/>
-</div>
-<div class="flex-1 py-1">
-<h3 class="font-title-lg text-body-lg font-bold text-on-surface mb-1">Xander's</h3>
-<p class="font-body-md text-on-surface-variant text-sm mb-2">Cafe · Continental · Desserts</p>
-<div class="flex items-center gap-3">
-<div class="flex items-center gap-1 bg-tertiary-container/20 px-2 py-0.5 rounded text-tertiary">
-<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-sm font-bold">4.7</span>
-</div>
-<span class="font-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">directions_walk</span> 1.2 km</span>
+<span class="font-label-sm text-on-surface-variant">{{ restaurant.city }}</span>
 </div>
 </div>
 </div>

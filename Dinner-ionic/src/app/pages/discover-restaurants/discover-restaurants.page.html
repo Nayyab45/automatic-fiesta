@@ -21,89 +21,50 @@
 
 <div class="flex flex-col gap-3 mb-stack-md">
 <div class="flex gap-stack-sm overflow-x-auto pb-1 scrollbar-hide -mx-container-padding px-container-padding">
-<button (click)="selectFilterChip($event)" class="filter-chip filter-chip-selected text-primary font-label-lg text-label-lg px-4 py-2 rounded-full border border-primary whitespace-nowrap flex items-center gap-1 font-bold transition-all"><span class="material-symbols-outlined text-sm filter-chip-check" style='font-variation-settings: "wght" 600;'>check</span>All</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Punjab</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Sindh</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">KPK</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Continental</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Desi</button>
-<button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full whitespace-nowrap hover:border-primary transition-all">Street Food</button>
+<button *ngFor="let region of regionChips" (click)="selectRegion(region)" [class.filter-chip-selected]="selectedRegion === region" class="filter-chip text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full border border-outline-variant whitespace-nowrap flex items-center gap-1 transition-all">
+<span *ngIf="selectedRegion === region" class="material-symbols-outlined text-sm filter-chip-check" style='font-variation-settings: "wght" 600;'>check</span>{{ region }}</button>
 </div>
-<div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding"><button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">Under 500</button><button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">500-1500</button><button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">1500-3000</button><button (click)="selectFilterChip($event)" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">3000+</button></div>
+<div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding">
+<button *ngFor="let price of priceChips" (click)="selectPriceTier(price.tier)" [class.filter-chip-selected]="selectedPriceTier === price.tier" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">{{ price.label }}</button>
+</div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant py-section-gap text-center">Loading restaurants…</p>
+<p *ngIf="!loading() && restaurants().length === 0" class="font-body-md text-body-md text-on-surface-variant py-section-gap text-center">No restaurants match these filters yet.</p>
 
-<article class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
+<div *ngIf="!loading() && restaurants().length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+
+<article *ngFor="let restaurant of restaurants()" class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
 <div class="relative h-64 w-full">
-<img alt="Haveli Restaurant exterior" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" data-alt="A breathtaking view of Haveli Restaurant in Lahore, overlooking the Badshahi Mosque at dusk. Warm, golden hour lighting illuminating the historic architecture. Diners are enjoying meals on a terrace. Premium, editorial photography style, conveying luxury and cultural heritage, fitting a high-end dining app. Ivory and muted gold tones dominant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-N3sZ_BCk5VFtATHaCWc9vilNvyR9_xdBxneokza5aIpkYBWtWM2lUwkq0AnFEov-Bp2kpXrxUCWOn2RWV4BSeWafwpJ33NpdNmjZSt0LAS_tFCCmghmSVKcv0zrDPRd3yz_BnQV9Jde9hrcrnpHNPUlsf9IegzcWeRG3qZhmu2_s4HPe4VZONLmy48Sn3diRG3mVn5C-agh0XY3oeMrEVUeGT-QoGgohdQ-IAPA74IXlVQ9HeWX7"/>
+<img [alt]="restaurant.name + ' photo'" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" [src]="restaurant.photoUrl"/>
 <div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
 <span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>
-<span class="font-label-lg text-label-lg text-on-surface">4.8 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(120 reviews)</span></span>
+<span class="font-label-lg text-label-lg text-on-surface">{{ restaurant.rating }} <span class="text-on-surface-variant font-normal tracking-normal lowercase">({{ restaurant.reviewCount }} reviews)</span></span>
 </div>
 <button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">place</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
 <div class="p-stack-md flex-1 flex flex-col">
 <div class="flex justify-between items-start mb-stack-sm">
 <div>
-<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Haveli Restaurant</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Lahore • Punjabi Pakistani • $$$</p>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">{{ restaurant.name }}</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ restaurant.city }} • {{ restaurant.cuisineTags.split(',').join(' ') }} • {{ '$'.repeat(restaurant.priceTier) }}</p>
 </div>
 <div class="flex gap-2">
 <button (click)="go('/restaurant-direction')" aria-label="Get directions" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
 <span class="material-symbols-outlined text-[20px]">directions</span>
 </button>
-<button (click)="toggleSave($event)" aria-label="Save restaurant" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
-<span class="material-symbols-outlined text-[20px]">bookmark</span>
+<button (click)="toggleSave(restaurant)" aria-label="Save restaurant" class="hover:text-primary transition-colors flex items-center justify-center p-1" [class.text-primary]="isSaved(restaurant.id)" [class.text-on-surface-variant]="!isSaved(restaurant.id)">
+<span class="material-symbols-outlined text-[20px]">{{ isSaved(restaurant.id) ? 'bookmark' : 'bookmark_border' }}</span>
 </button>
 </div>
 </div>
-<div class="mb-stack-md">
+<div class="mb-stack-md" *ngIf="popularDishNames(restaurant).length > 0">
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-unit">Popular</p>
 <div class="flex flex-wrap gap-2">
-<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Chicken Karahi</span>
-<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Seekh Kebab</span>
-<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Naan</span>
+<span *ngFor="let dish of popularDishNames(restaurant)" class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">{{ dish }}</span>
 </div>
 </div>
 <div class="mt-auto pt-stack-sm border-t border-outline-variant/30 flex gap-stack-sm">
-<button (click)="go('/restaurant-detail')" class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
-<button (click)="go('/create-table')" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
-</div>
-</div>
-</article>
-
-<article class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
-<div class="relative h-64 w-full">
-<img alt="Kolachi Restaurant interior" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" data-alt="An elegant, dimly lit interior of a high-end Pakistani restaurant in Karachi. Focus on a beautifully set table with copper serving dishes, warm ambient lighting from ornate lamps. The atmosphere is sophisticated and inviting, matching the luxury ivory and gold theme. Professional culinary lifestyle photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1GxHh8jZZ8hfGYve-BngWCr78b09nXeGrBo8gVwlxDonqA1vGgD7NMoW8gc81UEs6U4T2JZNfZrpVjv9PU76tY2KTlc9np2wSUPmaPhi9fNM3-AwYyrjcCZQgwJnagdRZaHPhArKCoguTfm-eTDVKKAlQH45Lv2NEzwDmjOQ7kzD-QJG01fJXFs6OkSHDREc7y8_9QBJLNG27ef_puOuUJmBAt5N4jfCDIKh8jv_4daNy_Aw8KeH-"/>
-<div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
-<span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>
-<span class="font-label-lg text-label-lg text-on-surface">4.9 <span class="text-on-surface-variant font-normal tracking-normal lowercase">(345 reviews)</span></span>
-</div>
-<button (click)="go('/restaurant-direction')" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">place</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
-<div class="p-stack-md flex-1 flex flex-col">
-<div class="flex justify-between items-start mb-stack-sm">
-<div>
-<h3 class="font-title-lg text-title-lg text-on-surface mb-unit">Kolachi</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Karachi • Seafront Dining • $$$$</p>
-</div>
-<div class="flex gap-2">
-<button (click)="go('/restaurant-direction')" aria-label="Get directions" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
-<span class="material-symbols-outlined text-[20px]">directions</span>
-</button>
-<button (click)="toggleSave($event)" aria-label="Save restaurant" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">
-<span class="material-symbols-outlined text-[20px]">bookmark</span>
-</button>
-</div>
-</div>
-<div class="mb-stack-md">
-<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-unit">Popular</p>
-<div class="flex flex-wrap gap-2">
-<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Peshawari Karahi</span>
-<span class="chip-bg text-tertiary font-label-lg text-label-lg px-3 py-1 rounded-full">Malai Boti</span>
-</div>
-</div>
-<div class="mt-auto pt-stack-sm border-t border-outline-variant/30 flex gap-stack-sm">
-<button (click)="go('/restaurant-detail')" class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
+<button (click)="go('/restaurant-detail/' + restaurant.id)" class="flex-1 bg-surface border border-secondary-container text-on-surface font-label-lg text-label-lg py-3 rounded-lg hover:border-primary transition-colors">View Restaurant</button>
 <button (click)="go('/create-table')" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 transition-opacity">Create Table</button>
 </div>
 </div>

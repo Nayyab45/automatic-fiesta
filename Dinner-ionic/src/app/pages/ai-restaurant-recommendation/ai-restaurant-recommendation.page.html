@@ -1,4 +1,4 @@
-<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface top-0 z-40 md:hidden sticky">
+<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface top-0 z-40 sticky">
 <div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
 <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">{{ cityService.label() }}</span>
@@ -8,46 +8,7 @@
 </div>
 </header>
 
-<nav class="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant px-container-padding py-section-gap z-50">
-<div class="mb-section-gap flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-display-lg" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="font-display-lg text-headline-md text-primary tracking-tighter">What Should We Eat?</span>
-</div>
-<ul class="flex flex-col gap-stack-lg flex-grow">
-<li>
-<a class="flex items-center gap-3 text-on-surface-variant hover:opacity-80 transition-opacity" routerLink="/home">
-<span class="material-symbols-outlined">home</span>
-<span class="font-title-lg text-title-lg">Home</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-3 text-primary font-bold hover:opacity-80 transition-opacity" routerLink="/discover-restaurants">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
-<span class="font-title-lg text-title-lg">Discover</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-3 text-on-surface-variant hover:opacity-80 transition-opacity" routerLink="/my-tables">
-<span class="material-symbols-outlined">restaurant</span>
-<span class="font-title-lg text-title-lg">Tables</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-3 text-on-surface-variant hover:opacity-80 transition-opacity" routerLink="/messages">
-<span class="material-symbols-outlined">chat_bubble</span>
-<span class="font-title-lg text-title-lg">Messages</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-3 text-on-surface-variant hover:opacity-80 transition-opacity" routerLink="/profile">
-<span class="material-symbols-outlined">person</span>
-<span class="font-title-lg text-title-lg">Profile</span>
-</a>
-</li>
-</ul>
-</nav>
-
-<main class="flex-grow md:ml-64 px-container-padding pt-stack-lg pb-32 max-w-4xl mx-auto">
+<main class="flex-grow px-container-padding pt-stack-lg pb-32 max-w-4xl mx-auto" *ngIf="!loading() && recommendation() as rec">
 <header class="mb-section-gap text-center md:text-left">
 <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">Tonight's Recommendation</h1>
 <p class="font-body-md text-body-md text-on-surface-variant">Curated for your palate.</p>
@@ -55,12 +16,12 @@
 
 <article class="glass-card rounded-xl overflow-hidden mb-section-gap group cursor-pointer hover:border-primary transition-colors duration-300">
 <div class="relative h-64 md:h-96 w-full">
-<img alt="Restaurant interior" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A beautiful, cinematic photograph of an upscale outdoor dining courtyard in Pakistan. The scene features elegant table settings with fine linens, warm ambient lighting from strung Edison bulbs, and lush greenery framing the space. The color palette is rich with muted golds, deep greens, and warm earth tones, conveying a luxurious and welcoming atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQZ77LKd-VTH23N8NhbFjORHLsOuxHe5RHYrM2rjdvSCU8lt_LyqdrHKmSUMtEoZ15UFPd9KpEQbLjPd-9pzPpDYzAjnZdDJUUnapA26--uuyDO-UcGu8ki7RlLW6srHDMHfDVQ2viwT-4Nbavo4hAzYko_KIszXhjMh_4__hg5QpeVNTGwEPH7s3t4HJ0opvb1oX6AAsQVmfWJk0XIDswsRQRytL9181e1bbHwV7LVs06slz4c7aI"/>
+<img [alt]="rec.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" [src]="rec.photoUrl"/>
 <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent"></div>
 <div class="absolute bottom-0 left-0 p-container-padding">
-<h2 class="font-display-lg text-display-lg text-on-primary mb-1 shadow-sm">Desi Courtyard</h2>
+<h2 class="font-display-lg text-display-lg text-on-primary mb-1 shadow-sm">{{ rec.name }}</h2>
 <p class="font-label-lg text-label-lg text-secondary-fixed flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">star</span> 4.9 • Upscale Pakistani
+<span class="material-symbols-outlined text-[16px]">star</span> {{ rec.rating }} • {{ cuisineTags().join(' ') }}
                     </p>
 </div>
 <div class="absolute top-4 right-4 bg-surface/90 backdrop-blur px-3 py-1 rounded-full border border-primary/30">
@@ -77,56 +38,32 @@
                         Recommended because...
                     </h3>
 <div class="flex flex-wrap gap-stack-sm">
-<div class="bg-tertiary-container/20 text-tertiary px-4 py-2 rounded-full border border-tertiary/20 flex items-center gap-2 font-label-lg text-label-lg">
-<span class="material-symbols-outlined text-[16px]">favorite</span> You love Karahi
-                        </div>
-<div class="bg-tertiary-container/20 text-tertiary px-4 py-2 rounded-full border border-tertiary/20 flex items-center gap-2 font-label-lg text-label-lg">
-<span class="material-symbols-outlined text-[16px]">local_fire_department</span> You enjoy BBQ
-                        </div>
-<div class="bg-tertiary-container/20 text-tertiary px-4 py-2 rounded-full border border-tertiary/20 flex items-center gap-2 font-label-lg text-label-lg">
-<span class="material-symbols-outlined text-[16px]">wine_bar</span> You prefer relaxed dinners
+<div *ngFor="let reason of reasons()" class="bg-tertiary-container/20 text-tertiary px-4 py-2 rounded-full border border-tertiary/20 flex items-center gap-2 font-label-lg text-label-lg">
+<span class="material-symbols-outlined text-[16px]">favorite</span> {{ reason }}
                         </div>
 </div>
 </section>
 
-<section>
+<section *ngIf="rec.dishes.length > 0">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
 <span class="material-symbols-outlined text-primary">restaurant_menu</span>
                         Suggested Dishes
                     </h3>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-<div class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant/50 hover:bg-surface-container transition-colors">
+<div *ngFor="let dish of rec.dishes" class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant/50 hover:bg-surface-container transition-colors">
 <div class="w-16 h-16 rounded-md overflow-hidden shrink-0">
-<img alt="" class="w-full h-full object-cover" data-alt="A close-up, mouth-watering editorial food photograph of sizzling Chicken Karahi served in a traditional copper wok. The dish is garnished with fresh ginger juliennes and green chilies. The lighting highlights the rich, spiced tomato base and succulent chicken pieces. Set against a clean, light ivory background with subtle warm gold accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0XqoAQcLlTQnk3pftNKva2hunc8RGl2k4d8WBswXzlJSjK-s7b20j-kcedZWx2lVMPhBB153Y6Jml3SiMMkgAr3dUCscACo13AXfRXg34JYanPUQDd26alaHohZ1HXmMT0o4luxrxMOweW3efBmE_xl-nv8ZStn3T9lvDj9o19nTDyNEoQflmhrs9elOzE60sFvLQIPXnKYheibkM299qBbDx_QH-pTMX9Y9BrgO1_FBGdceIQq_y"/>
+<img [alt]="dish.name" class="w-full h-full object-cover" [src]="dish.photoUrl"/>
 </div>
 <div>
-<h4 class="font-label-lg text-label-lg text-on-surface">Chicken Karahi</h4>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Signature blend</p>
-</div>
-</div>
-<div class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant/50 hover:bg-surface-container transition-colors">
-<div class="w-16 h-16 rounded-md overflow-hidden shrink-0">
-<img alt="" class="w-full h-full object-cover" data-alt="A highly detailed, top-down view of perfectly grilled Seekh Kebabs resting on a bed of thinly sliced red onions and fresh cilantro on an elegant white ceramic plate. The kebabs are beautifully charred with a slight sheen. The visual style is premium and editorial, suited for a high-end dining menu with soft, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN1pEVZwdDrZC2upy1_JMr0Sbr48TCnq1E6QMubSFOjnnRprHVA1DeNXxiEOiVDNrxM6aQE56UTNyAqc00Uyow5GovwnmK1pdZ0lSxlaX7sSOQY17oqrBLp_4TDMjKOj2HbUEpobLdDoxs8lEVf901NiLpVS37wjQsUgzbQm2iNHHRdDzMhYZxdh_O6a8HfKEwHVJS7tSg98CrmsejOMtY7GLpZ-YNACbTf8h7rpuByg94dagDLsoI"/>
-</div>
-<div>
-<h4 class="font-label-lg text-label-lg text-on-surface">Seekh Kebab</h4>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Charcoal grilled</p>
-</div>
-</div>
-<div class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant/50 hover:bg-surface-container transition-colors">
-<div class="w-16 h-16 rounded-md overflow-hidden shrink-0">
-<img alt="" class="w-full h-full object-cover" data-alt="A delicate, minimalist photo of traditional Kheer dessert served in a small terracotta bowl. The creamy rice pudding is exquisitely garnished with silver leaf (varq), chopped pistachios, and a few strands of saffron. The lighting is soft and bright, emphasizing the creamy texture and luxurious presentation against a clean ivory table setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATztXWfmkwT2JdtFUaLSj_EnFO2eP9Vvj72dXJzFC7qezDiNHf_LlFyybwCFdMLM8srurDYDK1q9sAZBWJ_9dJM39mFcvydBCcI4Tw8lPFgsrucS6ECaAfSQaTwXqR_8BkYcMyN1Rckku8e9MKw491vdp8PFfWFmtmFT2agaRnEkdtT5NuxIjy2dpY1P1lszPM8JSgciC8ej_VhWFN4HQrIchS4EeI619UgRucQv-tdZiOUuyo-WFT"/>
-</div>
-<div>
-<h4 class="font-label-lg text-label-lg text-on-surface">Kheer</h4>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Classic dessert</p>
+<h4 class="font-label-lg text-label-lg text-on-surface">{{ dish.name }}</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ dish.description }}</p>
 </div>
 </div>
 </div>
 </section>
 
 <div class="mt-stack-lg flex justify-end">
-<button (click)="go('/restaurant-detail')" class="bg-primary-container text-on-primary font-label-lg text-label-lg px-8 py-4 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm flex items-center gap-2">
+<button (click)="viewRestaurant()" class="bg-primary-container text-on-primary font-label-lg text-label-lg px-8 py-4 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm flex items-center gap-2">
                         Explore Restaurant
                         <span class="material-symbols-outlined">arrow_forward</span>
 </button>
@@ -134,5 +71,7 @@
 </div>
 </article>
 </main>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Finding tonight's pick…</p>
 
 <app-bottom-nav active="discover"></app-bottom-nav>

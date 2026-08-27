@@ -92,4 +92,13 @@ export class SearchFilterPage extends BasePage {
     this.selectedDate = 'Today, Oct 24';
     this.selectedTime = '20:00';
   }
+
+  showResults(): void {
+    const params = new URLSearchParams();
+    const [firstCuisine] = this.selectedCuisines;
+    if (firstCuisine) params.set('cuisine', firstCuisine);
+    params.set('priceTier', String(this.priceTierIndex + 1));
+    params.set('minRating', String(this.ratingValue));
+    this.go(`/discover-restaurants?${params.toString()}`);
+  }
 }
