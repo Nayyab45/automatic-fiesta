@@ -79,40 +79,23 @@
 </div>
 </section>
 
-<section class="space-y-stack-md pb-section-gap">
+<section class="space-y-stack-md pb-section-gap" *ngIf="peopleToMeet().length > 0">
 <div class="px-container-padding flex justify-between items-end">
 <h2 class="font-headline-lg text-title-lg text-on-surface">People to Meet</h2>
-<a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
+<a (click)="go('/discover-people')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
-<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
-<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
-<img alt="Ali" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_VLewOf7U6ze1QlYq2FqjnRfP5rSaAvCXlqxqyfVmz7_07q5J4Ua5OzlEeKhXkXlhemZDil7zvxog8u1ew8bFhR0oy2TdBZRrNvCdZqr_yh43-x-Fs3vF4x_rJsv7c3IQk4jW-fjFXhfj1OvvEljwspzl0A6L34vVxwGKjcTMAHZ5PKbtwn6TkAEWECAM0vv78FZiABpVt1Cz4fIbddC7csLSdTygAHUNEP6twbdT2Xrhsmb3rVt-"/>
+<div *ngFor="let person of peopleToMeet()" (click)="go('/discover-people')" (keydown.enter)="go('/discover-people')" role="button" tabindex="0" class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors" *ngIf="person.photoUrl; else initialAvatar">
+<img [alt]="person.name" class="w-full h-full object-cover" [src]="person.photoUrl"/>
 </div>
-<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Ali R.</h3>
-<p class="font-label-sm text-primary text-center mb-2">Top Reviewer</p>
+<ng-template #initialAvatar>
+<div class="w-20 h-20 rounded-full mb-3 border-2 border-surface shadow-sm bg-tertiary-container/30 text-tertiary flex items-center justify-center font-headline-md text-headline-md">{{ person.name.charAt(0) }}</div>
+</ng-template>
+<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">{{ person.name }}</h3>
+<p class="font-label-sm text-primary text-center mb-2">{{ person.interests[0] ? person.interests[0].name : (person.city || 'New here') }}</p>
 <div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
-<span class="material-symbols-outlined text-[12px]">favorite</span> 4 mutual
-</div>
-</div>
-<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
-<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
-<img alt="Zara" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZvKv48Yl6eg2Ot-ud9LrswVbgR7tM3uM0s4pbbMRGNoGb1XpuddELWfSWiq68zn4r6-OHnUK7IO2x5DtO4JHgEe0i_j2ToMXABuvdMZsCGhYqrEb99xmjp0dAXVPf92c0hz5nBhQIf6ykZj0T3ZznnaEbmtFl-vfAtYTMeJtw6JUB6XOPGSttpy9s6Y1mquNH4VFTBOys5LBBJepu_lkofEQW725P96uiPZvyMi2mKY6Q8oT3QSmH"/>
-</div>
-<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Zara M.</h3>
-<p class="font-label-sm text-primary text-center mb-2">Cafe Explorer</p>
-<div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
-<span class="material-symbols-outlined text-[12px]">favorite</span> 2 mutual
-</div>
-</div>
-<div class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
-<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors">
-<img alt="Omar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9HPyLZ4iws-jK1NnU_ptsjExRF5dvKi06meDXIbpWqwpNa9pOhmRS4HWTX-rKedcxpara_d6RGok7CQMUFYvd3_Yb0gXvVDiqDWbNZZMNKPr6kUSd_RezpHx5RdBamzpU9TDgCRys0slb3RogHQlo_0OrzK0lpVni7ri10h0a4zl1hQpaDb_SH_v3Ghg3Ufzrs0wnZGOKBOr3UjSjFJlEHXx-eq2ld48uYhncnEI2wno12i6_ls3q"/>
-</div>
-<h3 class="font-title-lg text-body-md font-bold text-on-surface text-center mb-1">Omar K.</h3>
-<p class="font-label-sm text-primary text-center mb-2">BBQ Enthusiast</p>
-<div class="flex items-center justify-center gap-1 w-full bg-surface-container py-1 rounded font-label-sm text-on-surface-variant">
-<span class="material-symbols-outlined text-[12px]">favorite</span> 6 mutual
+<span class="material-symbols-outlined text-[12px]" [style.font-variation-settings]="person.verified ? '\'FILL\' 1' : '\'FILL\' 0'">verified</span> {{ person.verified ? 'Verified' : 'Member' }}
 </div>
 </div>
 </div>

@@ -73,7 +73,7 @@
 <span class="material-symbols-outlined text-primary text-4xl drop-shadow-md">place</span>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant">{{ r.address }}</p>
-<button (click)="go('/restaurant-direction')" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<button (click)="go('/restaurant-direction/' + r.id)" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-[20px]">directions</span>
                     Get Directions
                 </button>
