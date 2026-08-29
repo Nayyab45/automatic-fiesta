@@ -170,3 +170,75 @@ describe('seat requests & notifications', () => {
     assert.equal(res.status, 400);
   });
 });
+
+describe('payment methods', () => {
+  test('rejects a submitted number longer than last4 (i.e. refuses a full card/account number)', async () => {
+    const user = await signup('payer-reject@example.com');
+    const res = await api('POST', '/api/payment-methods', {
+      token: user.accessToken,
+      body: { type: 'visa', last4: '4242424242424242', expiryMonth: 8, expiryYear: 2027, cardholderName: 'Test User' },
+    });
+    assert.equal(res.status, 400);
+  });
+
+  test('adding the first method makes it default; adding a second does not', async () => {
+    const user = await signup('payer-default@example.com');
+
+    const visa = await api('POST', '/api/payment-methods', {
+      token: user.accessToken,
+      body: { type: 'visa', last4: '4242', expiryMonth: 8, expiryYear: 2027, cardholderName: 'Test User' },
+    });
+    assert.equal(visa.status, 201);
+    assert.equal(visa.body.paymentMethod.isDefault, true);
+    assert.equal(visa.body.paymentMethod.label, 'Visa •••• 4242');
+
+    const easypaisa = await api('POST', '/api/payment-methods', {
+      token: user.accessToken,
+      body: { type: 'easypaisa', walletPhone: '03001234567' },
+    });
+    assert.equal(easypaisa.status, 201);
+    assert.equal(easypaisa.body.paymentMethod.isDefault, false);
+    assert.match(easypaisa.body.paymentMethod.label, /^EasyPaisa .*4567$/);
+  });
+
+  test('setting a new default flips off the old one; removing the default promotes another', async () => {
+    const user = await signup('payer-switch@example.com');
+    const first = await api('POST', '/api/payment-methods', {
+      token: user.accessToken,
+      body: { type: 'bank', bankName: 'Meezan Bank', accountTitle: 'Test User', last4: '1234' },
+    });
+    const second = await api('POST', '/api/payment-methods', {
+      token: user.accessToken,
+      body: { type: 'jazzcash', walletPhone: '03111234567' },
+    });
+
+    const switched = await api('PUT', `/api/payment-methods/${second.body.paymentMethod.id}/default`, { token: user.accessToken });
+    assert.equal(switched.status, 200);
+    const byId = Object.fromEntries(switched.body.paymentMethods.map((m) => [m.id, m]));
+    assert.equal(byId[first.body.paymentMethod.id].isDefault, false);
+    assert.equal(byId[second.body.paymentMethod.id].isDefault, true);
+
+    const afterRemove = await api('DELETE', `/api/payment-methods/${second.body.paymentMethod.id}`, { token: user.accessToken });
+    assert.equal(afterRemove.status, 200);
+    assert.equal(afterRemove.body.paymentMethods.length, 1);
+    assert.equal(afterRemove.body.paymentMethods[0].isDefault, true);
+  });
+
+  test("a user cannot see or delete another user's payment methods", async () => {
+    const owner = await signup('payer-owner@example.com');
+    const intruder = await signup('payer-intruder@example.com');
+
+    const created = await api('POST', '/api/payment-methods', {
+      token: owner.accessToken,
+      body: { type: 'visa', last4: '9999', expiryMonth: 1, expiryYear: 2030, cardholderName: 'Owner' },
+    });
+
+    const intrudersList = await api('GET', '/api/payment-methods', { token: intruder.accessToken });
+    assert.equal(intrudersList.body.paymentMethods.length, 0);
+
+    const intruderDelete = await api('DELETE', `/api/payment-methods/${created.body.paymentMethod.id}`, {
+      token: intruder.accessToken,
+    });
+    assert.equal(intruderDelete.status, 404);
+  });
+});

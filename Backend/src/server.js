@@ -9,6 +9,7 @@ import { profileRouter, interestsRouter, peopleRouter, matchesRouter, privacySet
 import { conversationsRouter, notificationsRouter } from './routes/messaging.js';
 import { emergencyContactsRouter, blocksRouter, reportsRouter } from './routes/safety.js';
 import { verificationRouter } from './routes/verification.js';
+import { paymentMethodsRouter } from './routes/payments.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -41,6 +42,7 @@ app.use('/api/emergency-contacts', emergencyContactsRouter);
 app.use('/api/blocks', blocksRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/verification', verificationRouter);
+app.use('/api/payment-methods', paymentMethodsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

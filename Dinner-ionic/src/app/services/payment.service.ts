@@ -1,57 +1,77 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export type PaymentMethodType = 'visa' | 'bank' | 'easypaisa' | 'jazzcash';
 
 export interface PaymentMethod {
-  id: string;
-  brand: 'Visa' | 'Mastercard';
-  last4: string;
-  expiry: string;
+  id: number;
+  type: PaymentMethodType;
+  label: string;
+  last4: string | null;
+  expiryMonth: number | null;
+  expiryYear: number | null;
+  cardholderName: string | null;
+  bankName: string | null;
+  accountTitle: string | null;
+  walletPhone: string | null;
   isDefault: boolean;
+  createdAt: string;
 }
 
-const STORAGE_KEY = 'paymentMethods';
+export interface AddVisaPayload {
+  type: 'visa';
+  last4: string;
+  expiryMonth: number;
+  expiryYear: number;
+  cardholderName: string;
+}
 
-const DEFAULT_METHODS: PaymentMethod[] = [
-  { id: 'pm_1', brand: 'Visa', last4: '4242', expiry: '08/27', isDefault: true },
-];
+export interface AddBankPayload {
+  type: 'bank';
+  bankName: string;
+  accountTitle: string;
+  last4: string;
+}
+
+export interface AddWalletPayload {
+  type: 'easypaisa' | 'jazzcash';
+  walletPhone: string;
+  accountTitle?: string;
+}
+
+export type AddPaymentMethodPayload = AddVisaPayload | AddBankPayload | AddWalletPayload;
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
-  private readonly methods = signal<PaymentMethod[]>(this.loadInitial());
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/payment-methods`;
+
+  private readonly methods = signal<PaymentMethod[]>([]);
   readonly paymentMethods = this.methods.asReadonly();
 
-  private loadInitial(): PaymentMethod[] {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_METHODS;
-    } catch {
-      return DEFAULT_METHODS;
-    }
+  load(): Observable<{ paymentMethods: PaymentMethod[] }> {
+    return this.http
+      .get<{ paymentMethods: PaymentMethod[] }>(this.baseUrl)
+      .pipe(tap(({ paymentMethods }) => this.methods.set(paymentMethods)));
   }
 
-  private persist(methods: PaymentMethod[]): void {
-    this.methods.set(methods);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(methods));
-    } catch {
-      /* localStorage unavailable, nothing to persist */
-    }
+  add(payload: AddPaymentMethodPayload): Observable<{ paymentMethod: PaymentMethod }> {
+    return this.http
+      .post<{ paymentMethod: PaymentMethod }>(this.baseUrl, payload)
+      .pipe(tap(({ paymentMethod }) => this.methods.update((list) => [...list, paymentMethod])));
   }
 
-  addCard(brand: 'Visa' | 'Mastercard', last4: string, expiry: string): void {
-    const isFirst = this.methods().length === 0;
-    const newMethod: PaymentMethod = { id: `pm_${Date.now()}`, brand, last4, expiry, isDefault: isFirst };
-    this.persist([...this.methods(), newMethod]);
+  setDefault(id: number): Observable<{ paymentMethods: PaymentMethod[] }> {
+    return this.http
+      .put<{ paymentMethods: PaymentMethod[] }>(`${this.baseUrl}/${id}/default`, {})
+      .pipe(tap(({ paymentMethods }) => this.methods.set(paymentMethods)));
   }
 
-  removeCard(id: string): void {
-    const remaining = this.methods().filter((m) => m.id !== id);
-    if (remaining.length > 0 && !remaining.some((m) => m.isDefault)) {
-      remaining[0].isDefault = true;
-    }
-    this.persist(remaining);
-  }
-
-  setDefault(id: string): void {
-    this.persist(this.methods().map((m) => ({ ...m, isDefault: m.id === id })));
+  remove(id: number): Observable<{ paymentMethods: PaymentMethod[] }> {
+    return this.http
+      .delete<{ paymentMethods: PaymentMethod[] }>(`${this.baseUrl}/${id}`)
+      .pipe(tap(({ paymentMethods }) => this.methods.set(paymentMethods)));
   }
 }

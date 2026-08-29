@@ -168,6 +168,7 @@ authRouter.delete('/me', requireAuth, (req, res) => {
   db.prepare('DELETE FROM match_preferences WHERE user_id = ?').run(userId);
   db.prepare('DELETE FROM privacy_settings WHERE user_id = ?').run(userId);
   db.prepare('DELETE FROM emergency_contacts WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM payment_methods WHERE user_id = ?').run(userId);
   db.prepare('DELETE FROM user_profiles WHERE user_id = ?').run(userId);
   db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
   db.prepare('DELETE FROM users WHERE id = ?').run(userId);
