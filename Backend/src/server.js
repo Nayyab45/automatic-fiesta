@@ -16,7 +16,14 @@ if (!process.env.JWT_SECRET) {
 }
 
 const app = express();
-app.use(cors());
+
+// CORS_ORIGIN is unset in local dev (falls back to `cors()`'s wide-open
+// default, matching prior behavior) and should be set to the real deployed
+// frontend's origin(s) in production. Comma-separated for the case where a
+// web build and a Capacitor-wrapped app hit the same backend from different
+// origins.
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim());
+app.use(cors(allowedOrigins ? { origin: allowedOrigins } : undefined));
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
