@@ -72,3 +72,46 @@ authRouter.get('/me', requireAuth, (req, res) => {
   }
   res.json({ user: toPublicUser(row) });
 });
+
+authRouter.put('/me', requireAuth, (req, res) => {
+  const { name, email } = req.body ?? {};
+  const current = db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(req.user.sub);
+
+  if (email) {
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(normalizedEmail, req.user.sub);
+    if (existing) {
+      return res.status(409).json({ message: 'An account with that email already exists' });
+    }
+  }
+
+  db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?').run(
+    name?.trim() || current.name,
+    email ? String(email).trim().toLowerCase() : current.email,
+    req.user.sub,
+  );
+
+  const updated = db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(req.user.sub);
+  const user = toPublicUser(updated);
+  res.json({ token: signToken(user), user });
+});
+
+// Deletes the user-identity-adjacent rows a person would expect gone (profile,
+// preferences, interests, emergency contacts) plus the login itself. Content
+// they created that other people's data now points to (hosted tables,
+// reviews, messages) is left in place rather than cascading a delete across
+// the whole relational graph -- the same trade-off a lot of small apps make
+// before building a real soft-delete/anonymization path.
+authRouter.delete('/me', requireAuth, (req, res) => {
+  const userId = req.user.sub;
+  db.prepare('DELETE FROM user_interests WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM food_preferences WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM dietary_preferences WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM match_preferences WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM privacy_settings WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM emergency_contacts WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM user_profiles WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+  res.json({ ok: true });
+});

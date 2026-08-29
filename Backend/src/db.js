@@ -7,6 +7,8 @@ import { tablesSchema } from './db/schema/tables.js';
 import { profilesSchema } from './db/schema/profiles.js';
 import { messagingSchema } from './db/schema/messaging.js';
 import { safetySchema } from './db/schema/safety.js';
+import { settingsSchema } from './db/schema/settings.js';
+import { ensureColumn } from './lib/ensureColumn.js';
 import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
 
@@ -15,9 +17,22 @@ const dbPath = path.join(__dirname, '..', 'data', 'app.sqlite');
 
 export const db = new DatabaseSync(dbPath);
 
-for (const schema of [usersSchema, restaurantsSchema, tablesSchema, profilesSchema, messagingSchema, safetySchema]) {
+for (const schema of [
+  usersSchema,
+  restaurantsSchema,
+  tablesSchema,
+  profilesSchema,
+  messagingSchema,
+  safetySchema,
+  settingsSchema,
+]) {
   db.exec(schema);
 }
+
+// user_profiles predates the "phone" field manage-account needs; added via
+// ensureColumn rather than a migration framework since this is the only
+// additive column the schema has needed so far.
+ensureColumn(db, 'user_profiles', 'phone', 'TEXT');
 
 for (const seed of [seedRestaurants, seedInterests]) {
   seed(db);

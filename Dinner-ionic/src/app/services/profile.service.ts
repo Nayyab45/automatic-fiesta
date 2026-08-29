@@ -18,6 +18,7 @@ export interface Profile {
   city: string | null;
   province: string | null;
   photoUrl: string | null;
+  phone: string | null;
   verified: boolean;
   tablesJoinedCount: number;
   rating: number | null;
@@ -38,6 +39,14 @@ export interface Person {
   photoUrl: string | null;
   verified: number;
   interests: Interest[];
+}
+
+export interface PrivacySettings {
+  profileVisible: boolean;
+  showMutualInterests: boolean;
+  showOnlineStatus: boolean;
+  showProfileViews: boolean;
+  locationPrecision: 'approximate' | 'exact';
 }
 
 export interface Match extends Person {
@@ -61,7 +70,7 @@ export class ProfileService {
     return this.http.get<{ profile: Profile }>(`${this.baseUrl}/${id}`);
   }
 
-  updateMe(payload: { age?: number; bio?: string; city?: string; province?: string; photoUrl?: string }): Observable<{ profile: Profile }> {
+  updateMe(payload: { age?: number; bio?: string; city?: string; province?: string; photoUrl?: string; phone?: string }): Observable<{ profile: Profile }> {
     return this.http.put<{ profile: Profile }>(`${this.baseUrl}/me`, payload);
   }
 
@@ -93,5 +102,13 @@ export class ProfileService {
 
   matches(): Observable<{ matches: Match[] }> {
     return this.http.get<{ matches: Match[] }>(`${environment.apiUrl}/matches`);
+  }
+
+  privacySettings(): Observable<{ settings: PrivacySettings }> {
+    return this.http.get<{ settings: PrivacySettings }>(`${this.baseUrl}/me/privacy-settings`);
+  }
+
+  updatePrivacySettings(payload: Partial<PrivacySettings>): Observable<{ settings: PrivacySettings }> {
+    return this.http.put<{ settings: PrivacySettings }>(`${this.baseUrl}/me/privacy-settings`, payload);
   }
 }

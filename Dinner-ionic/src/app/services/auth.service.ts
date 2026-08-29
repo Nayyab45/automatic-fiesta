@@ -48,6 +48,14 @@ export class AuthService {
     this.currentUserSignal.set(null);
   }
 
+  updateMe(payload: { name?: string; email?: string }): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.baseUrl}/me`, payload).pipe(tap((response) => this.setSession(response)));
+  }
+
+  deleteMe(): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/me`).pipe(tap(() => this.logout()));
+  }
+
   private setSession(response: AuthResponse): void {
     localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USER_KEY, JSON.stringify(response.user));

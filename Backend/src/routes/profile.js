@@ -7,10 +7,32 @@ export const profileRouter = Router();
 export const interestsRouter = Router();
 export const peopleRouter = Router();
 export const matchesRouter = Router();
+export const privacySettingsRouter = Router();
 
 profileRouter.use(requireAuth);
 peopleRouter.use(requireAuth);
 matchesRouter.use(requireAuth);
+privacySettingsRouter.use(requireAuth);
+
+const DEFAULT_PRIVACY_SETTINGS = {
+  profileVisible: true,
+  showMutualInterests: true,
+  showOnlineStatus: false,
+  showProfileViews: false,
+  locationPrecision: 'approximate',
+};
+
+function privacySettingsFor(userId) {
+  const row = db.prepare('SELECT * FROM privacy_settings WHERE user_id = ?').get(userId);
+  if (!row) return { ...DEFAULT_PRIVACY_SETTINGS };
+  return {
+    profileVisible: !!row.profile_visible,
+    showMutualInterests: !!row.show_mutual_interests,
+    showOnlineStatus: !!row.show_online_status,
+    showProfileViews: !!row.show_profile_views,
+    locationPrecision: row.location_precision,
+  };
+}
 
 function tablesJoinedCount(userId) {
   const { count } = db
@@ -62,6 +84,7 @@ function fullProfile(userId) {
     city: profile?.city ?? null,
     province: profile?.province ?? null,
     photoUrl: profile?.photo_url ?? null,
+    phone: profile?.phone ?? null,
     verified: !!profile?.verified,
     tablesJoinedCount: tablesJoinedCount(userId),
     rating: hostRating(userId),
@@ -90,14 +113,29 @@ profileRouter.get('/:id', (req, res) => {
   res.json({ profile: fullProfile(user.id) });
 });
 
+// Merges onto the existing row rather than overwriting wholesale, since
+// callers now legitimately send partial updates (avatar-only from
+// manage-account's photo picker, phone-only from its edit-phone prompt)
+// alongside profile-creation's full-form save.
 profileRouter.put('/me', (req, res) => {
-  const { age, bio, city, province, photoUrl } = req.body ?? {};
+  const { age, bio, city, province, photoUrl, phone } = req.body ?? {};
+  const existing = db.prepare('SELECT * FROM user_profiles WHERE user_id = ?').get(req.user.sub);
+
+  const merged = {
+    age: age !== undefined ? age : (existing?.age ?? null),
+    bio: bio !== undefined ? bio : (existing?.bio ?? null),
+    city: city !== undefined ? city : (existing?.city ?? null),
+    province: province !== undefined ? province : (existing?.province ?? null),
+    photoUrl: photoUrl !== undefined ? photoUrl : (existing?.photo_url ?? null),
+    phone: phone !== undefined ? phone : (existing?.phone ?? null),
+  };
+
   db.prepare(
-    `INSERT INTO user_profiles (user_id, age, bio, city, province, photo_url, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+    `INSERT INTO user_profiles (user_id, age, bio, city, province, photo_url, phone, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
      ON CONFLICT(user_id) DO UPDATE SET age = excluded.age, bio = excluded.bio, city = excluded.city,
-       province = excluded.province, photo_url = excluded.photo_url, updated_at = datetime('now')`,
-  ).run(req.user.sub, age ?? null, bio ?? null, city ?? null, province ?? null, photoUrl ?? null);
+       province = excluded.province, photo_url = excluded.photo_url, phone = excluded.phone, updated_at = datetime('now')`,
+  ).run(req.user.sub, merged.age, merged.bio, merged.city, merged.province, merged.photoUrl, merged.phone);
   res.json({ profile: fullProfile(req.user.sub) });
 });
 
@@ -147,9 +185,16 @@ const NOT_BLOCKED_CLAUSE = `u.id NOT IN (
   SELECT blocker_user_id FROM user_blocks WHERE blocked_user_id = ?
 )`;
 
+// Respects privacy-settings' "Show my profile to nearby users" toggle: a row
+// missing from privacy_settings defaults to visible, matching
+// DEFAULT_PRIVACY_SETTINGS below.
+const PROFILE_VISIBLE_CLAUSE = `u.id NOT IN (
+  SELECT user_id FROM privacy_settings WHERE profile_visible = 0
+)`;
+
 peopleRouter.get('/', (req, res) => {
   const { city } = req.query;
-  const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE];
+  const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE, PROFILE_VISIBLE_CLAUSE];
   const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
     clauses.push('p.city = ?');
@@ -177,7 +222,7 @@ matchesRouter.get('/', (req, res) => {
       .prepare(
         `SELECT u.id, u.name, p.age, p.city, p.bio, p.photo_url, p.verified FROM users u
          JOIN user_profiles p ON p.user_id = u.id
-         WHERE u.id != ? AND ${NOT_BLOCKED_CLAUSE}`,
+         WHERE u.id != ? AND ${NOT_BLOCKED_CLAUSE} AND ${PROFILE_VISIBLE_CLAUSE}`,
       )
       .all(req.user.sub, req.user.sub, req.user.sub),
   );
@@ -207,4 +252,32 @@ matchesRouter.get('/', (req, res) => {
     .sort((a, b) => b.score - a.score);
 
   res.json({ matches });
+});
+
+privacySettingsRouter.get('/', (req, res) => {
+  res.json({ settings: privacySettingsFor(req.user.sub) });
+});
+
+privacySettingsRouter.put('/', (req, res) => {
+  const existing = privacySettingsFor(req.user.sub);
+  const merged = { ...existing, ...req.body };
+
+  db.prepare(
+    `INSERT INTO privacy_settings
+       (user_id, profile_visible, show_mutual_interests, show_online_status, show_profile_views, location_precision, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET profile_visible = excluded.profile_visible,
+       show_mutual_interests = excluded.show_mutual_interests, show_online_status = excluded.show_online_status,
+       show_profile_views = excluded.show_profile_views, location_precision = excluded.location_precision,
+       updated_at = datetime('now')`,
+  ).run(
+    req.user.sub,
+    merged.profileVisible ? 1 : 0,
+    merged.showMutualInterests ? 1 : 0,
+    merged.showOnlineStatus ? 1 : 0,
+    merged.showProfileViews ? 1 : 0,
+    merged.locationPrecision,
+  );
+
+  res.json({ settings: privacySettingsFor(req.user.sub) });
 });
