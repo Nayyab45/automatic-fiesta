@@ -65,6 +65,28 @@
             "development": { "buildTarget": "dastarkhan:build:development" }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "assets" },
+              { "glob": "manifest.webmanifest", "input": "src", "output": "" }
+            ],
+            "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource-variable/playfair-display/index.css",
+              "node_modules/@fontsource-variable/dm-sans/index.css",
+              "src/theme/icons.scss",
+              "src/global.scss",
+              "src/theme/variables.scss"
+            ],
+            "scripts": [],
+            "karmaConfig": "karma.conf.js"
+          }
         }
       }
     }

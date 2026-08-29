@@ -6,7 +6,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "node --watch --experimental-sqlite src/server.js",
-    "start": "node --experimental-sqlite src/server.js"
+    "start": "node --experimental-sqlite src/server.js",
+    "test": "node --experimental-sqlite --test"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -14,7 +14,9 @@ import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '..', 'data', 'app.sqlite');
+// Tests set DB_PATH=:memory: so each test file gets its own throwaway
+// database instead of touching the real dev database in data/app.sqlite.
+const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'app.sqlite');
 
 export const db = new DatabaseSync(dbPath);
 

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { pathToFileURL } from 'node:url';
 import { authRouter } from './routes/auth.js';
 import { restaurantsRouter } from './routes/restaurants.js';
 import { tablesRouter, seatRequestsRouter } from './routes/tables.js';
@@ -36,5 +37,15 @@ app.use('/api/verification', verificationRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Backend listening on http://localhost:${port}`));
+// Only binds a port when run directly (`node src/server.js`); tests import
+// `app` and call `app.listen(0)` themselves so each test file gets its own
+// ephemeral port instead of colliding with a dev server already on 3000.
+// pathToFileURL (not string concatenation) handles Windows drive letters and
+// slash direction correctly, which a naive `file://${argv[1]}` comparison
+// does not.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Backend listening on http://localhost:${port}`));
+}
+
+export { app };
