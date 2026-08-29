@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { requireFields } from '../lib/validate.js';
+import { createNotification } from './messaging.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -13,6 +14,11 @@ seatRequestsRouter.use(requireAuth);
 function guestCount(tableId) {
   const { count } = db.prepare('SELECT COUNT(*) as count FROM table_guests WHERE table_id = ?').get(tableId);
   return 1 + count; // + host
+}
+
+function isTableMember(table, userId) {
+  if (table.host_user_id === userId) return true;
+  return !!db.prepare('SELECT 1 FROM table_guests WHERE table_id = ? AND user_id = ?').get(table.id, userId);
 }
 
 function tableWithContext(row, userId) {
@@ -135,6 +141,8 @@ tablesRouter.post('/:id/seat-requests', (req, res) => {
     .prepare('INSERT INTO seat_requests (table_id, user_id, message) VALUES (?, ?, ?)')
     .run(table.id, req.user.sub, req.body?.message ?? null);
 
+  createNotification(table.host_user_id, 'seat_request_received', { tableId: table.id, actorUserId: req.user.sub });
+
   const created = db.prepare('SELECT * FROM seat_requests WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json({ seatRequest: toCamel(created) });
 });
@@ -236,6 +244,56 @@ seatRequestsRouter.patch('/:id', (req, res) => {
     );
   }
 
+  createNotification(seatRequest.user_id, status === 'confirmed' ? 'seat_request_confirmed' : 'seat_request_declined', {
+    tableId: seatRequest.table_id,
+    actorUserId: req.user.sub,
+  });
+
   const updated = db.prepare('SELECT * FROM seat_requests WHERE id = ?').get(seatRequest.id);
   res.json({ seatRequest: toCamel(updated) });
+});
+
+tablesRouter.get('/:id/messages', (req, res) => {
+  const table = db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!isTableMember(table, req.user.sub)) {
+    return res.status(403).json({ message: 'Not a member of this table' });
+  }
+
+  const rows = db
+    .prepare(
+      `SELECT m.*, u.name as sender_name FROM table_messages m
+       JOIN users u ON u.id = m.sender_id
+       WHERE m.table_id = ? ORDER BY m.created_at ASC`,
+    )
+    .all(table.id);
+  res.json({ messages: toCamelRows(rows) });
+});
+
+tablesRouter.post('/:id/messages', (req, res) => {
+  const table = db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!isTableMember(table, req.user.sub)) {
+    return res.status(403).json({ message: 'Not a member of this table' });
+  }
+  const missingFieldsError = requireFields(req.body, ['body']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+
+  const result = db
+    .prepare('INSERT INTO table_messages (table_id, sender_id, body) VALUES (?, ?, ?)')
+    .run(table.id, req.user.sub, req.body.body);
+
+  const created = db
+    .prepare(
+      `SELECT m.*, u.name as sender_name FROM table_messages m
+       JOIN users u ON u.id = m.sender_id WHERE m.id = ?`,
+    )
+    .get(result.lastInsertRowid);
+  res.status(201).json({ message: toCamel(created) });
 });

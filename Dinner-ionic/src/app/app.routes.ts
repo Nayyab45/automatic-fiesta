@@ -60,6 +60,7 @@ const routeDefinitions: Routes = [
   { path: 'post-dining-review/:id', loadComponent: () => import('./pages/post-dining-review/post-dining-review.page').then((m) => m.PostDiningReviewPage) },
   { path: 'dining-group-chat', loadComponent: () => import('./pages/dining-group-chat/dining-group-chat.page').then((m) => m.DiningGroupChatPage) },
   { path: 'dining-group-chat/:id', loadComponent: () => import('./pages/dining-group-chat/dining-group-chat.page').then((m) => m.DiningGroupChatPage) },
+  { path: 'dining-group-chat/dm/:id', loadComponent: () => import('./pages/dining-group-chat/dining-group-chat.page').then((m) => m.DiningGroupChatPage), data: { mode: 'dm' } },
   { path: 'messages', loadComponent: () => import('./pages/messages/messages.page').then((m) => m.MessagesPage) },
   { path: 'notifications', loadComponent: () => import('./pages/notifications/notifications.page').then((m) => m.NotificationsPage) },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage) },

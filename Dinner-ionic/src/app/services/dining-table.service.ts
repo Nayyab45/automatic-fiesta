@@ -83,6 +83,15 @@ export interface ReviewPayload {
   comment: string;
 }
 
+export interface TableMessage {
+  id: number;
+  tableId: number;
+  senderId: number;
+  senderName: string;
+  body: string;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DiningTableService {
   private readonly http = inject(HttpClient);
@@ -130,5 +139,13 @@ export class DiningTableService {
 
   submitReview(id: number | string, payload: ReviewPayload): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/${id}/reviews`, payload);
+  }
+
+  messages(id: number | string): Observable<{ messages: TableMessage[] }> {
+    return this.http.get<{ messages: TableMessage[] }>(`${this.baseUrl}/${id}/messages`);
+  }
+
+  sendMessage(id: number | string, body: string): Observable<{ message: TableMessage }> {
+    return this.http.post<{ message: TableMessage }>(`${this.baseUrl}/${id}/messages`, { body });
   }
 }
