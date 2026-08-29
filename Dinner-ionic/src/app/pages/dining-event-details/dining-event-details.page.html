@@ -80,7 +80,7 @@
 </section>
 </main>
 
-<div class="fixed bottom-0 left-0 w-full z-50 bg-surface/95 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe shadow-[0_-8px_24px_rgba(0,0,0,0.03)] pb-8" style="padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 2px + 32px);"><button (click)="go('/safety-checkin')" class="w-full h-12 mb-3 bg-secondary-container/30 text-primary font-label-lg text-label-lg rounded-xl flex items-center justify-center space-x-2 border border-outline-variant/30 transition-all active:scale-[0.98]"><span class="material-symbols-outlined text-[20px]">verified_user</span><span>Safety Check-in</span></button>
+<div class="fixed bottom-0 left-0 w-full z-50 bg-surface/95 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe shadow-[0_-8px_24px_rgba(0,0,0,0.03)] pb-8" style="padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 2px + 32px);"><button (click)="go('/safety-checkin/' + t.id)" class="w-full h-12 mb-3 bg-secondary-container/30 text-primary font-label-lg text-label-lg rounded-xl flex items-center justify-center space-x-2 border border-outline-variant/30 transition-all active:scale-[0.98]"><span class="material-symbols-outlined text-[20px]">verified_user</span><span>Safety Check-in</span></button>
 <button *ngIf="!t.isHost" (click)="go('/request-seat/' + t.id)" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl flex items-center justify-center space-x-2 shadow-sm transition-all active:scale-[0.98] active:bg-primary">
 <span class="">Request a Seat</span>
 <span class="material-symbols-outlined text-[20px]">chair_alt</span>

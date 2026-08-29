@@ -6,6 +6,7 @@ import { restaurantsRouter } from './routes/restaurants.js';
 import { tablesRouter, seatRequestsRouter } from './routes/tables.js';
 import { profileRouter, interestsRouter, peopleRouter, matchesRouter } from './routes/profile.js';
 import { conversationsRouter, notificationsRouter } from './routes/messaging.js';
+import { emergencyContactsRouter, blocksRouter, reportsRouter } from './routes/safety.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -26,6 +27,9 @@ app.use('/api/people', peopleRouter);
 app.use('/api/matches', matchesRouter);
 app.use('/api/conversations', conversationsRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/emergency-contacts', emergencyContactsRouter);
+app.use('/api/blocks', blocksRouter);
+app.use('/api/reports', reportsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

@@ -9,11 +9,15 @@
 
 </div>
 </header>
-<main class="flex-1 w-full flex flex-col gap-stack-lg mt-unit">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+<p *ngIf="!loading() && !table()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No meetup selected.</p>
+
+<main *ngIf="!loading() && table() as t" class="flex-1 w-full flex flex-col gap-stack-lg mt-unit">
 
 <section class="relative w-full">
 <div class="w-full h-[280px] bg-surface-container relative">
-<img alt="Map showing your check-in location at Beach Avenue, Phase 8 DHA, Karachi" class="w-full h-full object-cover" data-alt="A high-end, minimalist digital map view of Karachi's coastal area, specifically around Beach Avenue Phase 8 DHA. The map styling is premium, using warm beige and soft muted greens to represent landmasses, with thin, delicate Champagne-colored lines for roads. The ocean is a pale, calm cream. The overall aesthetic mimics a luxury travel publication. Lighting is soft and bright, light-mode style." data-location="Karachi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm90hqbdeoJUGGBebSgBQzVkTGXRqEMv96RMm-VVkxN2t8e2XTlHOaBDEVZlaR6TPz0ybpMFquc4FLO4L2yG_hB8k5GbezUSK3jV-AyK0eFC6BbuMwcFx3thIqjuZJ88UM0cFZZFNr2vl4EeGPfL0Cm5yL7npIDPc2Ep-DWe0QpB_Dqp4WAB5jBcTjW4U_Do7w41MGQO1KyYVdS3XshQw7oJ8n01Rtw-eFfP9IB4Mxw0cSQcx7HqjX"/>
+<img [alt]="'Map showing ' + t.restaurant.name" class="w-full h-full object-cover opacity-90" [src]="t.restaurant.photoUrl"/>
 <div class="absolute inset-0 map-gradient"></div>
 
 <div class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce" style="animation-duration: 2s;">
@@ -27,32 +31,32 @@
 <div class="px-container-padding -mt-16 relative z-10">
 <div class="glass-card rounded-xl p-gutter flex flex-col gap-stack-sm relative">
 <div class="absolute inset-0 rounded-xl border border-secondary-container pointer-events-none"></div>
-<h2 class="font-title-lg text-title-lg text-on-surface">Kolachi Restaurant</h2>
+<h2 class="font-title-lg text-title-lg text-on-surface">{{ t.restaurant.name }}</h2>
 <div class="flex items-start gap-2 text-on-surface-variant">
 <span class="material-symbols-outlined text-[18px] mt-0.5">place</span>
-<p class="font-body-md text-body-md">Beach Avenue, Phase 8, DHA, Karachi</p>
+<p class="font-body-md text-body-md">{{ t.restaurant.address }}</p>
 </div>
 <div class="w-full h-[0.5px] bg-secondary-container my-1"></div>
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[18px]">schedule</span>
-<p class="font-label-lg text-label-lg">Meetup Tonight, 8:00 PM</p>
+<p class="font-label-lg text-label-lg">{{ t.title }}, {{ t.dateTime | date: 'medium' }}</p>
 </div>
 </div>
 </div>
 </section>
 
 <section class="px-container-padding flex flex-col items-center gap-stack-sm">
-<button *ngIf="!checkedIn" (click)="checkIn()" class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
+<button *ngIf="!checkedIn()" (click)="checkIn()" class="w-full h-[56px] rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_4px_16px_0_rgba(184,155,94,0.3)] transition-all duration-200 btn-press">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                     I've Arrived — Check In
                 </button>
-<button *ngIf="checkedIn" disabled class="w-full h-[56px] rounded-full bg-primary-container/50 text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg cursor-not-allowed">
+<button *ngIf="checkedIn()" disabled class="w-full h-[56px] rounded-full bg-primary-container/50 text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg cursor-not-allowed">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                     Checked In
                 </button>
 <div class="flex items-center gap-1.5 mt-2">
-<div class="w-2 h-2 rounded-full" [class.bg-outline-variant]="!checkedIn" [class.bg-tertiary]="checkedIn"></div>
-<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">{{ checkedIn ? 'Checked in' : 'Not checked in' }}</span>
+<div class="w-2 h-2 rounded-full" [class.bg-outline-variant]="!checkedIn()" [class.bg-tertiary]="checkedIn()"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">{{ checkedIn() ? 'Checked in' : 'Not checked in' }}</span>
 </div>
 </section>
 
@@ -78,7 +82,7 @@
 </section>
 
 <section class="px-container-padding mt-stack-sm">
-<button (click)="checkOut()" [disabled]="!checkedIn" class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200" [class.opacity-60]="!checkedIn" [class.cursor-not-allowed]="!checkedIn">
+<button (click)="checkOut()" [disabled]="!checkedIn()" class="w-full h-[56px] rounded-full border border-secondary-container text-outline flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all duration-200" [class.opacity-60]="!checkedIn()" [class.cursor-not-allowed]="!checkedIn()">
 <span class="material-symbols-outlined">logout</span>
                     I've Left Safely — Check Out
                 </button>

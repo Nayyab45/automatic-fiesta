@@ -3,7 +3,7 @@
 <span class="material-symbols-outlined text-[24px]">arrow_back</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-on-surface text-center flex-1">Blocked Users</h1>
-<div class="w-10"></div> 
+<div class="w-10"></div>
 </header>
 <main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-lg">
 
@@ -13,51 +13,27 @@
             </p>
 </section>
 
-<ul class="flex flex-col w-full" id="blocked-users-list">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 
-<li class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
+<ul class="flex flex-col w-full" *ngIf="!loading() && blocked().length > 0">
+<li *ngFor="let user of blocked()" class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
 <div class="flex items-center gap-gutter">
-<img alt="Sami Khan" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small circular profile portrait of a modern young man with dark hair, slightly smiling, set against a soft blurred background with warm lighting, capturing a premium dining app aesthetic in high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs6hXQQK79JgctmeuEH_JitGgFE_ZpeDASA9DnErfInX_fpKZaqRO-irJhr_GwFYXzTUm-ZmIE8Pzsssb0IVBaxap8sl9NPuONStFRw_2GvWodEZ-5cyhlBw7Vpph5lZLcyzkexAu6RrgdOdgQ6ME5wWpnbHwpaftxt6yehd0WD9Ly4dNl2FGoXaasoL0pzL9Js8ZiqnTOEb1T4Ovb39qQiotzEvtyZ6iFauF_Bv4QIGKSo9vUcVw4"/>
-<div class="flex flex-col gap-unit">
-<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px]">Sami Khan</span>
-<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Blocked on Oct 12, 2023</span>
-</div>
-</div>
-<button class="interactive-element px-4 py-2 rounded-full border border-primary-container text-on-surface font-label-lg text-label-lg bg-transparent hover:bg-surface-variant/50">
-                    Unblock
-                </button>
-</li>
-
-<li class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
-<div class="flex items-center gap-gutter">
-<img alt="Zoya Ahmed" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small circular profile portrait of a stylish South Asian woman with elegant jewelry and dark hair, softly lit in a warm, inviting restaurant ambiance, capturing a sophisticated and premium look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX0L-X-EI7H-FZV_RH0e8XnY6x0WWg-_aV1QD317zDnXGo4zaiG601b71ngsx75Z_QFPqVUuIP5jFCO0zqNvc914d3nMU0Zx8eFKbYgHRPpy6uw3c3Fy4NeZsPOZqNzz4C1SkO-xl8LpjwHTTOGRzDVsSy_UqYJBGXRFxyJMiTCUqXhl6LIszOjHnshEpK9BpTE-gAYKmqbaU1zcgZyovunppRWC_jKJzh_1XQKAlyYeWXtWvZ3Y5Q"/>
-<div class="flex flex-col gap-unit">
-<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px]">Zoya Ahmed</span>
-<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Blocked on Nov 05, 2023</span>
-</div>
-</div>
-<button class="interactive-element px-4 py-2 rounded-full border border-primary-container text-on-surface font-label-lg text-label-lg bg-transparent hover:bg-surface-variant/50">
-                    Unblock
-                </button>
-</li>
-
-<li class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
-<div class="flex items-center gap-gutter">
-<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant/30">
+<img *ngIf="user.photoUrl" [alt]="user.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" [src]="user.photoUrl"/>
+<div *ngIf="!user.photoUrl" class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant/30">
 <span class="material-symbols-outlined text-on-surface-variant fill-icon">person</span>
 </div>
 <div class="flex flex-col gap-unit">
-<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px]">Ali Raza</span>
-<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Blocked on Jan 18, 2024</span>
+<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px]">{{ user.name }}</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Blocked on {{ user.createdAt | date: 'mediumDate' }}</span>
 </div>
 </div>
-<button class="interactive-element px-4 py-2 rounded-full border border-primary-container text-on-surface font-label-lg text-label-lg bg-transparent hover:bg-surface-variant/50">
+<button (click)="unblock(user)" class="interactive-element px-4 py-2 rounded-full border border-primary-container text-on-surface font-label-lg text-label-lg bg-transparent hover:bg-surface-variant/50">
                     Unblock
                 </button>
 </li>
 </ul>
 
-<div class="hidden flex-col items-center justify-center text-center py-section-gap h-64 opacity-0 transition-opacity duration-500" id="empty-state">
+<div *ngIf="!loading() && blocked().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
 <div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
 <span class="material-symbols-outlined text-[40px] text-primary-container">how_to_reg</span>
 </div>

@@ -6,6 +6,7 @@ import { restaurantsSchema } from './db/schema/restaurants.js';
 import { tablesSchema } from './db/schema/tables.js';
 import { profilesSchema } from './db/schema/profiles.js';
 import { messagingSchema } from './db/schema/messaging.js';
+import { safetySchema } from './db/schema/safety.js';
 import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
 
@@ -14,7 +15,7 @@ const dbPath = path.join(__dirname, '..', 'data', 'app.sqlite');
 
 export const db = new DatabaseSync(dbPath);
 
-for (const schema of [usersSchema, restaurantsSchema, tablesSchema, profilesSchema, messagingSchema]) {
+for (const schema of [usersSchema, restaurantsSchema, tablesSchema, profilesSchema, messagingSchema, safetySchema]) {
   db.exec(schema);
 }
 

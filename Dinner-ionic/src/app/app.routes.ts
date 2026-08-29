@@ -70,6 +70,7 @@ const routeDefinitions: Routes = [
   { path: 'premium-members', loadComponent: () => import('./pages/premium-members/premium-members.page').then((m) => m.PremiumMembersPage) },
   { path: 'safety-center', loadComponent: () => import('./pages/safety-center/safety-center.page').then((m) => m.SafetyCenterPage) },
   { path: 'safety-checkin', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },
+  { path: 'safety-checkin/:id', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },
   { path: 'emergency-contacts', loadComponent: () => import('./pages/emergency-contacts/emergency-contacts.page').then((m) => m.EmergencyContactsPage) },
   { path: 'community-guidelines', loadComponent: () => import('./pages/community-guidelines/community-guidelines.page').then((m) => m.CommunityGuidelinesPage) },
   { path: 'report-users', loadComponent: () => import('./pages/report-users/report-users.page').then((m) => m.ReportUsersPage) },

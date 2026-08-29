@@ -4,34 +4,49 @@
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Emergency Contact</h1>
-<div class="w-10"></div> 
+<div class="w-10"></div>
 </div>
 </header>
 <main class="flex-1 w-full max-w-md mx-auto px-container-padding py-stack-lg flex flex-col gap-section-gap pb-32">
 
-<section class="flex flex-col items-center text-center gap-stack-md">
+<section class="flex flex-col items-center text-center gap-stack-md" *ngIf="showForm()">
 <div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
-<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">chevron_left</span>
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">contact_emergency</span>
 </div>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px]">
                 Add someone we can reach out to if you ever need help during a meetup.
             </p>
 </section>
 
-<section class="bg-surface rounded-xl p-container-padding flex flex-col gap-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-outline-variant/30">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<section class="flex flex-col gap-stack-md" *ngIf="!loading() && contacts().length > 0">
+<h2 class="font-title-lg text-title-lg text-on-surface">Your Emergency Contacts</h2>
+<div *ngFor="let c of contacts()" class="bg-surface rounded-xl p-container-padding flex items-center justify-between gap-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-outline-variant/30">
+<div>
+<p class="font-title-lg text-title-lg text-on-surface">{{ c.name }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ c.relationship || 'Contact' }} · {{ c.phone }}</p>
+</div>
+<button (click)="remove(c)" aria-label="Remove contact" class="text-on-surface-variant hover:text-error transition-colors p-2">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</section>
+
+<section *ngIf="showForm()" class="bg-surface rounded-xl p-container-padding flex flex-col gap-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-outline-variant/30">
 <div class="flex flex-col gap-stack-sm relative">
 <label class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider" for="contact-name">Contact Name</label>
-<input class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 placeholder-outline transition-colors" id="contact-name" placeholder="e.g., Jane Doe" type="text"/>
+<input [(ngModel)]="name" name="name" class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 placeholder-outline transition-colors" id="contact-name" placeholder="e.g., Jane Doe" type="text"/>
 </div>
 <div class="flex flex-col gap-stack-sm relative">
 <label class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider" for="relationship">Relationship</label>
 <div class="relative">
-<select class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 appearance-none bg-transparent" id="relationship">
-<option disabled="" selected="" value="">Select relationship</option>
-<option value="family">Family</option>
-<option value="friend">Friend</option>
-<option value="partner">Partner</option>
-<option value="other">Other</option>
+<select [(ngModel)]="relationship" name="relationship" class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 appearance-none bg-transparent" id="relationship">
+<option disabled value="">Select relationship</option>
+<option value="Family">Family</option>
+<option value="Friend">Friend</option>
+<option value="Partner">Partner</option>
+<option value="Other">Other</option>
 </select>
 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-on-surface-variant">
 <span class="material-symbols-outlined text-xl">expand_more</span>
@@ -40,54 +55,36 @@
 </div>
 <div class="flex flex-col gap-stack-sm relative">
 <label class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider" for="phone-number">Phone Number</label>
-<div class="flex items-end">
-<div class="relative w-1/3 border-b border-outline-variant mr-4 pb-2">
-<select class="w-full appearance-none bg-transparent font-body-lg text-body-lg text-on-surface focus:outline-none">
-<option>PK (+92)</option>
-<option>US (+1)</option>
-<option>UK (+44)</option>
-</select>
-<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center text-on-surface-variant">
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</div>
-</div>
-<input class="w-2/3 font-body-lg text-body-lg text-on-surface pt-2 pb-2 placeholder-outline transition-colors" id="phone-number" placeholder="300 1234567" type="tel"/>
-</div>
+<input [(ngModel)]="phone" name="phone" class="w-full font-body-lg text-body-lg text-on-surface pt-2 pb-2 placeholder-outline transition-colors border-b border-outline-variant" id="phone-number" placeholder="+92 300 1234567" type="tel"/>
 </div>
 <div class="flex flex-col gap-stack-sm relative">
 <label class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider" for="email">Email (Optional)</label>
-<input class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 placeholder-outline transition-colors" id="email" placeholder="jane@example.com" type="email"/>
+<input [(ngModel)]="email" name="email" class="font-body-lg text-body-lg text-on-surface w-full pt-2 pb-2 placeholder-outline transition-colors" id="email" placeholder="jane@example.com" type="email"/>
 </div>
 </section>
 
-<section class="flex flex-col gap-stack-md">
+<section class="flex flex-col gap-stack-md" *ngIf="showForm()">
 <div class="flex items-start justify-between gap-4 py-2 border-b border-outline-variant/30 pb-4">
 <div class="flex flex-col gap-1 flex-1">
 <span class="font-body-lg text-body-lg text-on-surface font-medium leading-tight">Automatically notify this contact when I check in to a meal</span>
 <span class="font-body-md text-body-md text-on-surface-variant">They'll get a text with your location and meetup details</span>
 </div>
-<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
-<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle1" name="toggle1" style="right: 0px; border-color: rgb(184, 155, 94); background-color: rgb(255, 223, 158);" type="checkbox"/>
-<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer bg-outline-variant bg-primary-container" for="toggle1"></label>
-</div>
+<input [(ngModel)]="notifyOnCheckin" name="notifyOnCheckin" type="checkbox" class="w-6 h-6 mt-1 accent-primary-container cursor-pointer"/>
 </div>
 <div class="flex items-start justify-between gap-4 py-2">
 <div class="flex flex-col gap-1 flex-1">
 <span class="font-body-lg text-body-lg text-on-surface font-medium leading-tight">Notify this contact if I don't check out within 2 hours of my meetup</span>
 </div>
-<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
-<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle2" name="toggle2" style="right: 0px; border-color: rgb(184, 155, 94);" type="checkbox"/>
-<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer bg-primary-container" for="toggle2"></label>
-</div>
+<input [(ngModel)]="notifyOnNoCheckout" name="notifyOnNoCheckout" type="checkbox" class="w-6 h-6 mt-1 accent-primary-container cursor-pointer"/>
 </div>
 </section>
 </main>
 
 <footer class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe z-50">
 <div class="w-full max-w-md mx-auto flex flex-col items-center gap-stack-sm">
-<button (click)="go('/safety-center')" class="w-full h-12 bg-primary-container text-on-primary rounded-full font-title-lg text-title-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm">Save Emergency Contact</button>
-<button class="font-body-md text-body-md text-primary font-medium py-2 hover:underline">
-                Add a second contact
+<button *ngIf="showForm()" (click)="save()" [disabled]="!name.trim() || !phone.trim() || saving()" class="w-full h-12 bg-primary-container text-on-primary rounded-full font-title-lg text-title-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50">{{ saving() ? 'Saving…' : 'Save Emergency Contact' }}</button>
+<button *ngIf="!showForm()" (click)="addAnother()" class="font-body-md text-body-md text-primary font-medium py-2 hover:underline">
+                Add another contact
             </button>
 <p class="font-label-sm text-label-sm text-on-surface-variant text-center mt-2 max-w-[300px]">
 <span class="material-symbols-outlined text-[14px] align-middle mr-1">lock</span>

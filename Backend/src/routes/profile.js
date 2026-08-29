@@ -138,10 +138,19 @@ profileRouter.put('/me/match-preferences', (req, res) => {
   res.json({ maxDistanceKm: maxDistanceKm ?? null, diningTimes: diningTimes ?? [] });
 });
 
+// Excluded from both `people` and `matches`: anyone in either direction of a
+// block relationship, so a block actually stops two users from seeing each
+// other rather than just hiding a "block" affordance.
+const NOT_BLOCKED_CLAUSE = `u.id NOT IN (
+  SELECT blocked_user_id FROM user_blocks WHERE blocker_user_id = ?
+  UNION
+  SELECT blocker_user_id FROM user_blocks WHERE blocked_user_id = ?
+)`;
+
 peopleRouter.get('/', (req, res) => {
   const { city } = req.query;
-  const clauses = ['u.id != ?'];
-  const params = [req.user.sub];
+  const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE];
+  const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
     clauses.push('p.city = ?');
     params.push(city);
@@ -168,9 +177,9 @@ matchesRouter.get('/', (req, res) => {
       .prepare(
         `SELECT u.id, u.name, p.age, p.city, p.bio, p.photo_url, p.verified FROM users u
          JOIN user_profiles p ON p.user_id = u.id
-         WHERE u.id != ?`,
+         WHERE u.id != ? AND ${NOT_BLOCKED_CLAUSE}`,
       )
-      .all(req.user.sub),
+      .all(req.user.sub, req.user.sub, req.user.sub),
   );
 
   const matches = candidates
