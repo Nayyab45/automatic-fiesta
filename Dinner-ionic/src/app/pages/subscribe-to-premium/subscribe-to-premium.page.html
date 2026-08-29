@@ -14,9 +14,9 @@
 </div>
 <div class="flex flex-col gap-stack-sm" id="planToggle">
 
-<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200 selected-ring">
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200" [class.selected-ring]="selectedPlan === 'monthly'">
 <div class="flex items-center gap-gutter">
-<input checked="" class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="monthly"/>
+<input [(ngModel)]="selectedPlan" class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="monthly"/>
 <div>
 <span class="font-body-lg text-body-lg block">Monthly Plan</span>
 <span class="font-body-md text-body-md text-on-surface-variant">$9.99 / month</span>
@@ -24,9 +24,9 @@
 </div>
 </label>
 
-<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200">
+<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200" [class.selected-ring]="selectedPlan === 'yearly'">
 <div class="flex items-center gap-gutter">
-<input class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="yearly"/>
+<input [(ngModel)]="selectedPlan" class="text-primary-container focus:ring-primary-container border-outline-variant" name="plan" type="radio" value="yearly"/>
 <div>
 <span class="font-body-lg text-body-lg block">Yearly Plan</span>
 <span class="font-body-md text-body-md text-on-surface-variant">$95.90 / year</span>
@@ -65,33 +65,29 @@
 
 <section class="flex flex-col gap-stack-md">
 <h2 class="font-headline-md text-headline-md-mobile text-on-surface">Payment Method</h2>
-<div class="flex flex-col gap-stack-sm">
 
-<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer selected-ring">
+<p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant py-stack-sm">Loading payment methods…</p>
+
+<div class="flex flex-col gap-stack-sm" *ngIf="!loading() && paymentMethods().length > 0">
+<label *ngFor="let method of paymentMethods()" class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer transition-all duration-200" [class.selected-ring]="selectedMethodId === method.id">
 <div class="flex items-center gap-gutter">
-<input checked="" class="text-primary-container focus:ring-primary-container border-outline-variant" name="payment" type="radio" value="saved_card"/>
+<input [(ngModel)]="selectedMethodId" [value]="method.id" class="text-primary-container focus:ring-primary-container border-outline-variant" name="payment" type="radio"/>
 <div class="flex items-center gap-stack-sm">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="credit_card">credit_card</span>
-<span class="font-body-md text-body-md">Visa ending in 4242</span>
+<span class="material-symbols-outlined text-on-surface-variant">{{ iconFor(method.type) }}</span>
+<span class="font-body-md text-body-md">{{ method.label }}</span>
 </div>
-</div>
-</label>
-
-<label class="flex items-center justify-between p-stack-md rounded-lg border-[0.5px] border-outline-variant cursor-pointer">
-<div class="flex items-center gap-gutter">
-<input class="text-primary-container focus:ring-primary-container border-outline-variant" name="payment" type="radio" value="new_card"/>
-<span class="font-body-md text-body-md">Add New Card</span>
 </div>
 </label>
 </div>
 
-<div class="bg-surface-container-lowest p-stack-md rounded-xl border-[0.5px] border-outline-variant flex flex-col gap-stack-md">
-<input class="premium-input font-body-md text-body-md w-full" placeholder="Card Number" type="text"/>
-<div class="flex gap-gutter">
-<input class="premium-input font-body-md text-body-md w-1/2" placeholder="MM/YY" type="text"/>
-<input class="premium-input font-body-md text-body-md w-1/2" placeholder="CVV" type="text"/>
+<div *ngIf="!loading() && paymentMethods().length === 0" class="bg-surface-container-lowest p-stack-md rounded-xl border border-dashed border-outline-variant text-center">
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-sm">No payment methods saved yet.</p>
 </div>
-</div>
+
+<button (click)="go('/payment-methods')" class="w-full flex items-center justify-center gap-2 p-stack-md rounded-lg border-[0.5px] border-dashed border-primary-container text-primary font-body-md text-body-md hover:bg-secondary-container/20 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+{{ paymentMethods().length > 0 ? 'Add Another Payment Method' : 'Add a Payment Method' }}
+</button>
 
 <details class="group">
 <summary class="flex justify-between items-center font-body-md text-body-md text-primary cursor-pointer list-none py-2 border-b-[0.5px] border-outline-variant">
@@ -131,8 +127,12 @@
 
 <div class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.05)] border-t-[0.5px] border-outline-variant px-container-padding py-stack-md pb-safe">
 <div class="max-w-lg mx-auto flex flex-col gap-stack-sm items-center">
-<button (click)="go('/subscribe-to-premium-success')" class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-4 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-<span id="btnText">Subscribe Now — $9.99/month</span>
+<p *ngIf="notConnected()" class="font-body-md text-body-md text-error text-center flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">info</span>
+Payment processing isn't connected yet — subscribing isn't available in this build.
+</p>
+<button (click)="subscribe()" [disabled]="!selectedMethodId" class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-4 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50">
+<span id="btnText">Subscribe Now — ${{ subtotal.toFixed(2) }}/{{ selectedPlan === 'monthly' ? 'month' : 'year' }}</span>
 </button>
 <p class="font-label-sm text-label-sm text-on-surface-variant text-center opacity-80">
                 Cancel anytime. Renews automatically.
