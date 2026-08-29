@@ -14,16 +14,20 @@
 
 <section class="flex flex-col gap-stack-lg">
 
-<div class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px]">
-<span class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
+<div (click)="frontInput.click()" (keydown.enter)="frontInput.click()" role="button" tabindex="0" class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px] overflow-hidden">
+<img *ngIf="frontPreview()" [src]="frontPreview()" alt="Front of ID preview" class="w-full h-32 object-cover rounded-lg"/>
+<span *ngIf="!frontPreview()" class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
 <h3 class="font-title-lg text-title-lg text-on-surface mt-2">Front of ID</h3>
-<p class="font-body-md text-body-md text-primary font-medium">Tap to Upload</p>
+<p class="font-body-md text-body-md text-primary font-medium">{{ frontPreview() ? 'Tap to Replace' : 'Tap to Upload' }}</p>
+<input #frontInput (change)="onFrontSelected($event)" accept="image/*" capture="environment" class="sr-only" type="file"/>
 </div>
 
-<div class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px]">
-<span class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
+<div (click)="backInput.click()" (keydown.enter)="backInput.click()" role="button" tabindex="0" class="bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant p-6 flex flex-col items-center justify-center gap-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors active:border-[#B89B5E] active:border-[1px] overflow-hidden">
+<img *ngIf="backPreview()" [src]="backPreview()" alt="Back of ID preview" class="w-full h-32 object-cover rounded-lg"/>
+<span *ngIf="!backPreview()" class="material-symbols-outlined text-4xl text-primary" data-icon="document_scanner">document_scanner</span>
 <h3 class="font-title-lg text-title-lg text-on-surface mt-2">Back of ID</h3>
-<p class="font-body-md text-body-md text-primary font-medium">Tap to Upload</p>
+<p class="font-body-md text-body-md text-primary font-medium">{{ backPreview() ? 'Tap to Replace' : 'Tap to Upload' }}</p>
+<input #backInput (change)="onBackSelected($event)" accept="image/*" capture="environment" class="sr-only" type="file"/>
 </div>
 </section>
 
@@ -54,8 +58,8 @@
 </section>
 
 <section class="mt-stack-md pb-container-padding">
-<button (click)="go('/face-verification')" class="w-full bg-primary-container text-on-primary rounded-full py-4 font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2">
-                Submit for Verification
+<button (click)="submit()" [disabled]="!frontPreview() || !backPreview() || submitting()" class="w-full bg-primary-container text-on-primary rounded-full py-4 font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                {{ submitting() ? 'Saving…' : 'Continue' }}
             </button>
 </section>
 </main>

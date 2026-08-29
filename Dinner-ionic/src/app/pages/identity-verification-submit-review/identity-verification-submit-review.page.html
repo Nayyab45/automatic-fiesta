@@ -21,7 +21,9 @@
             </p>
 </div>
 
-<div class="w-full bg-surface-container-lowest rounded-xl p-gutter shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant mb-stack-md flex flex-col gap-4">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && verification() as v" class="w-full bg-surface-container-lowest rounded-xl p-gutter shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant mb-stack-md flex flex-col gap-4">
 <div class="flex items-center justify-between pb-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
@@ -29,9 +31,9 @@
 </div>
 <span class="font-body-md text-body-md font-medium text-on-surface">National ID</span>
 </div>
-<div class="flex items-center gap-2 text-tertiary">
-<span class="font-label-sm text-label-sm uppercase tracking-wider">Captured</span>
-<span class="material-symbols-outlined icon-fill text-lg">check_circle</span>
+<div class="flex items-center gap-2" [class.text-tertiary]="v.hasIdFront && v.hasIdBack" [class.text-error]="!v.hasIdFront || !v.hasIdBack">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">{{ v.hasIdFront && v.hasIdBack ? 'Captured' : 'Missing' }}</span>
+<span class="material-symbols-outlined icon-fill text-lg">{{ v.hasIdFront && v.hasIdBack ? 'check_circle' : 'error' }}</span>
 </div>
 </div>
 <div class="flex items-center justify-between">
@@ -41,9 +43,9 @@
 </div>
 <span class="font-body-md text-body-md font-medium text-on-surface">Face Match</span>
 </div>
-<div class="flex items-center gap-2 text-tertiary">
-<span class="font-label-sm text-label-sm uppercase tracking-wider">Ready</span>
-<span class="material-symbols-outlined icon-fill text-lg">check_circle</span>
+<div class="flex items-center gap-2" [class.text-tertiary]="v.hasSelfie" [class.text-error]="!v.hasSelfie">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">{{ v.hasSelfie ? 'Captured' : 'Missing' }}</span>
+<span class="material-symbols-outlined icon-fill text-lg">{{ v.hasSelfie ? 'check_circle' : 'error' }}</span>
 </div>
 </div>
 </div>
@@ -55,9 +57,9 @@
             </p>
 </div>
 
-<div class="w-full mt-auto pt-stack-lg">
-<button (click)="go('/identity-verification')" class="w-full h-14 bg-primary-container text-on-primary hover:bg-primary transition-colors rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(184,155,94,0.3)] active:scale-[0.98]">
-<span>SUBMIT FOR REVIEW</span>
+<div *ngIf="!loading()" class="w-full mt-auto pt-stack-lg">
+<button (click)="submit()" [disabled]="submitting() || !verification()?.hasIdFront || !verification()?.hasIdBack || !verification()?.hasSelfie" class="w-full h-14 bg-primary-container text-on-primary hover:bg-primary transition-colors rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(184,155,94,0.3)] active:scale-[0.98] disabled:opacity-50">
+<span>{{ submitting() ? 'SUBMITTING…' : 'SUBMIT FOR REVIEW' }}</span>
 <span class="material-symbols-outlined text-lg">arrow_forward</span>
 </button>
 <p class="text-center font-label-sm text-label-sm text-outline mt-stack-sm flex items-center justify-center gap-1">

@@ -7,17 +7,35 @@
 <h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Verification</h1>
 </header>
 
-<main class="flex-1 px-container-padding py-stack-lg flex flex-col gap-stack-lg overflow-y-auto">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<main *ngIf="!loading() && verification() as v" class="flex-1 px-container-padding py-stack-lg flex flex-col gap-stack-lg overflow-y-auto">
 
 <div class="flex flex-col items-center justify-center text-center mt-stack-md mb-stack-sm">
 <div class="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center mb-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] relative">
-<span class="material-symbols-outlined text-outline text-[48px]" data-icon="shield_person" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<span *ngIf="v.status === 'not_started' || v.status === 'rejected'" class="material-symbols-outlined text-outline text-[48px]" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<span *ngIf="v.status === 'pending'" class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">hourglass_top</span>
+<span *ngIf="v.status === 'approved'" class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
-<h2 class="font-title-lg text-title-lg text-on-surface mb-unit">Not Verified</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">We need to verify your identity to ensure a safe dining community.</p>
+<h2 class="font-title-lg text-title-lg text-on-surface mb-unit">
+<ng-container [ngSwitch]="v.status">
+<ng-container *ngSwitchCase="'pending'">Pending Review</ng-container>
+<ng-container *ngSwitchCase="'approved'">Verified</ng-container>
+<ng-container *ngSwitchCase="'rejected'">Verification Failed</ng-container>
+<ng-container *ngSwitchDefault>Not Verified</ng-container>
+</ng-container>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+<ng-container [ngSwitch]="v.status">
+<ng-container *ngSwitchCase="'pending'">We're reviewing your submission. This usually takes 24–48 hours.</ng-container>
+<ng-container *ngSwitchCase="'approved'">Your identity has been verified. Thanks for helping keep the community safe.</ng-container>
+<ng-container *ngSwitchCase="'rejected'">We couldn't verify your submission. Please try again with clearer photos.</ng-container>
+<ng-container *ngSwitchDefault>We need to verify your identity to ensure a safe dining community.</ng-container>
+</ng-container>
+</p>
 </div>
 
-<div class="bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-stack-md border border-outline-variant/50">
+<div *ngIf="v.status === 'not_started' || v.status === 'rejected'" class="bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-stack-md border border-outline-variant/50">
 <h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-stack-md">Verification Steps</h3>
 <ul class="flex flex-col">
 <li class="flex items-start gap-stack-md py-stack-sm relative group">
@@ -49,21 +67,21 @@
 
 <div class="flex justify-center items-center gap-stack-md text-on-surface-variant/70 mt-stack-sm">
 <div class="flex items-center gap-unit">
-<span class="material-symbols-outlined text-[16px]" data-icon="lock">lock</span>
+<span class="material-symbols-outlined text-[16px]">lock</span>
 <span class="font-label-sm text-label-sm">Secure</span>
 </div>
 <div class="w-1 h-1 rounded-full bg-outline-variant"></div>
 <div class="flex items-center gap-unit">
-<span class="material-symbols-outlined text-[16px]" data-icon="visibility_off">visibility_off</span>
+<span class="material-symbols-outlined text-[16px]">visibility_off</span>
 <span class="font-label-sm text-label-sm">Private</span>
 </div>
 </div>
-<div class="flex-1"></div> 
+<div class="flex-1"></div>
 </main>
 
-<footer class="px-container-padding pb-stack-lg pt-stack-sm bg-surface/90 backdrop-blur-md border-t-[0.5px] border-outline-variant/30 fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 z-50">
+<footer *ngIf="!loading() && (verification()?.status === 'not_started' || verification()?.status === 'rejected')" class="px-container-padding pb-stack-lg pt-stack-sm bg-surface/90 backdrop-blur-md border-t-[0.5px] border-outline-variant/30 fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 z-50">
 <button (click)="go('/identity-verification-id-upload')" class="w-full bg-primary-container text-on-primary h-[48px] rounded-lg font-label-lg text-label-lg shadow-sm hover:opacity-90 active:border active:border-primary transition-all flex items-center justify-center mb-stack-sm">
-                Start Verification
+                {{ verification()?.status === 'rejected' ? 'Try Again' : 'Start Verification' }}
             </button>
 <p class="text-center font-body-md text-body-md text-on-surface-variant/80 text-[12px] leading-relaxed">
                 Verification usually takes 24–48 hours

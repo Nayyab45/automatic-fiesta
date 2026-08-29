@@ -8,6 +8,7 @@ import { profilesSchema } from './db/schema/profiles.js';
 import { messagingSchema } from './db/schema/messaging.js';
 import { safetySchema } from './db/schema/safety.js';
 import { settingsSchema } from './db/schema/settings.js';
+import { verificationSchema } from './db/schema/verification.js';
 import { ensureColumn } from './lib/ensureColumn.js';
 import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
@@ -25,6 +26,7 @@ for (const schema of [
   messagingSchema,
   safetySchema,
   settingsSchema,
+  verificationSchema,
 ]) {
   db.exec(schema);
 }

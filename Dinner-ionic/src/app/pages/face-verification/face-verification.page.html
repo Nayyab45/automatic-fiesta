@@ -3,7 +3,7 @@
 <span class="material-symbols-outlined" data-icon="arrow_back" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">What Should We Eat?</h1>
-<div class="w-10"></div> 
+<div class="w-10"></div>
 </header>
 
 <main class="flex-grow flex flex-col items-center px-container-padding py-stack-lg relative z-0 mt-stack-md">
@@ -18,9 +18,8 @@
 <div class="relative w-64 h-80 flex items-center justify-center mb-stack-lg">
 
 <div class="absolute inset-0 rounded-[100px] overflow-hidden bg-surface-container-low shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border-[1.5px] border-primary-container z-0 flex items-center justify-center">
-<img alt="" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply filter blur-sm" data-alt="A softly lit, out-of-focus background representing a blurred view from a front-facing mobile camera. The scene suggests a warm, elegant interior space with gentle natural light and subtle champagne tones. The aesthetic is clean, premium, and sophisticated, acting as a backdrop for a face verification step in a luxury dining app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGjj2nZsQ6Wxcd37yshBGiHr6oz4rwSutF1jm2GgQHoa6yVzklrSv966VLYRAq00EzaLyTHdDyyltPZ272DJNnvd_IrDRHL8Mi4nmQriamPihXD3TMxyPuf7Ln0k51HZzYTGBCLuQvlnYFvNgTLCa9uPijfzPQtb8bz9aB8NSe7-E6cpplnHzGRGHkrYDRfyuSgKXogTRjS2jQUAbV3wFrWoSFNr6rbxjhUsPxBDJHyQnVkRVZEE9m"/>
-
-<div class="w-40 h-56 rounded-full border border-dashed border-primary/40 absolute z-10 pulse-ring"></div>
+<img *ngIf="preview()" [src]="preview()" alt="Captured selfie" class="absolute inset-0 w-full h-full object-cover"/>
+<div *ngIf="!preview()" class="w-40 h-56 rounded-full border border-dashed border-primary/40 absolute z-10 pulse-ring"></div>
 </div>
 
 <div class="absolute -inset-10 bg-background/30 camera-overlay pointer-events-none z-10"></div>
@@ -28,15 +27,25 @@
 
 <div class="flex items-center justify-center space-x-2 bg-surface-container-high px-4 py-2 rounded-full shadow-sm mb-auto">
 <span class="material-symbols-outlined text-primary-container text-[18px]" data-icon="face" style="font-variation-settings: 'FILL' 1;">face</span>
-<span class="font-label-sm text-label-sm text-on-surface">Ready to capture</span>
+<span class="font-label-sm text-label-sm text-on-surface">{{ preview() ? 'Photo captured' : 'Ready to capture' }}</span>
 </div>
 </main>
 
+<input #selfieInput (change)="onSelfieSelected($event)" accept="image/*" capture="user" class="sr-only" type="file"/>
+
 <footer class="w-full px-container-padding pb-section-gap pt-stack-md bg-gradient-to-t from-background via-background to-transparent relative z-20 flex flex-col items-center">
-<button (click)="go('/identity-verification-submit-review')" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] flex items-center justify-center space-x-2 hover:opacity-90 active:scale-[0.98] transition-all duration-200 border-[1px] border-primary-container/50 mb-stack-md">
+<button *ngIf="!preview()" (click)="selfieInput.click()" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] flex items-center justify-center space-x-2 hover:opacity-90 active:scale-[0.98] transition-all duration-200 border-[1px] border-primary-container/50 mb-stack-md">
 <span class="material-symbols-outlined" data-icon="camera" style="font-variation-settings: 'FILL' 1;">camera</span>
 <span>Capture</span>
 </button>
+<div *ngIf="preview()" class="w-full flex flex-col gap-stack-sm mb-stack-md">
+<button (click)="capture()" [disabled]="saving()" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] flex items-center justify-center space-x-2 hover:opacity-90 active:scale-[0.98] transition-all duration-200 border-[1px] border-primary-container/50 disabled:opacity-50">
+<span>{{ saving() ? 'Saving…' : 'Continue' }}</span>
+</button>
+<button (click)="selfieInput.click()" [disabled]="saving()" class="w-full h-10 text-on-surface-variant font-label-lg text-label-lg rounded-xl hover:bg-surface-container transition-colors">
+                Retake
+            </button>
+</div>
 <div class="flex items-center space-x-2 opacity-70">
 <span class="material-symbols-outlined text-[14px] text-on-surface-variant" data-icon="lock" style="font-variation-settings: 'FILL' 0;">lock</span>
 <p class="font-label-sm text-label-sm text-on-surface-variant text-center max-w-[260px]">
