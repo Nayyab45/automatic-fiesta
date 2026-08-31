@@ -7,6 +7,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { toCamel } from '../lib/serialize.js';
 import { requireFields, passwordStrengthError } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
+import { mailer } from '../lib/mailer.js';
 
 export const authRouter = Router();
 
@@ -150,7 +151,24 @@ authRouter.post('/forgot-password', asyncHandler(async (req, res) => {
       hashToken(token),
       expiresAt,
     );
-    console.log(`[password reset] ${normalizedEmail} -> token=${token} (expires in ${RESET_TOKEN_TTL_MINUTES}m)`);
+
+    const resetUrl = `${process.env.PUBLIC_APP_URL || 'http://localhost:8100'}/reset-password-new?token=${token}`;
+    if (mailer.isConfigured()) {
+      try {
+        await mailer.sendPasswordResetEmail({ to: normalizedEmail, resetUrl });
+      } catch (err) {
+        // Still respond ok:true below -- an email-delivery hiccup shouldn't
+        // reveal to the caller whether the address matched an account, and
+        // the token is still valid via the logged fallback if support needs
+        // to hand it to the user manually.
+        console.error('[password reset] failed to send email:', err);
+        console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
+      }
+    } else {
+      // No RESEND_API_KEY/RESEND_FROM_EMAIL configured -- log the link so
+      // it's still usable in dev instead of silently going nowhere.
+      console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
+    }
   }
 
   res.json({ ok: true });

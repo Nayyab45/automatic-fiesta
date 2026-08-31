@@ -14,6 +14,8 @@ in this folder.
 | `PORT` | No | Most platforms inject this themselves; only set it if yours doesn't. |
 | `CORS_ORIGIN` | No | Comma-separated list of allowed origins. Unset = allow any origin, which is fine for local dev but **should be set in production** to your deployed frontend's real origin(s). |
 | `PUBLIC_ASSET_BASE_URL` | No | This backend's own public origin, used to build URLs for the self-hosted restaurant/dish photos at `/images`. Defaults to `http://localhost:$PORT`, which is only correct for local dev -- **must be set to the real deployed origin** or every photo URL stored in the database points at your laptop. |
+| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | No | Email delivery for `/auth/forgot-password` via [Resend](https://resend.com). Unset = the reset link is just logged server-side instead of emailed -- fine for dev, not for real users. |
+| `PUBLIC_APP_URL` | No | Where the Angular frontend is actually hosted, used to build the link inside password-reset emails. Defaults to `http://localhost:8100` (`ionic serve`'s default). |
 | `JAZZCASH_*` / `EASYPAISA_*` / `BANK_GATEWAY_*` | No | Payment gateway credentials -- see `.env.example` and `src/lib/paymentGateways/`. A provider whose vars are unset just responds "not connected yet" at checkout instead of failing to start. |
 
 See `.env.example` for the same list with inline comments.
