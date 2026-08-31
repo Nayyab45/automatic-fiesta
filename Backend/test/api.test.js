@@ -107,7 +107,7 @@ async function api(method, path, { body, token } = {}) {
 
 async function signup(local) {
   const { body } = await api('POST', '/api/auth/signup', {
-    body: { name: 'Test User', email: testEmail(local), password: 'password123' },
+    body: { name: 'Test User', email: testEmail(local), password: 'password123!' },
   });
   if (body?.user?.id) createdUserIds.push(body.user.id);
   return body; // { accessToken, refreshToken, user }
@@ -121,7 +121,7 @@ describe('auth', () => {
     assert.equal(session.user.email, testEmail('alice'));
 
     const dup = await api('POST', '/api/auth/signup', {
-      body: { name: 'Alice Two', email: testEmail('alice'), password: 'password123' },
+      body: { name: 'Alice Two', email: testEmail('alice'), password: 'password123!' },
     });
     assert.equal(dup.status, 409);
   });
