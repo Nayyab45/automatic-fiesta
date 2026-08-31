@@ -32,6 +32,7 @@
               "node_modules/@fontsource-variable/inter/index.css",
               "node_modules/@fontsource-variable/playfair-display/index.css",
               "node_modules/@fontsource-variable/dm-sans/index.css",
+              "node_modules/leaflet/dist/leaflet.css",
               "src/theme/icons.scss",
               "src/global.scss",
               "src/theme/variables.scss"
@@ -80,6 +81,7 @@
               "node_modules/@fontsource-variable/inter/index.css",
               "node_modules/@fontsource-variable/playfair-display/index.css",
               "node_modules/@fontsource-variable/dm-sans/index.css",
+              "node_modules/leaflet/dist/leaflet.css",
               "src/theme/icons.scss",
               "src/global.scss",
               "src/theme/variables.scss"
