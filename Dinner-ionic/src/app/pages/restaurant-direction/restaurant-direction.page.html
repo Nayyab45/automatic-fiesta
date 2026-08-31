@@ -13,29 +13,10 @@
 <main class="absolute inset-0 w-full h-full">
 
 <div class="absolute inset-0 w-full h-full bg-[#f0ede9]">
-<img [alt]="'Map route to ' + r.name" class="w-full h-full object-cover opacity-90" [src]="r.photoUrl"/>
-
-<div class="absolute inset-0 pointer-events-none">
-
-<div class="absolute bottom-[35%] left-[30%] w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center z-10">
-<div class="w-4 h-4 rounded-full bg-primary relative pulse-marker"></div>
-</div>
-
-<div class="absolute top-[30%] right-[25%] flex flex-col items-center z-10 -translate-y-full">
-<div class="bg-white text-primary px-3 py-1 rounded-full shadow-md text-[12px] font-bold mb-1 whitespace-nowrap border border-soft-border">
-                        {{ r.name }}
-                    </div>
-<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shadow-lg text-on-secondary">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-</div>
-<div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-secondary -mt-0.5"></div>
-</div>
-
-<svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-<path d="M 120 450 Q 200 350 280 250" fill="none" stroke="#f4a482" stroke-dasharray="8 6" stroke-linecap="round" stroke-width="4"></path>
-<path d="M 120 450 Q 150 420 170 390" fill="none" stroke="#8c4e32" stroke-linecap="round" stroke-width="4"></path>
-</svg>
-</div>
+<div #mapContainer class="w-full h-full"></div>
+<p *ngIf="!r.latitude || !r.longitude" class="absolute inset-0 flex items-center justify-center px-8 text-center font-body-md text-body-md text-on-surface-variant bg-surface-container-low">
+No map coordinates for this restaurant yet.
+</p>
 </div>
 
 <div class="absolute bottom-0 w-full h-64 map-gradient-overlay pointer-events-none"></div>
@@ -44,28 +25,32 @@
 <div class="bg-white/95 backdrop-blur-lg rounded-t-[24px] shadow-xl p-4 flex flex-col gap-4 border-t border-soft-border">
 <div class="w-12 h-1.5 bg-surface-dim rounded-full mx-auto -mt-2 mb-1"></div>
 
-<div class="flex justify-between items-center border-b border-soft-border pb-4">
-<div>
-<p class="text-lg font-display font-bold text-on-background">{{ r.name }}</p>
-<p class="text-[14px] text-on-surface-variant">{{ r.address || (r.city + ', ' + r.region) }}</p>
+<div class="flex gap-3 border-b border-soft-border pb-4">
+<img *ngIf="r.photoUrl" [src]="r.photoUrl" [alt]="r.name" class="w-16 h-16 rounded-xl object-cover shrink-0 border border-soft-border"/>
+<div class="flex justify-between items-start flex-1 min-w-0">
+<div class="min-w-0">
+<p class="text-lg font-display font-bold text-on-background truncate">{{ r.name }}</p>
+<p class="text-[14px] text-on-surface-variant truncate">{{ r.address || (r.city + ', ' + r.region) }}</p>
 </div>
-<div class="text-right">
+<div class="text-right shrink-0 ml-2">
 <p class="text-[14px] font-bold text-secondary flex items-center justify-end gap-1">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span> {{ r.rating }}
                         </p>
 <p class="text-[13px] text-on-surface-variant mt-1">{{ cuisineTags().join(' · ') }}</p>
 </div>
 </div>
+</div>
 
-<div class="flex items-center gap-3 bg-surface-container-low p-3 rounded-xl border border-soft-border/50">
+<a [href]="directionsUrl(r)" target="_blank" rel="noopener" class="flex items-center gap-3 bg-surface-container-low p-3 rounded-xl border border-soft-border/50 hover:border-primary transition-colors">
 <div class="w-10 h-10 rounded-full bg-primary-container/20 text-primary flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
 </div>
 <div class="flex-grow">
 <p class="text-[14px] font-bold text-on-background">Open this address in your maps app</p>
-<p class="text-[13px] text-on-surface-variant">Live turn-by-turn isn't available yet</p>
+<p class="text-[13px] text-on-surface-variant">Turn-by-turn directions via Google Maps</p>
 </div>
-</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</a>
 
 <div class="flex flex-col gap-2 mt-1">
 <button (click)="go('/dining-group-chat')" class="w-full py-4 px-4 bg-secondary-container/40 text-on-secondary-container font-bold text-[16px] rounded-full border border-secondary-container/60 flex justify-center items-center gap-2 active:scale-95 transition-transform">

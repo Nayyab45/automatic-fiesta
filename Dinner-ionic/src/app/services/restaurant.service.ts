@@ -31,6 +31,10 @@ export interface Restaurant {
   description: string | null;
   address: string | null;
   photoUrl: string | null;
+  /** Null for a restaurant that hasn't been geocoded -- see
+   * Backend/scripts/geocode-restaurants.mjs. */
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
   /** Up to 3 popular dishes; present on list results, absent elsewhere unless requested. */
   dishes?: Dish[];
