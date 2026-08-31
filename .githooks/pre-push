@@ -1,0 +1,20 @@
+#!/bin/sh
+# Local "CI" -- there's no GitHub/GitLab remote wired up for this repo (it
+# pushes straight to a plain SSH server), so there's no hosted runner to
+# trigger on push. This is the substitute: run the backend test suite and a
+# production frontend build before every push, and refuse to push if either
+# fails.
+#
+# One-time setup on each clone (this only needs running once per machine --
+# core.hooksPath isn't itself tracked by git):
+#   git config core.hooksPath .githooks
+
+set -e
+
+echo "[pre-push] Running backend test suite..."
+(cd Backend && npm test)
+
+echo "[pre-push] Building frontend (production)..."
+(cd Dinner-ionic && npx ng build --configuration production)
+
+echo "[pre-push] All checks passed."
