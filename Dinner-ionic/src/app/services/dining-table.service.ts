@@ -101,6 +101,12 @@ export class DiningTableService {
     return this.http.get<{ tables: DiningTable[] }>(`${this.baseUrl}?mine=true`);
   }
 
+  /** Public, upcoming tables hosted by other people -- not ones the caller
+   * already hosts or has joined. */
+  discover(): Observable<{ tables: DiningTable[] }> {
+    return this.http.get<{ tables: DiningTable[] }>(`${this.baseUrl}/discover`);
+  }
+
   get(id: number | string): Observable<{ table: DiningTable }> {
     return this.http.get<{ table: DiningTable }>(`${this.baseUrl}/${id}`);
   }

@@ -12,7 +12,42 @@
 </div>
 </header>
 
-<main class="flex-1 flex flex-col items-center justify-center px-container-padding pb-32 relative overflow-hidden">
+<main class="flex-1 flex flex-col px-container-padding pb-32 relative overflow-hidden" *ngIf="!loading() && tables().length > 0">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-stack-lg mb-stack-lg">Public tables near you</h1>
+<div class="flex flex-col gap-gutter">
+
+<div *ngFor="let table of tables()" (click)="go('/table-details-guests/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
+<div class="flex flex-col sm:flex-row">
+<div class="w-full sm:w-1/3 h-40 sm:h-auto">
+<img [alt]="table.restaurant.name" class="w-full h-full object-cover" [src]="table.restaurant.photoUrl"/>
+</div>
+<div class="p-gutter flex flex-col justify-between flex-grow">
+<div>
+<span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">{{ table.gatheringType }}</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-unit">{{ table.title }}</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">place</span>
+                                    {{ table.restaurant.address }}
+                                </p>
+</div>
+<div class="flex items-center gap-gutter mt-stack-md pt-stack-md border-t-[0.5px] border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">schedule</span>
+<span class="font-body-lg text-body-lg text-on-surface">{{ table.dateTime | date: 'medium' }}</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">group</span>
+<span class="font-body-lg text-body-lg text-on-surface">{{ table.seatsTotal - table.guestCount }} seat{{ table.seatsTotal - table.guestCount === 1 ? '' : 's' }} left</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</main>
+
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding pb-32 relative overflow-hidden" *ngIf="loading() || tables().length === 0">
 
 <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23735b25\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E');"></div>
 <div class="max-w-md w-full flex flex-col items-center text-center z-10 space-y-stack-lg">
@@ -22,7 +57,7 @@
 <div class="absolute inset-0 bg-gradient-to-tr from-surface to-surface-container rounded-full opacity-60 blur-2xl"></div>
 
 <div class="relative w-48 h-48 rounded-full overflow-hidden shadow-sm" style="box-shadow: 0 4px 16px rgba(0,0,0,0.04); border: 0.5px solid #E8D8B8;">
-<img alt="" class="w-full h-full object-cover" data-alt="A highly detailed, elegant top-down view of a traditional Pakistani tea set arranged on a pristine white linen table. The set features muted brass and ceramic elements reflecting soft, diffused natural light in a bright, modern light-mode setting. The composition is minimalist and sophisticated, conveying a premium dining experience with a color palette of soft whites, muted gold accents, and subtle earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsOSS0DPprvCvL-r4VkGegsX5ep7NGw_SB8K-SD0cW0t0AwX23VRpjsHjY7ZrQOcj6sGOjXHFa1SXVSrSdJ_rDyfeijlVS7Q701fDHR2VJ-1qh1VUOpv--DNJiO8r1YJm-SoZcTwAVtQqsXeI3BrS28u0hImgsFW7CvHW6jsz0SCs4qukH7e9GZBxYcaFcu2n5vX7Uo4v1EJ3duw4twbqO7qidL4D8UDMPeGBKwrtsJweofMMl9Bda"/>
+<img alt="" class="w-full h-full object-cover" data-alt="A highly detailed, elegant top-down view of a traditional Pakistani tea set arranged on a pristine white linen table. The set features muted brass and ceramic elements reflecting soft, diffused natural light in a bright, modern light-mode setting. The composition is minimalist and sophisticated, conveying a premium dining experience with a color palette of soft whites, muted gold accents, and subtle earthy tones." src="assets/images/empty-state-table.jpg"/>
 </div>
 
 <div class="absolute bottom-4 right-8 w-12 h-12 bg-surface rounded-full shadow-sm flex items-center justify-center border border-outline-variant">
@@ -32,17 +67,17 @@
 
 <div class="space-y-stack-sm max-w-[280px]">
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">
-                    No tables yet.
+                    {{ loading() ? 'Looking for tables…' : 'No public tables yet.' }}
                 </h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed" *ngIf="!loading()">
                     Your next great meal could start here.
                 </p>
 </div>
 
-<div class="pt-stack-md w-full">
+<div class="pt-stack-md w-full" *ngIf="!loading()">
 <button (click)="go('/discover-restaurants')" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
-                    Discover Tables
+                    Browse Restaurants Instead
                 </button>
 </div>
 </div>
