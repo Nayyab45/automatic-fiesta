@@ -1,16 +1,28 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
 import { WhatsNewComponent } from '../../components/whats-new/whats-new.component';
 import { WhatsNewService } from '../../services/whats-new.service';
 import { LocationService } from '../../services/location.service';
+import { AuthService } from '../../services/auth.service';
+import { DiningTable, DiningTableService } from '../../services/dining-table.service';
+import { Match, ProfileService } from '../../services/profile.service';
+import { MessagingService } from '../../services/messaging.service';
+
+function timeOfDayGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, WhatsNewComponent, BottomNavComponent],
+  imports: [CommonModule, RouterLink, WhatsNewComponent, BottomNavComponent, UserAvatarComponent],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss',
 })
@@ -19,17 +31,43 @@ export class HomePage extends BasePage implements OnInit {
   showWhatsNew = false;
   private readonly whatsNew = inject(WhatsNewService);
   readonly cityService = inject(LocationService);
+  private readonly authService = inject(AuthService);
+  private readonly tableService = inject(DiningTableService);
+  private readonly profileService = inject(ProfileService);
+  private readonly messagingService = inject(MessagingService);
+
+  readonly greeting = timeOfDayGreeting();
+  readonly firstName = computed(() => this.authService.currentUser()?.name?.split(' ')[0] ?? 'there');
+
+  readonly loadingTables = signal(true);
+  readonly upcomingTable = signal<DiningTable | null>(null);
+
+  readonly loadingMatches = signal(true);
+  readonly matches = signal<Match[]>([]);
 
   ngOnInit(): void {
     this.showWhatsNew = this.whatsNew.shouldShow();
+    this.tableService.listMine().subscribe({
+      next: ({ tables }) => {
+        const upcoming = tables.filter((t) => !t.isPast).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+        this.upcomingTable.set(upcoming[0] ?? null);
+        this.loadingTables.set(false);
+      },
+      error: () => this.loadingTables.set(false),
+    });
+    this.profileService.matches().subscribe({
+      next: ({ matches }) => {
+        this.matches.set(matches.slice(0, 6));
+        this.loadingMatches.set(false);
+      },
+      error: () => this.loadingMatches.set(false),
+    });
   }
 
-  toggleConnect(event: Event): void {
-    const btn = event.currentTarget as HTMLElement;
-    const icon = btn.querySelector('.material-symbols-outlined');
-    if (!icon) return;
-    const connected = icon.textContent?.trim() === 'check';
-    icon.textContent = connected ? 'add' : 'check';
-    btn.classList.toggle('bg-primary/10', !connected);
+  /** Mirrors discover-people's "message" action: there's no separate
+   * connection/follow concept in the backend, just direct messaging, so
+   * "Connect" here starts (or reopens) a DM with that match. */
+  connect(match: Match): void {
+    this.messagingService.getOrCreateWith(match.id).subscribe(({ conversation }) => this.go(`/dining-group-chat/dm/${conversation.id}`));
   }
 }
