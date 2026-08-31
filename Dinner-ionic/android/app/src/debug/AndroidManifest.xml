@@ -2,7 +2,7 @@
 <!--
   Debug-only manifest fragment (Gradle merges this into debug builds only,
   never release) so a debug build can talk to a local dev backend over
-  plain HTTP -- Android blocks cleartext traffic by default on API 28+,
+  plain HTTP. Android blocks cleartext traffic by default on API 28+,
   which would otherwise make every API call silently fail when testing
   against `http://<lan-ip>:3000` instead of a real HTTPS backend.
 -->
