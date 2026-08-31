@@ -1,0 +1,4 @@
+# Standalone scratch project for prototyping the MySQL/JWT auth pattern --
+# not part of the What Should We Eat app (that's Backend/ + Dinner-ionic/),
+# and it carries its own .env with live DB/JWT credentials.
+api_test/
