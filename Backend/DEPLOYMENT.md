@@ -53,8 +53,9 @@ rebuild/re-sync the Android app) to point at it.
 
 ## Not covered here
 
-No CI/CD pipeline, no database migration framework (schema changes are
-still hand-rolled `CREATE TABLE IF NOT EXISTS` — fine for one file, would
-need a real migration tool before this has multiple people deploying
-against the same database), and no monitoring beyond whatever the host's
-own container logs give you.
+No monitoring beyond whatever the host's own container logs give you. CI
+is a local pre-push git hook (`.githooks/pre-push`) rather than a hosted
+runner, since this repo's remote is a plain SSH server rather than
+GitHub/GitLab. Schema changes go through `src/db/migrations/` (see
+`src/db/migrate.js`) — add a new numbered file rather than editing an
+existing one, and it's applied automatically on next server start.

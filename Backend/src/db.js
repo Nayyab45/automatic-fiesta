@@ -1,13 +1,5 @@
 import mysql from 'mysql2/promise';
-import { usersSchema } from './db/schema/users.js';
-import { restaurantsSchema } from './db/schema/restaurants.js';
-import { tablesSchema } from './db/schema/tables.js';
-import { profilesSchema } from './db/schema/profiles.js';
-import { messagingSchema } from './db/schema/messaging.js';
-import { safetySchema } from './db/schema/safety.js';
-import { settingsSchema } from './db/schema/settings.js';
-import { verificationSchema } from './db/schema/verification.js';
-import { paymentsSchema } from './db/schema/payments.js';
+import { runMigrations } from './db/migrate.js';
 import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
 
@@ -52,38 +44,8 @@ export const db = {
   },
 };
 
-async function execSchema(schema) {
-  // Strip `--` line comments before splitting on `;` -- a schema file's own
-  // prose can otherwise contain a semicolon (as an example: this sentence
-  // does) and silently break a naive split into two garbage statements.
-  const withoutComments = schema
-    .split('\n')
-    .map((line) => line.replace(/--.*$/, ''))
-    .join('\n');
-  const statements = withoutComments
-    .split(';')
-    .map((statement) => statement.trim())
-    .filter(Boolean);
-  for (const statement of statements) {
-    await pool.query(statement);
-  }
-}
-
 export async function initSchema() {
-  for (const schema of [
-    usersSchema,
-    restaurantsSchema,
-    tablesSchema,
-    profilesSchema,
-    messagingSchema,
-    safetySchema,
-    settingsSchema,
-    verificationSchema,
-    paymentsSchema,
-  ]) {
-    await execSchema(schema);
-  }
-
+  await runMigrations(pool);
   await seedRestaurants(db);
   await seedInterests(db);
 }
