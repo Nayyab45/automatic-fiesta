@@ -11,7 +11,7 @@
 <span class="material-symbols-outlined">search</span>
 </button>
 <div class="hover:opacity-80 transition-opacity">
-<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A sophisticated close-up portrait of a person suitable for a high-end dining concierge profile avatar. Warm, flattering lighting, soft depth of field, set against a luxurious, slightly muted background matching the ivory and muted gold aesthetic of the app. Premium quality, editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWXsK79dYIw6DHOcwf-s9Zn7lOD_owVWN-M2RgMhDbsAI0bHy9bRTVRvspQ4seKVlx--e8kdpqHoUd934UN5HyTGptrjEknZtyx0jBDXknqxcYK1qTWWmcww3uYI8C7zl5rpBo-lYq9vJnxhFKQ4kGacBds6IKFD__c8IGpJmgkFbKGMLUJ_qAdIxJ5A3BK27ciUvQrtQw6f6GMp6eH8UMKYUSvww9UUp4jit2gZO4B9dK4MD-I6vt"/>
+<app-user-avatar class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant"></app-user-avatar>
 </div>
 </div>
 </header>
@@ -53,7 +53,7 @@
 <span class="material-symbols-outlined text-[20px]">directions</span>
 </button>
 <button (click)="toggleSave(restaurant)" aria-label="Save restaurant" class="hover:text-primary transition-colors flex items-center justify-center p-1" [class.text-primary]="isSaved(restaurant.id)" [class.text-on-surface-variant]="!isSaved(restaurant.id)">
-<span class="material-symbols-outlined text-[20px]">{{ isSaved(restaurant.id) ? 'bookmark' : 'bookmark_border' }}</span>
+<span class="material-symbols-outlined text-[20px]" [style.font-variation-settings]="isSaved(restaurant.id) ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
 </button>
 </div>
 </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
 import { LocationService } from '../../services/location.service';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
 
@@ -26,7 +27,7 @@ const PRICE_CHIPS: { label: string; tier: number | null }[] = [
 @Component({
   selector: 'app-discover-restaurants',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent],
   templateUrl: './discover-restaurants.page.html',
   styleUrl: './discover-restaurants.page.scss',
 })

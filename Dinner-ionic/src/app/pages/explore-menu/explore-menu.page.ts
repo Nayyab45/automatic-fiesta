@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
 import { LocationService } from '../../services/location.service';
 import { FeaturedDish, Restaurant, RestaurantService } from '../../services/restaurant.service';
 import { Person, ProfileService } from '../../services/profile.service';
@@ -10,7 +11,7 @@ import { Person, ProfileService } from '../../services/profile.service';
 @Component({
   selector: 'app-explore-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent],
   templateUrl: './explore-menu.page.html',
   styleUrl: './explore-menu.page.scss',
 })

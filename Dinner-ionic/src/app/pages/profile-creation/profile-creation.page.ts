@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
+import { resizeImageToDataUrl } from '../../shared/image-resize';
 
 @Component({
   selector: 'app-profile-creation',
@@ -33,6 +34,7 @@ export class ProfileCreationPage extends BasePage {
   province = '';
   city = '';
   bio = '';
+  avatarUrl: string | null = null;
   readonly submitting = signal(false);
 
   constructor() {
@@ -43,7 +45,24 @@ export class ProfileCreationPage extends BasePage {
       this.city = profile.city ?? '';
       this.bio = profile.bio ?? '';
       this.favoriteFoods = profile.favoriteFoods;
+      this.avatarUrl = profile.photoUrl;
     });
+  }
+
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    resizeImageToDataUrl(file)
+      .then((dataUrl) => {
+        this.profileService.updateMe({ photoUrl: dataUrl }).subscribe({
+          next: ({ profile }) => (this.avatarUrl = profile.photoUrl ?? dataUrl),
+          error: (err) => window.alert(err?.error?.message ?? 'Could not upload photo. Please try again.'),
+        });
+      })
+      .catch((err) => window.alert(err?.message ?? 'Could not process the selected image.'))
+      .finally(() => (input.value = ''));
   }
 
   addFavoriteFood(): void {

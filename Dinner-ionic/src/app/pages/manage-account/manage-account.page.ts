@@ -5,6 +5,7 @@ import { BasePage } from '../base.page';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
+import { resizeImageToDataUrl } from '../../shared/image-resize';
 
 @Component({
   selector: 'app-manage-account',
@@ -79,13 +80,18 @@ export class ManageAccountPage extends BasePage {
   }
 
   onAvatarSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      this.profileService.updateMe({ photoUrl: dataUrl }).subscribe(({ profile }) => (this.avatarUrl = profile.photoUrl ?? dataUrl));
-    };
-    reader.readAsDataURL(file);
+
+    resizeImageToDataUrl(file)
+      .then((dataUrl) => {
+        this.profileService.updateMe({ photoUrl: dataUrl }).subscribe({
+          next: ({ profile }) => (this.avatarUrl = profile.photoUrl ?? dataUrl),
+          error: (err) => window.alert(err?.error?.message ?? 'Could not upload photo. Please try again.'),
+        });
+      })
+      .catch((err) => window.alert(err?.message ?? 'Could not process the selected image.'))
+      .finally(() => (input.value = ''));
   }
 }

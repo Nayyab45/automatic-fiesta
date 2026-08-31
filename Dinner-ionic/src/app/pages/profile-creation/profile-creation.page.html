@@ -14,13 +14,15 @@
 <p class="font-body-md text-body-md text-on-surface-variant leading-tight mt-1">We'll use this to personalize your dining experience.</p>
 </div>
 <div class="flex flex-row items-center justify-center gap-4 flex-shrink-0 md:justify-start">
-<div class="relative group cursor-pointer">
+<div (click)="avatarFileInput.click()" class="relative group cursor-pointer">
 <div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-300 group-hover:border-primary-container">
-<span class="material-symbols-outlined text-3xl text-on-surface-variant opacity-50">person</span>
+<img *ngIf="avatarUrl" alt="Your profile photo" class="w-full h-full object-cover" [src]="avatarUrl"/>
+<span *ngIf="!avatarUrl" class="material-symbols-outlined text-3xl text-on-surface-variant opacity-50">person</span>
 </div>
 <div class="absolute bottom-0 right-0 bg-primary-container text-on-primary rounded-full p-1 shadow-sm flex items-center justify-center transform translate-x-1/4 -translate-y-1/4">
 <span class="material-symbols-outlined text-[14px]">add_a_photo</span>
 </div>
+<input #avatarFileInput (change)="onAvatarSelected($event)" accept="image/*" class="sr-only" type="file"/>
 </div>
 <div class="text-left">
 <p class="font-title-lg text-title-lg text-on-surface leading-tight">Profile Photo</p>
