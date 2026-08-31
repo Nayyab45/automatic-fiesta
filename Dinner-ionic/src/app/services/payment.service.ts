@@ -43,10 +43,30 @@ export interface AddWalletPayload {
 
 export type AddPaymentMethodPayload = AddVisaPayload | AddBankPayload | AddWalletPayload;
 
+export type Plan = 'monthly' | 'yearly';
+
+export interface Subscription {
+  status: 'inactive' | 'active' | 'canceled' | 'past_due';
+  plan: Plan | null;
+  provider: PaymentMethodType | null;
+  currentPeriodEnd: string | null;
+}
+
+/** Mirrors the three shapes POST /subscriptions/checkout can return -- see
+ * subscriptions.js: a wallet gateway (JazzCash/EasyPaisa) charges
+ * synchronously and answers with 'succeeded'/'failed' directly; a
+ * hosted-checkout gateway (bank/visa) can't know the outcome yet and
+ * answers 'redirect' with a URL to send the customer to instead. */
+export type CheckoutResult =
+  | { status: 'succeeded'; subscription: Subscription }
+  | { status: 'failed'; message: string }
+  | { status: 'redirect'; redirectUrl: string };
+
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/payment-methods`;
+  private readonly subscriptionsUrl = `${environment.apiUrl}/subscriptions`;
 
   private readonly methods = signal<PaymentMethod[]>([]);
   readonly paymentMethods = this.methods.asReadonly();
@@ -73,5 +93,15 @@ export class PaymentService {
     return this.http
       .delete<{ paymentMethods: PaymentMethod[] }>(`${this.baseUrl}/${id}`)
       .pipe(tap(({ paymentMethods }) => this.methods.set(paymentMethods)));
+  }
+
+  getSubscription(): Observable<{ subscription: Subscription }> {
+    return this.http.get<{ subscription: Subscription }>(`${this.subscriptionsUrl}/me`);
+  }
+
+  /** cnicLast6 is only meaningful (and only required server-side) when the
+   * chosen payment method is a JazzCash wallet -- see subscriptions.js. */
+  checkout(paymentMethodId: number, plan: Plan, cnicLast6?: string): Observable<CheckoutResult> {
+    return this.http.post<CheckoutResult>(`${this.subscriptionsUrl}/checkout`, { paymentMethodId, plan, cnicLast6 });
   }
 }

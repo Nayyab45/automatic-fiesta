@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { PaymentMethod, PaymentService } from '../../services/payment.service';
 
@@ -21,6 +22,7 @@ export class SubscribeToPremiumPage extends BasePage {
   selectedPlan: keyof typeof PLAN_PRICES = 'monthly';
   promoMessage = '';
   discount = 0;
+  cnicLast6 = '';
 
   get subtotal(): number {
     return PLAN_PRICES[this.selectedPlan];
@@ -29,10 +31,15 @@ export class SubscribeToPremiumPage extends BasePage {
   readonly loading = signal(true);
   readonly paymentMethods = this.paymentService.paymentMethods;
   selectedMethodId: number | null = null;
-  readonly notConnected = signal(false);
+  readonly submitting = signal(false);
+  readonly errorMessage = signal<string | null>(null);
 
   get total(): number {
     return Math.max(this.subtotal - this.discount, 0);
+  }
+
+  get selectedMethod(): PaymentMethod | null {
+    return this.paymentMethods().find((m) => m.id === this.selectedMethodId) ?? null;
   }
 
   constructor() {
@@ -65,10 +72,31 @@ export class SubscribeToPremiumPage extends BasePage {
   }
 
   subscribe(): void {
-    if (!this.selectedMethodId) return;
-    // No payment gateway is connected yet (see payment-methods) -- this
-    // stops short of pretending a charge succeeded and granting premium,
-    // which would be fabricating a paid transaction that never happened.
-    this.notConnected.set(true);
+    const method = this.selectedMethod;
+    if (!method || this.submitting()) return;
+
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.paymentService.checkout(method.id, this.selectedPlan, this.cnicLast6 || undefined).subscribe({
+      next: (result) => {
+        if (result.status === 'succeeded') {
+          this.go('/subscribe-to-premium-success');
+        } else if (result.status === 'redirect') {
+          // Hosted-checkout gateway (bank/visa): the customer finishes
+          // payment on the gateway's own page, not in this app.
+          window.location.href = result.redirectUrl;
+        } else {
+          this.submitting.set(false);
+          this.errorMessage.set(result.message);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.submitting.set(false);
+        // 503 here specifically means "this provider's gateway credentials
+        // aren't set on the backend yet" -- see subscriptions.js.
+        this.errorMessage.set(err.error?.message ?? 'Something went wrong. Please try again.');
+      },
+    });
   }
 }

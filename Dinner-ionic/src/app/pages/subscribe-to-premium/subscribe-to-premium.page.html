@@ -89,6 +89,12 @@
 {{ paymentMethods().length > 0 ? 'Add Another Payment Method' : 'Add a Payment Method' }}
 </button>
 
+<div *ngIf="selectedMethod?.type === 'jazzcash'" class="flex flex-col gap-unit">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="cnicLast6">Last 6 digits of your CNIC</label>
+<input [(ngModel)]="cnicLast6" class="premium-input font-body-md text-body-md" id="cnicLast6" maxlength="6" name="cnicLast6" placeholder="e.g. 123456" type="text"/>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">JazzCash requires this to verify the mobile account being charged. It isn't stored.</p>
+</div>
+
 <details class="group">
 <summary class="flex justify-between items-center font-body-md text-body-md text-primary cursor-pointer list-none py-2 border-b-[0.5px] border-outline-variant">
 <span>Add Promo Code</span>
@@ -127,12 +133,12 @@
 
 <div class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.05)] border-t-[0.5px] border-outline-variant px-container-padding py-stack-md pb-safe">
 <div class="max-w-lg mx-auto flex flex-col gap-stack-sm items-center">
-<p *ngIf="notConnected()" class="font-body-md text-body-md text-error text-center flex items-center gap-2">
+<p *ngIf="errorMessage()" class="font-body-md text-body-md text-error text-center flex items-center gap-2" role="alert">
 <span class="material-symbols-outlined text-[18px]">info</span>
-Payment processing isn't connected yet — subscribing isn't available in this build.
+{{ errorMessage() }}
 </p>
-<button (click)="subscribe()" [disabled]="!selectedMethodId" class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-4 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50">
-<span id="btnText">Subscribe Now — ${{ subtotal.toFixed(2) }}/{{ selectedPlan === 'monthly' ? 'month' : 'year' }}</span>
+<button (click)="subscribe()" [disabled]="!selectedMethodId || submitting()" class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-4 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50">
+<span id="btnText">{{ submitting() ? 'Processing…' : 'Subscribe Now — $' + subtotal.toFixed(2) + '/' + (selectedPlan === 'monthly' ? 'month' : 'year') }}</span>
 </button>
 <p class="font-label-sm text-label-sm text-on-surface-variant text-center opacity-80">
                 Cancel anytime. Renews automatically.
