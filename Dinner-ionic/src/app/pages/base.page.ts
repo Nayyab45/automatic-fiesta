@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { Directive, HostBinding, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,20 @@ import { map } from 'rxjs';
  * to declare a constructor (and remember to call `super()`) just to pull in
  * their own services.
  */
+@Directive()
 export abstract class BasePage {
+  // global.scss's scroll-container rules (`.ion-page { display: flex; ... }`
+  // and `.ion-page > main { overflow-y: auto; ... }`) are written assuming
+  // Ionic's own IonRouterOutlet stamps this class onto each routed page --
+  // but this app uses a plain <router-outlet> (a deliberate, permanent
+  // choice, not an oversight), which never applies it. With no element ever
+  // carrying `ion-page`, those rules matched nothing anywhere in the app:
+  // <body> stayed pinned `position: fixed; overflow: hidden` (Ionic's base
+  // CSS) and no page's <main> ever became scrollable, on every screen whose
+  // content overflows the viewport. Binding the class here, once, restores
+  // the contract those rules were already written for.
+  @HostBinding('class.ion-page') protected readonly ionPageHostClass = true;
+
   protected readonly router = inject(Router);
   protected readonly location = inject(Location);
   protected readonly route = inject(ActivatedRoute);

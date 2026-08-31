@@ -40,6 +40,19 @@ ICON_RE = re.compile(r"material-symbols-outlined[^>]*>\s*([a-z0-9_]+)\s*<")
 # escaped the first version of this script.
 ICON_PROP_RE = re.compile(r"""\bicon\s*:\s*['"]([a-z0-9_]+)['"]""")
 
+# Also invisible to ICON_RE: a ternary choosing between two icon names inside
+# the span's own interpolation, e.g.
+#   {{ saved ? 'bookmark' : 'bookmark_border' }}
+# The interpolation starts with `{`, not a bare icon name, so ICON_RE's
+# `>\s*([a-z0-9_]+)\s*<` never matches it -- both names silently render as
+# literal text instead of glyphs (this is how radio_button_checked/unchecked
+# escaped the script and rendered as raw text on dietary-preferences).
+# Capture just the interpolation body in its own group -- scanning the whole
+# match (tag included) would also pick up unrelated quoted attribute values
+# like [class.text-error]="destructive" sitting between the class and the ">".
+ICON_TERNARY_RE = re.compile(r"material-symbols-outlined[^>]*>\s*\{\{([^}]*)\}\}")
+QUOTED_NAME_RE = re.compile(r"""['"]([a-z0-9_]+)['"]""")
+
 
 def used_icons():
     found = set()
@@ -47,6 +60,8 @@ def used_icons():
         text = path.read_text(encoding="utf-8", errors="ignore")
         found |= set(ICON_RE.findall(text))
         found |= set(ICON_PROP_RE.findall(text))
+        for interpolation in ICON_TERNARY_RE.findall(text):
+            found |= set(QUOTED_NAME_RE.findall(interpolation))
     return found
 
 

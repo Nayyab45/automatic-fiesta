@@ -5,7 +5,7 @@
 </button>
 <div class="flex gap-2">
 <button (click)="toggleSave()" aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">{{ saved ? 'bookmark' : 'bookmark_border' }}</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" [style.font-variation-settings]="saved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
 </button>
 <button (click)="share()" aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">share</span>
@@ -13,7 +13,7 @@
 </div>
 </div>
 </header>
-<main class="w-full max-w-md mx-auto" *ngIf="!loading() && restaurant() as r">
+<main class="w-full max-w-md mx-auto pb-32" *ngIf="!loading() && restaurant() as r">
 
 <section class="relative w-full h-[397px] bg-surface-variant">
 <div class="bg-cover bg-center w-full h-full" [style.background-image]="'url(' + r.photoUrl + ')'"></div>
