@@ -7,33 +7,29 @@ in this folder.
 
 ## Required environment variables
 
-| Variable      | Required | Notes                                                                                                  |
-| ------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `JWT_SECRET`  | Yes      | Long random string. The server refuses to start without it. Generate one with `openssl rand -hex 32`.    |
-| `PORT`        | No       | Most platforms inject this themselves; only set it if yours doesn't.                                      |
-| `CORS_ORIGIN` | No       | Comma-separated list of allowed origins. Unset = allow any origin, which is fine for local dev but **should be set in production** to your deployed frontend's real origin(s). |
-| `DB_PATH`     | No       | Where the SQLite file lives. The Dockerfile sets this to `/app/data/app.sqlite` already — see below.       |
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `JWT_SECRET` | Yes | Long random string. The server refuses to start without it. Generate one with `openssl rand -hex 32`. |
+| `DB_HOST` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` / `DB_PORT` | Yes | The live MySQL/MariaDB database. All state lives here. |
+| `PORT` | No | Most platforms inject this themselves; only set it if yours doesn't. |
+| `CORS_ORIGIN` | No | Comma-separated list of allowed origins. Unset = allow any origin, which is fine for local dev but **should be set in production** to your deployed frontend's real origin(s). |
+| `PUBLIC_ASSET_BASE_URL` | No | This backend's own public origin, used to build URLs for the self-hosted restaurant/dish photos at `/images`. Defaults to `http://localhost:$PORT`, which is only correct for local dev -- **must be set to the real deployed origin** or every photo URL stored in the database points at your laptop. |
+| `JAZZCASH_*` / `EASYPAISA_*` / `BANK_GATEWAY_*` | No | Payment gateway credentials -- see `.env.example` and `src/lib/paymentGateways/`. A provider whose vars are unset just responds "not connected yet" at checkout instead of failing to start. |
 
 See `.env.example` for the same list with inline comments.
 
-## The SQLite persistent-volume problem
+## No persistent volume needed
 
-This backend stores everything in a single SQLite file (`node:sqlite`, no
-external database server). That file has to survive restarts and
-redeploys, which means **the hosting platform needs a persistent volume
-mounted at the path `DB_PATH` points to** (the Dockerfile mounts one at
-`/app/data`).
+Unlike an earlier version of this backend (SQLite, a single file on local
+disk), all state now lives in the remote MySQL database configured via
+`DB_HOST`/etc. The container itself is stateless, so **any host works,
+including purely serverless/ephemeral platforms** -- there's no filesystem
+to lose on a cold start or redeploy.
 
-- **Works as-is**: any host that supports attaching a persistent disk/volume
-  to a container (Fly.io volumes, Railway volumes, Render persistent disks,
-  a VPS with a real filesystem).
-- **Does not work as-is**: purely serverless/ephemeral platforms (e.g. a
-  bare Vercel/Netlify function, most "serverless container" tiers) — the
-  filesystem resets on every cold start, which would silently wipe every
-  user's data. Don't deploy this backend there without first swapping
-  SQLite for a hosted Postgres/MySQL instance, which is a real migration
-  (schema syntax, `node:sqlite`-specific query patterns), not a config
-  change — out of scope here.
+The one thing to get right: the database itself needs to survive restarts,
+which a real hosted MySQL/MariaDB instance already does (this project's dev
+database is on a shared host at `ns3.netstech.net`) -- nothing further to
+configure here.
 
 ## Verifying the Docker image locally
 
@@ -41,14 +37,10 @@ mounted at the path `DB_PATH` points to** (the Dockerfile mounts one at
 docker build -t whatshouldweeat-backend .
 docker run --rm -p 3000:3000 \
   -e JWT_SECRET=dev-only-secret \
-  -v whatshouldweeat-data:/app/data \
+  -e DB_HOST=... -e DB_USER=... -e DB_PASSWORD=... -e DB_NAME=... \
   whatshouldweeat-backend
 curl http://localhost:3000/api/health
 ```
-
-`whatshouldweeat-data` is a named Docker volume standing in for whatever
-persistent disk the real host provides — swap it for that host's actual
-volume mechanism when deploying for real.
 
 ## Wiring the frontend to the deployed backend
 
@@ -60,7 +52,7 @@ rebuild/re-sync the Android app) to point at it.
 ## Not covered here
 
 No CI/CD pipeline, no database migration framework (schema changes are
-still hand-rolled `CREATE TABLE IF NOT EXISTS` + the `ensureColumn` helper —
-fine for one file, would need a real migration tool before this has
-multiple people deploying against the same database), and no monitoring
-beyond whatever the host's own container logs give you.
+still hand-rolled `CREATE TABLE IF NOT EXISTS` — fine for one file, would
+need a real migration tool before this has multiple people deploying
+against the same database), and no monitoring beyond whatever the host's
+own container logs give you.

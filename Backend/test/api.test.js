@@ -1,26 +1,96 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 
-// Set before importing server.js/db.js: DB_PATH picks a fresh in-memory
-// SQLite database instead of the real dev database in data/app.sqlite, and
-// server.js exits immediately if JWT_SECRET is missing. Using a dynamic
-// import (rather than a static one, which Node hoists above these
-// assignments) is what makes the ordering here actually take effect.
+// db.js now talks to a live, shared MySQL/MariaDB database (see .env) instead
+// of an in-memory SQLite file, and the credentials there only grant access to
+// that one database (`SHOW GRANTS` confirms no CREATE DATABASE privilege) --
+// so there's no way to point tests at an isolated database of their own.
+// Instead this suite isolates itself within the shared database:
+//   1. initSchema() is called explicitly below, since server.js only calls it
+//      when run directly (`node src/server.js`), not when `app` is imported.
+//      It's safe to call repeatedly -- every table is CREATE TABLE IF NOT
+//      EXISTS, and the seed helpers no-op once their table has any rows.
+//   2. Every user this run creates has RUN_TAG baked into its email's local
+//      part, so a rerun (or a run racing another one) never collides with a
+//      previous run's leftover data or a real account.
+//   3. `after` deletes every row this run created (tracked via
+//      createdUserIds/table ownership) directly through the DB pool, then
+//      closes the pool so `node --test` can exit.
 process.env.JWT_SECRET = 'test-secret';
-process.env.DB_PATH = ':memory:';
 
 const { app } = await import('../src/server.js');
+const { initSchema, pool } = await import('../src/db.js');
 
 let server;
 let baseUrl;
 
+const RUN_TAG = `test-${Date.now().toString(36)}-${randomUUID().slice(0, 8)}`;
+const createdUserIds = [];
+
+function testEmail(local) {
+  return `${local}+${RUN_TAG}@example.com`;
+}
+
+// Tables keyed directly by a user id (column name may differ per table).
+// Swept for every id in createdUserIds during cleanup.
+const USER_ID_TABLES = [
+  ['refresh_tokens', 'user_id'],
+  ['user_interests', 'user_id'],
+  ['food_preferences', 'user_id'],
+  ['dietary_preferences', 'user_id'],
+  ['match_preferences', 'user_id'],
+  ['privacy_settings', 'user_id'],
+  ['identity_verifications', 'user_id'],
+  ['emergency_contacts', 'user_id'],
+  ['payment_methods', 'user_id'],
+  ['user_profiles', 'user_id'],
+  ['seat_requests', 'user_id'],
+  ['table_guests', 'user_id'],
+  ['reviews', 'reviewer_user_id'],
+  ['table_messages', 'sender_id'],
+  ['direct_messages', 'sender_id'],
+  ['conversation_participants', 'user_id'],
+  ['user_reports', 'reporter_user_id'],
+  ['user_reports', 'reported_user_id'],
+];
+
+async function cleanupTestData() {
+  if (createdUserIds.length === 0) return;
+
+  // dining_tables has no FK/cascade to depend on, so anything keyed off a
+  // table this run's users hosted has to be deleted before the table itself.
+  const [tableRows] = await pool.query('SELECT id FROM dining_tables WHERE host_user_id IN (?)', [createdUserIds]);
+  const tableIds = tableRows.map((row) => row.id);
+  if (tableIds.length > 0) {
+    for (const table of ['table_guests', 'seat_requests', 'check_ins', 'reviews', 'table_messages', 'notifications']) {
+      await pool.query(`DELETE FROM ${table} WHERE table_id IN (?)`, [tableIds]);
+    }
+    await pool.query('DELETE FROM dining_tables WHERE id IN (?)', [tableIds]);
+  }
+
+  await pool.query('DELETE FROM notifications WHERE user_id IN (?) OR actor_user_id IN (?)', [createdUserIds, createdUserIds]);
+  await pool.query('DELETE FROM user_blocks WHERE blocker_user_id IN (?) OR blocked_user_id IN (?)', [createdUserIds, createdUserIds]);
+
+  for (const [table, column] of USER_ID_TABLES) {
+    await pool.query(`DELETE FROM ${table} WHERE ${column} IN (?)`, [createdUserIds]);
+  }
+
+  await pool.query('DELETE FROM users WHERE id IN (?)', [createdUserIds]);
+}
+
 before(async () => {
+  await initSchema();
   server = app.listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
   baseUrl = `http://localhost:${server.address().port}`;
 });
 
-after(() => new Promise((resolve) => server.close(resolve)));
+after(async () => {
+  await new Promise((resolve) => server.close(resolve));
+  await cleanupTestData();
+  await pool.end();
+});
 
 async function api(method, path, { body, token } = {}) {
   const res = await fetch(`${baseUrl}${path}`, {
@@ -35,29 +105,30 @@ async function api(method, path, { body, token } = {}) {
   return { status: res.status, body: json };
 }
 
-async function signup(email) {
+async function signup(local) {
   const { body } = await api('POST', '/api/auth/signup', {
-    body: { name: 'Test User', email, password: 'password123' },
+    body: { name: 'Test User', email: testEmail(local), password: 'password123' },
   });
+  if (body?.user?.id) createdUserIds.push(body.user.id);
   return body; // { accessToken, refreshToken, user }
 }
 
 describe('auth', () => {
   test('signup issues a session and rejects a duplicate email', async () => {
-    const session = await signup('alice@example.com');
+    const session = await signup('alice');
     assert.ok(session.accessToken);
     assert.ok(session.refreshToken);
-    assert.equal(session.user.email, 'alice@example.com');
+    assert.equal(session.user.email, testEmail('alice'));
 
     const dup = await api('POST', '/api/auth/signup', {
-      body: { name: 'Alice Two', email: 'alice@example.com', password: 'password123' },
+      body: { name: 'Alice Two', email: testEmail('alice'), password: 'password123' },
     });
     assert.equal(dup.status, 409);
   });
 
   test('login rejects a wrong password', async () => {
-    await signup('bob@example.com');
-    const res = await api('POST', '/api/auth/login', { body: { email: 'bob@example.com', password: 'wrong-pass' } });
+    await signup('bob');
+    const res = await api('POST', '/api/auth/login', { body: { email: testEmail('bob'), password: 'wrong-pass' } });
     assert.equal(res.status, 401);
   });
 
@@ -67,7 +138,7 @@ describe('auth', () => {
   });
 
   test('refresh rotates the token pair and the used refresh token stops working', async () => {
-    const session = await signup('carol@example.com');
+    const session = await signup('carol');
 
     const refreshed = await api('POST', '/api/auth/refresh', { body: { refreshToken: session.refreshToken } });
     assert.equal(refreshed.status, 200);
@@ -79,7 +150,7 @@ describe('auth', () => {
   });
 
   test('logout revokes the refresh token', async () => {
-    const session = await signup('dave@example.com');
+    const session = await signup('dave');
 
     const out = await api('POST', '/api/auth/logout', { body: { refreshToken: session.refreshToken } });
     assert.equal(out.status, 200);
@@ -91,8 +162,8 @@ describe('auth', () => {
 
 describe('blocking', () => {
   test('blocking a user removes them from /people for both people', async () => {
-    const alice = await signup('block-alice@example.com');
-    const bob = await signup('block-bob@example.com');
+    const alice = await signup('block-alice');
+    const bob = await signup('block-bob');
     await api('PUT', '/api/profile/me', { token: alice.accessToken, body: { city: 'Karachi' } });
     await api('PUT', '/api/profile/me', { token: bob.accessToken, body: { city: 'Karachi' } });
 
@@ -112,8 +183,8 @@ describe('blocking', () => {
 
 describe('seat requests & notifications', () => {
   test('requesting then confirming a seat notifies the host, then the guest', async () => {
-    const host = await signup('host@example.com');
-    const guest = await signup('guest@example.com');
+    const host = await signup('host');
+    const guest = await signup('guest');
 
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
     const restaurantId = restaurants.body.restaurants[0].id;
@@ -149,7 +220,7 @@ describe('seat requests & notifications', () => {
   });
 
   test('a guest cannot request a seat at their own table', async () => {
-    const host = await signup('self-host@example.com');
+    const host = await signup('self-host');
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
     const restaurantId = restaurants.body.restaurants[0].id;
 
@@ -173,7 +244,7 @@ describe('seat requests & notifications', () => {
 
 describe('payment methods', () => {
   test('rejects a submitted number longer than last4 (i.e. refuses a full card/account number)', async () => {
-    const user = await signup('payer-reject@example.com');
+    const user = await signup('payer-reject');
     const res = await api('POST', '/api/payment-methods', {
       token: user.accessToken,
       body: { type: 'visa', last4: '4242424242424242', expiryMonth: 8, expiryYear: 2027, cardholderName: 'Test User' },
@@ -182,7 +253,7 @@ describe('payment methods', () => {
   });
 
   test('adding the first method makes it default; adding a second does not', async () => {
-    const user = await signup('payer-default@example.com');
+    const user = await signup('payer-default');
 
     const visa = await api('POST', '/api/payment-methods', {
       token: user.accessToken,
@@ -202,7 +273,7 @@ describe('payment methods', () => {
   });
 
   test('setting a new default flips off the old one; removing the default promotes another', async () => {
-    const user = await signup('payer-switch@example.com');
+    const user = await signup('payer-switch');
     const first = await api('POST', '/api/payment-methods', {
       token: user.accessToken,
       body: { type: 'bank', bankName: 'Meezan Bank', accountTitle: 'Test User', last4: '1234' },
@@ -225,8 +296,8 @@ describe('payment methods', () => {
   });
 
   test("a user cannot see or delete another user's payment methods", async () => {
-    const owner = await signup('payer-owner@example.com');
-    const intruder = await signup('payer-intruder@example.com');
+    const owner = await signup('payer-owner');
+    const intruder = await signup('payer-intruder');
 
     const created = await api('POST', '/api/payment-methods', {
       token: owner.accessToken,

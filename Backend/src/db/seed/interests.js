@@ -26,12 +26,12 @@ const INTERESTS = [
   { name: 'Pets', category: 'Lifestyle' },
 ];
 
-export function seedInterests(db) {
-  const { count } = db.prepare('SELECT COUNT(*) as count FROM interests').get();
+export async function seedInterests(db) {
+  const { count } = await db.prepare('SELECT COUNT(*) as count FROM interests').get();
   if (count > 0) return;
 
   const insert = db.prepare('INSERT INTO interests (name, category) VALUES (?, ?)');
   for (const interest of INTERESTS) {
-    insert.run(interest.name, interest.category);
+    await insert.run(interest.name, interest.category);
   }
 }

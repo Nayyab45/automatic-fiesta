@@ -1,35 +1,41 @@
 export const restaurantsSchema = `
   CREATE TABLE IF NOT EXISTS restaurants (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    city TEXT NOT NULL,
-    region TEXT NOT NULL,
-    cuisine_tags TEXT NOT NULL,
-    price_tier INTEGER NOT NULL,
-    rating REAL NOT NULL,
-    review_count INTEGER NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    region VARCHAR(255) NOT NULL,
+    cuisine_tags VARCHAR(255) NOT NULL,
+    price_tier INT NOT NULL,
+    rating DOUBLE NOT NULL,
+    review_count INT NOT NULL,
     description TEXT,
     address TEXT,
     photo_url TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    -- Nullable: only populated for the seeded restaurants (geocoded via
+    -- OpenStreetMap's Nominatim, see scripts/geocode-restaurants.mjs) --
+    -- a restaurant added later without coordinates just doesn't get a map
+    -- pin, rather than blocking the row from being created.
+    latitude DECIMAL(10, 7) NULL,
+    longitude DECIMAL(10, 7) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS dishes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    restaurant_id INTEGER NOT NULL REFERENCES restaurants(id),
-    name TEXT NOT NULL,
-    price REAL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    restaurant_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    price DOUBLE,
     description TEXT,
     photo_url TEXT,
-    rating REAL,
-    is_popular INTEGER NOT NULL DEFAULT 0,
-    is_featured INTEGER NOT NULL DEFAULT 0
+    rating DOUBLE,
+    is_popular TINYINT(1) NOT NULL DEFAULT 0,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS saved_restaurants (
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    restaurant_id INTEGER NOT NULL REFERENCES restaurants(id),
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    user_id INT NOT NULL,
+    restaurant_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, restaurant_id)
   );
 `;

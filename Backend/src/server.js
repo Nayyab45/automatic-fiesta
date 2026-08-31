@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { initSchema } from './db.js';
 import { authRouter } from './routes/auth.js';
 import { restaurantsRouter } from './routes/restaurants.js';
 import { tablesRouter, seatRequestsRouter } from './routes/tables.js';
@@ -10,6 +12,7 @@ import { conversationsRouter, notificationsRouter } from './routes/messaging.js'
 import { emergencyContactsRouter, blocksRouter, reportsRouter } from './routes/safety.js';
 import { verificationRouter } from './routes/verification.js';
 import { paymentMethodsRouter } from './routes/payments.js';
+import { subscriptionsRouter, subscriptionCallbackRouter } from './routes/subscriptions.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -25,7 +28,17 @@ const app = express();
 // origins.
 const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim());
 app.use(cors(allowedOrigins ? { origin: allowedOrigins } : undefined));
-app.use(express.json());
+// Raised from Express's 100kb default: profile photos are sent as base64
+// data URLs (~33% larger than the original file), and the client-side
+// compression in resizeImageToDataUrl() targets a few hundred KB, not 100kb.
+app.use(express.json({ limit: '5mb' }));
+
+// Serves the restaurant/dish photos self-hosted from src/assets/images
+// (downloaded via scripts/download-restaurant-images.mjs) instead of
+// hotlinking Google's prototype CDN. Seed data builds each photoUrl from
+// PUBLIC_ASSET_BASE_URL + this path -- see db/seed/restaurants.js.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use('/images', express.static(path.join(__dirname, 'assets', 'images')));
 
 app.use('/api/auth', authRouter);
 app.use('/api/restaurants', restaurantsRouter);
@@ -43,8 +56,23 @@ app.use('/api/blocks', blocksRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/payment-methods', paymentMethodsRouter);
+// Mounted before subscriptionsRouter's own requireAuth applies: the gateway
+// calls this directly, not a logged-in user's browser.
+app.use('/api/subscriptions/callback', subscriptionCallbackRouter);
+app.use('/api/subscriptions', subscriptionsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
+// Catches errors forwarded via next(err) -- notably from asyncHandler when an
+// async route handler's promise rejects (e.g. a transient DB error). Without
+// this, Express's default error handler still responds, but as HTML instead
+// of JSON; this keeps every error response consistent with the rest of the
+// API. Must be registered after all routes and take exactly 4 args so
+// Express recognizes it as an error handler.
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ message: 'Internal server error' });
+});
 
 // Only binds a port when run directly (`node src/server.js`); tests import
 // `app` and call `app.listen(0)` themselves so each test file gets its own
@@ -54,7 +82,14 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 // does not.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log(`Backend listening on http://localhost:${port}`));
+  initSchema()
+    .then(() => {
+      app.listen(port, () => console.log(`Backend listening on http://localhost:${port}`));
+    })
+    .catch((err) => {
+      console.error('Failed to initialize database schema:', err.message);
+      process.exit(1);
+    });
 }
 
 export { app };

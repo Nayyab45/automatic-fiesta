@@ -1,58 +1,58 @@
 export const tablesSchema = `
   CREATE TABLE IF NOT EXISTS dining_tables (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    restaurant_id INTEGER NOT NULL REFERENCES restaurants(id),
-    host_user_id INTEGER NOT NULL REFERENCES users(id),
-    gathering_type TEXT NOT NULL,
-    date_time TEXT NOT NULL,
-    seats_total INTEGER NOT NULL,
-    visibility TEXT NOT NULL DEFAULT 'public',
-    atmosphere TEXT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    restaurant_id INT NOT NULL,
+    host_user_id INT NOT NULL,
+    gathering_type VARCHAR(100) NOT NULL,
+    date_time VARCHAR(40) NOT NULL,
+    seats_total INT NOT NULL,
+    visibility VARCHAR(20) NOT NULL DEFAULT 'public',
+    atmosphere VARCHAR(255),
     note TEXT,
-    price_per_person REAL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    price_per_person DOUBLE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS table_guests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_id INTEGER NOT NULL REFERENCES dining_tables(id),
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    role TEXT,
-    joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    user_id INT NOT NULL,
+    role VARCHAR(100),
+    joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(table_id, user_id)
   );
 
   CREATE TABLE IF NOT EXISTS seat_requests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_id INTEGER NOT NULL REFERENCES dining_tables(id),
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    status TEXT NOT NULL DEFAULT 'sent' CHECK(status IN ('sent','confirmed','declined')),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    user_id INT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'sent' CHECK(status IN ('sent','confirmed','declined')),
     message TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS check_ins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_id INTEGER NOT NULL REFERENCES dining_tables(id),
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    checked_in_at TEXT NOT NULL DEFAULT (datetime('now')),
-    checked_out_at TEXT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    user_id INT NOT NULL,
+    checked_in_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    checked_out_at DATETIME NULL,
     UNIQUE(table_id, user_id)
   );
 
   CREATE TABLE IF NOT EXISTS reviews (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_id INTEGER NOT NULL REFERENCES dining_tables(id),
-    reviewer_user_id INTEGER NOT NULL REFERENCES users(id),
-    food_rating INTEGER,
-    restaurant_rating INTEGER,
-    conversation_rating INTEGER,
-    overall_rating INTEGER,
-    dine_again TEXT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    reviewer_user_id INT NOT NULL,
+    food_rating INT,
+    restaurant_rating INT,
+    conversation_rating INT,
+    overall_rating INT,
+    dine_again VARCHAR(20),
     comment TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(table_id, reviewer_user_id)
   );
 `;

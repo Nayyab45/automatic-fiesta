@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { requireFields } from '../lib/validate.js';
+import { asyncHandler } from '../lib/asyncHandler.js';
 
 export const conversationsRouter = Router();
 export const notificationsRouter = Router();
@@ -13,8 +14,8 @@ notificationsRouter.use(requireAuth);
 // Inserted from other route files (e.g. seat-request lifecycle) so notification
 // wording stays centralized in formatNotification() below instead of being
 // re-derived at every call site.
-export function createNotification(userId, type, { tableId = null, actorUserId = null } = {}) {
-  db.prepare('INSERT INTO notifications (user_id, type, table_id, actor_user_id) VALUES (?, ?, ?, ?)').run(
+export async function createNotification(userId, type, { tableId = null, actorUserId = null } = {}) {
+  await db.prepare('INSERT INTO notifications (user_id, type, table_id, actor_user_id) VALUES (?, ?, ?, ?)').run(
     userId,
     type,
     tableId,
@@ -22,8 +23,8 @@ export function createNotification(userId, type, { tableId = null, actorUserId =
   );
 }
 
-function otherParticipant(conversationId, userId) {
-  const row = db
+async function otherParticipant(conversationId, userId) {
+  const row = await db
     .prepare(
       `SELECT u.id, u.name, p.photo_url FROM conversation_participants cp
        JOIN users u ON u.id = cp.user_id
@@ -34,40 +35,42 @@ function otherParticipant(conversationId, userId) {
   return row ? toCamel(row) : null;
 }
 
-function isParticipant(conversationId, userId) {
-  return !!db
+async function isParticipant(conversationId, userId) {
+  return !!(await db
     .prepare('SELECT 1 FROM conversation_participants WHERE conversation_id = ? AND user_id = ?')
-    .get(conversationId, userId);
+    .get(conversationId, userId));
 }
 
-conversationsRouter.get('/', (req, res) => {
+conversationsRouter.get('/', asyncHandler(async (req, res) => {
   const userId = req.user.sub;
-  const conversations = db
+  const conversations = await db
     .prepare(
       `SELECT c.id, c.created_at, cp.last_read_at FROM conversations c
        JOIN conversation_participants cp ON cp.conversation_id = c.id AND cp.user_id = ?`,
     )
     .all(userId);
 
-  const result = conversations.map((conversation) => {
-    const person = otherParticipant(conversation.id, userId);
-    const lastMessage = db
-      .prepare('SELECT body, sender_id, created_at FROM direct_messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1')
-      .get(conversation.id);
-    const { count: unreadCount } = db
-      .prepare(
-        `SELECT COUNT(*) as count FROM direct_messages
-         WHERE conversation_id = ? AND sender_id != ? AND (? IS NULL OR created_at > ?)`,
-      )
-      .get(conversation.id, userId, conversation.last_read_at, conversation.last_read_at);
+  const result = await Promise.all(
+    conversations.map(async (conversation) => {
+      const person = await otherParticipant(conversation.id, userId);
+      const lastMessage = await db
+        .prepare('SELECT body, sender_id, created_at FROM direct_messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1')
+        .get(conversation.id);
+      const { count: unreadCount } = await db
+        .prepare(
+          `SELECT COUNT(*) as count FROM direct_messages
+           WHERE conversation_id = ? AND sender_id != ? AND (? IS NULL OR created_at > ?)`,
+        )
+        .get(conversation.id, userId, conversation.last_read_at, conversation.last_read_at);
 
-    return {
-      id: conversation.id,
-      person,
-      lastMessage: lastMessage ? toCamel(lastMessage) : null,
-      unreadCount,
-    };
-  });
+      return {
+        id: conversation.id,
+        person,
+        lastMessage: lastMessage ? toCamel(lastMessage) : null,
+        unreadCount,
+      };
+    }),
+  );
 
   result.sort((a, b) => {
     const aTime = a.lastMessage?.createdAt ?? '';
@@ -76,9 +79,9 @@ conversationsRouter.get('/', (req, res) => {
   });
 
   res.json({ conversations: result });
-});
+}));
 
-conversationsRouter.post('/', (req, res) => {
+conversationsRouter.post('/', asyncHandler(async (req, res) => {
   const { recipientId } = req.body ?? {};
   const missingFieldsError = requireFields(req.body, ['recipientId']);
   if (missingFieldsError) {
@@ -88,12 +91,12 @@ conversationsRouter.post('/', (req, res) => {
     return res.status(400).json({ message: "You can't message yourself" });
   }
 
-  const recipient = db.prepare('SELECT id FROM users WHERE id = ?').get(recipientId);
+  const recipient = await db.prepare('SELECT id FROM users WHERE id = ?').get(recipientId);
   if (!recipient) {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  const existing = db
+  const existing = await db
     .prepare(
       `SELECT cp1.conversation_id as id FROM conversation_participants cp1
        JOIN conversation_participants cp2 ON cp2.conversation_id = cp1.conversation_id AND cp2.user_id = ?
@@ -103,28 +106,28 @@ conversationsRouter.post('/', (req, res) => {
 
   let conversationId = existing?.id;
   if (!conversationId) {
-    const result = db.prepare('INSERT INTO conversations DEFAULT VALUES').run();
+    const result = await db.prepare('INSERT INTO conversations () VALUES ()').run();
     conversationId = result.lastInsertRowid;
     const addParticipant = db.prepare('INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?)');
-    addParticipant.run(conversationId, req.user.sub);
-    addParticipant.run(conversationId, recipientId);
+    await addParticipant.run(conversationId, req.user.sub);
+    await addParticipant.run(conversationId, recipientId);
   }
 
-  res.status(201).json({ conversation: { id: conversationId, person: otherParticipant(conversationId, req.user.sub) } });
-});
+  res.status(201).json({ conversation: { id: conversationId, person: await otherParticipant(conversationId, req.user.sub) } });
+}));
 
-conversationsRouter.get('/:id', (req, res) => {
-  if (!isParticipant(req.params.id, req.user.sub)) {
+conversationsRouter.get('/:id', asyncHandler(async (req, res) => {
+  if (!(await isParticipant(req.params.id, req.user.sub))) {
     return res.status(403).json({ message: 'Not a participant in this conversation' });
   }
-  res.json({ conversation: { id: Number(req.params.id), person: otherParticipant(req.params.id, req.user.sub) } });
-});
+  res.json({ conversation: { id: Number(req.params.id), person: await otherParticipant(req.params.id, req.user.sub) } });
+}));
 
-conversationsRouter.get('/:id/messages', (req, res) => {
-  if (!isParticipant(req.params.id, req.user.sub)) {
+conversationsRouter.get('/:id/messages', asyncHandler(async (req, res) => {
+  if (!(await isParticipant(req.params.id, req.user.sub))) {
     return res.status(403).json({ message: 'Not a participant in this conversation' });
   }
-  const rows = db
+  const rows = await db
     .prepare(
       `SELECT m.*, u.name as sender_name FROM direct_messages m
        JOIN users u ON u.id = m.sender_id
@@ -132,10 +135,10 @@ conversationsRouter.get('/:id/messages', (req, res) => {
     )
     .all(req.params.id);
   res.json({ messages: toCamelRows(rows) });
-});
+}));
 
-conversationsRouter.post('/:id/messages', (req, res) => {
-  if (!isParticipant(req.params.id, req.user.sub)) {
+conversationsRouter.post('/:id/messages', asyncHandler(async (req, res) => {
+  if (!(await isParticipant(req.params.id, req.user.sub))) {
     return res.status(403).json({ message: 'Not a participant in this conversation' });
   }
   const missingFieldsError = requireFields(req.body, ['body']);
@@ -143,30 +146,30 @@ conversationsRouter.post('/:id/messages', (req, res) => {
     return res.status(400).json({ message: missingFieldsError });
   }
 
-  const result = db
+  const result = await db
     .prepare('INSERT INTO direct_messages (conversation_id, sender_id, body) VALUES (?, ?, ?)')
     .run(req.params.id, req.user.sub, req.body.body);
-  db.prepare(
-    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, datetime('now'))
-     ON CONFLICT(conversation_id, user_id) DO UPDATE SET last_read_at = datetime('now')`,
+  await db.prepare(
+    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, NOW())
+     ON DUPLICATE KEY UPDATE last_read_at = NOW()`,
   ).run(req.params.id, req.user.sub);
 
-  const created = db
+  const created = await db
     .prepare(
       `SELECT m.*, u.name as sender_name FROM direct_messages m
        JOIN users u ON u.id = m.sender_id WHERE m.id = ?`,
     )
     .get(result.lastInsertRowid);
   res.status(201).json({ message: toCamel(created) });
-});
+}));
 
-conversationsRouter.post('/:id/read', (req, res) => {
-  db.prepare(
-    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, datetime('now'))
-     ON CONFLICT(conversation_id, user_id) DO UPDATE SET last_read_at = datetime('now')`,
+conversationsRouter.post('/:id/read', asyncHandler(async (req, res) => {
+  await db.prepare(
+    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, NOW())
+     ON DUPLICATE KEY UPDATE last_read_at = NOW()`,
   ).run(req.params.id, req.user.sub);
   res.json({ ok: true });
-});
+}));
 
 function formatNotification(row) {
   const actorName = row.actor_name ?? 'Someone';
@@ -188,8 +191,8 @@ function formatNotification(row) {
   };
 }
 
-notificationsRouter.get('/', (req, res) => {
-  const rows = db
+notificationsRouter.get('/', asyncHandler(async (req, res) => {
+  const rows = await db
     .prepare(
       `SELECT n.*, actor.name as actor_name, r.name as restaurant_name FROM notifications n
        LEFT JOIN users actor ON actor.id = n.actor_user_id
@@ -199,9 +202,9 @@ notificationsRouter.get('/', (req, res) => {
     )
     .all(req.user.sub);
   res.json({ notifications: rows.map(formatNotification) });
-});
+}));
 
-notificationsRouter.post('/read-all', (req, res) => {
-  db.prepare("UPDATE notifications SET read_at = datetime('now') WHERE user_id = ? AND read_at IS NULL").run(req.user.sub);
+notificationsRouter.post('/read-all', asyncHandler(async (req, res) => {
+  await db.prepare('UPDATE notifications SET read_at = NOW() WHERE user_id = ? AND read_at IS NULL').run(req.user.sub);
   res.json({ ok: true });
-});
+}));

@@ -1,6 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import mysql from 'mysql2/promise';
 import { usersSchema } from './db/schema/users.js';
 import { restaurantsSchema } from './db/schema/restaurants.js';
 import { tablesSchema } from './db/schema/tables.js';
@@ -10,36 +8,82 @@ import { safetySchema } from './db/schema/safety.js';
 import { settingsSchema } from './db/schema/settings.js';
 import { verificationSchema } from './db/schema/verification.js';
 import { paymentsSchema } from './db/schema/payments.js';
-import { ensureColumn } from './lib/ensureColumn.js';
 import { seedRestaurants } from './db/seed/restaurants.js';
 import { seedInterests } from './db/seed/interests.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Tests set DB_PATH=:memory: so each test file gets its own throwaway
-// database instead of touching the real dev database in data/app.sqlite.
-const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'app.sqlite');
+export const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  // Returns DATE/DATETIME/TIMESTAMP columns as plain strings instead of JS
+  // Date objects, matching the string-based datetime values the route code
+  // was written against (string comparisons, .localeCompare, etc.).
+  dateStrings: true,
+  // The shared host resets idle connections; keepalive pings prevent a
+  // pooled connection from going stale and erroring (ECONNRESET) on reuse.
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+});
 
-export const db = new DatabaseSync(dbPath);
+// Thin adapter over the pool that mimics the synchronous better-sqlite3-style
+// `db.prepare(sql).get/all/run(...)` API the routes were written against, but
+// async under the hood. Keeps every route file's query code nearly untouched
+// -- only `async`/`await` needed to be added -- while swapping the engine.
+export const db = {
+  prepare(sql) {
+    return {
+      async get(...params) {
+        const [rows] = await pool.query(sql, params);
+        return rows[0] ?? null;
+      },
+      async all(...params) {
+        const [rows] = await pool.query(sql, params);
+        return rows;
+      },
+      async run(...params) {
+        const [result] = await pool.query(sql, params);
+        return { lastInsertRowid: result.insertId, changes: result.affectedRows };
+      },
+    };
+  },
+};
 
-for (const schema of [
-  usersSchema,
-  restaurantsSchema,
-  tablesSchema,
-  profilesSchema,
-  messagingSchema,
-  safetySchema,
-  settingsSchema,
-  verificationSchema,
-  paymentsSchema,
-]) {
-  db.exec(schema);
+async function execSchema(schema) {
+  // Strip `--` line comments before splitting on `;` -- a schema file's own
+  // prose can otherwise contain a semicolon (as an example: this sentence
+  // does) and silently break a naive split into two garbage statements.
+  const withoutComments = schema
+    .split('\n')
+    .map((line) => line.replace(/--.*$/, ''))
+    .join('\n');
+  const statements = withoutComments
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
 }
 
-// user_profiles predates the "phone" field manage-account needs; added via
-// ensureColumn rather than a migration framework since this is the only
-// additive column the schema has needed so far.
-ensureColumn(db, 'user_profiles', 'phone', 'TEXT');
+export async function initSchema() {
+  for (const schema of [
+    usersSchema,
+    restaurantsSchema,
+    tablesSchema,
+    profilesSchema,
+    messagingSchema,
+    safetySchema,
+    settingsSchema,
+    verificationSchema,
+    paymentsSchema,
+  ]) {
+    await execSchema(schema);
+  }
 
-for (const seed of [seedRestaurants, seedInterests]) {
-  seed(db);
+  await seedRestaurants(db);
+  await seedInterests(db);
 }

@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamelRows } from '../lib/serialize.js';
 import { requireFields, isOneOf } from '../lib/validate.js';
+import { asyncHandler } from '../lib/asyncHandler.js';
 
 export const paymentMethodsRouter = Router();
 
@@ -39,16 +40,16 @@ function serialize(row) {
   return { ...camel, isDefault: !!row.is_default, label: labelFor(row) };
 }
 
-function listFor(userId) {
-  const rows = db.prepare('SELECT * FROM payment_methods WHERE user_id = ? ORDER BY created_at ASC').all(userId);
+async function listFor(userId) {
+  const rows = await db.prepare('SELECT * FROM payment_methods WHERE user_id = ? ORDER BY created_at ASC').all(userId);
   return rows.map(serialize);
 }
 
-paymentMethodsRouter.get('/', (req, res) => {
-  res.json({ paymentMethods: listFor(req.user.sub) });
-});
+paymentMethodsRouter.get('/', asyncHandler(async (req, res) => {
+  res.json({ paymentMethods: await listFor(req.user.sub) });
+}));
 
-paymentMethodsRouter.post('/', (req, res) => {
+paymentMethodsRouter.post('/', asyncHandler(async (req, res) => {
   const { type } = req.body ?? {};
   if (!isOneOf(type, TYPES)) {
     return res.status(400).json({ message: `type must be one of: ${TYPES.join(', ')}` });
@@ -89,9 +90,9 @@ paymentMethodsRouter.post('/', (req, res) => {
     return res.status(400).json({ message: 'last4 must be at most 4 digits -- send only the last 4, never a full number' });
   }
 
-  const isFirst = db.prepare('SELECT COUNT(*) as count FROM payment_methods WHERE user_id = ?').get(req.user.sub).count === 0;
+  const isFirst = (await db.prepare('SELECT COUNT(*) as count FROM payment_methods WHERE user_id = ?').get(req.user.sub)).count === 0;
 
-  const result = db
+  const result = await db
     .prepare(
       `INSERT INTO payment_methods
        (user_id, type, last4, expiry_month, expiry_year, cardholder_name, bank_name, account_title, wallet_phone, is_default)
@@ -110,33 +111,33 @@ paymentMethodsRouter.post('/', (req, res) => {
       isFirst ? 1 : 0,
     );
 
-  const created = db.prepare('SELECT * FROM payment_methods WHERE id = ?').get(result.lastInsertRowid);
+  const created = await db.prepare('SELECT * FROM payment_methods WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json({ paymentMethod: serialize(created) });
-});
+}));
 
-paymentMethodsRouter.put('/:id/default', (req, res) => {
-  const method = db.prepare('SELECT id FROM payment_methods WHERE id = ? AND user_id = ?').get(req.params.id, req.user.sub);
+paymentMethodsRouter.put('/:id/default', asyncHandler(async (req, res) => {
+  const method = await db.prepare('SELECT id FROM payment_methods WHERE id = ? AND user_id = ?').get(req.params.id, req.user.sub);
   if (!method) {
     return res.status(404).json({ message: 'Payment method not found' });
   }
-  db.prepare('UPDATE payment_methods SET is_default = 0 WHERE user_id = ?').run(req.user.sub);
-  db.prepare('UPDATE payment_methods SET is_default = 1 WHERE id = ?').run(method.id);
-  res.json({ paymentMethods: listFor(req.user.sub) });
-});
+  await db.prepare('UPDATE payment_methods SET is_default = 0 WHERE user_id = ?').run(req.user.sub);
+  await db.prepare('UPDATE payment_methods SET is_default = 1 WHERE id = ?').run(method.id);
+  res.json({ paymentMethods: await listFor(req.user.sub) });
+}));
 
-paymentMethodsRouter.delete('/:id', (req, res) => {
-  const method = db.prepare('SELECT * FROM payment_methods WHERE id = ? AND user_id = ?').get(req.params.id, req.user.sub);
+paymentMethodsRouter.delete('/:id', asyncHandler(async (req, res) => {
+  const method = await db.prepare('SELECT * FROM payment_methods WHERE id = ? AND user_id = ?').get(req.params.id, req.user.sub);
   if (!method) {
     return res.status(404).json({ message: 'Payment method not found' });
   }
-  db.prepare('DELETE FROM payment_methods WHERE id = ?').run(method.id);
+  await db.prepare('DELETE FROM payment_methods WHERE id = ?').run(method.id);
 
   if (method.is_default) {
-    const next = db.prepare('SELECT id FROM payment_methods WHERE user_id = ? ORDER BY created_at ASC LIMIT 1').get(req.user.sub);
+    const next = await db.prepare('SELECT id FROM payment_methods WHERE user_id = ? ORDER BY created_at ASC LIMIT 1').get(req.user.sub);
     if (next) {
-      db.prepare('UPDATE payment_methods SET is_default = 1 WHERE id = ?').run(next.id);
+      await db.prepare('UPDATE payment_methods SET is_default = 1 WHERE id = ?').run(next.id);
     }
   }
 
-  res.json({ paymentMethods: listFor(req.user.sub) });
-});
+  res.json({ paymentMethods: await listFor(req.user.sub) });
+}));

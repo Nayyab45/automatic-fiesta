@@ -1,41 +1,42 @@
 export const profilesSchema = `
   CREATE TABLE IF NOT EXISTS user_profiles (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id),
-    age INTEGER,
+    user_id INT PRIMARY KEY,
+    age INT,
     bio TEXT,
-    city TEXT,
-    province TEXT,
-    photo_url TEXT,
-    verified INTEGER NOT NULL DEFAULT 0,
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    city VARCHAR(255),
+    province VARCHAR(255),
+    photo_url MEDIUMTEXT,
+    phone VARCHAR(50),
+    verified TINYINT(1) NOT NULL DEFAULT 0,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS interests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    category TEXT NOT NULL
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS user_interests (
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    interest_id INTEGER NOT NULL REFERENCES interests(id),
+    user_id INT NOT NULL,
+    interest_id INT NOT NULL,
     PRIMARY KEY (user_id, interest_id)
   );
 
   CREATE TABLE IF NOT EXISTS food_preferences (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id),
+    user_id INT PRIMARY KEY,
     favorite_foods TEXT
   );
 
   CREATE TABLE IF NOT EXISTS dietary_preferences (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id),
+    user_id INT PRIMARY KEY,
     needs TEXT,
-    spice_tolerance TEXT
+    spice_tolerance VARCHAR(50)
   );
 
   CREATE TABLE IF NOT EXISTS match_preferences (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id),
-    max_distance_km INTEGER,
+    user_id INT PRIMARY KEY,
+    max_distance_km INT,
     dining_times TEXT
   );
 `;
