@@ -17,6 +17,12 @@ interface AuthSession {
   user: AuthUser;
 }
 
+/** /auth/login returns a real session directly, unless the account has 2FA
+ * enabled -- then it returns a short-lived challenge instead, and the
+ * caller must exchange it (+ a TOTP code) via verify2faLogin() for the
+ * actual session. */
+export type LoginResult = AuthSession | { twoFactorRequired: true; challengeToken: string };
+
 const ACCESS_TOKEN_KEY = 'auth_access_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_KEY = 'auth_user';
@@ -65,10 +71,34 @@ export class AuthService {
       .pipe(tap((session) => this.setSession(session)));
   }
 
-  login(email: string, password: string): Observable<AuthSession> {
+  login(email: string, password: string): Observable<LoginResult> {
+    return this.http.post<LoginResult>(`${this.baseUrl}/login`, { email, password }).pipe(
+      tap((result) => {
+        if (!('twoFactorRequired' in result)) this.setSession(result);
+      }),
+    );
+  }
+
+  verify2faLogin(challengeToken: string, code: string): Observable<AuthSession> {
     return this.http
-      .post<AuthSession>(`${this.baseUrl}/login`, { email, password })
+      .post<AuthSession>(`${this.baseUrl}/2fa/verify-login`, { challengeToken, code })
       .pipe(tap((session) => this.setSession(session)));
+  }
+
+  get2faStatus(): Observable<{ enabled: boolean }> {
+    return this.http.get<{ enabled: boolean }>(`${this.baseUrl}/2fa/status`);
+  }
+
+  setup2fa(): Observable<{ secret: string; qrCodeDataUrl: string }> {
+    return this.http.post<{ secret: string; qrCodeDataUrl: string }>(`${this.baseUrl}/2fa/setup`, {});
+  }
+
+  enable2fa(code: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/2fa/enable`, { code });
+  }
+
+  disable2fa(code: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/2fa/disable`, { code });
   }
 
   logout(): void {

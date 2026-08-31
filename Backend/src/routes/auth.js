@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
+import QRCode from 'qrcode';
 import { randomBytes, createHash } from 'node:crypto';
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -18,6 +20,10 @@ export const authRouter = Router();
 const ACCESS_TOKEN_TTL = '15m';
 const REFRESH_TOKEN_TTL_DAYS = 30;
 const RESET_TOKEN_TTL_MINUTES = 60;
+// How long a "password was correct, now enter your 2FA code" challenge
+// stays valid for -- short, since it only needs to survive the user
+// switching to their authenticator app and back.
+const TWO_FACTOR_CHALLENGE_TTL_MINUTES = 5;
 
 function toPublicUser(row) {
   const { id, name, email } = toCamel(row);
@@ -47,6 +53,23 @@ async function issueRefreshToken(userId) {
 
 async function issueSession(user) {
   return { accessToken: signAccessToken(user), refreshToken: await issueRefreshToken(user.id), user };
+}
+
+function signTwoFactorChallenge(userId) {
+  return jwt.sign({ sub: userId, purpose: '2fa-challenge' }, process.env.JWT_SECRET, {
+    expiresIn: `${TWO_FACTOR_CHALLENGE_TTL_MINUTES}m`,
+  });
+}
+
+// Throws (via jwt.verify) on an expired/tampered/wrong-purpose token --
+// callers are expected to catch and respond 401, same as any other invalid
+// credential.
+function verifyTwoFactorChallenge(challengeToken) {
+  const decoded = jwt.verify(challengeToken, process.env.JWT_SECRET);
+  if (decoded.purpose !== '2fa-challenge') {
+    throw new Error('Not a 2FA challenge token');
+  }
+  return decoded.sub;
 }
 
 authRouter.post('/signup', asyncHandler(async (req, res) => {
@@ -88,6 +111,14 @@ authRouter.post('/login', asyncHandler(async (req, res) => {
   const row = await db.prepare('SELECT * FROM users WHERE email = ?').get(normalizedEmail);
   if (!row || !bcrypt.compareSync(password, row.password_hash)) {
     return res.status(401).json({ message: 'Invalid email or password' });
+  }
+
+  const twoFactor = await db.prepare('SELECT enabled FROM two_factor_auth WHERE user_id = ?').get(row.id);
+  if (twoFactor?.enabled) {
+    // Correct password, but the session isn't issued yet -- the client
+    // exchanges this challenge token + a TOTP code for the real session via
+    // /auth/2fa/verify-login. Never issue real tokens before that check.
+    return res.json({ twoFactorRequired: true, challengeToken: signTwoFactorChallenge(row.id) });
   }
 
   res.json(await issueSession(toPublicUser(row)));
@@ -241,6 +272,7 @@ authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   await db.prepare('DELETE FROM refresh_tokens WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM password_reset_tokens WHERE user_id = ?').run(userId);
+  await db.prepare('DELETE FROM two_factor_auth WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM user_interests WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM food_preferences WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM dietary_preferences WHERE user_id = ?').run(userId);
@@ -252,4 +284,85 @@ authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
   await db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
   await db.prepare('DELETE FROM users WHERE id = ?').run(userId);
   res.json({ ok: true });
+}));
+
+authRouter.get('/2fa/status', requireAuth, asyncHandler(async (req, res) => {
+  const row = await db.prepare('SELECT enabled FROM two_factor_auth WHERE user_id = ?').get(req.user.sub);
+  res.json({ enabled: !!row?.enabled });
+}));
+
+// Generates a fresh secret and stores it as not-yet-enabled -- re-running
+// setup (e.g. the user backed out and started over) just overwrites the
+// pending secret rather than accumulating rows, since enabled stays 0 until
+// /enable actually verifies a code against it.
+authRouter.post('/2fa/setup', requireAuth, asyncHandler(async (req, res) => {
+  const user = await db.prepare('SELECT email FROM users WHERE id = ?').get(req.user.sub);
+  const secret = generateSecret();
+
+  await db.prepare(
+    `INSERT INTO two_factor_auth (user_id, secret, enabled) VALUES (?, ?, 0)
+     ON DUPLICATE KEY UPDATE secret = VALUES(secret), enabled = 0`,
+  ).run(req.user.sub, secret);
+
+  const otpauthUrl = generateURI({ strategy: 'totp', issuer: 'What Should We Eat', label: user.email, secret });
+  const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
+  res.json({ secret, qrCodeDataUrl });
+}));
+
+authRouter.post('/2fa/enable', requireAuth, asyncHandler(async (req, res) => {
+  const { code } = req.body ?? {};
+  const missingFieldsError = requireFields(req.body, ['code']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+
+  const row = await db.prepare('SELECT secret FROM two_factor_auth WHERE user_id = ?').get(req.user.sub);
+  if (!row || !(await verifyTotp({ token: String(code), secret: row.secret })).valid) {
+    return res.status(401).json({ message: 'Incorrect code. Check your authenticator app and try again.' });
+  }
+
+  await db.prepare('UPDATE two_factor_auth SET enabled = 1 WHERE user_id = ?').run(req.user.sub);
+  res.json({ ok: true });
+}));
+
+// Requires a current code rather than just a password -- disabling 2FA is
+// exactly the action an attacker who already stole the password (but not
+// the authenticator) would want to take.
+authRouter.post('/2fa/disable', requireAuth, asyncHandler(async (req, res) => {
+  const { code } = req.body ?? {};
+  const missingFieldsError = requireFields(req.body, ['code']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+
+  const row = await db.prepare('SELECT secret, enabled FROM two_factor_auth WHERE user_id = ?').get(req.user.sub);
+  if (!row?.enabled || !(await verifyTotp({ token: String(code), secret: row.secret })).valid) {
+    return res.status(401).json({ message: 'Incorrect code.' });
+  }
+
+  await db.prepare('DELETE FROM two_factor_auth WHERE user_id = ?').run(req.user.sub);
+  res.json({ ok: true });
+}));
+
+authRouter.post('/2fa/verify-login', asyncHandler(async (req, res) => {
+  const { challengeToken, code } = req.body ?? {};
+  const missingFieldsError = requireFields(req.body, ['challengeToken', 'code']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+
+  let userId;
+  try {
+    userId = verifyTwoFactorChallenge(challengeToken);
+  } catch {
+    return res.status(401).json({ message: 'This login attempt has expired. Please log in again.' });
+  }
+
+  const twoFactor = await db.prepare('SELECT secret FROM two_factor_auth WHERE user_id = ? AND enabled = 1').get(userId);
+  const user = await db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(userId);
+  if (!twoFactor || !user || !(await verifyTotp({ token: String(code), secret: twoFactor.secret })).valid) {
+    return res.status(401).json({ message: 'Incorrect code.' });
+  }
+
+  res.json(await issueSession(toPublicUser(user)));
 }));

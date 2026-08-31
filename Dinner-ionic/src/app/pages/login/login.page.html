@@ -13,6 +13,26 @@
 
 <div class="w-full bg-surface rounded-xl p-8 sm:p-10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant/40 flex flex-col">
 
+@if (twoFactorChallengeToken()) {
+<div class="flex flex-col items-center text-center gap-unit mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Enter your code</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Open your authenticator app and enter the current 6-digit code.</p>
+</div>
+
+<form (ngSubmit)="submitTwoFactorCode()" class="flex flex-col gap-stack-md w-full">
+@if (errorMessage()) {
+<p class="font-body-md text-body-md text-error" role="alert">{{ errorMessage() }}</p>
+}
+<div class="flex flex-col gap-unit group">
+<label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors" for="twoFactorCode">Authentication Code</label>
+<input [(ngModel)]="twoFactorCode" name="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" class="w-full h-12 bg-transparent border-0 border-b-[1.5px] border-outline-variant focus:border-primary focus:ring-0 px-2 font-body-lg text-body-lg text-on-surface transition-colors tracking-[0.3em]" id="twoFactorCode" placeholder="000000" maxlength="6"/>
+</div>
+<button [disabled]="submitting()" class="w-full h-12 mt-stack-sm bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full flex items-center justify-center gap-unit hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-[0.98] shadow-sm disabled:opacity-60" type="submit">
+<span>{{ submitting() ? 'Verifying…' : 'Verify' }}</span>
+</button>
+</form>
+} @else {
+
 <div class="flex flex-col items-center text-center gap-unit mb-stack-lg">
 <h2 class="font-headline-md text-headline-md text-on-surface">Welcome Back</h2>
 <p class="font-body-md text-body-md text-on-surface-variant">Sign in to continue your dining journey.</p>
@@ -74,13 +94,16 @@
 </svg>
 </button>
 </div>
+}
 </div>
 
+@if (!twoFactorChallengeToken()) {
 <div class="mt-stack-lg text-center">
 <p class="font-body-md text-body-md text-on-surface-variant">
-                    Don't have an account? 
+                    Don't have an account?
                     <a (click)="go('/signup')" class="text-primary font-label-lg text-label-lg hover:text-primary-fixed-dim hover:underline underline-offset-4 transition-colors ml-unit">Sign Up</a>
 </p>
 </div>
+}
 </div>
 </main>
