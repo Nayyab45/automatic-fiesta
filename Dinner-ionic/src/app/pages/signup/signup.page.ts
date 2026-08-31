@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
+import { passwordErrorMessage, strongPasswordValidator } from '../../shared/password-validator';
 
 @Component({
   selector: 'app-signup',
@@ -25,9 +26,14 @@ export class SignupPage extends BasePage {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, strongPasswordValidator()]],
     terms: [false, [Validators.requiredTrue]],
   });
+
+  get passwordErrorMessage(): string | null {
+    const control = this.form.controls.password;
+    return control.touched ? passwordErrorMessage(control.errors) : null;
+  }
 
   submit(): void {
     if (this.form.invalid || this.submitting()) {

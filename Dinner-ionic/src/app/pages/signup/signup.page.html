@@ -24,16 +24,25 @@
 <label class="font-body-md text-body-md" for="email">Email Address</label>
 </div>
 
+<div class="flex flex-col gap-1">
 <div class="input-floating rounded-lg border border-secondary-fixed-dim focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all">
 <input formControlName="password" class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md h-14 rounded-lg outline-none" id="password" placeholder=" " type="password"/>
 <label class="font-body-md text-body-md" for="password">Password</label>
 </div>
+<p *ngIf="passwordErrorMessage as msg" class="font-label-sm text-label-sm text-error" role="alert">{{ msg }}</p>
+<p *ngIf="!passwordErrorMessage" class="font-label-sm text-label-sm text-on-surface-variant">At least 8 characters, with a number and a special character.</p>
+</div>
 
-<div class="flex items-center gap-2 mt-2">
+<div class="flex flex-col gap-1 mt-2">
+<div class="flex items-center gap-2">
 <input formControlName="terms" class="rounded border-outline text-primary-container focus:ring-primary-container w-4 h-4 bg-transparent cursor-pointer" id="terms" type="checkbox"/>
 <label class="font-label-sm text-label-sm text-on-surface-variant cursor-pointer" for="terms">
                         I agree to the <a (click)="go('/terms-of-service')" class="text-primary hover:underline">Terms of Service</a> &amp; <a (click)="go('/privacy-policy')" class="text-primary hover:underline">Privacy Policy</a>
 </label>
+</div>
+<p *ngIf="form.controls.terms.invalid && form.controls.terms.touched" class="font-label-sm text-label-sm text-error" role="alert">
+                    You must agree to the Terms of Service &amp; Privacy Policy to create an account.
+                </p>
 </div>
 
 <button [disabled]="submitting()" class="mt-stack-sm w-full h-12 bg-primary-container text-on-primary rounded-lg font-label-lg text-label-lg uppercase tracking-wider hover:bg-primary transition-colors flex items-center justify-center gap-2 disabled:opacity-60" type="submit">

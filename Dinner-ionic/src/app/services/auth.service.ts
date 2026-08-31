@@ -90,6 +90,17 @@ export class AuthService {
     return this.http.delete(`${this.baseUrl}/me`).pipe(tap(() => this.logout()));
   }
 
+  /** Always resolves the same way whether or not the email matched an
+   * account -- the backend deliberately doesn't reveal which, so the UI
+   * shouldn't either. */
+  forgotPassword(email: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, password: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/reset-password`, { token, password });
+  }
+
   /** Exchanges the stored refresh token for a new access token. Concurrent
    * callers (several requests 401ing at once) share one in-flight refresh
    * via shareReplay rather than each racing to rotate the same token --
