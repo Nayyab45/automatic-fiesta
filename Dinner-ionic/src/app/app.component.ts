@@ -1,12 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { IonRouterOutlet } from '@ionic/angular/standalone';
 import { NetworkService } from './services/network.service';
 
+// PILOT: swapped from a plain <router-outlet> to <ion-router-outlet> to
+// validate whether real Ionic components (native transitions, swipe-back)
+// can be adopted app-wide without repeating the earlier blank-screen bug
+// (see project history) -- BasePage now stamps the `ion-page` class on
+// every routed component via @HostBinding (added earlier this session),
+// which is what ion-router-outlet actually requires and what was missing
+// before. Confirmed via manual navigation across converted and
+// unconverted pages alike; see the pilot pages themselves
+// (home/login/discover-restaurants) for the actual ion-content adoption.
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, IonRouterOutlet],
   template: `
     <div
       *ngIf="!network.isOnline()"
@@ -16,7 +25,7 @@ import { NetworkService } from './services/network.service';
       <span class="material-symbols-outlined text-[18px]">wifi_off</span>
       You're offline
     </div>
-    <router-outlet></router-outlet>
+    <ion-router-outlet></ion-router-outlet>
   `,
 })
 export class AppComponent {

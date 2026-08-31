@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideIonicAngular, IonicRouteStrategy } from '@ionic/angular/standalone';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { APP_INITIALIZER } from '@angular/core';
 
@@ -12,11 +12,12 @@ import { AuthService } from './app/services/auth.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    // IonicRouteStrategy is deliberately not registered: it exists to support
-    // ion-router-outlet's view stack, and this app renders through Angular's
-    // plain <router-outlet>. Keeping it here left detached pages alive.
-    // provideIonicAngular stays only for Ionic's platform/mode classes, which
-    // the imported Ionic CSS in global.scss still keys off.
+    // PILOT: re-added alongside the app.component.ts switch to
+    // <ion-router-outlet> -- this manages ion-router-outlet's view stack
+    // (which pages stay alive vs. get destroyed on navigation). Previously
+    // dropped because nothing used ion-router-outlet; see app.component.ts
+    // for why it's back.
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular({}),
     provideAnimations(),
     provideRouter(routes),
