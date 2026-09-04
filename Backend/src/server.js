@@ -13,9 +13,19 @@ import { emergencyContactsRouter, blocksRouter, reportsRouter } from './routes/s
 import { verificationRouter } from './routes/verification.js';
 import { paymentMethodsRouter } from './routes/payments.js';
 import { subscriptionsRouter, subscriptionCallbackRouter } from './routes/subscriptions.js';
+import { friendsRouter } from './routes/friends.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
+  process.exit(1);
+}
+
+// PAYMENT_MOCK_MODE fakes a successful charge for every payment method,
+// with no real processor involved -- useful for testing checkout before a
+// merchant account exists, but it must never be reachable in production
+// (a real user would "pay" and get premium activated for free).
+if (process.env.PAYMENT_MOCK_MODE === 'true' && process.env.NODE_ENV === 'production') {
+  console.error('PAYMENT_MOCK_MODE=true is not allowed with NODE_ENV=production -- it fakes successful payments for real users.');
   process.exit(1);
 }
 
@@ -56,6 +66,7 @@ app.use('/api/blocks', blocksRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/payment-methods', paymentMethodsRouter);
+app.use('/api/friends', friendsRouter);
 // Mounted before subscriptionsRouter's own requireAuth applies: the gateway
 // calls this directly, not a logged-in user's browser.
 app.use('/api/subscriptions/callback', subscriptionCallbackRouter);
