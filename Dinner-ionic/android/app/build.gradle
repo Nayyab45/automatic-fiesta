@@ -1,5 +1,20 @@
 apply plugin: 'com.android.application'
 
+// Release-signing credentials live outside version control (keystore.properties
+// is gitignored, same as google-services.json below) -- only present on a
+// machine that's actually meant to produce a signed release build. Without
+// it, `assembleRelease`/`bundleRelease` still work but produce an unsigned
+// artifact you can't upload to the Play Store, which is the right failure
+// mode for e.g. CI that only builds debug.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+def hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    logger.info("keystore.properties not found -- release builds will be unsigned. See DEPLOYMENT.md.")
+}
+
 android {
     namespace = "com.whatshouldweeat.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +31,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
