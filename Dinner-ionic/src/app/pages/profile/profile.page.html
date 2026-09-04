@@ -44,6 +44,18 @@
 </div>
 
 <div *ngIf="!isOwnProfile()" class="flex gap-stack-sm w-full md:w-auto mt-2">
+<button *ngIf="friendStatus() === 'none'" (click)="sendFriendRequest()" class="flex-1 md:flex-none border border-primary-container text-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">person_add</span> Add Friend
+                    </button>
+<button *ngIf="friendStatus() === 'pending_sent'" (click)="cancelOrDeclineFriendRequest()" class="flex-1 md:flex-none border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span> Request Sent
+                    </button>
+<button *ngIf="friendStatus() === 'pending_received'" (click)="acceptFriendRequest()" class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">how_to_reg</span> Accept Request
+                    </button>
+<button *ngIf="friendStatus() === 'friends'" (click)="unfriend()" class="flex-1 md:flex-none border border-primary-container text-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm fill">how_to_reg</span> Friends
+                    </button>
 <button (click)="message()" class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-sm">chat</span> Message
                     </button>
@@ -72,6 +84,14 @@
 </div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Rating</div>
 </div>
+<ng-container *ngIf="isOwnProfile()">
+<div class="w-px bg-outline-variant opacity-50"></div>
+<div (click)="go('/friends')" class="text-center cursor-pointer relative">
+<div class="font-headline-md text-headline-md text-primary">{{ friendsCount() }}</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Friends</div>
+<span *ngIf="pendingRequestsCount() > 0" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</div>
+</ng-container>
 </div>
 </div>
 

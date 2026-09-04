@@ -81,6 +81,7 @@
     "notifications",
     "payments",
     "person",
+    "person_add",
     "photo_camera",
     "place",
     "policy",

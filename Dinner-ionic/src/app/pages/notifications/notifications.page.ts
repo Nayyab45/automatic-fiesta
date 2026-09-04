@@ -10,6 +10,8 @@ const TYPE_ICONS: Record<string, string> = {
   seat_request_received: 'mail',
   seat_request_confirmed: 'check',
   seat_request_declined: 'schedule',
+  friend_request_received: 'person_add',
+  friend_request_accepted: 'how_to_reg',
 };
 
 @Component({
@@ -41,6 +43,10 @@ export class NotificationsPage extends BasePage {
 
   iconFor(type: string): string {
     return TYPE_ICONS[type] ?? 'notifications';
+  }
+
+  open(n: AppNotification): void {
+    if (n.actorUserId) this.go(`/profile/${n.actorUserId}`);
   }
 
   markAllAsRead(): void {

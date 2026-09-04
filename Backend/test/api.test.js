@@ -55,6 +55,8 @@ const USER_ID_TABLES = [
   ['user_reports', 'reporter_user_id'],
   ['user_reports', 'reported_user_id'],
   ['two_factor_auth', 'user_id'],
+  ['friend_requests', 'requester_id'],
+  ['friend_requests', 'recipient_id'],
 ];
 
 async function cleanupTestData() {
@@ -313,6 +315,80 @@ describe('payment methods', () => {
       token: intruder.accessToken,
     });
     assert.equal(intruderDelete.status, 404);
+  });
+});
+
+describe('friends', () => {
+  test('send -> accept moves both sides to friends, and notifies the requester', async () => {
+    const alice = await signup('friend-alice');
+    const bob = await signup('friend-bob');
+
+    const send = await api('POST', '/api/friends/requests', { token: alice.accessToken, body: { recipientId: bob.user.id } });
+    assert.equal(send.status, 201);
+    assert.equal(send.body.status, 'pending_sent');
+
+    const aliceStatus = await api('GET', `/api/friends/status/${bob.user.id}`, { token: alice.accessToken });
+    assert.equal(aliceStatus.body.status, 'pending_sent');
+    const bobStatus = await api('GET', `/api/friends/status/${alice.user.id}`, { token: bob.accessToken });
+    assert.equal(bobStatus.body.status, 'pending_received');
+
+    const bobRequests = await api('GET', '/api/friends/requests', { token: bob.accessToken });
+    assert.ok(bobRequests.body.requests.some((r) => r.requesterId === alice.user.id));
+
+    const accept = await api('POST', `/api/friends/requests/${send.body.requestId}/accept`, { token: bob.accessToken });
+    assert.equal(accept.status, 200);
+    assert.equal(accept.body.status, 'friends');
+
+    const aliceFriends = await api('GET', '/api/friends', { token: alice.accessToken });
+    assert.ok(aliceFriends.body.friends.some((f) => f.id === bob.user.id));
+    const bobFriends = await api('GET', '/api/friends', { token: bob.accessToken });
+    assert.ok(bobFriends.body.friends.some((f) => f.id === alice.user.id));
+
+    const aliceNotifs = await api('GET', '/api/notifications', { token: alice.accessToken });
+    assert.ok(aliceNotifs.body.notifications.some((n) => n.type === 'friend_request_accepted'));
+  });
+
+  test('a mutual request (both sides send) auto-accepts instead of erroring', async () => {
+    const carol = await signup('friend-carol');
+    const dave = await signup('friend-dave');
+
+    await api('POST', '/api/friends/requests', { token: carol.accessToken, body: { recipientId: dave.user.id } });
+    const daveSends = await api('POST', '/api/friends/requests', { token: dave.accessToken, body: { recipientId: carol.user.id } });
+    assert.equal(daveSends.status, 200);
+    assert.equal(daveSends.body.status, 'friends');
+  });
+
+  test('unfriending removes the pair for both sides', async () => {
+    const erin = await signup('friend-erin');
+    const frank = await signup('friend-frank');
+
+    const send = await api('POST', '/api/friends/requests', { token: erin.accessToken, body: { recipientId: frank.user.id } });
+    await api('POST', `/api/friends/requests/${send.body.requestId}/accept`, { token: frank.accessToken });
+
+    const unfriend = await api('DELETE', `/api/friends/${frank.user.id}`, { token: erin.accessToken });
+    assert.equal(unfriend.status, 200);
+
+    const erinStatus = await api('GET', `/api/friends/status/${frank.user.id}`, { token: erin.accessToken });
+    assert.equal(erinStatus.body.status, 'none');
+  });
+
+  test('blocking a friend ends the friendship', async () => {
+    const gina = await signup('friend-gina');
+    const hank = await signup('friend-hank');
+
+    const send = await api('POST', '/api/friends/requests', { token: gina.accessToken, body: { recipientId: hank.user.id } });
+    await api('POST', `/api/friends/requests/${send.body.requestId}/accept`, { token: hank.accessToken });
+
+    await api('POST', '/api/blocks', { token: gina.accessToken, body: { userId: hank.user.id } });
+
+    const status = await api('GET', `/api/friends/status/${hank.user.id}`, { token: gina.accessToken });
+    assert.equal(status.body.status, 'none');
+  });
+
+  test("can't send a friend request to yourself", async () => {
+    const ivan = await signup('friend-ivan');
+    const res = await api('POST', '/api/friends/requests', { token: ivan.accessToken, body: { recipientId: ivan.user.id } });
+    assert.equal(res.status, 400);
   });
 });
 

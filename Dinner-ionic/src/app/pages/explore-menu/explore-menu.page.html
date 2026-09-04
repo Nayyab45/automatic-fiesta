@@ -85,7 +85,7 @@
 <a (click)="go('/discover-people')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
-<div *ngFor="let person of peopleToMeet()" (click)="go('/discover-people')" (keydown.enter)="go('/discover-people')" role="button" tabindex="0" class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
+<div *ngFor="let person of peopleToMeet()" (click)="go('/profile/' + person.id)" (keydown.enter)="go('/profile/' + person.id)" role="button" tabindex="0" class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">
 <div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface shadow-sm group-hover:border-primary transition-colors" *ngIf="person.photoUrl; else initialAvatar">
 <img [alt]="person.name" class="w-full h-full object-cover" [src]="person.photoUrl"/>
 </div>

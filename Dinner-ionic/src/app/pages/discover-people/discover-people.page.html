@@ -43,7 +43,7 @@
 <section *ngIf="!loading() && people().length > 0" class="flex flex-col gap-stack-md">
 
 <div *ngFor="let person of people()" class="bg-surface-container-lowest rounded-xl p-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-low flex flex-col gap-stack-md relative overflow-hidden">
-<div class="flex items-start gap-4">
+<div class="flex items-start gap-4 cursor-pointer" (click)="go('/profile/' + person.id)">
 <div class="w-16 h-16 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-headline-md text-headline-md border-[0.5px] border-outline-variant shadow-sm shrink-0">{{ person.name.charAt(0) }}</div>
 <div class="flex-1 flex flex-col justify-center">
 <div class="flex justify-between items-center">

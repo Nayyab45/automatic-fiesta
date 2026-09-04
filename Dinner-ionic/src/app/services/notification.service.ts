@@ -9,6 +9,7 @@ export interface AppNotification {
   message: string;
   tableId: number | null;
   actorName: string | null;
+  actorUserId: number | null;
   read: boolean;
   createdAt: string;
 }

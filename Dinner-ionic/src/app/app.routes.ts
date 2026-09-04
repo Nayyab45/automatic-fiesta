@@ -66,6 +66,7 @@ const routeDefinitions: Routes = [
   { path: 'notifications', loadComponent: () => import('./pages/notifications/notifications.page').then((m) => m.NotificationsPage) },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage) },
   { path: 'profile/:id', loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage) },
+  { path: 'friends', loadComponent: () => import('./pages/friends-list/friends-list.page').then((m) => m.FriendsListPage) },
   { path: 'edit-preferences', loadComponent: () => import('./pages/edit-preferences/edit-preferences.page').then((m) => m.EditPreferencesPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage) },
   { path: 'premium-members', loadComponent: () => import('./pages/premium-members/premium-members.page').then((m) => m.PremiumMembersPage) },

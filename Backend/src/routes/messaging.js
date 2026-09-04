@@ -178,6 +178,8 @@ function formatNotification(row) {
     seat_request_received: `${actorName} requested a seat at ${restaurantName}`,
     seat_request_confirmed: `Your seat request was approved at ${restaurantName}`,
     seat_request_declined: `Your seat request was declined at ${restaurantName}`,
+    friend_request_received: `${actorName} sent you a friend request`,
+    friend_request_accepted: `${actorName} accepted your friend request`,
   };
 
   return {
@@ -186,6 +188,7 @@ function formatNotification(row) {
     message: messages[row.type] ?? 'You have a new notification',
     tableId: row.table_id,
     actorName: row.actor_user_id ? actorName : null,
+    actorUserId: row.actor_user_id,
     read: !!row.read_at,
     createdAt: row.created_at,
   };

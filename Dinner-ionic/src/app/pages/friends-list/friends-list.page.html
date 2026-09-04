@@ -1,0 +1,134 @@
+<header class="w-full top-0 sticky bg-background z-10 flex items-center justify-between px-container-padding py-stack-md border-b border-outline-variant/20 shadow-sm" style="box-shadow: 0 4px 16px 0 rgba(0,0,0,0.02);">
+<button (click)="goBack()" aria-label="Go back" class="interactive-element p-2 -ml-2 rounded-full hover:bg-surface-variant/50 text-on-surface">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface text-center flex-1">Friends</h1>
+<div class="w-10"></div>
+</header>
+
+<div class="flex gap-stack-lg px-container-padding border-b border-outline-variant/30 sticky top-[65px] bg-background z-10">
+<button (click)="selectTab('friends')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors" [class.text-primary]="activeTab() === 'friends'" [class.font-bold]="activeTab() === 'friends'" [class.text-on-surface-variant]="activeTab() !== 'friends'">
+                Friends
+                <div *ngIf="activeTab() === 'friends'" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-primary rounded-t-sm"></div>
+</button>
+<button (click)="selectTab('requests')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors flex items-center gap-1" [class.text-primary]="activeTab() === 'requests'" [class.font-bold]="activeTab() === 'requests'" [class.text-on-surface-variant]="activeTab() !== 'requests'">
+                Requests
+                <span *ngIf="requests().length > 0" class="w-1.5 h-1.5 bg-error rounded-full"></span>
+<div *ngIf="activeTab() === 'requests'" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-primary rounded-t-sm"></div>
+</button>
+<button (click)="selectTab('add')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors" [class.text-primary]="activeTab() === 'add'" [class.font-bold]="activeTab() === 'add'" [class.text-on-surface-variant]="activeTab() !== 'add'">
+                Add Friend
+                <div *ngIf="activeTab() === 'add'" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-primary rounded-t-sm"></div>
+</button>
+</div>
+
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-section-gap">
+
+<ng-container *ngIf="activeTab() === 'friends'">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<ul *ngIf="!loading() && friends().length > 0" class="flex flex-col w-full">
+<li *ngFor="let friend of friends()" class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
+<div (click)="go('/profile/' + friend.id)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0">
+<img *ngIf="friend.photoUrl" [alt]="friend.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="friend.photoUrl"/>
+<div *ngIf="!friend.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ friend.name.charAt(0) }}</div>
+<div class="flex flex-col gap-unit min-w-0">
+<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px] truncate">{{ friend.name }}</span>
+<span *ngIf="friend.city" class="font-body-md text-body-md text-on-surface-variant text-[13px]">{{ friend.city }}</span>
+</div>
+</div>
+<button (click)="unfriend(friend)" class="interactive-element px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-lg text-label-lg bg-transparent hover:bg-surface-variant/50 shrink-0">
+                    Unfriend
+                </button>
+</li>
+</ul>
+
+<div *ngIf="!loading() && friends().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">group</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No friends yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px] mb-stack-md">
+                Add people whose vibe matches yours from the Add Friend tab.
+            </p>
+<button (click)="selectTab('add')" class="px-6 py-3 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:opacity-90 transition-opacity">
+                Add Friend
+            </button>
+</div>
+</ng-container>
+
+<ng-container *ngIf="activeTab() === 'requests'">
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && requests().length > 0" class="flex flex-col gap-stack-md">
+<div *ngFor="let request of requests()" class="flex items-center justify-between gap-gutter py-stack-sm border-b border-outline-variant/30">
+<div (click)="go('/profile/' + request.requesterId)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0">
+<img *ngIf="request.photoUrl" [alt]="request.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="request.photoUrl"/>
+<div *ngIf="!request.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ request.name.charAt(0) }}</div>
+<span class="font-title-lg text-title-lg text-on-surface truncate">{{ request.name }}</span>
+</div>
+<div class="flex gap-2 shrink-0">
+<button (click)="accept(request)" aria-label="Accept" class="interactive-element w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:opacity-90">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button (click)="decline(request)" aria-label="Decline" class="interactive-element w-10 h-10 rounded-full border border-outline-variant text-on-surface-variant flex items-center justify-center hover:bg-surface-variant/50">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+</div>
+
+<div *ngIf="!loading() && requests().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">mail</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No pending requests</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">
+                Friend requests you receive will show up here.
+            </p>
+</div>
+</ng-container>
+
+<ng-container *ngIf="activeTab() === 'add'">
+<p class="font-body-md text-body-md text-on-surface-variant -mt-2">
+            People suggested based on your interests and vibe.
+        </p>
+
+<p *ngIf="loadingSuggestions()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Finding people who match your vibe…</p>
+
+<div *ngIf="!loadingSuggestions() && suggestions().length > 0" class="flex flex-col gap-stack-md">
+<div *ngFor="let match of suggestions()" class="bg-surface-container-lowest rounded-xl p-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-low flex flex-col gap-stack-sm">
+<div (click)="go('/profile/' + match.id)" class="flex items-start gap-gutter cursor-pointer">
+<img *ngIf="match.photoUrl" [alt]="match.name" class="w-14 h-14 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="match.photoUrl"/>
+<div *ngIf="!match.photoUrl" class="w-14 h-14 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ match.name.charAt(0) }}</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center gap-2">
+<h3 class="font-title-lg text-title-lg text-on-surface truncate">{{ match.name }}{{ match.age ? ', ' + match.age : '' }}</h3>
+<span class="font-label-lg text-label-lg text-primary font-bold shrink-0">{{ match.score }}% Vibe</span>
+</div>
+<span *ngIf="match.city" class="font-label-sm text-label-sm text-outline">{{ match.city }}</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2" *ngIf="(match.sharedInterests.length ? match.sharedInterests : match.interests).length > 0">
+<span *ngFor="let interest of (match.sharedInterests.length ? match.sharedInterests : match.interests)" class="px-3 py-1 rounded-full bg-tertiary-container bg-opacity-10 text-tertiary font-label-sm text-label-sm border-[0.5px] border-tertiary-container">{{ interest.name }}</span>
+</div>
+<button *ngIf="!sentRequestIds().has(match.id)" (click)="addFriend(match)" class="self-end mt-1 bg-primary-container text-on-primary rounded-full px-6 py-2 font-label-lg text-label-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">person_add</span> Add Friend
+                </button>
+<span *ngIf="sentRequestIds().has(match.id)" class="self-end mt-1 text-on-surface-variant font-label-lg text-label-lg px-6 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">schedule</span> Request Sent
+                </span>
+</div>
+</div>
+
+<div *ngIf="!loadingSuggestions() && suggestions().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">favorite</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No suggestions right now</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">
+                Add more interests to your profile to get better matches.
+            </p>
+</div>
+</ng-container>
+</main>

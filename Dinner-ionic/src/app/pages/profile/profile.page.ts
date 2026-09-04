@@ -7,6 +7,7 @@ import { LocationService } from '../../services/location.service';
 import { Profile, ProfileService } from '../../services/profile.service';
 import { MessagingService } from '../../services/messaging.service';
 import { SafetyService } from '../../services/safety.service';
+import { FriendsService, FriendStatus } from '../../services/friends.service';
 
 @Component({
   selector: 'app-profile',
@@ -21,11 +22,16 @@ export class ProfilePage extends BasePage {
   private readonly profileService = inject(ProfileService);
   private readonly messagingService = inject(MessagingService);
   private readonly safetyService = inject(SafetyService);
+  private readonly friendsService = inject(FriendsService);
 
   readonly profile = signal<Profile | null>(null);
   readonly loading = signal(true);
   readonly isOwnProfile = computed(() => !this.routeId());
   readonly isBlocked = signal(false);
+  readonly friendStatus = signal<FriendStatus>('none');
+  readonly friendRequestId = signal<number | null>(null);
+  readonly friendsCount = signal(0);
+  readonly pendingRequestsCount = signal(0);
 
   constructor() {
     super();
@@ -43,6 +49,13 @@ export class ProfilePage extends BasePage {
       this.safetyService.blockedUsers().subscribe(({ blocked }) => {
         this.isBlocked.set(blocked.some((b) => b.userId === Number(id)));
       });
+      this.friendsService.status(Number(id)).subscribe(({ status, requestId }) => {
+        this.friendStatus.set(status);
+        this.friendRequestId.set(requestId ?? null);
+      });
+    } else {
+      this.friendsService.list().subscribe(({ friends }) => this.friendsCount.set(friends.length));
+      this.friendsService.requests().subscribe(({ requests }) => this.pendingRequestsCount.set(requests.length));
     }
   }
 
@@ -56,6 +69,48 @@ export class ProfilePage extends BasePage {
     const profile = this.profile();
     if (!profile) return;
     const request$ = this.isBlocked() ? this.safetyService.unblock(profile.id) : this.safetyService.block(profile.id);
-    request$.subscribe(() => this.isBlocked.update((v) => !v));
+    request$.subscribe(() => {
+      this.isBlocked.update((v) => !v);
+      if (!this.isBlocked()) return;
+      // Blocking ends any friendship server-side too -- mirror that here
+      // instead of waiting on a refetch.
+      this.friendStatus.set('none');
+      this.friendRequestId.set(null);
+    });
+  }
+
+  sendFriendRequest(): void {
+    const profile = this.profile();
+    if (!profile) return;
+    this.friendsService.send(profile.id).subscribe(({ status, requestId }) => {
+      this.friendStatus.set(status);
+      this.friendRequestId.set(requestId);
+    });
+  }
+
+  // Doubles as "cancel" when a request I sent is still pending -- the
+  // backend's decline endpoint accepts either side of the pair.
+  cancelOrDeclineFriendRequest(): void {
+    const requestId = this.friendRequestId();
+    if (!requestId) return;
+    this.friendsService.decline(requestId).subscribe(() => {
+      this.friendStatus.set('none');
+      this.friendRequestId.set(null);
+    });
+  }
+
+  acceptFriendRequest(): void {
+    const requestId = this.friendRequestId();
+    if (!requestId) return;
+    this.friendsService.accept(requestId).subscribe(({ status }) => this.friendStatus.set(status));
+  }
+
+  unfriend(): void {
+    const profile = this.profile();
+    if (!profile) return;
+    this.friendsService.unfriend(profile.id).subscribe(() => {
+      this.friendStatus.set('none');
+      this.friendRequestId.set(null);
+    });
   }
 }

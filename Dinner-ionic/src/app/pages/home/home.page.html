@@ -93,7 +93,7 @@
 <div class="flex overflow-x-auto no-scrollbar gap-stack-md pb-stack-sm -mx-container-padding px-container-padding md:mx-0 md:px-0">
 
 <div *ngFor="let match of matches()" class="flex-none w-64 rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant p-stack-md flex flex-col gap-stack-sm interactive-card">
-<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm">
+<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm cursor-pointer" (click)="go('/profile/' + match.id)">
 <div class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-lg text-title-lg shrink-0 border border-outline-variant">{{ match.name.charAt(0) }}</div>
 <div class="flex flex-col">
 <h3 class="font-body-lg text-body-lg font-medium text-on-surface">{{ match.name }}</h3>

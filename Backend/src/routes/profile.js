@@ -247,6 +247,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
         return {
           ...candidate,
           score: Math.min(score, 99),
+          interests: candidateInterests,
           sharedInterests,
           reasons,
           rating: await hostRating(candidate.id),

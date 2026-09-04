@@ -77,6 +77,13 @@ blocksRouter.post('/', asyncHandler(async (req, res) => {
     req.user.sub,
     userId,
   );
+  // A block should end any existing friendship too -- staying "friends"
+  // with someone you just blocked doesn't make sense.
+  await db
+    .prepare(
+      `DELETE FROM friend_requests WHERE (requester_id = ? AND recipient_id = ?) OR (requester_id = ? AND recipient_id = ?)`,
+    )
+    .run(req.user.sub, userId, userId, req.user.sub);
   res.status(201).json({ ok: true });
 }));
 
