@@ -2,3 +2,10 @@
 # not part of the What Should We Eat app (that's Backend/ + Dinner-ionic/),
 # and it carries its own .env with live DB/JWT credentials.
 api_test/
+
+# Per-session Claude Code state -- worktrees are separate git checkouts
+# (committing them as plain files would embed a second copy of the repo),
+# and scheduled_tasks.lock is a runtime lock file. launch.json is the one
+# file here worth version-controlling (dev server config).
+.claude/worktrees/
+.claude/scheduled_tasks.lock

@@ -4,6 +4,11 @@
 /tmp
 /out-tsc
 
+# Angular CLI / Vite dev-server cache -- regenerates on every `ng serve`,
+# was being tracked by mistake (this repo's .gitignore never excluded it,
+# unlike the Angular CLI's own default template).
+/.angular/cache
+
 # dependencies
 /node_modules
 

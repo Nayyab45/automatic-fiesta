@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dinner-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["ng", "serve", "--port", "4200"],
+      "cwd": "Dinner-ionic",
+      "port": 4200
+    }
+  ]
+}
