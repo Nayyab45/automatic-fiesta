@@ -182,13 +182,18 @@ function formatNotification(row) {
     friend_request_accepted: `${actorName} accepted your friend request`,
   };
 
+  // row.actor_name comes from a LEFT JOIN, so it's null both when there's no
+  // actor and when the actor's account has since been deleted (any user can
+  // delete their own account) -- either way, there's no live profile to link
+  // to, so actorUserId must follow actor_name's presence, not actor_user_id's.
+  const actorStillExists = row.actor_user_id && row.actor_name;
   return {
     id: row.id,
     type: row.type,
     message: messages[row.type] ?? 'You have a new notification',
     tableId: row.table_id,
-    actorName: row.actor_user_id ? actorName : null,
-    actorUserId: row.actor_user_id,
+    actorName: actorStillExists ? actorName : null,
+    actorUserId: actorStillExists ? row.actor_user_id : null,
     read: !!row.read_at,
     createdAt: row.created_at,
   };
