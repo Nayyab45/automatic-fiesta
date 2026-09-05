@@ -282,6 +282,7 @@ authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
   await db.prepare('DELETE FROM payment_methods WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM user_profiles WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
+  await db.prepare('DELETE FROM friend_requests WHERE requester_id = ? OR recipient_id = ?').run(userId, userId);
   await db.prepare('DELETE FROM users WHERE id = ?').run(userId);
   res.json({ ok: true });
 }));
