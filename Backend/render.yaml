@@ -1,0 +1,57 @@
+# Render Blueprint for this backend. Import this repo at
+# https://dashboard.render.com/blueprints -- Render reads this file
+# automatically and creates the service below.
+#
+# Every envVar marked `sync: false` is a secret Render will prompt you to
+# fill in during setup (never committed here); DB_PORT/NODE_ENV have real
+# defaults since they're the same across environments.
+services:
+  - type: web
+    name: whatweeat-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Long random string -- Render generates and stores this for you.
+      - key: JWT_SECRET
+        generateValue: true
+      # Same MySQL database this backend already uses locally (see
+      # Backend/.env on your machine) -- paste the same DB_HOST/USER/
+      # PASSWORD/NAME values in here so prod and dev share one database.
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      # Your deployed frontend's real origin(s), comma-separated. Leaving
+      # this unset falls back to allowing any origin -- fine for an initial
+      # deploy, but tighten it once the frontend has a real URL.
+      - key: CORS_ORIGIN
+        sync: false
+      # This service's own public URL once Render assigns one, e.g.
+      # https://whatweeat-backend.onrender.com -- used to build restaurant/
+      # dish photo URLs. Without it every image URL points at localhost.
+      - key: PUBLIC_ASSET_BASE_URL
+        sync: false
+      # From resend.com -- enables real password-reset emails instead of
+      # just logging the link server-side.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      # Where the Angular frontend is hosted, used inside the password-reset
+      # email link. Defaults to localhost:8100 if left unset.
+      - key: PUBLIC_APP_URL
+        sync: false
+      # Leave unset in production -- server.js refuses to start if this is
+      # "true" while NODE_ENV=production, since it fakes successful
+      # payments for real users.
+      # - key: PAYMENT_MOCK_MODE
