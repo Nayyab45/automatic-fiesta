@@ -40,6 +40,7 @@
 <div *ngIf="!restaurant.photoUrl" class="w-full h-full flex items-center justify-center bg-surface-container border-b-[0.5px] border-outline-variant">
 <span class="material-symbols-outlined text-on-surface-variant text-[40px]">restaurant</span>
 </div>
+<p *ngIf="restaurant.photoUrl && restaurant.photoAttribution" class="absolute bottom-0 left-0 right-0 font-label-sm text-label-sm text-white/70 bg-black/30 px-2 py-0.5 truncate">{{ restaurant.photoAttribution }}</p>
 <div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
 <ng-container *ngIf="restaurant.rating !== null; else notRated">
 <span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>

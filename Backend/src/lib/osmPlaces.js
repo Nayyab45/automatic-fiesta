@@ -11,6 +11,8 @@
 // across every city in Pakistan would hammer a shared resource nobody here
 // operates. `restaurant_import_log` makes sure a city is only ever fetched
 // once, including cities OSM has zero tagged results for.
+import { getOrCreateCuisinePhoto, getRealPlacePhoto } from './restaurantPhotos.js';
+
 const USER_AGENT = 'WhatShouldWeEat-DevApp/1.0 (contact: nayyabashfaq05@gmail.com)';
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
@@ -65,12 +67,18 @@ export async function fetchOverpassRestaurants(bbox) {
 /**
  * Imports a city's real restaurants from OpenStreetMap into the `restaurants`
  * table, unless it's already been imported before. `fetchBoundingBox`/
- * `fetchPlaces` are injectable so tests can stub the network calls out.
+ * `fetchPlaces`/`fetchRealPhoto`/`fetchCuisinePhoto` are injectable so tests
+ * can stub every network call out.
  */
 export async function importCityRestaurants(
   db,
   city,
-  { fetchBoundingBox = lookupCityBoundingBox, fetchPlaces = fetchOverpassRestaurants } = {},
+  {
+    fetchBoundingBox = lookupCityBoundingBox,
+    fetchPlaces = fetchOverpassRestaurants,
+    fetchRealPhoto = getRealPlacePhoto,
+    fetchCuisinePhoto = getOrCreateCuisinePhoto,
+  } = {},
 ) {
   const alreadyImported = await db.prepare('SELECT 1 FROM restaurant_import_log WHERE city = ?').get(city);
   if (alreadyImported) {
@@ -86,24 +94,48 @@ export async function importCityRestaurants(
   }
 
   const places = await fetchPlaces(bbox);
-  for (const place of places) {
+
+  // Photos are fetched in parallel rather than one place at a time inside
+  // the loop below -- a city can have 80 places but usually far fewer
+  // *distinct* cuisines, and with up to a couple of network calls per photo,
+  // doing this sequentially could turn a city's first load into a
+  // multi-minute wait. Real per-place photos run in parallel across every
+  // place; cuisine photos run in parallel across only the distinct cuisines
+  // present, then get reused via this map instead of re-fetched per place.
+  const realPhotos = await Promise.all(places.map((place) => fetchRealPhoto(place, place.tags)));
+  const distinctCuisines = [...new Set(places.map((place) => cuisineTagsFrom(place.tags)))];
+  const cuisinePhotos = new Map(
+    await Promise.all(distinctCuisines.map(async (cuisine) => [cuisine, await fetchCuisinePhoto(db, cuisine)])),
+  );
+
+  for (const [index, place] of places.entries()) {
     const tags = place.tags;
+    const cuisineTags = cuisineTagsFrom(tags);
+    // A real photo of this exact place if OSM has one linked, otherwise a
+    // cuisine-matched stock photo (both already enhanced -- see
+    // restaurantPhotos.js) -- or null, which just means "no photo yet",
+    // handled by the same placeholder the app already shows for that.
+    const photo = realPhotos[index] ?? cuisinePhotos.get(cuisineTags);
+
     await db
       .prepare(
-        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, source, external_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'osm', ?)
+        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, photo_url, photo_attribution, source, external_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?)
          ON DUPLICATE KEY UPDATE
            name = VALUES(name), latitude = VALUES(latitude), longitude = VALUES(longitude),
-           cuisine_tags = VALUES(cuisine_tags), address = VALUES(address)`,
+           cuisine_tags = VALUES(cuisine_tags), address = VALUES(address),
+           photo_url = VALUES(photo_url), photo_attribution = VALUES(photo_attribution)`,
       )
       .run(
         tags.name,
         city,
         bbox.region,
-        cuisineTagsFrom(tags),
+        cuisineTags,
         addressFrom(tags, city),
         place.lat,
         place.lon,
+        photo?.url ?? null,
+        photo?.attribution ?? null,
         `osm:${place.type}/${place.id}`,
       );
   }

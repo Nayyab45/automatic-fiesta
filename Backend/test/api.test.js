@@ -1,6 +1,9 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { readdir, rm } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { generate as generateTotp } from 'otplib';
 
 // db.js now talks to a live, shared MySQL/MariaDB database (see .env) instead
@@ -23,6 +26,8 @@ process.env.JWT_SECRET = 'test-secret';
 const { app } = await import('../src/server.js');
 const { initSchema, pool, db } = await import('../src/db.js');
 const { importCityRestaurants } = await import('../src/lib/osmPlaces.js');
+const { getRealPlacePhoto, getOrCreateCuisinePhoto, enhancePhoto } = await import('../src/lib/restaurantPhotos.js');
+const { Jimp } = await import('jimp');
 
 let server;
 let baseUrl;
@@ -499,6 +504,11 @@ describe('real restaurant imports (OpenStreetMap)', () => {
     const result = await importCityRestaurants(db, testCity, {
       fetchBoundingBox: async () => bbox,
       fetchPlaces: async () => places,
+      fetchRealPhoto: async () => null,
+      fetchCuisinePhoto: async (_db, cuisineTags) => ({
+        url: `https://example.com/stock/${cuisineTags}.jpg`,
+        attribution: `Photo by Someone, CC BY 4.0`,
+      }),
     });
     assert.equal(result.imported, 2);
 
@@ -508,6 +518,8 @@ describe('real restaurant imports (OpenStreetMap)', () => {
     assert.equal(rows[0].external_id, 'osm:node/111');
     assert.equal(rows[0].cuisine_tags, 'Pakistani,Bbq');
     assert.equal(rows[0].rating, null);
+    assert.equal(rows[0].photo_url, 'https://example.com/stock/Pakistani,Bbq.jpg');
+    assert.equal(rows[0].photo_attribution, 'Photo by Someone, CC BY 4.0');
     // Untagged cuisine still gets an honest, non-blank label instead of ''.
     assert.equal(rows[1].cuisine_tags, 'Restaurant');
   });
@@ -542,5 +554,66 @@ describe('real restaurant imports (OpenStreetMap)', () => {
 
     await pool.query('DELETE FROM restaurants WHERE city = ?', [gatedCity]);
     await pool.query('DELETE FROM restaurant_import_log WHERE city = ?', [gatedCity]);
+  });
+});
+
+// Also no live network here -- fetchImage is stubbed with an in-memory image
+// on every call, never a real Openverse/OpenStreetMap request.
+describe('restaurant photo enhancement', () => {
+  const testCuisine = `Test Cuisine ${RUN_TAG}`;
+  const IMAGES_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'assets', 'images', 'restaurants');
+
+  after(async () => {
+    await pool.query('DELETE FROM cuisine_stock_photos WHERE cuisine = ?', [testCuisine]);
+    await rm(path.join(IMAGES_DIR, 'osm-node-12345.jpg'), { force: true });
+    const leftoverCuisineFiles = (await readdir(IMAGES_DIR)).filter((f) => f.startsWith('cuisine-test-cuisine-'));
+    await Promise.all(leftoverCuisineFiles.map((f) => rm(path.join(IMAGES_DIR, f), { force: true })));
+  });
+
+  async function tinySourceImageBuffer() {
+    const image = new Jimp({ width: 40, height: 20, color: 0x3366ccff });
+    return image.getBuffer('image/png');
+  }
+
+  test('enhancePhoto crops to a consistent 800x600 landscape ratio', async () => {
+    const enhanced = await enhancePhoto(await tinySourceImageBuffer());
+    const image = await Jimp.fromBuffer(enhanced);
+    assert.equal(image.bitmap.width, 800);
+    assert.equal(image.bitmap.height, 600);
+  });
+
+  test('getRealPlacePhoto returns null when the fetch turns up nothing, without throwing', async () => {
+    const photo = await getRealPlacePhoto(
+      { type: 'node', id: 999 },
+      { name: 'No Photo Place' },
+      { fetchImage: async () => null },
+    );
+    assert.equal(photo, null);
+  });
+
+  test('getRealPlacePhoto stores and returns an enhanced, attributed photo when one is found', async () => {
+    const photo = await getRealPlacePhoto(
+      { type: 'node', id: 12345 },
+      { name: 'Real Photo Place', image: 'https://example.com/photo.jpg' },
+      { fetchImage: async () => ({ buffer: await tinySourceImageBuffer(), attribution: 'Photo via OpenStreetMap contributors' }) },
+    );
+    assert.match(photo.url, /\/images\/restaurants\/osm-node-12345\.jpg$/);
+    assert.equal(photo.attribution, 'Photo via OpenStreetMap contributors');
+  });
+
+  test('getOrCreateCuisinePhoto fetches once per cuisine, then serves from cache', async () => {
+    let fetchCalls = 0;
+    const fetchImage = async () => {
+      fetchCalls++;
+      return { buffer: await tinySourceImageBuffer(), attribution: 'Photo by Someone, CC BY 4.0' };
+    };
+
+    const first = await getOrCreateCuisinePhoto(db, testCuisine, { fetchImage });
+    const second = await getOrCreateCuisinePhoto(db, testCuisine, { fetchImage });
+
+    assert.equal(fetchCalls, 1);
+    assert.deepEqual(first, second);
+    assert.match(first.url, /\/images\/restaurants\/cuisine-.*\.jpg$/);
+    assert.equal(first.attribution, 'Photo by Someone, CC BY 4.0');
   });
 });

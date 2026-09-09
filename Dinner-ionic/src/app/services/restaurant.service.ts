@@ -32,6 +32,11 @@ export interface Restaurant {
   description: string | null;
   address: string | null;
   photoUrl: string | null;
+  /** Credit line for photoUrl when it's Creative Commons-licensed (from
+   * Openverse -- see Backend/src/lib/restaurantPhotos.js); most CC licenses
+   * require this be shown alongside the photo. Null for the app's own
+   * curated seed photos, which don't need it. */
+  photoAttribution: string | null;
   /** Null for a restaurant that hasn't been geocoded -- see
    * Backend/scripts/geocode-restaurants.mjs. */
   latitude: number | null;

@@ -83,16 +83,29 @@ export class RestaurantsMapPage extends BasePage implements AfterViewInit, OnDes
     this.map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
   }
 
+  /** Restaurant names/cuisines can now come from OpenStreetMap (public,
+   * crowd-sourced data) rather than only this app's own seed data, so they
+   * get escaped before landing in Leaflet's innerHTML-based popup. */
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   private popupHtml(restaurant: Restaurant): string {
     const ratingText =
       restaurant.rating !== null
         ? `★ ${restaurant.rating} (${restaurant.reviewCount} reviews)`
         : 'Not yet rated';
+    const attributionHtml = restaurant.photoAttribution
+      ? `<p style="font-size:10px;color:#999;margin-top:4px">${this.escapeHtml(restaurant.photoAttribution)}</p>`
+      : '';
     return `
       <div style="min-width:180px">
-        <p style="font-weight:600;margin-bottom:2px">${restaurant.name}</p>
-        <p style="font-size:12px;color:#6b6b6b;margin-bottom:6px">${restaurant.cuisineTags.split(',').join(' · ')} • ${ratingText}</p>
+        <p style="font-weight:600;margin-bottom:2px">${this.escapeHtml(restaurant.name)}</p>
+        <p style="font-size:12px;color:#6b6b6b;margin-bottom:6px">${this.escapeHtml(restaurant.cuisineTags.split(',').join(' · '))} • ${ratingText}</p>
         <button type="button" data-restaurant-id="${restaurant.id}" class="map-popup-view-link" style="color:#8c4e32;font-weight:600;font-size:13px;border:none;background:none;padding:0;cursor:pointer">View Restaurant</button>
+        ${attributionHtml}
       </div>
     `;
   }

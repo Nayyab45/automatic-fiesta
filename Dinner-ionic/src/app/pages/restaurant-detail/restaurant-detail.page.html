@@ -16,7 +16,11 @@
 <main class="w-full max-w-md mx-auto pb-32" *ngIf="!loading() && restaurant() as r">
 
 <section class="relative w-full h-[397px] bg-surface-variant">
-<div class="bg-cover bg-center w-full h-full" [style.background-image]="'url(' + r.photoUrl + ')'"></div>
+<div *ngIf="r.photoUrl" class="bg-cover bg-center w-full h-full" [style.background-image]="'url(' + r.photoUrl + ')'"></div>
+<div *ngIf="!r.photoUrl" class="w-full h-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[64px]">restaurant</span>
+</div>
+<p *ngIf="r.photoUrl && r.photoAttribution" class="absolute top-2 right-2 z-10 font-label-sm text-label-sm text-white/80 bg-black/40 px-2 py-0.5 rounded max-w-[90%] truncate">{{ r.photoAttribution }}</p>
 
 <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
 
@@ -31,9 +35,12 @@
 </div>
 <div class="flex flex-col items-end">
 <div class="bg-primary-container text-on-primary font-label-lg text-label-lg px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<ng-container *ngIf="r.rating !== null; else notRatedDetail">
 <span class="material-symbols-outlined fill text-[14px]">star</span>
                             {{ r.rating }}
-                        </div>
+                        </ng-container>
+<ng-template #notRatedDetail>Not yet rated</ng-template>
+</div>
 </div>
 </div>
 

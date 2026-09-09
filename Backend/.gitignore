@@ -3,3 +3,11 @@ node_modules/
 data/
 backend.log
 backend_live.log
+
+# Auto-generated photo cache for real (OpenStreetMap-imported) restaurants --
+# see src/lib/restaurantPhotos.js. Regenerated on demand from OpenStreetMap
+# tags / Openverse in any environment, keyed by cuisine_stock_photos /
+# restaurants.external_id in the database, so committing them would just be
+# a snapshot of whichever cuisines this dev machine happened to look up.
+src/assets/images/restaurants/cuisine-*.jpg
+src/assets/images/restaurants/osm-*.jpg

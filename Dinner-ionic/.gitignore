@@ -44,3 +44,8 @@ testem.log
 Thumbs.db
 lint.json
 __pycache__/
+
+# JVM class-data-sharing replay dumps -- not from this project's own
+# tooling (Node/Angular), just something a JVM-based tool running nearby
+# (e.g. Android Studio) occasionally drops into whatever the cwd was.
+replay_pid*.log
