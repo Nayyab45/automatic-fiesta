@@ -85,5 +85,9 @@
 <span class="">Request a Seat</span>
 <span class="material-symbols-outlined text-[20px]">chair_alt</span>
 </button>
+<button *ngIf="t.isHost" (click)="go('/manage-seat-requests/' + t.id)" class="w-full h-14 bg-primary-container text-on-primary font-title-lg text-title-lg rounded-xl flex items-center justify-center space-x-2 shadow-sm transition-all active:scale-[0.98] active:bg-primary">
+<span class="">Manage Requests</span>
+<span class="material-symbols-outlined text-[20px]">how_to_reg</span>
+</button>
 </div>
 </ng-container>

@@ -46,6 +46,17 @@ export class NotificationsPage extends BasePage {
   }
 
   open(n: AppNotification): void {
+    // A seat-request notification names the table it's about -- route the
+    // host to the request they need to act on, or the guest to their
+    // request's live status, rather than just their counterpart's profile.
+    if (n.type === 'seat_request_received' && n.tableId) {
+      this.go(`/manage-seat-requests/${n.tableId}`);
+      return;
+    }
+    if ((n.type === 'seat_request_confirmed' || n.type === 'seat_request_declined') && n.tableId) {
+      this.go(`/request-status/${n.tableId}`);
+      return;
+    }
     if (n.actorUserId) this.go(`/profile/${n.actorUserId}`);
   }
 
