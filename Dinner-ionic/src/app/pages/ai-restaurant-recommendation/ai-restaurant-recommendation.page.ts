@@ -27,9 +27,9 @@ export class AiRestaurantRecommendationPage extends BasePage {
     const restaurant = this.recommendation();
     if (!restaurant) return [];
     const reasons: string[] = [];
-    if (restaurant.rating >= 4.7) reasons.push(`Top rated in ${restaurant.city}`);
+    if (restaurant.rating !== null && restaurant.rating >= 4.7) reasons.push(`Top rated in ${restaurant.city}`);
     reasons.push(`Known for ${restaurant.cuisineTags.split(',')[0]}`);
-    reasons.push(restaurant.priceTier >= 3 ? 'Great for a special occasion' : 'Easy on the budget');
+    reasons.push((restaurant.priceTier ?? 0) >= 3 ? 'Great for a special occasion' : 'Easy on the budget');
     return reasons;
   });
 

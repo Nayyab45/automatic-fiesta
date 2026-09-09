@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { PAKISTAN_CITIES } from '../data/pakistan-cities';
 
 export interface City {
   name: string;
@@ -7,20 +8,9 @@ export interface City {
 
 const STORAGE_KEY = 'selectedCity';
 
-const CITIES: City[] = [
-  { name: 'Karachi', region: 'Sindh' },
-  { name: 'Lahore', region: 'Punjab' },
-  { name: 'Islamabad', region: 'Federal Capital' },
-  { name: 'Rawalpindi', region: 'Punjab' },
-  { name: 'Faisalabad', region: 'Punjab' },
-  { name: 'Peshawar', region: 'Khyber Pakhtunkhwa' },
-  { name: 'Multan', region: 'Punjab' },
-  { name: 'Quetta', region: 'Balochistan' },
-];
-
 @Injectable({ providedIn: 'root' })
 export class LocationService {
-  readonly cities = CITIES;
+  readonly cities = PAKISTAN_CITIES;
 
   private readonly currentCity = signal<string>(this.loadInitial());
   readonly current = this.currentCity.asReadonly();

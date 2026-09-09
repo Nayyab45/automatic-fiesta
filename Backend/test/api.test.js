@@ -21,7 +21,8 @@ import { generate as generateTotp } from 'otplib';
 process.env.JWT_SECRET = 'test-secret';
 
 const { app } = await import('../src/server.js');
-const { initSchema, pool } = await import('../src/db.js');
+const { initSchema, pool, db } = await import('../src/db.js');
+const { importCityRestaurants } = await import('../src/lib/osmPlaces.js');
 
 let server;
 let baseUrl;
@@ -462,5 +463,84 @@ describe('two-factor auth', () => {
     const plainLogin = await api('POST', '/api/auth/login', { body: { email, password } });
     assert.ok(plainLogin.body.accessToken);
     assert.equal(plainLogin.body.twoFactorRequired, undefined);
+  });
+});
+
+// No live network in this suite -- fetchBoundingBox/fetchPlaces are stubbed
+// throughout, consistent with this project's existing avoidance of hitting
+// real third-party services (payment gateways, Resend) from automated tests.
+describe('real restaurant imports (OpenStreetMap)', () => {
+  const testCity = `Test City ${RUN_TAG}`;
+
+  after(async () => {
+    await pool.query('DELETE FROM restaurants WHERE city = ?', [testCity]);
+    await pool.query('DELETE FROM restaurant_import_log WHERE city = ?', [testCity]);
+  });
+
+  test('imports OSM results with a queryable external_id, tagged as real', async () => {
+    const bbox = { south: 30, north: 31, west: 70, east: 71, region: 'Test Region' };
+    const places = [
+      {
+        type: 'node',
+        id: 111,
+        lat: 30.5,
+        lon: 70.5,
+        tags: { name: 'Real Place One', cuisine: 'pakistani;bbq' },
+      },
+      {
+        type: 'node',
+        id: 222,
+        lat: 30.6,
+        lon: 70.6,
+        tags: { name: 'Real Place Two' },
+      },
+    ];
+
+    const result = await importCityRestaurants(db, testCity, {
+      fetchBoundingBox: async () => bbox,
+      fetchPlaces: async () => places,
+    });
+    assert.equal(result.imported, 2);
+
+    const [rows] = await pool.query('SELECT * FROM restaurants WHERE city = ? ORDER BY name', [testCity]);
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0].source, 'osm');
+    assert.equal(rows[0].external_id, 'osm:node/111');
+    assert.equal(rows[0].cuisine_tags, 'Pakistani,Bbq');
+    assert.equal(rows[0].rating, null);
+    // Untagged cuisine still gets an honest, non-blank label instead of ''.
+    assert.equal(rows[1].cuisine_tags, 'Restaurant');
+  });
+
+  test('a second import for the same city is a no-op', async () => {
+    let boundingBoxCalls = 0;
+    const result = await importCityRestaurants(db, testCity, {
+      fetchBoundingBox: async () => {
+        boundingBoxCalls++;
+        return { south: 0, north: 0, west: 0, east: 0, region: 'x' };
+      },
+      fetchPlaces: async () => [],
+    });
+    assert.equal(result.skipped, true);
+    assert.equal(boundingBoxCalls, 0);
+  });
+
+  test('GET /restaurants?city=X respects the import gate and returns that city\'s rows', async () => {
+    const gatedCity = `Gated City ${RUN_TAG}`;
+    await pool.query(
+      `INSERT INTO restaurants (name, city, region, cuisine_tags, source, external_id)
+       VALUES ('Pre-seeded Real Place', ?, 'Test Region', 'Restaurant', 'osm', ?)`,
+      [gatedCity, `osm:node/${RUN_TAG}`],
+    );
+    // Marks the city as already imported so the route's internal
+    // importCityRestaurants call is a fast no-op, not a live network call.
+    await pool.query('INSERT INTO restaurant_import_log (city, place_count) VALUES (?, 1)', [gatedCity]);
+
+    const { status, body } = await api('GET', `/api/restaurants?city=${encodeURIComponent(gatedCity)}`);
+    assert.equal(status, 200);
+    assert.ok(body.restaurants.some((r) => r.name === 'Pre-seeded Real Place'));
+
+    await pool.query('DELETE FROM restaurants WHERE city = ?', [gatedCity]);
+    await pool.query('DELETE FROM restaurant_import_log WHERE city = ?', [gatedCity]);
   });
 });

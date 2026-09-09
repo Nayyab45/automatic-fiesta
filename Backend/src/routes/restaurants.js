@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
+import { importCityRestaurants } from '../lib/osmPlaces.js';
 
 export const restaurantsRouter = Router();
 
@@ -55,6 +56,13 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
 
 restaurantsRouter.get('/', asyncHandler(async (req, res) => {
   const { city, region, cuisine, priceTier, minRating, query } = req.query;
+
+  // First time this city is asked for, pull its real restaurants from
+  // OpenStreetMap and cache them -- see importCityRestaurants for why this
+  // only ever happens once per city.
+  if (city) {
+    await importCityRestaurants(db, city);
+  }
 
   const clauses = [];
   const params = [];

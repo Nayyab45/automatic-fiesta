@@ -10,20 +10,33 @@
     Choose your city to see restaurants, tables and people dining near you.
 </p>
 
+<div class="relative mb-stack-lg">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input
+  type="text"
+  placeholder="Search cities…"
+  [value]="filterText()"
+  (input)="onFilterInput($any($event.target).value)"
+  class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"
+/>
+</div>
+
+<p *ngIf="groups().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No cities match "{{ filterText() }}".</p>
+
+<div *ngFor="let group of groups()" class="mb-stack-lg">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-stack-sm px-1">{{ group.region }}</h2>
 <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
 <ul class="divide-y divide-secondary-container/50">
-<li *ngFor="let city of cityService.cities">
+<li *ngFor="let city of group.cities">
 <button (click)="selectCity(city.name)" class="w-full flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors text-left group">
 <div class="flex items-center gap-gutter">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">place</span>
-<div>
 <p class="font-body-lg text-body-lg text-on-surface">{{ city.name }}</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">{{ city.region }}</p>
-</div>
 </div>
 <span *ngIf="cityService.current() === city.name" class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
 </button>
 </li>
 </ul>
+</div>
 </div>
 </main>

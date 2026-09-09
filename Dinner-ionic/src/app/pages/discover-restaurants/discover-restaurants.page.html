@@ -4,7 +4,7 @@
 <span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>place</span>
 <h1 class="font-headline-md text-headline-md font-bold">{{ cityService.label() }}</h1>
 </div>
-<button (click)="go('/restaurant-direction')" class="ml-2 bg-primary-container text-on-primary px-3 py-1.5 rounded-full hover:opacity-90 transition-all flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[18px]">map</span><span class="font-label-lg text-label-lg">Map View</span></button>
+<button (click)="go('/restaurants-map')" class="ml-2 bg-primary-container text-on-primary px-3 py-1.5 rounded-full hover:opacity-90 transition-all flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-[18px]">map</span><span class="font-label-lg text-label-lg">Map View</span></button>
 </div>
 <div class="flex items-center gap-stack-sm">
 <button (click)="go('/search-filter')" aria-label="Search this area" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
@@ -36,17 +36,25 @@
 
 <article *ngFor="let restaurant of restaurants()" class="bg-surface rounded-xl card-shadow border border-outline-variant overflow-hidden flex flex-col active:border-primary active:border transition-all">
 <div class="relative h-64 w-full">
-<img [alt]="restaurant.name + ' photo'" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" [src]="restaurant.photoUrl"/>
+<img *ngIf="restaurant.photoUrl" [alt]="restaurant.name + ' photo'" class="w-full h-full object-cover border-b-[0.5px] border-outline-variant" [src]="restaurant.photoUrl"/>
+<div *ngIf="!restaurant.photoUrl" class="w-full h-full flex items-center justify-center bg-surface-container border-b-[0.5px] border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[40px]">restaurant</span>
+</div>
 <div class="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm px-2 py-1.5 rounded flex items-center gap-1 border border-outline-variant/50">
+<ng-container *ngIf="restaurant.rating !== null; else notRated">
 <span class="material-symbols-outlined text-primary text-[14px]" style='font-variation-settings: "FILL" 1;'>star</span>
 <span class="font-label-lg text-label-lg text-on-surface">{{ restaurant.rating }} <span class="text-on-surface-variant font-normal tracking-normal lowercase">({{ restaurant.reviewCount }} reviews)</span></span>
+</ng-container>
+<ng-template #notRated>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Not yet rated</span>
+</ng-template>
 </div>
 <button (click)="go('/restaurant-direction/' + restaurant.id)" class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-outline-variant/50 hover:border-primary transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-[18px]">place</span><span class="font-label-lg text-label-lg text-on-surface">Show on Map</span></button></div>
 <div class="p-stack-md flex-1 flex flex-col">
 <div class="flex justify-between items-start mb-stack-sm">
 <div>
 <h3 class="font-title-lg text-title-lg text-on-surface mb-unit">{{ restaurant.name }}</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">{{ restaurant.city }} • {{ restaurant.cuisineTags.split(',').join(' ') }} • {{ '$'.repeat(restaurant.priceTier) }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ restaurant.city }} • {{ restaurant.cuisineTags.split(',').join(' ') }} <ng-container *ngIf="restaurant.priceTier"> • {{ '$'.repeat(restaurant.priceTier) }}</ng-container></p>
 </div>
 <div class="flex gap-2">
 <button (click)="go('/restaurant-direction/' + restaurant.id)" aria-label="Get directions" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-1">

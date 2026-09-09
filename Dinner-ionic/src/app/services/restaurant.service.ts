@@ -25,9 +25,10 @@ export interface Restaurant {
   city: string;
   region: string;
   cuisineTags: string;
-  priceTier: number;
-  rating: number;
-  reviewCount: number;
+  /** Null for a real place imported from OpenStreetMap -- no fabricated price/rating. */
+  priceTier: number | null;
+  rating: number | null;
+  reviewCount: number | null;
   description: string | null;
   address: string | null;
   photoUrl: string | null;
