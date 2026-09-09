@@ -443,6 +443,28 @@ describe('friends', () => {
     const res = await api('POST', '/api/friends/requests', { token: ivan.accessToken, body: { recipientId: ivan.user.id } });
     assert.equal(res.status, 400);
   });
+
+  test('two near-simultaneous requests for the same pair both resolve cleanly instead of one 500ing', async () => {
+    const julia = await signup('friend-julia');
+    const kevin = await signup('friend-kevin');
+
+    // Both fire before either's INSERT can commit, racing past the
+    // "no existing row" check the same way -- this is what used to make the
+    // loser hit the table's unique constraint as an unhandled 500.
+    const [first, second] = await Promise.all([
+      api('POST', '/api/friends/requests', { token: julia.accessToken, body: { recipientId: kevin.user.id } }),
+      api('POST', '/api/friends/requests', { token: julia.accessToken, body: { recipientId: kevin.user.id } }),
+    ]);
+
+    for (const res of [first, second]) {
+      assert.ok([200, 201].includes(res.status), `expected 200/201, got ${res.status}: ${JSON.stringify(res.body)}`);
+      assert.equal(res.body.status, 'pending_sent');
+    }
+    assert.equal(first.body.requestId, second.body.requestId);
+
+    const status = await api('GET', `/api/friends/status/${kevin.user.id}`, { token: julia.accessToken });
+    assert.equal(status.body.status, 'pending_sent');
+  });
 });
 
 describe('two-factor auth', () => {

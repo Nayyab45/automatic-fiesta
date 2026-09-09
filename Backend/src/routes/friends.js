@@ -59,6 +59,25 @@ friendsRouter.get('/requests', asyncHandler(async (req, res) => {
   res.json({ requests: toCamelRows(rows) });
 }));
 
+// Shared by the up-front check and the race-recovery path below: given a
+// pair row that already exists for (myId, otherId), respond the same way
+// regardless of which path found it -- a request seen a moment earlier
+// isn't handled any differently than one that showed up because this
+// request lost a race to create it.
+async function respondToExistingPair(res, pair, myId, otherId) {
+  if (pair.status === 'accepted') {
+    return res.json({ status: 'friends', requestId: pair.id });
+  }
+  if (pair.requester_id === otherId) {
+    // They already sent us a request -- accept it instead of creating a
+    // second row (the unique key on the pair wouldn't allow that anyway).
+    await db.prepare("UPDATE friend_requests SET status = 'accepted' WHERE id = ?").run(pair.id);
+    await createNotification(otherId, 'friend_request_accepted', { actorUserId: myId });
+    return res.json({ status: 'friends', requestId: pair.id });
+  }
+  return res.json({ status: 'pending_sent', requestId: pair.id });
+}
+
 friendsRouter.post('/requests', asyncHandler(async (req, res) => {
   const { recipientId } = req.body ?? {};
   const missingFieldsError = requireFields(req.body, ['recipientId']);
@@ -81,23 +100,29 @@ friendsRouter.post('/requests', asyncHandler(async (req, res) => {
   }
 
   const existing = await findPair(req.user.sub, otherId);
-  if (existing?.status === 'accepted') {
-    return res.json({ status: 'friends', requestId: existing.id });
-  }
-  if (existing && existing.requester_id === otherId) {
-    // They already sent us a request -- accept it instead of creating a
-    // second row (the unique key on the pair wouldn't allow that anyway).
-    await db.prepare("UPDATE friend_requests SET status = 'accepted' WHERE id = ?").run(existing.id);
-    await createNotification(otherId, 'friend_request_accepted', { actorUserId: req.user.sub });
-    return res.json({ status: 'friends', requestId: existing.id });
-  }
   if (existing) {
-    return res.json({ status: 'pending_sent', requestId: existing.id });
+    return respondToExistingPair(res, existing, req.user.sub, otherId);
   }
 
-  const result = await db
-    .prepare('INSERT INTO friend_requests (requester_id, recipient_id) VALUES (?, ?)')
-    .run(req.user.sub, otherId);
+  let result;
+  try {
+    result = await db
+      .prepare('INSERT INTO friend_requests (requester_id, recipient_id) VALUES (?, ?)')
+      .run(req.user.sub, otherId);
+  } catch (err) {
+    // Two near-simultaneous requests for the same pair can both pass the
+    // "no existing row" check above before either INSERT commits -- the
+    // loser hits the table's unique pair constraint. That's a lost race,
+    // not a real failure, so resolve it the same way a request that
+    // arrived a moment later than the winner's would have been resolved,
+    // instead of 500ing.
+    if (err.code === 'ER_DUP_ENTRY') {
+      const race = await findPair(req.user.sub, otherId);
+      return respondToExistingPair(res, race, req.user.sub, otherId);
+    }
+    throw err;
+  }
+
   await createNotification(otherId, 'friend_request_received', { actorUserId: req.user.sub });
   res.status(201).json({ status: 'pending_sent', requestId: result.lastInsertRowid });
 }));
