@@ -59,9 +59,17 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
 
   // First time this city is asked for, pull its real restaurants from
   // OpenStreetMap and cache them -- see importCityRestaurants for why this
-  // only ever happens once per city.
+  // only ever happens once per city. OSM's free/keyless services occasionally
+  // rate-limit or error out; when that happens, log it and fall through to
+  // serving whatever's already cached for this city (possibly nothing) rather
+  // than 500ing the whole request -- the import will simply retry on the
+  // city's next request since a transient failure isn't logged as "imported".
   if (city) {
-    await importCityRestaurants(db, city);
+    try {
+      await importCityRestaurants(db, city);
+    } catch (err) {
+      console.error(`[restaurants] OSM import for "${city}" failed, serving cached results instead:`, err.message);
+    }
   }
 
   const clauses = [];
