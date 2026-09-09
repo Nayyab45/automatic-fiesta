@@ -41,6 +41,12 @@ function addressFrom(tags, city) {
 export async function lookupCityBoundingBox(city) {
   const url = `${NOMINATIM_URL}?format=json&limit=1&city=${encodeURIComponent(city)}&country=Pakistan&addressdetails=1`;
   const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+  // Nominatim returns an HTML/plain-text error body (not JSON) on rate-limits
+  // or outages -- parsing that as JSON would throw a confusing SyntaxError,
+  // so surface the real HTTP failure instead.
+  if (!response.ok) {
+    throw new Error(`Nominatim lookup for "${city}" failed: ${response.status} ${response.statusText}`);
+  }
   const results = await response.json();
   if (!results.length) return null;
 
@@ -60,6 +66,11 @@ export async function fetchOverpassRestaurants(bbox) {
     headers: { 'User-Agent': USER_AGENT, 'Content-Type': 'text/plain' },
     body: query,
   });
+  // Overpass returns an XML error document (not JSON) when it's rate-limiting
+  // or rejecting the query -- same reasoning as the Nominatim check above.
+  if (!response.ok) {
+    throw new Error(`Overpass query failed: ${response.status} ${response.statusText}`);
+  }
   const data = await response.json();
   return (data.elements || []).filter((element) => element.tags?.name);
 }
@@ -85,6 +96,12 @@ export async function importCityRestaurants(
     return { imported: 0, skipped: true };
   }
 
+  // Deliberately NOT logged to restaurant_import_log below: that table means
+  // "we asked OSM about this city and it had a real answer" (including zero
+  // results), not "OSM was unreachable/rate-limited just now". Logging a
+  // transient failure the same way would permanently skip the city, so a
+  // caller that catches this should just fall back to whatever's already in
+  // the DB and let the next request for this city try the import again.
   const bbox = await fetchBoundingBox(city);
   if (!bbox) {
     // Records the attempt so an unresolvable city name isn't re-queried on

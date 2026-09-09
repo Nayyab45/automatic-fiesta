@@ -182,6 +182,28 @@ tablesRouter.get('/:id/seat-requests/me', asyncHandler(async (req, res) => {
   res.json({ seatRequest: row ? toCamel(row) : null });
 }));
 
+// Host-only: every request made for this table, not just the caller's own
+// (that's /:id/seat-requests/me above) -- lets the host review and act on
+// the full queue instead of needing each request's id from a notification.
+tablesRouter.get('/:id/seat-requests', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (table.host_user_id !== req.user.sub) {
+    return res.status(403).json({ message: 'Only the host can view seat requests for this table' });
+  }
+
+  const rows = await db
+    .prepare(
+      `SELECT sr.*, u.name as user_name FROM seat_requests sr
+       JOIN users u ON u.id = sr.user_id
+       WHERE sr.table_id = ? ORDER BY sr.created_at DESC`,
+    )
+    .all(table.id);
+  res.json({ seatRequests: toCamelRows(rows) });
+}));
+
 tablesRouter.post('/:id/check-in', asyncHandler(async (req, res) => {
   const table = await db.prepare('SELECT id FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!table) {
@@ -238,6 +260,28 @@ tablesRouter.post('/:id/reviews', asyncHandler(async (req, res) => {
 
   const created = await db.prepare('SELECT * FROM reviews WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json({ review: toCamel(created) });
+}));
+
+// Table members only, mirroring /:id/messages below -- a review's comment
+// is about a specific private dining event, not something to expose to
+// anyone who merely knows the table's numeric id.
+tablesRouter.get('/:id/reviews', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!(await isTableMember(table, req.user.sub))) {
+    return res.status(403).json({ message: 'Not a member of this table' });
+  }
+
+  const rows = await db
+    .prepare(
+      `SELECT r.*, u.name as reviewer_name FROM reviews r
+       JOIN users u ON u.id = r.reviewer_user_id
+       WHERE r.table_id = ? ORDER BY r.created_at DESC`,
+    )
+    .all(table.id);
+  res.json({ reviews: toCamelRows(rows) });
 }));
 
 // Mounted separately at /api/seat-requests since it acts on a seat request
