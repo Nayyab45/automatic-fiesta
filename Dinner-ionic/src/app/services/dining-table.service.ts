@@ -48,6 +48,9 @@ export interface SeatRequest {
   id: number;
   tableId: number;
   userId: number;
+  // Only present on the host-only list endpoint (getSeatRequests), not on
+  // mySeatRequest -- a guest already knows who they are.
+  userName?: string;
   status: 'sent' | 'confirmed' | 'declined';
   message: string | null;
   createdAt: string;
@@ -81,6 +84,14 @@ export interface ReviewPayload {
   overallRating: number;
   dineAgain: string;
   comment: string;
+}
+
+export interface Review extends ReviewPayload {
+  id: number;
+  tableId: number;
+  reviewerUserId: number;
+  reviewerName: string;
+  createdAt: string;
 }
 
 export interface TableMessage {
@@ -127,6 +138,11 @@ export class DiningTableService {
     return this.http.get<{ seatRequest: SeatRequest | null }>(`${this.baseUrl}/${id}/seat-requests/me`);
   }
 
+  /** Host-only: every request made for this table. */
+  seatRequests(id: number | string): Observable<{ seatRequests: SeatRequest[] }> {
+    return this.http.get<{ seatRequests: SeatRequest[] }>(`${this.baseUrl}/${id}/seat-requests`);
+  }
+
   patchSeatRequest(requestId: number | string, status: 'confirmed' | 'declined'): Observable<{ seatRequest: SeatRequest }> {
     return this.http.patch<{ seatRequest: SeatRequest }>(`${environment.apiUrl}/seat-requests/${requestId}`, { status });
   }
@@ -145,6 +161,11 @@ export class DiningTableService {
 
   submitReview(id: number | string, payload: ReviewPayload): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/${id}/reviews`, payload);
+  }
+
+  /** Table members only. */
+  reviews(id: number | string): Observable<{ reviews: Review[] }> {
+    return this.http.get<{ reviews: Review[] }>(`${this.baseUrl}/${id}/reviews`);
   }
 
   messages(id: number | string): Observable<{ messages: TableMessage[] }> {

@@ -227,6 +227,13 @@ describe('seat requests & notifications', () => {
 
     const guestNotifs = await api('GET', '/api/notifications', { token: guest.accessToken });
     assert.ok(guestNotifs.body.notifications.some((n) => n.type === 'seat_request_confirmed'));
+
+    const hostList = await api('GET', `/api/tables/${table.body.table.id}/seat-requests`, { token: host.accessToken });
+    assert.equal(hostList.status, 200);
+    assert.ok(hostList.body.seatRequests.some((r) => r.id === seatReq.body.seatRequest.id && r.userName === 'Test User'));
+
+    const guestList = await api('GET', `/api/tables/${table.body.table.id}/seat-requests`, { token: guest.accessToken });
+    assert.equal(guestList.status, 403);
   });
 
   test('a guest cannot request a seat at their own table', async () => {
@@ -249,6 +256,46 @@ describe('seat requests & notifications', () => {
       body: {},
     });
     assert.equal(res.status, 400);
+  });
+});
+
+describe('reviews', () => {
+  test('a table member can list reviews; a non-member cannot', async () => {
+    const host = await signup('review-host');
+    const guest = await signup('review-guest');
+    const stranger = await signup('review-stranger');
+
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const restaurantId = restaurants.body.restaurants[0].id;
+    const table = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: {
+        restaurantId,
+        gatheringType: 'dinner',
+        dateTime: new Date(Date.now() + 86400000).toISOString(),
+        seatsTotal: 4,
+      },
+    });
+    const tableId = table.body.table.id;
+
+    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
+      token: host.accessToken,
+      body: { status: 'confirmed' },
+    });
+
+    const review = await api('POST', `/api/tables/${tableId}/reviews`, {
+      token: guest.accessToken,
+      body: { foodRating: 5, restaurantRating: 4, conversationRating: 5, overallRating: 5, dineAgain: 'yes', comment: 'Great time!' },
+    });
+    assert.equal(review.status, 201);
+
+    const hostView = await api('GET', `/api/tables/${tableId}/reviews`, { token: host.accessToken });
+    assert.equal(hostView.status, 200);
+    assert.ok(hostView.body.reviews.some((r) => r.comment === 'Great time!' && r.reviewerName === 'Test User'));
+
+    const strangerView = await api('GET', `/api/tables/${tableId}/reviews`, { token: stranger.accessToken });
+    assert.equal(strangerView.status, 403);
   });
 });
 
