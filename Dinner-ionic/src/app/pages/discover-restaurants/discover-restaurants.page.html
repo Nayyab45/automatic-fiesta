@@ -21,7 +21,7 @@
 
 <div class="flex flex-col gap-3 mb-stack-md">
 <div class="flex gap-stack-sm overflow-x-auto pb-1 scrollbar-hide -mx-container-padding px-container-padding">
-<button *ngFor="let region of regionChips" (click)="selectRegion(region)" [class.filter-chip-selected]="selectedRegion === region" class="filter-chip text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full border border-outline-variant whitespace-nowrap flex items-center gap-1 transition-all">
+<button *ngFor="let region of regionChips()" (click)="selectRegion(region)" [class.filter-chip-selected]="selectedRegion === region" class="filter-chip text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full border border-outline-variant whitespace-nowrap flex items-center gap-1 transition-all">
 <span *ngIf="selectedRegion === region" class="material-symbols-outlined text-sm filter-chip-check" style='font-variation-settings: "wght" 600;'>check</span>{{ region }}</button>
 </div>
 <div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding">

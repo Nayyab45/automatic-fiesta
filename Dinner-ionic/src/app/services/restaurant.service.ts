@@ -74,6 +74,12 @@ export class RestaurantService {
     return this.http.get<{ restaurants: Restaurant[] }>(this.baseUrl, { params: httpParams });
   }
 
+  cuisines(city?: string): Observable<{ cuisines: string[] }> {
+    let httpParams = new HttpParams();
+    if (city) httpParams = httpParams.set('city', city);
+    return this.http.get<{ cuisines: string[] }>(`${this.baseUrl}/cuisines`, { params: httpParams });
+  }
+
   get(id: number | string): Observable<{ restaurant: RestaurantDetail }> {
     return this.http.get<{ restaurant: RestaurantDetail }>(`${this.baseUrl}/${id}`);
   }

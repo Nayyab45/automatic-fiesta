@@ -22,77 +22,13 @@
 
 <div class="md:col-span-8 space-y-section-gap">
 
-<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
-<h2 class="font-title-lg text-title-lg text-on-surface">Location &amp; Proximity</h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter">
-<div>
-<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase" for="filter-city">City</label>
-<select id="filter-city" class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container py-2 text-on-surface focus:ring-0 outline-none">
-<option value="karachi">Karachi</option>
-<option value="lahore">Lahore</option>
-<option value="islamabad">Islamabad</option>
-</select>
-</div>
-<div>
-<label class="block font-label-lg text-label-lg text-on-surface-variant mb-stack-sm uppercase flex justify-between" for="filter-distance">
-<span>Distance</span>
-<span class="text-primary-container" id="distance-val">5 km</span>
-</label>
-<div class="pt-2">
-<input aria-describedby="distance-val" class="range-slider" id="filter-distance" max="25" min="1" type="range" value="5"/>
-</div>
-</div>
-</div>
-</section>
-
-<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
+<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg" *ngIf="cuisines().length">
 <h2 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-container">restaurant</span>
                         Regional Cuisine
                     </h2>
 <div class="flex flex-wrap gap-stack-sm">
-<button *ngFor="let cuisine of cuisines" (click)="toggleCuisine(cuisine)" [class.selected]="selectedCuisines.has(cuisine)" class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">{{ cuisine }}</button>
-</div>
-</section>
-
-<section class="space-y-stack-md border-b border-outline-variant pb-stack-lg">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-section-gap">
-<div>
-<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Experience</h2>
-<div class="space-y-stack-sm">
-<label class="flex items-center gap-3 cursor-pointer group">
-<input checked="" class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
-<span class="text-on-surface group-hover:text-primary transition-colors">Fine Dining</span>
-</label>
-<label class="flex items-center gap-3 cursor-pointer group">
-<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
-<span class="text-on-surface group-hover:text-primary transition-colors">Casual Eatery</span>
-</label>
-<label class="flex items-center gap-3 cursor-pointer group">
-<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
-<span class="text-on-surface group-hover:text-primary transition-colors">Dhaba Style</span>
-</label>
-<label class="flex items-center gap-3 cursor-pointer group">
-<input class="w-4 h-4 text-primary-container border-outline-variant rounded focus:ring-primary-container bg-surface" type="checkbox"/>
-<span class="text-on-surface group-hover:text-primary transition-colors">Rooftop / Outdoor</span>
-</label>
-</div>
-</div>
-<div>
-<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md">Dining Time</h2>
-<div class="space-y-stack-sm">
-<button (click)="openPicker(dateInput)" class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
-<span>Date</span>
-<span class="text-on-surface-variant font-label-lg">{{ selectedDate }}</span>
-</button>
-<input #dateInput (change)="onDateChange($event)" class="sr-only" type="date"/>
-<button (click)="openPicker(timeInput)" class="w-full text-left py-2 border-b border-outline-variant flex justify-between items-center hover:text-primary transition-colors">
-<span>Time</span>
-<span class="text-on-surface-variant font-label-lg">{{ selectedTime }}</span>
-</button>
-<input #timeInput (change)="onTimeChange($event)" class="sr-only" type="time"/>
-</div>
-</div>
+<button *ngFor="let cuisine of cuisines()" (click)="toggleCuisine(cuisine)" [class.selected]="selectedCuisines.has(cuisine)" class="filter-chip px-4 py-2 rounded-full border border-outline-variant text-on-surface bg-surface hover:border-primary-container">{{ cuisine }}</button>
 </div>
 </section>
 </div>
@@ -109,8 +45,8 @@
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Minimum Rating</h2>
 <div class="flex items-center gap-2">
-<button *ngFor="let star of stars" (click)="setRating(star)" [class.text-primary-container]="star <= ratingValue" [class.text-outline-variant]="star > ratingValue"><span class="material-symbols-outlined" [style.font-variation-settings]="star <= ratingValue ? '\'FILL\' 1' : '\'FILL\' 0'">star</span></button>
-<span class="ml-2 font-label-lg text-on-surface-variant">{{ ratingValue }}.0+</span>
+<button *ngFor="let star of stars" (click)="setRating(star)" [class.text-primary-container]="ratingValue !== null && star <= ratingValue" [class.text-outline-variant]="ratingValue === null || star > ratingValue"><span class="material-symbols-outlined" [style.font-variation-settings]="ratingValue !== null && star <= ratingValue ? '\'FILL\' 1' : '\'FILL\' 0'">star</span></button>
+<span class="ml-2 font-label-lg text-on-surface-variant">{{ ratingValue !== null ? ratingValue + '.0+' : 'Any' }}</span>
 </div>
 </section>
 

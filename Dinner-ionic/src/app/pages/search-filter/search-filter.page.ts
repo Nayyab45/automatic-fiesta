@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
 import { LocationService } from '../../services/location.service';
+import { RestaurantService } from '../../services/restaurant.service';
 
 @Component({
   selector: 'app-search-filter',
@@ -16,38 +17,30 @@ import { LocationService } from '../../services/location.service';
 export class SearchFilterPage extends BasePage {
   readonly pageTitle = "Search & Filter";
 
-  readonly cuisines = ['Punjabi', 'Sindhi', 'Peshawari', 'Balochi', 'Kashmiri', 'Mughlai', 'Karachi Street'];
   readonly priceTiers = ['Rs', 'Rs Rs', 'Rs Rs Rs', 'Rs Rs Rs Rs'];
   readonly stars = [1, 2, 3, 4, 5];
 
-  selectedCuisines = new Set<string>(['Sindhi']);
-  priceTierIndex = 1;
-  ratingValue = 4;
+  // Cuisine chips are the cuisine_tags that actually occur for this city
+  // (freeform text imported from OpenStreetMap -- see osmPlaces.js), fetched
+  // below rather than hardcoded, since a curated list like "Punjabi"/"Sindhi"
+  // mostly wouldn't match any real restaurant.
+  readonly cuisines = signal<string[]>([]);
+  selectedCuisines = new Set<string>();
+  // null means "no filter chosen" -- these used to default to a specific
+  // tier/rating and get sent regardless of whether the user touched them,
+  // which silently filtered out most results.
+  priceTierIndex: number | null = null;
+  ratingValue: number | null = null;
   guestCount = 2;
-  selectedDate = 'Today, Oct 24';
-  selectedTime = '20:00';
   readonly cityService = inject(LocationService);
+  private readonly restaurantService = inject(RestaurantService);
 
-  /**
-   * Open a native date/time picker.
-   *
-   * `showPicker()` is missing on older Android WebViews and Safari < 16, so it
-   * has to be feature-detected -- but the DOM typings declare it as always
-   * present, which strictTemplates (rightly) flags as a condition that is
-   * always true. Hence the runtime `typeof` check here rather than in the
-   * template. It can also throw if the call is not tied to a user gesture, so
-   * fall back to `click()` either way.
-   */
-  openPicker(input: HTMLInputElement): void {
-    if (typeof input.showPicker === 'function') {
-      try {
-        input.showPicker();
-        return;
-      } catch {
-        /* not allowed in this context -- fall through to the click fallback */
-      }
-    }
-    input.click();
+  constructor() {
+    super();
+    this.restaurantService.cuisines(this.cityService.current()).subscribe({
+      next: ({ cuisines }) => this.cuisines.set(cuisines),
+      error: () => {},
+    });
   }
 
   toggleCuisine(name: string): void {
@@ -59,11 +52,11 @@ export class SearchFilterPage extends BasePage {
   }
 
   selectPriceTier(index: number): void {
-    this.priceTierIndex = index;
+    this.priceTierIndex = this.priceTierIndex === index ? null : index;
   }
 
   setRating(value: number): void {
-    this.ratingValue = value;
+    this.ratingValue = this.ratingValue === value ? null : value;
   }
 
   incrementGuests(): void {
@@ -74,32 +67,18 @@ export class SearchFilterPage extends BasePage {
     this.guestCount = Math.max(this.guestCount - 1, 1);
   }
 
-  onDateChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    if (!value) return;
-    this.selectedDate = new Date(value + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  }
-
-  onTimeChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    if (value) this.selectedTime = value;
-  }
-
   resetFilters(): void {
     this.selectedCuisines = new Set<string>();
-    this.priceTierIndex = 1;
-    this.ratingValue = 4;
+    this.priceTierIndex = null;
+    this.ratingValue = null;
     this.guestCount = 2;
-    this.selectedDate = 'Today, Oct 24';
-    this.selectedTime = '20:00';
   }
 
   showResults(): void {
     const params = new URLSearchParams();
-    const [firstCuisine] = this.selectedCuisines;
-    if (firstCuisine) params.set('cuisine', firstCuisine);
-    params.set('priceTier', String(this.priceTierIndex + 1));
-    params.set('minRating', String(this.ratingValue));
+    if (this.selectedCuisines.size) params.set('cuisine', [...this.selectedCuisines].join(','));
+    if (this.priceTierIndex !== null) params.set('priceTier', String(this.priceTierIndex + 1));
+    if (this.ratingValue !== null) params.set('minRating', String(this.ratingValue));
     this.go(`/discover-restaurants?${params.toString()}`);
   }
 }

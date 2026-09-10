@@ -83,15 +83,23 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
     params.push(region);
   }
   if (cuisine) {
-    clauses.push('cuisine_tags LIKE ?');
-    params.push(`%${cuisine}%`);
+    // The UI lets a user pick more than one cuisine chip; the frontend sends
+    // them comma-joined in one query param rather than repeating ?cuisine=.
+    const cuisineList = String(cuisine).split(',').map((c) => c.trim()).filter(Boolean);
+    if (cuisineList.length) {
+      clauses.push(`(${cuisineList.map(() => 'cuisine_tags LIKE ?').join(' OR ')})`);
+      params.push(...cuisineList.map((c) => `%${c}%`));
+    }
   }
   if (priceTier) {
-    clauses.push('price_tier = ?');
+    // Restaurants imported from OpenStreetMap have no genuine price_tier (see
+    // migration 0004) rather than a fabricated one -- treat "unknown" as "not
+    // ruled out" so this filter doesn't hide almost every real restaurant.
+    clauses.push('(price_tier = ? OR price_tier IS NULL)');
     params.push(Number(priceTier));
   }
   if (minRating) {
-    clauses.push('rating >= ?');
+    clauses.push('(rating >= ? OR rating IS NULL)');
     params.push(Number(minRating));
   }
   if (query) {
@@ -102,6 +110,43 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
   const rows = await db.prepare(`SELECT * FROM restaurants ${where} ORDER BY rating DESC`).all(...params);
   res.json({ restaurants: await Promise.all(toCamelRows(rows).map(attachPopularDishes)) });
+}));
+
+// Real (OSM-imported) cuisine_tags are freeform text from OpenStreetMap, not
+// the curated cuisine names shown as filter chips -- so the frontend asks
+// here for the tags that actually occur, instead of filtering by a hardcoded
+// list that mostly wouldn't match anything.
+restaurantsRouter.get('/cuisines', asyncHandler(async (req, res) => {
+  const { city } = req.query;
+
+  if (city) {
+    try {
+      await importCityRestaurants(db, city);
+    } catch (err) {
+      console.error(`[restaurants] OSM import for "${city}" failed, serving cached results instead:`, err.message);
+    }
+  }
+
+  const where = city ? 'WHERE city = ?' : '';
+  const rows = await db.prepare(`SELECT cuisine_tags FROM restaurants ${where}`).all(...(city ? [city] : []));
+
+  const counts = new Map();
+  for (const row of rows) {
+    for (const tag of row.cuisine_tags.split(',').map((t) => t.trim()).filter(Boolean)) {
+      // "Restaurant" is the fallback label for an untagged place (see
+      // cuisineTagsFrom in osmPlaces.js), not a real cuisine -- not useful as
+      // a filter chip.
+      if (tag === 'Restaurant') continue;
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+
+  const cuisines = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 8)
+    .map(([tag]) => tag);
+
+  res.json({ cuisines });
 }));
 
 restaurantsRouter.get('/:id', asyncHandler(async (req, res) => {

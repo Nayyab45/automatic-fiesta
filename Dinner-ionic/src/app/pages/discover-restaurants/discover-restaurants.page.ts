@@ -7,7 +7,12 @@ import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.co
 import { LocationService } from '../../services/location.service';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
 
-const REGION_CHIPS = ['All', 'Punjab', 'Sindh', 'KPK', 'Continental', 'Desi', 'Street Food'];
+// Province chips are static (they map onto restaurants.region, whose values
+// are fixed). Cuisine chips are NOT static -- restaurants.cuisine_tags is
+// freeform text from OpenStreetMap (see osmPlaces.js), so a hardcoded list
+// like "Continental"/"Desi"/"Street Food" mostly wouldn't match anything.
+// They're fetched per-city from RestaurantService.cuisines() instead.
+const BASE_CHIPS = ['All', 'Punjab', 'Sindh', 'KPK'];
 // The chip row mixes two different data dimensions from the original design:
 // provinces (filter by restaurants.region) and cuisine styles (filter by
 // restaurants.cuisine_tags). This maps each chip to the right one and the
@@ -36,7 +41,7 @@ export class DiscoverRestaurantsPage extends BasePage {
   readonly cityService = inject(LocationService);
   private readonly restaurantService = inject(RestaurantService);
 
-  readonly regionChips = REGION_CHIPS;
+  readonly regionChips = signal<string[]>(BASE_CHIPS);
   readonly priceChips = PRICE_CHIPS;
   readonly restaurants = signal<Restaurant[]>([]);
   readonly loading = signal(true);
@@ -56,6 +61,14 @@ export class DiscoverRestaurantsPage extends BasePage {
     if (priceTier) this.selectedPriceTier = Number(priceTier);
     if (minRating) this.minRating = Number(minRating);
     this.loadRestaurants();
+    this.loadCuisineChips();
+  }
+
+  private loadCuisineChips(): void {
+    this.restaurantService.cuisines(this.cityService.current()).subscribe({
+      next: ({ cuisines }) => this.regionChips.set([...BASE_CHIPS, ...cuisines]),
+      error: () => {},
+    });
   }
 
   private loadRestaurants(): void {

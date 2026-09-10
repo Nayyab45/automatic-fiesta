@@ -19,7 +19,12 @@ const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 const MAX_PLACES_PER_CITY = 80;
 
 function capitalize(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
+  // OSM cuisine values are snake_case (e.g. "coffee_shop") -- render as words.
+  return word
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
 
 function cuisineTagsFrom(tags) {
