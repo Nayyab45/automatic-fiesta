@@ -77,7 +77,12 @@ export class DiscoverRestaurantsPage extends BasePage {
     const cuisine = this.selectedRegion === 'All' || province ? undefined : this.selectedRegion;
     this.restaurantService
       .list({
-        city: this.cityService.current(),
+        // A province chip browses that whole province, not just the
+        // currently selected city -- city and region both narrow by
+        // location and every city implies exactly one region, so sending
+        // both ANDs them together and returns nothing unless the city
+        // happens to already be in that province.
+        city: province ? undefined : this.cityService.current(),
         region: province,
         cuisine,
         priceTier: this.selectedPriceTier ?? undefined,
