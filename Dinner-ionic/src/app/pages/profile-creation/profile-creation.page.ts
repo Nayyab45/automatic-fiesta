@@ -5,6 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
+import { PAKISTAN_CITIES } from '../../data/pakistan-cities';
+
+// Pakistan's 4 official provinces. Islamabad (a federal territory, not a
+// province), Azad Kashmir and Gilgit-Baltistan are deliberately left out of
+// this list -- they're still valid `region` values in PAKISTAN_CITIES (and
+// so still reachable through Select Location's city picker), just not
+// offered as "Province" choices here.
+const OFFICIAL_PROVINCES = ['Punjab', 'Sindh', 'Khyber Pakhtunkhwa', 'Balochistan'];
 
 @Component({
   selector: 'app-profile-creation',
@@ -17,15 +25,14 @@ export class ProfileCreationPage extends BasePage {
   readonly pageTitle = 'Profile Creation';
   private readonly profileService = inject(ProfileService);
 
-  private readonly citiesByProvince: Record<string, string[]> = {
-    punjab: ['Lahore', 'Faisalabad', 'Multan', 'Rawalpindi', 'Gujranwala'],
-    sindh: ['Karachi', 'Hyderabad', 'Sukkur', 'Larkana', 'Mirpur Khas'],
-    kpk: ['Peshawar', 'Mardan', 'Abbottabad', 'Swat'],
-    balochistan: ['Quetta', 'Gwadar', 'Khuzdar'],
-    islamabad: ['Islamabad'],
-    'gilgit-baltistan': ['Gilgit', 'Skardu'],
-    ajk: ['Muzaffarabad', 'Mirpur', 'Rawalakot'],
-  };
+  // /profile-creation also serves as the "Edit Profile" screen for existing
+  // users (see profile.page.html) -- ?mode=edit stops submit() from chaining
+  // into the rest of the new-user onboarding wizard (personal-interests ->
+  // food-preferences -> dietary-preferences), since none of that belongs to
+  // an in-place profile edit.
+  readonly isEditMode = this.route.snapshot.queryParamMap.get('mode') === 'edit';
+
+  readonly provinces = OFFICIAL_PROVINCES;
 
   cities: string[] = [];
   favoriteFoods: string[] = [];
@@ -42,11 +49,17 @@ export class ProfileCreationPage extends BasePage {
     this.profileService.me().subscribe(({ profile }) => {
       this.name = profile.name;
       this.age = profile.age;
+      this.province = profile.province ?? '';
       this.city = profile.city ?? '';
       this.bio = profile.bio ?? '';
       this.favoriteFoods = profile.favoriteFoods;
       this.avatarUrl = profile.photoUrl;
+      this.cities = this.citiesForProvince(this.province);
     });
+  }
+
+  private citiesForProvince(province: string): string[] {
+    return PAKISTAN_CITIES.filter((c) => c.region === province).map((c) => c.name);
   }
 
   onAvatarSelected(event: Event): void {
@@ -76,18 +89,22 @@ export class ProfileCreationPage extends BasePage {
 
   onProvinceChange(event: Event): void {
     const province = (event.target as HTMLSelectElement).value;
-    this.cities = this.citiesByProvince[province] ?? [];
+    this.cities = this.citiesForProvince(province);
+    // The previously picked city almost certainly isn't in the new
+    // province's list -- clear it rather than leave a stale, invalid value.
+    if (!this.cities.includes(this.city)) this.city = '';
   }
 
   submit(): void {
     if (this.submitting()) return;
     this.submitting.set(true);
 
+    const next = this.isEditMode ? '/profile' : '/personal-interests';
     this.profileService.updateMe({ age: this.age ?? undefined, bio: this.bio, city: this.city, province: this.province }).subscribe({
-      next: () => this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go('/personal-interests')),
+      next: () => this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go(next)),
       error: () => {
         this.submitting.set(false);
-        this.go('/personal-interests');
+        this.go(next);
       },
     });
   }
