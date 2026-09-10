@@ -17,6 +17,28 @@ const USER_AGENT = 'WhatShouldWeEat-DevApp/1.0 (contact: nayyabashfaq05@gmail.co
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 const MAX_PLACES_PER_CITY = 80;
+// Plain fetch() has no timeout of its own -- a black-holed connection to
+// either free service (same failure mode already fixed for the MySQL pool,
+// see QUERY_TIMEOUT_MS in db.js) leaves the promise awaiting a response that
+// never arrives, which hangs the whole /restaurants request (and the
+// Discover page's "loading" state) indefinitely instead of falling through
+// to the catch-and-serve-cached-results behavior the route already has.
+const FETCH_TIMEOUT_MS = 15000;
+
+async function fetchWithTimeout(url, options) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Request to ${new URL(url).host} timed out after ${FETCH_TIMEOUT_MS}ms`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function capitalize(word) {
   // OSM cuisine values are snake_case (e.g. "coffee_shop") -- render as words.
@@ -44,8 +66,13 @@ function addressFrom(tags, city) {
 
 /** One Nominatim lookup for a city's bounding box + province ("state"). */
 export async function lookupCityBoundingBox(city) {
-  const url = `${NOMINATIM_URL}?format=json&limit=1&city=${encodeURIComponent(city)}&country=Pakistan&addressdetails=1`;
-  const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+  // accept-language=en pins the province name in `address.state` to English
+  // ("Punjab") -- without it Nominatim has been observed returning the local
+  // script ("پنجاب") for the same province depending on the request, which
+  // silently broke the app's region filter chips for every city imported
+  // while it did.
+  const url = `${NOMINATIM_URL}?format=json&limit=1&city=${encodeURIComponent(city)}&country=Pakistan&addressdetails=1&accept-language=en`;
+  const response = await fetchWithTimeout(url, { headers: { 'User-Agent': USER_AGENT } });
   // Nominatim returns an HTML/plain-text error body (not JSON) on rate-limits
   // or outages -- parsing that as JSON would throw a confusing SyntaxError,
   // so surface the real HTTP failure instead.
@@ -66,7 +93,7 @@ export async function fetchOverpassRestaurants(bbox) {
     node["amenity"~"^(restaurant|fast_food|cafe|food_court)$"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
     out ${MAX_PLACES_PER_CITY};
   `;
-  const response = await fetch(OVERPASS_URL, {
+  const response = await fetchWithTimeout(OVERPASS_URL, {
     method: 'POST',
     headers: { 'User-Agent': USER_AGENT, 'Content-Type': 'text/plain' },
     body: query,

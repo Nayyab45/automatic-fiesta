@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
+
+// A city not yet cached can trigger a live OpenStreetMap import server-side
+// (see Backend/src/lib/osmPlaces.js), which itself now times out -- but this
+// caps it from the client side too, so a slow/unreachable backend can never
+// leave a page's "loading" state spinning forever regardless of the cause.
+const REQUEST_TIMEOUT_MS = 20000;
 
 export interface Dish {
   id: number;
@@ -71,13 +77,15 @@ export class RestaurantService {
         httpParams = httpParams.set(key, value);
       }
     }
-    return this.http.get<{ restaurants: Restaurant[] }>(this.baseUrl, { params: httpParams });
+    return this.http.get<{ restaurants: Restaurant[] }>(this.baseUrl, { params: httpParams }).pipe(timeout(REQUEST_TIMEOUT_MS));
   }
 
   cuisines(city?: string): Observable<{ cuisines: string[] }> {
     let httpParams = new HttpParams();
     if (city) httpParams = httpParams.set('city', city);
-    return this.http.get<{ cuisines: string[] }>(`${this.baseUrl}/cuisines`, { params: httpParams });
+    return this.http
+      .get<{ cuisines: string[] }>(`${this.baseUrl}/cuisines`, { params: httpParams })
+      .pipe(timeout(REQUEST_TIMEOUT_MS));
   }
 
   get(id: number | string): Observable<{ restaurant: RestaurantDetail }> {
