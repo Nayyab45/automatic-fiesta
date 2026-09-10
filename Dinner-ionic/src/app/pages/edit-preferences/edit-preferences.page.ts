@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
 
@@ -27,6 +27,9 @@ export class EditPreferencesPage extends BasePage {
   spice = 'Medium';
   maxDistanceKm = 15;
   readonly submitting = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly changesRemaining = signal<number | null>(null);
+  readonly nextResetAt = signal<string | null>(null);
   /** Dish-level favorites from the food-preferences step, preserved on save
    *  since this page's cuisine chips share the same favoriteFoods field. */
   private nonCuisineFoods: string[] = [];
@@ -36,7 +39,7 @@ export class EditPreferencesPage extends BasePage {
 
   constructor() {
     super();
-    this.profileService.me().subscribe(({ profile }) => {
+    this.profileService.me().subscribe(({ profile, preferenceChanges }) => {
       this.nonCuisineFoods = profile.favoriteFoods.filter((f) => !this.cuisines.includes(f));
       this.selectedCuisines.set(new Set(profile.favoriteFoods.filter((f) => this.cuisines.includes(f))));
       this.otherDietaryNeeds = profile.dietaryNeeds.filter((n) => !this.dietaryOptions.includes(n));
@@ -46,6 +49,8 @@ export class EditPreferencesPage extends BasePage {
       }
       this.maxDistanceKm = profile.maxDistanceKm ?? 15;
       this.selectedDiningTimes.set(new Set(profile.diningTimes.filter((t) => this.diningTimeOptions.includes(t))));
+      this.changesRemaining.set(preferenceChanges.remaining);
+      this.nextResetAt.set(preferenceChanges.nextResetAt);
     });
   }
 
@@ -102,16 +107,26 @@ export class EditPreferencesPage extends BasePage {
   save(): void {
     if (this.submitting()) return;
     this.submitting.set(true);
+    this.errorMessage.set(null);
 
-    forkJoin([
-      this.profileService.setFoodPreferences([...this.nonCuisineFoods, ...this.selectedCuisines()]),
-      this.profileService.setDietaryPreferences([...this.otherDietaryNeeds, ...this.selectedDietary()], this.spice),
-      this.profileService.setMatchPreferences(this.maxDistanceKm, Array.from(this.selectedDiningTimes())),
-    ]).subscribe({
-      next: () => this.go('/profile'),
-      error: () => {
-        this.submitting.set(false);
-      },
-    });
+    this.profileService
+      .updatePreferences({
+        favoriteFoods: [...this.nonCuisineFoods, ...this.selectedCuisines()],
+        needs: [...this.otherDietaryNeeds, ...this.selectedDietary()],
+        spiceTolerance: this.spice,
+        maxDistanceKm: this.maxDistanceKm,
+        diningTimes: Array.from(this.selectedDiningTimes()),
+      })
+      .subscribe({
+        next: () => this.go('/profile'),
+        error: (err: HttpErrorResponse) => {
+          this.submitting.set(false);
+          if (err.status === 429) {
+            this.changesRemaining.set(err.error?.preferenceChanges?.remaining ?? 0);
+            this.nextResetAt.set(err.error?.preferenceChanges?.nextResetAt ?? null);
+          }
+          this.errorMessage.set(err.error?.message ?? 'Something went wrong. Please try again.');
+        },
+      });
   }
 }

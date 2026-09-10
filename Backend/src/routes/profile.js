@@ -102,8 +102,29 @@ interestsRouter.get('/', requireAuth, asyncHandler(async (_req, res) => {
   res.json({ interests: toCamelRows(await db.prepare('SELECT * FROM interests ORDER BY category, name').all()) });
 }));
 
+// Preferences are meant to be fairly stable (they feed the matching
+// algorithm -- see matches.js/matchesRouter below), so changing them is
+// capped at MONTHLY_PREFERENCE_CHANGE_LIMIT per calendar month instead of
+// being unlimited. Calendar month (not a rolling 30 days) so "resets on the
+// 1st" is a simple, predictable date to show the user, not something that
+// depends on exactly when their prior changes happened to land.
+const MONTHLY_PREFERENCE_CHANGE_LIMIT = 2;
+
+async function preferenceChangeStatus(userId) {
+  const { usedCount } = await db
+    .prepare(
+      `SELECT COUNT(*) as usedCount FROM preference_updates
+       WHERE user_id = ? AND updated_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')`,
+    )
+    .get(userId);
+  const { nextResetAt } = await db
+    .prepare("SELECT DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y-%m-01') as nextResetAt")
+    .get();
+  return { remaining: Math.max(0, MONTHLY_PREFERENCE_CHANGE_LIMIT - usedCount), nextResetAt };
+}
+
 profileRouter.get('/me', asyncHandler(async (req, res) => {
-  res.json({ profile: await fullProfile(req.user.sub) });
+  res.json({ profile: await fullProfile(req.user.sub), preferenceChanges: await preferenceChangeStatus(req.user.sub) });
 }));
 
 profileRouter.get('/:id', asyncHandler(async (req, res) => {
@@ -175,6 +196,40 @@ profileRouter.put('/me/match-preferences', asyncHandler(async (req, res) => {
      ON DUPLICATE KEY UPDATE max_distance_km = VALUES(max_distance_km), dining_times = VALUES(dining_times)`,
   ).run(req.user.sub, maxDistanceKm ?? null, (diningTimes ?? []).join(','));
   res.json({ maxDistanceKm: maxDistanceKm ?? null, diningTimes: diningTimes ?? [] });
+}));
+
+// Consolidated save used by the Edit Preferences page (as opposed to the
+// three endpoints above, which are the one-time onboarding steps for each
+// preference type and are NOT rate-limited -- setting your preferences for
+// the first time isn't a "change"). One save here uses up one of this
+// user's MONTHLY_PREFERENCE_CHANGE_LIMIT changes, covering food + dietary +
+// match together, since the page's own "Save Preferences" button already
+// saves all three as a single user action.
+profileRouter.put('/me/preferences', asyncHandler(async (req, res) => {
+  const status = await preferenceChangeStatus(req.user.sub);
+  if (status.remaining <= 0) {
+    return res.status(429).json({
+      message: `You've used your ${MONTHLY_PREFERENCE_CHANGE_LIMIT} preference changes for this month. Next change available ${status.nextResetAt}.`,
+      preferenceChanges: status,
+    });
+  }
+
+  const { favoriteFoods, needs, spiceTolerance, maxDistanceKm, diningTimes } = req.body ?? {};
+  await db.prepare(
+    `INSERT INTO food_preferences (user_id, favorite_foods) VALUES (?, ?)
+     ON DUPLICATE KEY UPDATE favorite_foods = VALUES(favorite_foods)`,
+  ).run(req.user.sub, (favoriteFoods ?? []).join(','));
+  await db.prepare(
+    `INSERT INTO dietary_preferences (user_id, needs, spice_tolerance) VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE needs = VALUES(needs), spice_tolerance = VALUES(spice_tolerance)`,
+  ).run(req.user.sub, (needs ?? []).join(','), spiceTolerance ?? null);
+  await db.prepare(
+    `INSERT INTO match_preferences (user_id, max_distance_km, dining_times) VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE max_distance_km = VALUES(max_distance_km), dining_times = VALUES(dining_times)`,
+  ).run(req.user.sub, maxDistanceKm ?? null, (diningTimes ?? []).join(','));
+  await db.prepare('INSERT INTO preference_updates (user_id) VALUES (?)').run(req.user.sub);
+
+  res.json({ profile: await fullProfile(req.user.sub), preferenceChanges: await preferenceChangeStatus(req.user.sub) });
 }));
 
 // Excluded from both `people` and `matches`: anyone in either direction of a

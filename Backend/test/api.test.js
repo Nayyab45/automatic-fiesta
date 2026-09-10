@@ -56,6 +56,7 @@ const USER_ID_TABLES = [
   ['table_guests', 'user_id'],
   ['reviews', 'reviewer_user_id'],
   ['restaurant_reviews', 'reviewer_user_id'],
+  ['preference_updates', 'user_id'],
   ['table_messages', 'sender_id'],
   ['direct_messages', 'sender_id'],
   ['conversation_participants', 'user_id'],
@@ -376,6 +377,48 @@ describe('restaurant reviews', () => {
     assert.equal(after.body.restaurant.reviewCount, null);
 
     await pool.query('DELETE FROM restaurants WHERE id = ?', [restaurantId]);
+  });
+});
+
+describe('preference change limit', () => {
+  const preferencesPayload = (n) => ({
+    favoriteFoods: [`Food ${n}`],
+    needs: [],
+    spiceTolerance: 'Medium',
+    maxDistanceKm: 10,
+    diningTimes: ['Dinner'],
+  });
+
+  test('caps Edit Preferences saves at 2/month, 3rd is blocked with a clear message, onboarding endpoints stay unaffected', async () => {
+    const user = await signup('preference-limits');
+
+    const initial = await api('GET', '/api/profile/me', { token: user.accessToken });
+    assert.equal(initial.body.preferenceChanges.remaining, 2);
+
+    const first = await api('PUT', '/api/profile/me/preferences', { token: user.accessToken, body: preferencesPayload(1) });
+    assert.equal(first.status, 200);
+    assert.equal(first.body.preferenceChanges.remaining, 1);
+
+    const second = await api('PUT', '/api/profile/me/preferences', { token: user.accessToken, body: preferencesPayload(2) });
+    assert.equal(second.status, 200);
+    assert.equal(second.body.preferenceChanges.remaining, 0);
+
+    const third = await api('PUT', '/api/profile/me/preferences', { token: user.accessToken, body: preferencesPayload(3) });
+    assert.equal(third.status, 429);
+    assert.match(third.body.message, /2 preference changes/);
+    assert.equal(third.body.preferenceChanges.remaining, 0);
+
+    // The third attempt's payload must not have been applied.
+    const afterBlocked = await api('GET', '/api/profile/me', { token: user.accessToken });
+    assert.deepEqual(afterBlocked.body.profile.favoriteFoods, ['Food 2']);
+
+    // Onboarding steps (first-time setup, not a "change") are a different
+    // endpoint entirely and stay unaffected once the monthly limit is hit.
+    const onboarding = await api('PUT', '/api/profile/me/food-preferences', {
+      token: user.accessToken,
+      body: { favoriteFoods: ['Onboarding Food'] },
+    });
+    assert.equal(onboarding.status, 200);
   });
 });
 

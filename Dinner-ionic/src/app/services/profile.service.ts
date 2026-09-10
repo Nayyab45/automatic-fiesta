@@ -41,6 +41,13 @@ export interface Person {
   interests: Interest[];
 }
 
+export interface PreferenceChangeStatus {
+  /** How many of the 2 monthly Edit Preferences saves are still available. */
+  remaining: number;
+  /** Date (YYYY-MM-DD) the monthly allowance resets -- always the 1st of next month. */
+  nextResetAt: string;
+}
+
 export interface PrivacySettings {
   profileVisible: boolean;
   showMutualInterests: boolean;
@@ -62,8 +69,8 @@ export class ProfileService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/profile`;
 
-  me(): Observable<{ profile: Profile }> {
-    return this.http.get<{ profile: Profile }>(`${this.baseUrl}/me`);
+  me(): Observable<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }> {
+    return this.http.get<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }>(`${this.baseUrl}/me`);
   }
 
   get(id: number | string): Observable<{ profile: Profile }> {
@@ -88,6 +95,17 @@ export class ProfileService {
 
   setMatchPreferences(maxDistanceKm: number, diningTimes: string[]): Observable<unknown> {
     return this.http.put(`${this.baseUrl}/me/match-preferences`, { maxDistanceKm, diningTimes });
+  }
+
+  /** Used only by the Edit Preferences page -- capped at 2 calls/month server-side (429 once used up). */
+  updatePreferences(payload: {
+    favoriteFoods: string[];
+    needs: string[];
+    spiceTolerance: string;
+    maxDistanceKm: number;
+    diningTimes: string[];
+  }): Observable<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }> {
+    return this.http.put<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }>(`${this.baseUrl}/me/preferences`, payload);
   }
 
   interests(): Observable<{ interests: Interest[] }> {
