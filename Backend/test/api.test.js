@@ -55,6 +55,7 @@ const USER_ID_TABLES = [
   ['seat_requests', 'user_id'],
   ['table_guests', 'user_id'],
   ['reviews', 'reviewer_user_id'],
+  ['restaurant_reviews', 'reviewer_user_id'],
   ['table_messages', 'sender_id'],
   ['direct_messages', 'sender_id'],
   ['conversation_participants', 'user_id'],
@@ -296,6 +297,85 @@ describe('reviews', () => {
 
     const strangerView = await api('GET', `/api/tables/${tableId}/reviews`, { token: stranger.accessToken });
     assert.equal(strangerView.status, 403);
+  });
+});
+
+describe('restaurant reviews', () => {
+  // A dedicated throwaway restaurant per test (rather than reusing a real
+  // seeded/imported one) so mutating its rating/review_count here can never
+  // leak into shared data another test or a real request depends on.
+  async function createTestRestaurant() {
+    const [result] = await pool.query(
+      `INSERT INTO restaurants (name, city, region, cuisine_tags, source, external_id)
+       VALUES (?, 'Test City', 'Test Region', 'Restaurant', 'osm', ?)`,
+      [`Review Test Place ${RUN_TAG}`, `osm:node/${randomUUID()}`],
+    );
+    return result.insertId;
+  }
+
+  test('posting a review is public to read, sets the restaurant\'s real rating, and editing replaces rather than duplicates', async () => {
+    const restaurantId = await createTestRestaurant();
+    const reviewer = await signup('restaurant-reviewer');
+
+    const before = await api('GET', `/api/restaurants/${restaurantId}`);
+    assert.equal(before.body.restaurant.rating, null);
+
+    const created = await api('POST', `/api/restaurants/${restaurantId}/reviews`, {
+      token: reviewer.accessToken,
+      body: { rating: 5, comment: 'Loved it' },
+    });
+    assert.equal(created.status, 201);
+    assert.equal(created.body.review.rating, 5);
+
+    const afterOne = await api('GET', `/api/restaurants/${restaurantId}`);
+    assert.equal(afterOne.body.restaurant.rating, 5);
+    assert.equal(afterOne.body.restaurant.reviewCount, 1);
+
+    // No auth required to read -- unlike a table's reviews, this is meant to
+    // be visible to anyone deciding whether to go.
+    const publicList = await api('GET', `/api/restaurants/${restaurantId}/reviews`);
+    assert.equal(publicList.status, 200);
+    assert.equal(publicList.body.reviews.length, 1);
+    assert.equal(publicList.body.reviews[0].reviewerName, 'Test User');
+
+    const edited = await api('POST', `/api/restaurants/${restaurantId}/reviews`, {
+      token: reviewer.accessToken,
+      body: { rating: 3, comment: 'Changed my mind' },
+    });
+    assert.equal(edited.status, 201);
+
+    const afterEdit = await api('GET', `/api/restaurants/${restaurantId}/reviews`);
+    assert.equal(afterEdit.body.reviews.length, 1, 'editing should replace the existing review, not add a second one');
+    assert.equal(afterEdit.body.reviews[0].rating, 3);
+
+    const restaurantAfterEdit = await api('GET', `/api/restaurants/${restaurantId}`);
+    assert.equal(restaurantAfterEdit.body.restaurant.rating, 3);
+
+    await pool.query('DELETE FROM restaurants WHERE id = ?', [restaurantId]);
+  });
+
+  test('rejects a rating outside 1-5, and deleting the only review resets the restaurant to "not yet rated"', async () => {
+    const restaurantId = await createTestRestaurant();
+    const reviewer = await signup('restaurant-reviewer-2');
+
+    const invalid = await api('POST', `/api/restaurants/${restaurantId}/reviews`, {
+      token: reviewer.accessToken,
+      body: { rating: 6 },
+    });
+    assert.equal(invalid.status, 400);
+
+    const unauthenticated = await api('POST', `/api/restaurants/${restaurantId}/reviews`, { body: { rating: 4 } });
+    assert.equal(unauthenticated.status, 401);
+
+    await api('POST', `/api/restaurants/${restaurantId}/reviews`, { token: reviewer.accessToken, body: { rating: 4 } });
+    const deleted = await api('DELETE', `/api/restaurants/${restaurantId}/reviews`, { token: reviewer.accessToken });
+    assert.equal(deleted.status, 200);
+
+    const after = await api('GET', `/api/restaurants/${restaurantId}`);
+    assert.equal(after.body.restaurant.rating, null);
+    assert.equal(after.body.restaurant.reviewCount, null);
+
+    await pool.query('DELETE FROM restaurants WHERE id = ?', [restaurantId]);
   });
 });
 

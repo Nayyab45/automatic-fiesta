@@ -1,23 +1,37 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
-import { RestaurantDetail, RestaurantService } from '../../services/restaurant.service';
+import { AuthService } from '../../services/auth.service';
+import { RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './restaurant-detail.page.html',
   styleUrl: './restaurant-detail.page.scss',
 })
 export class RestaurantDetailPage extends BasePage {
   readonly pageTitle = 'Restaurant Detail';
   private readonly restaurantService = inject(RestaurantService);
+  private readonly authService = inject(AuthService);
 
   readonly restaurant = signal<RestaurantDetail | null>(null);
   readonly loading = signal(true);
   saved = false;
+
+  readonly stars = [1, 2, 3, 4, 5];
+  readonly reviews = signal<RestaurantReview[]>([]);
+  readonly myReview = computed(() => {
+    const userId = this.authService.currentUser()?.id;
+    return this.reviews().find((r) => r.reviewerUserId === userId) ?? null;
+  });
+  readonly editingReview = signal(false);
+  readonly draftRating = signal(0);
+  readonly submittingReview = signal(false);
+  draftComment = '';
 
   readonly cuisineTags = computed(() => this.restaurant()?.cuisineTags.split(',') ?? []);
 
@@ -38,9 +52,65 @@ export class RestaurantDetailPage extends BasePage {
           },
           error: () => this.loading.set(false),
         });
+        this.restaurantService.reviews(id).subscribe({
+          next: ({ reviews }) => this.reviews.set(reviews),
+        });
       },
       { allowSignalWrites: true },
     );
+  }
+
+  startReview(): void {
+    const existing = this.myReview();
+    this.draftRating.set(existing?.rating ?? 0);
+    this.draftComment = existing?.comment ?? '';
+    this.editingReview.set(true);
+  }
+
+  cancelReview(): void {
+    this.editingReview.set(false);
+  }
+
+  setDraftRating(value: number): void {
+    this.draftRating.set(value);
+  }
+
+  submitReview(): void {
+    const restaurant = this.restaurant();
+    if (!restaurant || this.draftRating() === 0) return;
+    this.submittingReview.set(true);
+    this.restaurantService
+      .submitReview(restaurant.id, { rating: this.draftRating(), comment: this.draftComment.trim() || undefined })
+      .subscribe({
+        next: ({ review }) => {
+          this.reviews.set([review, ...this.reviews().filter((r) => r.id !== review.id)]);
+          this.editingReview.set(false);
+          this.submittingReview.set(false);
+          this.refreshRating();
+        },
+        error: () => this.submittingReview.set(false),
+      });
+  }
+
+  deleteReview(): void {
+    const restaurant = this.restaurant();
+    if (!restaurant) return;
+    this.restaurantService.deleteReview(restaurant.id).subscribe(() => {
+      const userId = this.authService.currentUser()?.id;
+      this.reviews.set(this.reviews().filter((r) => r.reviewerUserId !== userId));
+      this.refreshRating();
+    });
+  }
+
+  // The average/count shown come from the backend's recomputed aggregate
+  // (restaurants.js), not something derived client-side from `reviews` --
+  // simplest way to stay in sync with it after a write is to just refetch.
+  private refreshRating(): void {
+    const restaurant = this.restaurant();
+    if (!restaurant) return;
+    this.restaurantService.get(restaurant.id).subscribe({
+      next: ({ restaurant }) => this.restaurant.set(restaurant),
+    });
   }
 
   toggleSave(): void {

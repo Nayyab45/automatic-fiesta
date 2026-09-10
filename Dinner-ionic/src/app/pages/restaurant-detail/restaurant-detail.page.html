@@ -75,6 +75,48 @@
 </section>
 
 <section class="flex flex-col gap-stack-md">
+<div class="flex justify-between items-center">
+<h2 class="font-title-lg text-title-lg text-on-surface">Reviews</h2>
+<button *ngIf="!editingReview()" (click)="startReview()" class="font-label-lg text-label-lg text-primary hover:underline">{{ myReview() ? 'Edit your review' : 'Write a review' }}</button>
+</div>
+
+<div *ngIf="editingReview()" class="flex flex-col gap-stack-sm p-stack-md rounded-xl bg-surface-container-low border-[0.5px] border-outline-variant/30">
+<div class="flex gap-1">
+<button *ngFor="let star of stars" (click)="setDraftRating(star)" [attr.aria-label]="'Rate ' + star + ' stars'">
+<span class="material-symbols-outlined text-[28px]" [class.text-primary-container]="star <= draftRating()" [class.text-outline-variant]="star > draftRating()" [style.font-variation-settings]="star <= draftRating() ? '\'FILL\' 1' : '\'FILL\' 0'">star</span>
+</button>
+</div>
+<textarea [(ngModel)]="draftComment" name="draftComment" rows="3" placeholder="What was it like? (optional)" class="w-full bg-surface rounded-lg border border-outline-variant/50 p-stack-sm font-body-md text-body-md text-on-surface resize-none"></textarea>
+<div class="flex gap-stack-sm">
+<button (click)="submitReview()" [disabled]="draftRating() === 0 || submittingReview()" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg py-2.5 rounded-lg disabled:opacity-50">{{ submittingReview() ? 'Saving…' : 'Submit' }}</button>
+<button (click)="cancelReview()" class="px-4 py-2.5 border border-outline-variant text-on-surface font-label-lg text-label-lg rounded-lg">Cancel</button>
+</div>
+</div>
+
+<div *ngIf="myReview() && !editingReview()" class="flex justify-end">
+<button (click)="deleteReview()" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline">Delete your review</button>
+</div>
+
+<p *ngIf="reviews().length === 0" class="font-body-md text-body-md text-on-surface-variant">No reviews yet -- be the first to share how it was.</p>
+
+<div *ngFor="let review of reviews()" class="flex flex-col gap-stack-sm p-stack-md rounded-xl bg-surface-container-low border-[0.5px] border-outline-variant/30">
+<div class="flex items-center justify-between gap-gutter">
+<div class="flex items-center gap-stack-md min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/20 shrink-0 font-title-lg text-title-lg">{{ review.reviewerName.charAt(0) }}</div>
+<div class="min-w-0">
+<p class="font-title-lg text-title-lg text-on-surface truncate">{{ review.reviewerName }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ review.createdAt | date: 'MMM d, y' }}</p>
+</div>
+</div>
+<div class="flex gap-0.5 shrink-0">
+<span *ngFor="let star of stars" class="material-symbols-outlined text-[16px]" [class.text-primary-container]="star <= review.rating" [class.text-outline-variant]="star > review.rating" [style.font-variation-settings]="star <= review.rating ? '\'FILL\' 1' : '\'FILL\' 0'">star</span>
+</div>
+</div>
+<p *ngIf="review.comment" class="font-body-md text-body-md text-on-surface-variant">{{ review.comment }}</p>
+</div>
+</section>
+
+<section class="flex flex-col gap-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Location</h2>
 <div class="w-full h-48 bg-surface-variant rounded-xl overflow-hidden shadow-sm relative border border-outline-variant/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary text-4xl drop-shadow-md">place</span>

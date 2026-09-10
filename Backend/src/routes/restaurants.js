@@ -4,6 +4,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { importCityRestaurants } from '../lib/osmPlaces.js';
+import { requireFields } from '../lib/validate.js';
 
 export const restaurantsRouter = Router();
 
@@ -155,6 +156,83 @@ restaurantsRouter.get('/:id', asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Restaurant not found' });
   }
   res.json({ restaurant: await attachDishes(toCamel(row)) });
+}));
+
+// Keeps restaurants.rating/review_count as a genuine, real-user-driven
+// figure instead of the null OSM import leaves it with (see migration 0004)
+// or a seed value that never changes -- once anyone reviews a restaurant
+// through the app, this recomputed average becomes the figure shown and used
+// by the price/rating filters, everywhere else in this file.
+async function recomputeRestaurantRating(restaurantId) {
+  const { avgRating, reviewCount } = await db
+    .prepare('SELECT AVG(rating) as avgRating, COUNT(*) as reviewCount FROM restaurant_reviews WHERE restaurant_id = ?')
+    .get(restaurantId);
+  const rating = reviewCount > 0 ? Math.round(avgRating * 10) / 10 : null;
+  await db
+    .prepare('UPDATE restaurants SET rating = ?, review_count = ? WHERE id = ?')
+    .run(rating, reviewCount > 0 ? reviewCount : null, restaurantId);
+}
+
+// Public -- unlike a dining table's reviews (tables.js), a restaurant review
+// is meant to be read by anyone deciding whether to go there, not just
+// people who've already dined with this specific host.
+restaurantsRouter.get('/:id/reviews', asyncHandler(async (req, res) => {
+  const rows = await db
+    .prepare(
+      `SELECT rr.*, u.name as reviewer_name FROM restaurant_reviews rr
+       JOIN users u ON u.id = rr.reviewer_user_id
+       WHERE rr.restaurant_id = ? ORDER BY rr.created_at DESC`,
+    )
+    .all(req.params.id);
+  res.json({ reviews: toCamelRows(rows) });
+}));
+
+// Deliberately not gated on having attended a table at this restaurant --
+// unlike table reviews, this is a standalone "rate any restaurant you've
+// been to" feature, not tied to a hosted dining event. One review per user
+// per restaurant; posting again edits it rather than erroring, so a user
+// can update their mind without deleting and re-creating.
+restaurantsRouter.post('/:id/reviews', requireAuth, asyncHandler(async (req, res) => {
+  const restaurant = await db.prepare('SELECT id FROM restaurants WHERE id = ?').get(req.params.id);
+  if (!restaurant) {
+    return res.status(404).json({ message: 'Restaurant not found' });
+  }
+
+  const missing = requireFields(req.body, ['rating']);
+  if (missing) {
+    return res.status(400).json({ message: missing });
+  }
+  const rating = Number(req.body.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'rating must be a whole number from 1 to 5' });
+  }
+  const comment = req.body.comment || null;
+
+  await db
+    .prepare(
+      `INSERT INTO restaurant_reviews (restaurant_id, reviewer_user_id, rating, comment)
+       VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE rating = VALUES(rating), comment = VALUES(comment), updated_at = CURRENT_TIMESTAMP`,
+    )
+    .run(restaurant.id, req.user.sub, rating, comment);
+  await recomputeRestaurantRating(restaurant.id);
+
+  const review = await db
+    .prepare(
+      `SELECT rr.*, u.name as reviewer_name FROM restaurant_reviews rr
+       JOIN users u ON u.id = rr.reviewer_user_id
+       WHERE rr.restaurant_id = ? AND rr.reviewer_user_id = ?`,
+    )
+    .get(restaurant.id, req.user.sub);
+  res.status(201).json({ review: toCamel(review) });
+}));
+
+restaurantsRouter.delete('/:id/reviews', requireAuth, asyncHandler(async (req, res) => {
+  await db
+    .prepare('DELETE FROM restaurant_reviews WHERE restaurant_id = ? AND reviewer_user_id = ?')
+    .run(req.params.id, req.user.sub);
+  await recomputeRestaurantRating(req.params.id);
+  res.json({ deleted: true });
 }));
 
 restaurantsRouter.post('/:id/save', requireAuth, asyncHandler(async (req, res) => {

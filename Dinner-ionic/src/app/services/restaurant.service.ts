@@ -56,6 +56,17 @@ export interface RestaurantDetail extends Restaurant {
   dishes: Dish[];
 }
 
+export interface RestaurantReview {
+  id: number;
+  restaurantId: number;
+  reviewerUserId: number;
+  reviewerName: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface RestaurantSearchParams {
   city?: string;
   region?: string;
@@ -110,5 +121,18 @@ export class RestaurantService {
 
   unsave(id: number | string): Observable<{ saved: boolean }> {
     return this.http.delete<{ saved: boolean }>(`${this.baseUrl}/${id}/save`);
+  }
+
+  reviews(id: number | string): Observable<{ reviews: RestaurantReview[] }> {
+    return this.http.get<{ reviews: RestaurantReview[] }>(`${this.baseUrl}/${id}/reviews`);
+  }
+
+  /** Posting again (same user, same restaurant) edits the existing review rather than erroring. */
+  submitReview(id: number | string, payload: { rating: number; comment?: string }): Observable<{ review: RestaurantReview }> {
+    return this.http.post<{ review: RestaurantReview }>(`${this.baseUrl}/${id}/reviews`, payload);
+  }
+
+  deleteReview(id: number | string): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}/reviews`);
   }
 }
