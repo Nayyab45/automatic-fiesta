@@ -7,5 +7,5 @@
 // IPv4 address).
 export const environment = {
   production: false,
-  apiUrl: 'http://10.43.209.160:3000/api',
+  apiUrl: 'http://192.168.100.33:3000/api',
 };
