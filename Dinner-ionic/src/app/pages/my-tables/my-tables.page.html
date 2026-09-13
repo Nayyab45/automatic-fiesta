@@ -1,12 +1,8 @@
-<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md sticky top-0 z-40">
-<div (click)="go('/select-location')" class="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer" role="button" tabindex="0"><div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1 rounded-full border border-outline-variant">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-[18px]" style="font-variation-settings: 'FILL' 1;">place</span>
-<span class="font-label-lg text-label-lg text-primary dark:text-primary-fixed-dim">{{ cityService.label() }}</span>
-</div></div>
-<div class="hover:opacity-80 transition-opacity cursor-pointer">
-<app-user-avatar class="w-[40px] h-[40px] rounded-full overflow-hidden border-2 border-surface-container-high"></app-user-avatar>
-</div>
-</header>
+<app-root-header [cityLabel]="cityService.label()">
+  <div class="hover:opacity-80 transition-opacity cursor-pointer">
+    <app-user-avatar class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant"></app-user-avatar>
+  </div>
+</app-root-header>
 
 <main class="px-container-padding pt-stack-lg pb-32 max-w-4xl mx-auto">
 <h1 class="font-display-lg text-display-lg text-on-surface mb-stack-lg">Your dining plans</h1>

@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -22,7 +23,7 @@ function timeOfDayGreeting(): string {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, WhatsNewComponent, BottomNavComponent, UserAvatarComponent],
+  imports: [CommonModule, RouterLink, WhatsNewComponent, BottomNavComponent, UserAvatarComponent, RootHeaderComponent],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss',
 })

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -10,7 +11,7 @@ import { DiningTable, DiningTableService } from '../../services/dining-table.ser
 @Component({
   selector: 'app-my-tables',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent, RootHeaderComponent],
   templateUrl: './my-tables.page.html',
   styleUrl: './my-tables.page.scss',
 })

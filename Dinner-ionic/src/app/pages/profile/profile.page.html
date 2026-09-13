@@ -1,12 +1,8 @@
-<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface sticky top-0 z-40">
-<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary">place</span>
-<span class="font-headline-md text-headline-md text-primary">{{ cityService.label() }}</span>
-</div>
-<button (click)="go('/settings')" aria-label="Settings" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
-<span class="material-symbols-outlined">settings</span>
-</button>
-</header>
+<app-root-header [cityLabel]="cityService.label()">
+  <button (click)="go('/settings')" aria-label="Settings" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+    <span class="material-symbols-outlined">settings</span>
+  </button>
+</app-root-header>
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading profile…</p>
 

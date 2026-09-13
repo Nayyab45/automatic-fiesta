@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -11,7 +12,7 @@ import { timeAgo } from '../../shared/time-ago';
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, RootHeaderComponent],
   templateUrl: './messages.page.html',
   styleUrl: './messages.page.scss',
 })

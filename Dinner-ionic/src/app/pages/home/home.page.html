@@ -1,14 +1,10 @@
 <app-whats-new *ngIf="showWhatsNew" (dismiss)="showWhatsNew = false"></app-whats-new>
 
-<header class="md:hidden flex justify-between items-center w-full px-container-padding py-stack-md bg-surface dark:bg-surface sticky top-0 z-40">
-<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
-<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityService.label() }}</span>
-</div>
-<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
-<app-user-avatar class="w-full h-full"></app-user-avatar>
-</div>
-</header>
+<app-root-header class="md:hidden" [cityLabel]="cityService.label()">
+  <div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+    <app-user-avatar class="w-full h-full"></app-user-avatar>
+  </div>
+</app-root-header>
 
 <main class="flex-1 w-full max-w-md mx-auto px-container-padding pt-stack-sm flex flex-col gap-section-gap md:max-w-4xl md:grid md:grid-cols-4 md:gap-gutter pb-32 overflow-y-auto">
 

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -32,7 +33,7 @@ const PRICE_CHIPS: { label: string; tier: number | null }[] = [
 @Component({
   selector: 'app-discover-restaurants',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent, RootHeaderComponent],
   templateUrl: './discover-restaurants.page.html',
   styleUrl: './discover-restaurants.page.scss',
 })

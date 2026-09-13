@@ -1,13 +1,8 @@
-<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface full-width top-0 z-40 sticky">
-<div (click)="go('/select-location')" class="flex items-center gap-unit cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
-<span class="material-symbols-outlined text-primary text-[20px]">place</span>
-<h2 class="font-headline-md text-headline-md text-primary tracking-tight">{{ cityService.label() }}</h2>
-<span class="material-symbols-outlined text-primary text-[18px]">keyboard_arrow_down</span>
-</div>
-<button (click)="go('/notifications')" aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-</header>
+<app-root-header [cityLabel]="cityService.label()">
+  <button (click)="go('/notifications')" aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+    <span class="material-symbols-outlined">notifications</span>
+  </button>
+</app-root-header>
 
 <main class="flex-1 px-container-padding pb-32 pt-stack-md">
 
