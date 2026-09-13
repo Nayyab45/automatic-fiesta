@@ -1,9 +1,4 @@
-<header class="w-full top-0 sticky bg-surface z-40 px-gutter py-4 flex items-center shadow-[0_1px_0_rgba(208,197,181,0.5)]">
-<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors group focus:outline-none focus:ring-2 focus:ring-primary/50">
-<span class="material-symbols-outlined text-on-surface group-hover:text-primary transition-colors">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile flex-1 text-center pr-12 text-on-surface">Identity Verification</h1>
-</header>
+<app-header title="Identity Verification" (back)="goBack()"></app-header>
 
 <main class="flex-1 flex flex-col items-center px-container-padding py-section-gap max-w-lg mx-auto w-full">
 

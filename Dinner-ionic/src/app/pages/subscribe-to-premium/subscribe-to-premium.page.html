@@ -1,11 +1,5 @@
-<header class="fixed top-0 w-full z-50 bg-surface flex justify-between items-center px-container-padding h-16 max-w-7xl mx-auto border-b-[0.5px] border-outline-variant">
-<button (click)="goBack()" aria-label="Go back" class="text-on-surface-variant hover:opacity-80 active:scale-95 duration-200 p-2 -ml-2">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface absolute left-1/2 -translate-x-1/2">Subscribe</h1>
-<div class="w-8"></div> 
-</header>
-<main class="flex-grow pt-24 pb-32 px-container-padding max-w-lg mx-auto w-full flex flex-col gap-stack-lg">
+<app-header title="Subscribe" (back)="goBack()"></app-header>
+<main class="flex-grow pb-32 px-container-padding max-w-lg mx-auto w-full flex flex-col gap-stack-lg">
 
 <section class="bg-surface-container-lowest rounded-xl premium-card p-stack-md border-[0.5px] border-outline-variant">
 <div class="flex items-center gap-stack-sm mb-stack-md">

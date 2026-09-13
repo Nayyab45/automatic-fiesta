@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
@@ -9,7 +10,7 @@ import { DiningTableService } from '../../services/dining-table.service';
 @Component({
   selector: 'app-create-table',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
   templateUrl: './create-table.page.html',
   styleUrl: './create-table.page.scss',
 })

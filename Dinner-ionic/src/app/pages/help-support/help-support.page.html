@@ -1,12 +1,6 @@
 <div class="w-full max-w-[480px] min-h-screen relative shadow-[0_0_40px_rgba(0,0,0,0.05)] bg-surface pb-stack-lg">
 
-<header class="bg-surface sticky top-0 z-50 flex justify-between items-center px-container-padding py-stack-sm w-full border-b-[0.5px] border-outline-variant">
-<button (click)="goBack()" aria-label="Go back" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 flex items-center justify-center p-2 rounded-full -ml-2">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">Help &amp; Support</h1>
-<div class="w-10"></div> 
-</header>
+<app-header title="Help &amp; Support" (back)="goBack()"></app-header>
 
 <main class="px-container-padding pt-stack-lg flex flex-col gap-section-gap">
 

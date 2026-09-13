@@ -1,13 +1,9 @@
-<header class="sticky top-0 z-40 bg-surface flex justify-between items-center w-full px-container-padding py-stack-md">
-<button (click)="goBack()" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-primary">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Discover People</h1>
-<button (click)="go('/search-filter')" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-primary relative" id="filterBtn">
-<span class="material-symbols-outlined">tune</span>
-<span class="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
-</button>
-</header>
+<app-header title="Discover People" (back)="goBack()">
+  <button (click)="go('/search-filter')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface relative" id="filterBtn">
+    <span class="material-symbols-outlined">tune</span>
+    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+  </button>
+</app-header>
 
 <main class="flex-1 overflow-y-auto px-container-padding pb-[100px] flex flex-col gap-stack-lg">
 

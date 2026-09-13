@@ -1,5 +1,6 @@
 import { Component, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -8,7 +9,7 @@ import { VerificationService } from '../../services/verification.service';
 @Component({
   selector: 'app-identity-verification-id-upload',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, HeaderComponent],
   templateUrl: './identity-verification-id-upload.page.html',
   styleUrl: './identity-verification-id-upload.page.scss',
 })

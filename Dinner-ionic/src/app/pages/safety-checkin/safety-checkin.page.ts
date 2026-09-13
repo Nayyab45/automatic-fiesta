@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { DiningTable, DiningTableService } from '../../services/dining-table.service';
@@ -7,7 +8,7 @@ import { DiningTable, DiningTableService } from '../../services/dining-table.ser
 @Component({
   selector: 'app-safety-checkin',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './safety-checkin.page.html',
   styleUrl: './safety-checkin.page.scss',
 })

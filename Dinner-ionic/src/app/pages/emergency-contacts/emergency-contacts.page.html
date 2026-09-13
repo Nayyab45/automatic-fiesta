@@ -1,12 +1,4 @@
-<header class="w-full top-0 sticky bg-surface dark:bg-surface-dim z-40">
-<div class="flex items-center px-gutter py-unit w-full max-w-7xl mx-auto h-16">
-<button (click)="goBack()" aria-label="Go back" class="p-2 -ml-2 text-primary hover:opacity-80 transition-opacity flex items-center justify-center rounded-full">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Emergency Contact</h1>
-<div class="w-10"></div>
-</div>
-</header>
+<app-header title="Emergency Contact" (back)="goBack()"></app-header>
 <main class="flex-1 w-full max-w-md mx-auto px-container-padding py-stack-lg flex flex-col gap-section-gap pb-32">
 
 <section class="flex flex-col items-center text-center gap-stack-md" *ngIf="showForm()">

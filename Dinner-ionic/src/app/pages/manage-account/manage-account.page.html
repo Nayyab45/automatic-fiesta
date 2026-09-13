@@ -1,12 +1,4 @@
-<header class="sticky top-0 z-40 w-full bg-surface dark:bg-surface-dim h-16">
-<div class="flex justify-between items-center px-container-padding h-full w-full max-w-7xl mx-auto">
-<button (click)="goBack()" aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 flex items-center justify-center p-2 -ml-2 rounded-full">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile text-primary font-bold tracking-tight text-center flex-grow">Manage Account</h1>
-<div class="w-10"></div> 
-</div>
-</header>
+<app-header title="Manage Account" (back)="goBack()"></app-header>
 
 <main class="flex-grow pb-section-gap px-container-padding max-w-md mx-auto w-full flex flex-col gap-section-gap">
 

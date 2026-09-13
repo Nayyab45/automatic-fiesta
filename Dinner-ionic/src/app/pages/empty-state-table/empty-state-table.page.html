@@ -1,16 +1,8 @@
-<header class="sticky top-0 bg-surface flex justify-between items-center w-full px-container-padding py-stack-md z-40">
-<div class="flex items-center gap-gutter">
-<button (click)="goBack()" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-container">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Tables</h1>
-</div>
-<div class="flex items-center gap-gutter">
-<button (click)="go('/search-filter')" class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-container">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">tune</span>
-</button>
-</div>
-</header>
+<app-header title="Tables" (back)="goBack()">
+  <button (click)="go('/search-filter')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface">
+    <span class="material-symbols-outlined">tune</span>
+  </button>
+</app-header>
 
 <main class="flex-1 flex flex-col px-container-padding pb-32 relative overflow-hidden" *ngIf="!loading() && tables().length > 0">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-stack-lg mb-stack-lg">Public tables near you</h1>

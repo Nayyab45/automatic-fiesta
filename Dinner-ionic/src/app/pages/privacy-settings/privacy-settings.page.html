@@ -1,14 +1,6 @@
 <div class="w-full max-w-md min-h-screen bg-surface flex flex-col relative pb-safe">
 
-<header class="w-full top-0 sticky bg-surface z-50 flex justify-between items-center px-container-padding py-stack-sm border-b-[0.5px] border-outline-variant">
-<button (click)="goBack()" aria-label="Go back" class="text-on-surface hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center w-12 h-12 -ml-3 rounded-full">
-<span class="material-symbols-outlined text-[24px]" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-on-surface">Privacy</h1>
-<div class="w-12 h-12 flex items-center justify-center -mr-3">
-<img alt="What Should We Eat Logo" class="w-8 h-8 object-contain opacity-80" src="assets/icon/logo.png"/>
-</div>
-</header>
+<app-header title="Privacy" (back)="goBack()"></app-header>
 
 <main class="flex-1 px-container-padding py-section-gap flex flex-col gap-stack-lg">
 <p class="font-body-md text-body-md text-on-surface-variant max-w-[280px]">

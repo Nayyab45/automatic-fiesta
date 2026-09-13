@@ -1,14 +1,6 @@
 <div class="w-full max-w-md min-h-screen relative overflow-x-hidden pb-stack-lg">
 
-<header class="w-full top-0 sticky z-50 bg-surface dark:bg-background border-b-[0.5px] border-secondary-container dark:border-on-surface-variant flex justify-between items-center px-container-padding py-stack-sm h-16 shadow-none">
-<button (click)="goBack()" class="w-12 h-12 flex items-center justify-center -ml-2 text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim absolute left-1/2 transform -translate-x-1/2">Meal Check-in</h1>
-<div class="w-12 h-12 rounded-full bg-surface-container overflow-hidden flex items-center justify-center opacity-0 pointer-events-none">
-
-</div>
-</header>
+<app-header title="Meal Check-in" (back)="goBack()"></app-header>
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 <p *ngIf="!loading() && !table()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No meetup selected.</p>

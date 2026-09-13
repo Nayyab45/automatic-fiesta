@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -12,7 +13,7 @@ import { DiningTable, DiningTableService } from '../../services/dining-table.ser
 @Component({
   selector: 'app-empty-state-table',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, HeaderComponent],
   templateUrl: './empty-state-table.page.html',
   styleUrl: './empty-state-table.page.scss',
 })

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BlockedUser, SafetyService } from '../../services/safety.service';
@@ -7,7 +8,7 @@ import { BlockedUser, SafetyService } from '../../services/safety.service';
 @Component({
   selector: 'app-blocked-users',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './blocked-users.page.html',
   styleUrl: './blocked-users.page.scss',
 })

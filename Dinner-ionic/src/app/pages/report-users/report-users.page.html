@@ -1,9 +1,4 @@
-<header class="bg-background w-full top-0 sticky z-40 flex items-center px-container-padding py-stack-md pt-8">
-<button (click)="goBack()" aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary mx-auto pr-8">Report {{ person()?.name || 'User' }}</h1>
-</header>
+<app-header [title]="'Report ' + (person()?.name || 'User')" (back)="goBack()"></app-header>
 <main class="flex-grow px-container-padding pb-32">
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>

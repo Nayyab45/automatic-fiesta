@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
@@ -8,7 +9,7 @@ import { AddPaymentMethodPayload, PaymentMethodType, PaymentService } from '../.
 @Component({
   selector: 'app-payment-methods',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
   templateUrl: './payment-methods.page.html',
   styleUrl: './payment-methods.page.scss',
 })

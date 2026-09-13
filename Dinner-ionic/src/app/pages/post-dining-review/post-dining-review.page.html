@@ -1,12 +1,6 @@
 <main class="w-full max-w-md bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden border border-surface-container-high relative">
 
-<header class="flex items-center justify-between px-container-padding py-stack-md border-b border-surface-container-high">
-<button (click)="goBack()" aria-label="Close" class="text-on-surface-variant hover:opacity-80 transition-opacity" type="button">
-<span class="material-symbols-outlined">close</span>
-</button>
-<h1 class="font-label-lg text-label-lg text-on-surface tracking-widest uppercase">Feedback</h1>
-<div class="w-6"></div> 
-</header>
+<app-header title="Feedback" backIcon="close" (back)="goBack()"></app-header>
 
 <div class="px-container-padding py-stack-lg flex flex-col gap-section-gap">
 

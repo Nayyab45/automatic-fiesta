@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
@@ -11,7 +12,7 @@ import { resizeImageToDataUrl } from '../../shared/image-resize';
 @Component({
   selector: 'app-manage-account',
   standalone: true,
-  imports: [CommonModule, RouterLink, ConfirmDialogComponent, FormsModule],
+  imports: [CommonModule, RouterLink, ConfirmDialogComponent, FormsModule, HeaderComponent],
   templateUrl: './manage-account.page.html',
   styleUrl: './manage-account.page.scss',
 })

@@ -1,16 +1,10 @@
-<header class="bg-surface dark:bg-surface w-full top-0 fixed z-40 transition-colors duration-300">
-<div class="flex justify-between items-center w-full px-container-padding py-stack-md">
-<button (click)="goBack()" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-12 h-12 -ml-3 rounded-full hover:bg-surface-container-low">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Settings</h1>
-<div class="w-12 h-12 flex items-center justify-center rounded-full overflow-hidden border border-outline-variant">
-<app-user-avatar class="w-full h-full"></app-user-avatar>
-</div>
-</div>
-</header>
+<app-header title="Settings" (back)="goBack()">
+  <div class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden border border-outline-variant">
+    <app-user-avatar class="w-full h-full"></app-user-avatar>
+  </div>
+</app-header>
 
-<main class="px-container-padding max-w-2xl mx-auto space-y-stack-lg pt-[80px] pb-section-gap">
+<main class="px-container-padding max-w-2xl mx-auto space-y-stack-lg pb-section-gap">
 
 <section>
 <h2 class="font-label-lg text-label-lg text-primary mb-stack-sm uppercase tracking-widest">General</h2>

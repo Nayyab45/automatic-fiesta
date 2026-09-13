@@ -1,9 +1,4 @@
-<header class="w-full top-0 sticky bg-surface z-40 flex items-center px-container-padding h-16 border-b border-outline-variant/30">
-<button (click)="goBack()" aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors -ml-2">
-<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Select City</h1>
-</header>
+<app-header title="Select City" (back)="goBack()"></app-header>
 
 <main class="px-container-padding pt-stack-lg pb-section-gap max-w-md mx-auto w-full">
 <p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg">

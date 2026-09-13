@@ -1,10 +1,4 @@
-<header class="w-full top-0 sticky bg-background flex items-center justify-between px-container-padding py-stack-md z-10">
-<button (click)="goBack()" aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity active:scale-95 flex items-center justify-center p-2 -ml-2 rounded-full">
-<span class="material-symbols-outlined" data-icon="arrow_back" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">What Should We Eat?</h1>
-<div class="w-10"></div>
-</header>
+<app-header title="What Should We Eat?" (back)="goBack()"></app-header>
 
 <main class="flex-grow flex flex-col items-center px-container-padding py-stack-lg relative z-0 mt-stack-md">
 

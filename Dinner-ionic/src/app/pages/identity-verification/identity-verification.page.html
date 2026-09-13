@@ -1,11 +1,6 @@
 <div class="w-full max-w-md bg-surface min-h-screen relative overflow-hidden flex flex-col md:shadow-2xl md:border md:border-outline-variant/30">
 
-<header class="bg-surface w-full sticky top-0 z-40 border-b-[0.5px] border-outline-variant flex justify-between items-center px-container-padding py-stack-sm h-16">
-<button (click)="goBack()" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform p-2 -ml-2 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-on-surface flex-1 text-center pr-8">Verification</h1>
-</header>
+<app-header title="Verification" (back)="goBack()"></app-header>
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 

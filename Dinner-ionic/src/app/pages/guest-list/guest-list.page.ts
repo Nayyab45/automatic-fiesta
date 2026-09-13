@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { TableGuest, DiningTableService } from '../../services/dining-table.service';
@@ -7,7 +8,7 @@ import { TableGuest, DiningTableService } from '../../services/dining-table.serv
 @Component({
   selector: 'app-guest-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './guest-list.page.html',
   styleUrl: './guest-list.page.scss',
 })

@@ -1,10 +1,4 @@
-<header class="w-full top-0 sticky bg-background z-10 flex items-center justify-between px-container-padding py-stack-md border-b border-outline-variant/20 shadow-sm" style="box-shadow: 0 4px 16px 0 rgba(0,0,0,0.02);">
-<button (click)="goBack()" aria-label="Go back" class="interactive-element p-2 -ml-2 rounded-full hover:bg-surface-variant/50 text-on-surface">
-<span class="material-symbols-outlined text-[24px]">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-on-surface text-center flex-1">Friends</h1>
-<div class="w-10"></div>
-</header>
+<app-header title="Friends" (back)="goBack()"></app-header>
 
 <div class="flex gap-stack-lg px-container-padding border-b border-outline-variant/30 sticky top-[65px] bg-background z-10">
 <button (click)="selectTab('friends')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors" [class.text-primary]="activeTab() === 'friends'" [class.font-bold]="activeTab() === 'friends'" [class.text-on-surface-variant]="activeTab() !== 'friends'">

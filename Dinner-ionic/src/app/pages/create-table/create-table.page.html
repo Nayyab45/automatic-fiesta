@@ -1,10 +1,4 @@
-<header class="flex justify-between items-center w-full px-container-padding py-stack-md bg-surface sticky top-0 z-40 bg-opacity-90 backdrop-blur-sm">
-<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
-<span class="material-symbols-outlined text-on-surface">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary font-bold">Create your table.</h1>
-<div class="w-12 h-12"></div> 
-</header>
+<app-header title="Create your table." (back)="goBack()"></app-header>
 <main class="px-container-padding max-w-2xl mx-auto space-y-section-gap pt-stack-md">
 
 <section class="space-y-stack-md">

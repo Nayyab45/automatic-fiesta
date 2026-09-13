@@ -1,12 +1,4 @@
-<header class="flex items-center px-container-padding py-stack-md bg-surface z-10 sticky top-0">
-<button (click)="goBack()" class="w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low rounded-full transition-colors -ml-3">
-<span class="material-symbols-outlined" data-icon="arrow_back" data-weight="regular">arrow_back</span>
-</button>
-<div class="flex-1 flex justify-center">
-<span class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-widest">Step 4 of 5</span>
-</div>
-<div class="w-12 h-12"></div> 
-</header>
+<app-header title="Step 4 of 5" (back)="goBack()"></app-header>
 
 <main class="flex-1 px-container-padding py-stack-md flex flex-col overflow-y-auto pb-32">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-sm mt-stack-md">Anything we should know?</h1>

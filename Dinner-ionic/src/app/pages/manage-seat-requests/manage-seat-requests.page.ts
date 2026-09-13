@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { DiningTable, SeatRequest, DiningTableService } from '../../services/dining-table.service';
@@ -7,7 +8,7 @@ import { DiningTable, SeatRequest, DiningTableService } from '../../services/din
 @Component({
   selector: 'app-manage-seat-requests',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './manage-seat-requests.page.html',
   styleUrl: './manage-seat-requests.page.scss',
 })

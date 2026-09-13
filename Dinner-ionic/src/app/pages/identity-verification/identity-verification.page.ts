@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { VerificationService, VerificationStatus } from '../../services/verification.service';
@@ -7,7 +8,7 @@ import { VerificationService, VerificationStatus } from '../../services/verifica
 @Component({
   selector: 'app-identity-verification',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './identity-verification.page.html',
   styleUrl: './identity-verification.page.scss',
 })

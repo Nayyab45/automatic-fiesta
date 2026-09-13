@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { Friend, FriendRequest, FriendsService } from '../../services/friends.service';
@@ -8,7 +9,7 @@ import { Match, ProfileService } from '../../services/profile.service';
 @Component({
   selector: 'app-friends-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './friends-list.page.html',
   styleUrl: './friends-list.page.scss',
 })

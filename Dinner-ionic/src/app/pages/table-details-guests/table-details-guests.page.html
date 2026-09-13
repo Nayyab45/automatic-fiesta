@@ -1,12 +1,8 @@
-<header class="w-full top-0 sticky bg-surface/95 backdrop-blur-sm z-40 flex justify-between items-center px-container-padding h-16 transition-all duration-300">
-<button (click)="goBack()" aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
-<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface">{{ table()?.restaurant?.name }}</h1>
-<button (click)="share()" aria-label="Share" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
-<span class="material-symbols-outlined text-on-surface" data-icon="ios_share">ios_share</span>
-</button>
-</header>
+<app-header [title]="table()?.restaurant?.name ?? ''" (back)="goBack()">
+  <button (click)="share()" aria-label="Share" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
+    <span class="material-symbols-outlined text-on-surface" data-icon="ios_share">ios_share</span>
+  </button>
+</app-header>
 
 <main class="w-full max-w-2xl mx-auto pb-32" *ngIf="!loading() && table() as t">
 

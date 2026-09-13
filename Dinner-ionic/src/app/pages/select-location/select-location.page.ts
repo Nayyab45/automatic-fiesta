@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { City, LocationService } from '../../services/location.service';
@@ -12,7 +13,7 @@ interface ProvinceGroup {
 @Component({
   selector: 'app-select-location',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './select-location.page.html',
   styleUrl: './select-location.page.scss',
 })

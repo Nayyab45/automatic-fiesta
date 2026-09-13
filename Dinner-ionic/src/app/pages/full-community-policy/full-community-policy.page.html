@@ -1,10 +1,4 @@
-<header class="bg-surface dark:bg-surface-dim text-primary dark:text-inverse-primary flex items-center justify-between px-gutter h-16 w-full max-w-7xl mx-auto sticky top-0 z-40">
-<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-on-surface" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md font-headline-md text-primary dark:text-primary-fixed-dim">Community Policy</h1>
-<div class="w-12 h-12"></div> 
-</header>
+<app-header title="Community Policy" (back)="goBack()"></app-header>
 
 <main class="flex-1 overflow-y-auto w-full max-w-3xl mx-auto px-container-padding py-stack-md scrolling-content pb-32">
 <div class="mb-stack-lg text-center">

@@ -1,12 +1,4 @@
-<header class="bg-surface/80 backdrop-blur-md dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md sticky top-0 z-50">
-<button (click)="goBack()" aria-label="Go Back" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2">
-<span class="material-symbols-outlined" data-icon="close">close</span>
-</button>
-<div class="text-center">
-<span class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim shimmer-text text-xl">What Should We Eat?</span>
-</div>
-<div class="w-10"></div> 
-</header>
+<app-header title="What Should We Eat?" backIcon="close" (back)="goBack()"></app-header>
 
 <main class="flex-grow flex flex-col items-center justify-start pt-stack-lg pb-32 px-container-padding relative">
 

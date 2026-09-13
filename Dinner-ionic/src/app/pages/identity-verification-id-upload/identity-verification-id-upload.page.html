@@ -1,9 +1,4 @@
-<header class="bg-background w-full top-0 sticky z-40 bg-background flex items-center px-gutter h-16 w-full">
-<button (click)="goBack()" class="mr-4 text-on-surface-variant hover:bg-surface-container-high transition-colors active:opacity-80 transition-opacity p-2 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary">Verify Your Identity</h1>
-</header>
+<app-header title="Verify Your Identity" (back)="goBack()"></app-header>
 <main class="px-container-padding py-stack-md flex flex-col gap-section-gap pb-32">
 
 <section>

@@ -1,14 +1,6 @@
-<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding py-stack-md sticky top-0 z-40">
-<div class="flex items-center gap-4">
-<button (click)="goBack()" class="hover:opacity-80 transition-opacity Active: scale-95 duration-150">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Safety Center</h1>
-</div>
-<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
-<app-user-avatar class="w-full h-full"></app-user-avatar>
-</div>
-</header>
+<app-header title="Safety Center" (back)="goBack()">
+  <app-user-avatar class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant"></app-user-avatar>
+</app-header>
 
 <main class="flex-1 w-full max-w-7xl mx-auto px-container-padding py-stack-lg flex flex-col gap-section-gap">
 

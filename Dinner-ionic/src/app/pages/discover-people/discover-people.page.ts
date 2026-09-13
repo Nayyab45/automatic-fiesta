@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -9,7 +10,7 @@ import { MessagingService } from '../../services/messaging.service';
 @Component({
   selector: 'app-discover-people',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent],
+  imports: [CommonModule, RouterLink, BottomNavComponent, HeaderComponent],
   templateUrl: './discover-people.page.html',
   styleUrl: './discover-people.page.scss',
 })

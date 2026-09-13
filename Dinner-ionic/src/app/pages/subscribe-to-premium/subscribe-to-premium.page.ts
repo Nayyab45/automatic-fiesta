@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,7 +12,7 @@ const PLAN_PRICES = { monthly: 9.99, yearly: 95.9 } as const;
 @Component({
   selector: 'app-subscribe-to-premium',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
   templateUrl: './subscribe-to-premium.page.html',
   styleUrl: './subscribe-to-premium.page.scss',
 })

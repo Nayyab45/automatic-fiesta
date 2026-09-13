@@ -1,14 +1,8 @@
-<header class="bg-surface dark:bg-surface-dim w-full top-0 sticky flex items-center justify-between px-gutter h-16 max-w-7xl mx-auto z-40 transition-shadow duration-300" id="top-app-bar">
-<button (click)="goBack()" aria-label="Go back" class="flex items-center justify-center p-2 rounded-full hover:opacity-80 transition-opacity text-primary dark:text-inverse-primary">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary dark:text-inverse-primary truncate flex-1 text-center font-bold px-4">
-            Privacy Policy
-        </h1>
-<button (click)="go('/profile')" aria-label="Account" class="flex items-center justify-center p-2 rounded-full hover:opacity-80 transition-opacity text-primary dark:text-inverse-primary">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-</button>
-</header>
+<app-header title="Privacy Policy" (back)="goBack()">
+  <button (click)="go('/profile')" aria-label="Account" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface">
+    <span class="material-symbols-outlined">account_circle</span>
+  </button>
+</app-header>
 
 <main class="flex-1 overflow-y-auto pb-32">
 <div class="max-w-3xl mx-auto px-container-padding py-stack-lg">

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
@@ -7,7 +8,7 @@ import { ProfileService } from '../../services/profile.service';
 @Component({
   selector: 'app-dietary-preferences',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './dietary-preferences.page.html',
   styleUrl: './dietary-preferences.page.scss',
 })

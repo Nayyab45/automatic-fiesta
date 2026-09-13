@@ -1,10 +1,4 @@
-<header class="flex items-center justify-between px-container-padding py-stack-md">
-<button (click)="goBack()" class="p-2 rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary">arrow_back</span>
-</button>
-<div class="font-headline-md text-headline-md text-primary font-bold">Tables</div>
-<div class="w-10"></div> 
-</header>
+<app-header title="Guest List" (back)="goBack()"></app-header>
 <main class="px-container-padding mt-stack-md max-w-2xl mx-auto">
 <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-section-gap">
             Who's joining the table?
