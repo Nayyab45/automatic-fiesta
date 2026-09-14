@@ -6,7 +6,7 @@ import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
 import { LocationService } from '../../services/location.service';
-import { Restaurant, RestaurantService } from '../../services/restaurant.service';
+import { googleMapsUrl, Restaurant, RestaurantService } from '../../services/restaurant.service';
 
 // Province chips are static (they map onto restaurants.region, whose values
 // are fixed). Cuisine chips are NOT static -- restaurants.cuisine_tags is
@@ -110,6 +110,10 @@ export class DiscoverRestaurantsPage extends BasePage {
 
   popularDishNames(restaurant: Restaurant): string[] {
     return (restaurant.dishes ?? []).map((d) => d.name);
+  }
+
+  mapsUrl(restaurant: Restaurant): string {
+    return googleMapsUrl(restaurant);
   }
 
   isSaved(id: number): boolean {

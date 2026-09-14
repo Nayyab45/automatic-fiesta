@@ -7,6 +7,7 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
 import { DiningTable, DiningTableService, TableGuest, TableMessage } from '../../services/dining-table.service';
 import { ConversationPerson, DirectMessage, MessagingService } from '../../services/messaging.service';
 import { AuthService } from '../../services/auth.service';
+import { googleMapsUrl } from '../../services/restaurant.service';
 import { timeAgo } from '../../shared/time-ago';
 
 interface ChatBubble {
@@ -72,6 +73,11 @@ export class DiningGroupChatPage extends BasePage {
       this.tableService.guests(id).subscribe(({ guests }) => this.guests.set(guests));
       this.tableService.messages(id).subscribe(({ messages }) => this.bubbles.set(messages.map((m) => this.toBubble(m))));
     }
+  }
+
+  mapsUrl(): string {
+    const restaurant = this.table()?.restaurant;
+    return restaurant ? googleMapsUrl(restaurant) : '';
   }
 
   private toBubble(message: TableMessage | DirectMessage): ChatBubble {

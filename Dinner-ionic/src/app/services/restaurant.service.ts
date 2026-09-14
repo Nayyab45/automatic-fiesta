@@ -62,6 +62,22 @@ export interface RestaurantDetail extends Restaurant {
   dishes: Dish[];
 }
 
+// Builds a link to the Google Maps app/website instead of rendering any
+// in-app map -- prefers coordinates (drops the user straight into turn-by-
+// turn directions) and falls back to a text search by address, then name,
+// for a restaurant that hasn't been geocoded yet.
+export function googleMapsUrl(place: {
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
+  name?: string | null;
+}): string {
+  if (place.latitude != null && place.longitude != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name || '')}`;
+}
+
 export interface RestaurantReview {
   id: number;
   restaurantId: number;

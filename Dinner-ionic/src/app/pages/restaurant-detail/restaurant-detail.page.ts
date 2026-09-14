@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
-import { RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
+import { googleMapsUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -118,6 +118,10 @@ export class RestaurantDetailPage extends BasePage {
     if (!restaurant) return;
     const request$ = this.saved ? this.restaurantService.unsave(restaurant.id) : this.restaurantService.save(restaurant.id);
     request$.subscribe(({ saved }) => (this.saved = saved));
+  }
+
+  mapsUrl(restaurant: RestaurantDetail): string {
+    return googleMapsUrl(restaurant);
   }
 
   share(): void {
