@@ -22,6 +22,10 @@ import { generate as generateTotp } from 'otplib';
 //      createdUserIds/table ownership) directly through the DB pool, then
 //      closes the pool so `node --test` can exit.
 process.env.JWT_SECRET = 'test-secret';
+// server.js normally binds a port on import; this suite imports `app` and
+// calls app.listen(0) itself per test file instead, so each gets its own
+// ephemeral port rather than colliding with a dev server already on 3000.
+process.env.SKIP_SERVER_LISTEN = 'true';
 
 const { app } = await import('../src/server.js');
 const { initSchema, pool, db } = await import('../src/db.js');
@@ -75,7 +79,7 @@ async function cleanupTestData() {
   const [tableRows] = await pool.query('SELECT id FROM dining_tables WHERE host_user_id IN (?)', [createdUserIds]);
   const tableIds = tableRows.map((row) => row.id);
   if (tableIds.length > 0) {
-    for (const table of ['table_guests', 'seat_requests', 'check_ins', 'reviews', 'table_messages', 'notifications']) {
+    for (const table of ['table_guests', 'seat_requests', 'check_ins', 'reviews', 'user_ratings', 'table_messages', 'notifications']) {
       await pool.query(`DELETE FROM ${table} WHERE table_id IN (?)`, [tableIds]);
     }
     await pool.query('DELETE FROM dining_tables WHERE id IN (?)', [tableIds]);
@@ -301,6 +305,114 @@ describe('reviews', () => {
   });
 });
 
+describe('people ratings', () => {
+  async function pastTableWith(hostToken, guestToken) {
+    const restaurants = await api('GET', '/api/restaurants', { token: hostToken });
+    const restaurantId = restaurants.body.restaurants[0].id;
+    const table = await api('POST', '/api/tables', {
+      token: hostToken,
+      body: {
+        restaurantId,
+        gatheringType: 'dinner',
+        dateTime: new Date(Date.now() - 86400000).toISOString(),
+        seatsTotal: 4,
+      },
+    });
+    const tableId = table.body.table.id;
+    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guestToken, body: {} });
+    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
+      token: hostToken,
+      body: { status: 'confirmed' },
+    });
+    return tableId;
+  }
+
+  test('fellow attendees of a past table can rate each other, and the average shows on the profile', async () => {
+    const host = await signup('rate-host');
+    const guest = await signup('rate-guest');
+    const tableId = await pastTableWith(host.accessToken, guest.accessToken);
+
+    const rateable = await api('GET', `/api/tables/${tableId}/rateable`, { token: guest.accessToken });
+    assert.equal(rateable.status, 200);
+    assert.ok(rateable.body.people.some((p) => p.id === host.user.id && p.myRating === null));
+
+    const rate = await api('POST', `/api/tables/${tableId}/rate`, {
+      token: guest.accessToken,
+      body: { ratedUserId: host.user.id, score: 5 },
+    });
+    assert.equal(rate.status, 200);
+
+    // Re-rating the same person for the same table edits rather than duplicating.
+    const rateAgain = await api('POST', `/api/tables/${tableId}/rate`, {
+      token: guest.accessToken,
+      body: { ratedUserId: host.user.id, score: 4 },
+    });
+    assert.equal(rateAgain.status, 200);
+
+    const hostProfile = await api('GET', `/api/profile/${host.user.id}`, { token: guest.accessToken });
+    assert.equal(hostProfile.body.profile.rating, 4);
+
+    const rateableAfter = await api('GET', `/api/tables/${tableId}/rateable`, { token: guest.accessToken });
+    assert.equal(rateableAfter.body.people.find((p) => p.id === host.user.id).myRating, 4);
+  });
+
+  test('a stranger who never shared the table cannot rate either attendee', async () => {
+    const host = await signup('rate-host2');
+    const guest = await signup('rate-guest2');
+    const stranger = await signup('rate-stranger');
+    const tableId = await pastTableWith(host.accessToken, guest.accessToken);
+
+    const strangerRateable = await api('GET', `/api/tables/${tableId}/rateable`, { token: stranger.accessToken });
+    assert.equal(strangerRateable.status, 403);
+
+    const strangerRate = await api('POST', `/api/tables/${tableId}/rate`, {
+      token: stranger.accessToken,
+      body: { ratedUserId: host.user.id, score: 5 },
+    });
+    assert.equal(strangerRate.status, 403);
+  });
+
+  test("rating is rejected for a table that hasn't happened yet, and for an out-of-range score", async () => {
+    const host = await signup('rate-host3');
+    const guest = await signup('rate-guest3');
+
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const table = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: {
+        restaurantId: restaurants.body.restaurants[0].id,
+        gatheringType: 'dinner',
+        dateTime: new Date(Date.now() + 86400000).toISOString(),
+        seatsTotal: 4,
+      },
+    });
+    const tableId = table.body.table.id;
+    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
+      token: host.accessToken,
+      body: { status: 'confirmed' },
+    });
+
+    const tooSoon = await api('POST', `/api/tables/${tableId}/rate`, {
+      token: guest.accessToken,
+      body: { ratedUserId: host.user.id, score: 5 },
+    });
+    assert.equal(tooSoon.status, 400);
+
+    // Backdate it directly (no API surface for editing dateTime) so the
+    // remaining assertion isolates the score-range validation specifically.
+    await pool.query('UPDATE dining_tables SET date_time = ? WHERE id = ?', [
+      new Date(Date.now() - 86400000).toISOString(),
+      tableId,
+    ]);
+    const badScore = await api('POST', `/api/tables/${tableId}/rate`, {
+      token: guest.accessToken,
+      body: { ratedUserId: host.user.id, score: 6 },
+    });
+    assert.equal(badScore.status, 400);
+  });
+});
+
 describe('restaurant reviews', () => {
   // A dedicated throwaway restaurant per test (rather than reusing a real
   // seeded/imported one) so mutating its rating/review_count here can never
@@ -419,6 +531,57 @@ describe('preference change limit', () => {
       body: { favoriteFoods: ['Onboarding Food'] },
     });
     assert.equal(onboarding.status, 200);
+  });
+});
+
+describe('people matching', () => {
+  test('food/taste dominates score, and same-city candidates rank above out-of-city ones regardless of score', async () => {
+    const me = await signup('match-me');
+    const sameCityTasteMatch = await signup('match-same-city');
+    const otherCityInterestMatch = await signup('match-other-city');
+
+    await api('PUT', '/api/profile/me', { token: me.accessToken, body: { city: 'MatchTestCity' } });
+    await api('PUT', '/api/profile/me', { token: sameCityTasteMatch.accessToken, body: { city: 'MatchTestCity' } });
+    await api('PUT', '/api/profile/me', { token: otherCityInterestMatch.accessToken, body: { city: 'SomeOtherCity' } });
+
+    await api('PUT', '/api/profile/me/food-preferences', {
+      token: me.accessToken,
+      body: { favoriteFoods: ['Biryani', 'Karahi'] },
+    });
+    await api('PUT', '/api/profile/me/food-preferences', {
+      token: sameCityTasteMatch.accessToken,
+      body: { favoriteFoods: ['Biryani', 'Karahi'] },
+    });
+
+    const interests = await api('GET', '/api/interests', { token: me.accessToken });
+    const interestIds = interests.body.interests.slice(0, 3).map((i) => i.id);
+    await api('PUT', '/api/profile/me/interests', { token: me.accessToken, body: { interestIds } });
+    // Shares every one of "me"'s interests but no food overlap and a
+    // different city -- should still rank below the same-city taste match.
+    await api('PUT', '/api/profile/me/interests', {
+      token: otherCityInterestMatch.accessToken,
+      body: { interestIds },
+    });
+
+    const result = await api('GET', '/api/matches', { token: me.accessToken });
+    assert.equal(result.status, 200);
+
+    const sameCityEntry = result.body.matches.find((m) => m.id === sameCityTasteMatch.user.id);
+    const otherCityEntry = result.body.matches.find((m) => m.id === otherCityInterestMatch.user.id);
+    assert.ok(sameCityEntry);
+    assert.ok(otherCityEntry);
+
+    // Taste dominates: 2 shared foods (2*25=50) beats 3 shared interests (3*5=15).
+    assert.ok(sameCityEntry.score > otherCityEntry.score);
+    assert.equal(sameCityEntry.sameCity, true);
+    assert.equal(otherCityEntry.sameCity, false);
+    assert.ok(sameCityEntry.reasons[0].includes('Biryani'));
+
+    // Same-city group ranks entirely above the other-city group, even
+    // though this test's own out-of-city candidate scores far from zero.
+    const sameCityIndex = result.body.matches.indexOf(sameCityEntry);
+    const otherCityIndex = result.body.matches.indexOf(otherCityEntry);
+    assert.ok(sameCityIndex < otherCityIndex);
   });
 });
 
@@ -793,19 +956,21 @@ describe('restaurant photo enhancement', () => {
     assert.equal(photo.attribution, 'Photo via OpenStreetMap contributors');
   });
 
-  test('getOrCreateCuisinePhoto fetches once per cuisine, then serves from cache', async () => {
+  test('getOrCreateCuisinePhoto caches per slot, and different slots get different photos', async () => {
     let fetchCalls = 0;
     const fetchImage = async () => {
       fetchCalls++;
-      return { buffer: await tinySourceImageBuffer(), attribution: 'Photo by Someone, CC BY 4.0' };
+      return { buffer: await tinySourceImageBuffer(), attribution: `Photo by Someone ${fetchCalls}, CC BY 4.0` };
     };
 
-    const first = await getOrCreateCuisinePhoto(db, testCuisine, { fetchImage });
-    const second = await getOrCreateCuisinePhoto(db, testCuisine, { fetchImage });
+    const slot0First = await getOrCreateCuisinePhoto(db, testCuisine, 0, { fetchImage });
+    const slot0Second = await getOrCreateCuisinePhoto(db, testCuisine, 0, { fetchImage });
+    const slot1 = await getOrCreateCuisinePhoto(db, testCuisine, 1, { fetchImage });
 
-    assert.equal(fetchCalls, 1);
-    assert.deepEqual(first, second);
-    assert.match(first.url, /\/images\/restaurants\/cuisine-.*\.jpg$/);
-    assert.equal(first.attribution, 'Photo by Someone, CC BY 4.0');
+    // One fetch per distinct slot -- slot 0's second call is served from cache.
+    assert.equal(fetchCalls, 2);
+    assert.deepEqual(slot0First, slot0Second);
+    assert.notEqual(slot0First.url, slot1.url);
+    assert.match(slot0First.url, /\/images\/restaurants\/cuisine-.*\.jpg$/);
   });
 });

@@ -94,6 +94,13 @@ export interface Review extends ReviewPayload {
   createdAt: string;
 }
 
+export interface RateablePerson {
+  id: number;
+  name: string;
+  photoUrl: string | null;
+  myRating: number | null;
+}
+
 export interface TableMessage {
   id: number;
   tableId: number;
@@ -166,6 +173,15 @@ export class DiningTableService {
   /** Table members only. */
   reviews(id: number | string): Observable<{ reviews: Review[] }> {
     return this.http.get<{ reviews: Review[] }>(`${this.baseUrl}/${id}/reviews`);
+  }
+
+  /** Fellow attendees of a past table this user shared -- ratable once the table's date_time is in the past. */
+  rateablePeople(id: number | string): Observable<{ people: RateablePerson[] }> {
+    return this.http.get<{ people: RateablePerson[] }>(`${this.baseUrl}/${id}/rateable`);
+  }
+
+  ratePerson(id: number | string, ratedUserId: number, score: number): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/${id}/rate`, { ratedUserId, score });
   }
 
   messages(id: number | string): Observable<{ messages: TableMessage[] }> {

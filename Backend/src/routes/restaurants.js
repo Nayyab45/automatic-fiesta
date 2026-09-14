@@ -5,6 +5,7 @@ import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { importCityRestaurants } from '../lib/osmPlaces.js';
 import { requireFields } from '../lib/validate.js';
+import { distanceKm, tastePrefsFor } from '../lib/taste.js';
 
 export const restaurantsRouter = Router();
 
@@ -50,9 +51,71 @@ restaurantsRouter.get('/saved', requireAuth, asyncHandler(async (req, res) => {
   res.json({ restaurants: toCamelRows(rows) });
 }));
 
+// A real (if AI-free) personalization pass: scores every candidate on
+// rating, overlap between the restaurant's cuisine_tags and the user's own
+// Food Preferences (see food-preferences.page.ts -- same vocabulary,
+// "Biryani"/"Karahi"/... is both a favorite-food chip and a cuisine tag),
+// and distance from the user's real GPS position when they share one
+// (falling back to their manually-set city otherwise, same as Discover).
 restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res) => {
-  const rows = await db.prepare('SELECT * FROM restaurants ORDER BY rating DESC LIMIT 10').all();
-  res.json({ restaurants: await Promise.all(toCamelRows(rows).map(attachDishes)) });
+  const { lat, lng, city } = req.query;
+  const hasCoords = lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
+  const userLat = hasCoords ? Number(lat) : null;
+  const userLng = hasCoords ? Number(lng) : null;
+
+  const myTaste = await tastePrefsFor(req.user.sub);
+  const favoriteFoods = myTaste.favoriteFoods.map((food) => food.toLowerCase());
+
+  // Real GPS already narrows "near me" better than a city string does, so
+  // only city-scope the candidate pool when there are no coordinates to
+  // sort by -- otherwise a good match just outside the city line would be
+  // filtered out before distance ever gets a say.
+  let effectiveCity = city;
+  if (!hasCoords && !effectiveCity) {
+    const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
+    effectiveCity = myProfile?.city;
+  }
+  const rows = toCamelRows(
+    effectiveCity && !hasCoords
+      ? await db.prepare('SELECT * FROM restaurants WHERE city = ?').all(effectiveCity)
+      : await db.prepare('SELECT * FROM restaurants').all(),
+  );
+
+  const scored = rows.map((restaurant) => {
+    const cuisineTags = restaurant.cuisineTags ? restaurant.cuisineTags.split(',').map((tag) => tag.trim()) : [];
+    const matchedFoods = cuisineTags.filter((tag) =>
+      favoriteFoods.some((food) => tag.toLowerCase().includes(food) || food.includes(tag.toLowerCase())),
+    );
+
+    const distance =
+      hasCoords && restaurant.latitude != null && restaurant.longitude != null
+        ? distanceKm(userLat, userLng, Number(restaurant.latitude), Number(restaurant.longitude))
+        : null;
+
+    // Rating anchors quality (0-50), taste match rewards each distinct
+    // favorite-food overlap (25 apiece), distance decays linearly to 0
+    // by ~10km so a great match nearby still beats a great match far away.
+    const ratingScore = (restaurant.rating ?? 0) * 10;
+    const tasteScore = matchedFoods.length * 25;
+    const distanceScore = distance !== null ? Math.max(0, 40 - distance * 4) : 0;
+
+    const reasons = [];
+    if (matchedFoods.length > 0) reasons.push(`Matches your love of ${matchedFoods[0]}`);
+    if (distance !== null) reasons.push(`${Math.round(distance * 10) / 10} km away`);
+    if (restaurant.rating !== null && restaurant.rating >= 4.7) reasons.push(`Top rated in ${restaurant.city}`);
+    if (reasons.length === 0) reasons.push(`Known for ${cuisineTags[0] ?? 'great food'}`);
+
+    return {
+      ...restaurant,
+      distanceKm: distance !== null ? Math.round(distance * 10) / 10 : null,
+      matchedFoods,
+      reasons,
+      score: ratingScore + tasteScore + distanceScore,
+    };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  res.json({ restaurants: await Promise.all(scored.slice(0, 10).map(attachDishes)) });
 }));
 
 restaurantsRouter.get('/', asyncHandler(async (req, res) => {

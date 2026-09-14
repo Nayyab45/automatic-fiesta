@@ -101,6 +101,28 @@
 </div>
 </div>
 
+<div class="md:col-span-12 glass-card rounded-xl p-stack-md" *ngIf="p.dietaryNeeds.length > 0 || p.spiceTolerance">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">local_fire_department</span>
+                    Dietary &amp; Taste
+                </h3>
+<div class="flex flex-wrap gap-2 mt-stack-sm">
+<span *ngFor="let need of p.dietaryNeeds" class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-full border border-outline-variant/30">{{ need }}</span>
+<span *ngIf="p.spiceTolerance" class="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-lg text-label-lg rounded-full border border-outline-variant/30">{{ p.spiceTolerance }}</span>
+</div>
+</div>
+
+<div *ngIf="isOwnProfile() && p.favoriteFoods.length === 0 && p.dietaryNeeds.length === 0 && !p.spiceTolerance" class="md:col-span-12 glass-card rounded-xl p-stack-md flex items-center justify-between gap-stack-md">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">restaurant_menu</span>
+                    Add your food &amp; taste
+                </h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Set your favorite dishes and dietary needs so AI People Recommendation can match you with people who share your taste.</p>
+</div>
+<button (click)="go('/food-preferences')" class="shrink-0 bg-primary-container text-on-primary font-label-lg text-label-lg px-5 py-3 rounded-lg hover:opacity-90 transition-opacity">Add</button>
+</div>
+
 <div class="md:col-span-12 glass-card rounded-xl p-stack-md" *ngIf="p.interests.length > 0">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-container">favorite</span>

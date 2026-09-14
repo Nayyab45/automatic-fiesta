@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.whatshouldweeat.app/api',
+  apiUrl: 'https://weeat.netstech.net/api',
 };

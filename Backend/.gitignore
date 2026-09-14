@@ -1,8 +1,13 @@
 node_modules/
 .env
+# Firebase Admin SDK credential for sending push notifications -- a full
+# backend credential (can send push to any user, impersonate the service
+# account), never commit it. See scripts/README or .env.example.
+firebase-service-account.json
 data/
 backend.log
 backend_live.log
+backend_start.log
 
 # Auto-generated photo cache for real (OpenStreetMap-imported) restaurants --
 # see src/lib/restaurantPhotos.js. Regenerated on demand from OpenStreetMap

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, NgZone, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { BasePage } from '../base.page';
@@ -25,8 +25,27 @@ export class RestaurantsMapPage extends BasePage implements AfterViewInit, OnDes
   @ViewChild('mapContainer') private mapContainer?: ElementRef<HTMLDivElement>;
   private map: L.Map | null = null;
 
+  /** See the identical guard in restaurant-direction.page.ts: ion-router-outlet
+   * keeps this page invisible until it confirms the enter transition
+   * finished (`ionViewDidEnter`), and building the Leaflet map beforehand
+   * was starving that completion signal, leaving the page invisible forever
+   * even though the map rendered underneath. The timeout is a safety net for
+   * this page ever being rendered outside ion-router-outlet. */
+  private viewEntered = false;
+
+  @HostListener('ionViewDidEnter')
+  onIonViewDidEnter(): void {
+    this.viewEntered = true;
+    this.initMap();
+  }
+
   constructor() {
     super();
+    setTimeout(() => {
+      this.viewEntered = true;
+      this.initMap();
+    }, 400);
+
     this.restaurantService.list({ city: this.cityService.current() }).subscribe({
       next: ({ restaurants }) => {
         this.restaurants.set(restaurants);
@@ -62,7 +81,7 @@ export class RestaurantsMapPage extends BasePage implements AfterViewInit, OnDes
   }
 
   private initMap(): void {
-    if (this.map || !this.mapContainer) return;
+    if (this.map || !this.mapContainer || !this.viewEntered) return;
     const withCoords = this.restaurants().filter((r) => r.latitude && r.longitude);
     if (withCoords.length === 0) return;
 

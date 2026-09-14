@@ -58,7 +58,11 @@ export interface PrivacySettings {
 
 export interface Match extends Person {
   score: number;
+  /** Whether this person is in the same city as you -- matches are grouped same-city-first, ranked by score within each group. */
+  sameCity: boolean;
   sharedInterests: Interest[];
+  /** Favorite foods (from Food Preferences) this person shares with you -- same vocabulary as restaurant cuisine tags. */
+  sharedFavoriteFoods: string[];
   reasons: string[];
   rating: number | null;
   tablesJoinedCount: number;

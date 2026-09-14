@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
+import { tastePrefsFor } from '../lib/taste.js';
 
 export const profileRouter = Router();
 export const interestsRouter = Router();
@@ -46,14 +47,12 @@ async function tablesJoinedCount(userId) {
   return count;
 }
 
-async function hostRating(userId) {
-  const row = await db
-    .prepare(
-      `SELECT AVG(r.overall_rating) as avg FROM reviews r
-       JOIN dining_tables t ON t.id = r.table_id
-       WHERE t.host_user_id = ? AND r.overall_rating IS NOT NULL`,
-    )
-    .get(userId);
+// Average of ratings left by fellow attendees of tables this person has
+// shared (see tablesRouter's /:id/rate in tables.js) -- rating them as a
+// dining companion, not the (unrelated) food/restaurant/conversation
+// review a table's reviews carry.
+async function peopleRating(userId) {
+  const row = await db.prepare('SELECT AVG(score) as avg FROM user_ratings WHERE rated_user_id = ?').get(userId);
   return row.avg ? Math.round(row.avg * 10) / 10 : null;
 }
 
@@ -88,7 +87,7 @@ async function fullProfile(userId) {
     phone: profile?.phone ?? null,
     verified: !!profile?.verified,
     tablesJoinedCount: await tablesJoinedCount(userId),
-    rating: await hostRating(userId),
+    rating: await peopleRating(userId),
     favoriteFoods: foodPrefs?.favorite_foods ? foodPrefs.favorite_foods.split(',') : [],
     dietaryNeeds: dietaryPrefs?.needs ? dietaryPrefs.needs.split(',') : [],
     spiceTolerance: dietaryPrefs?.spice_tolerance ?? null,
@@ -274,6 +273,9 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
 matchesRouter.get('/', asyncHandler(async (req, res) => {
   const myInterestIds = new Set((await interestsFor(req.user.sub)).map((i) => i.id));
   const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
+  const myTaste = await tastePrefsFor(req.user.sub);
+  const myFavoriteFoods = new Set(myTaste.favoriteFoods.map((food) => food.toLowerCase()));
+  const myDietaryNeeds = new Set(myTaste.dietaryNeeds.map((need) => need.toLowerCase()));
 
   const candidates = toCamelRows(
     await db
@@ -291,26 +293,66 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
         const candidateInterests = await interestsFor(candidate.id);
         const sharedInterests = candidateInterests.filter((i) => myInterestIds.has(i.id));
         const sameCity = myProfile?.city && myProfile.city === candidate.city;
-        const score = sharedInterests.length * 15 + (sameCity ? 20 : 0);
+
+        // "Taste" match: favorite Pakistani dishes/cuisines and dietary
+        // needs someone actually set in Food/Dietary Preferences (see
+        // food-preferences.page.ts, dietary-preferences.page.ts) --
+        // real signal from the same vocabulary restaurants use
+        // (cuisine_tags), not just shared hobby interests.
+        const candidateTaste = await tastePrefsFor(candidate.id);
+        const sharedFavoriteFoods = candidateTaste.favoriteFoods.filter((food) => myFavoriteFoods.has(food.toLowerCase()));
+        const sharedDietaryNeeds = candidateTaste.dietaryNeeds.filter((need) => myDietaryNeeds.has(need.toLowerCase()));
+        const sameSpiceTolerance =
+          myTaste.spiceTolerance && myTaste.spiceTolerance === candidateTaste.spiceTolerance;
+
+        // Food/taste dominates the score -- interests are a smaller
+        // tiebreaker on top of it, not an equal factor. Area is
+        // deliberately NOT part of this score: it's applied afterward as a
+        // same-city-first grouping instead (see the sort below), so it
+        // never lets a distant stranger who shares your city outrank a
+        // genuinely taste-matched person from elsewhere within their group.
+        const score =
+          sharedFavoriteFoods.length * 25 +
+          sharedDietaryNeeds.length * 15 +
+          (sameSpiceTolerance ? 10 : 0) +
+          sharedInterests.length * 5;
+
         const reasons = [];
+        if (sharedFavoriteFoods.length > 0) {
+          reasons.push(`Also loves ${sharedFavoriteFoods[0]}`);
+        }
+        if (sharedDietaryNeeds.length > 0) {
+          reasons.push(`Both ${sharedDietaryNeeds[0].toLowerCase()}`);
+        }
+        if (sameSpiceTolerance) {
+          reasons.push(`Same spice tolerance (${candidateTaste.spiceTolerance})`);
+        }
         if (sharedInterests.length > 0) {
           reasons.push(`Shares your interest in ${sharedInterests[0].name}`);
         }
         if (sameCity) {
           reasons.push(`Also based in ${candidate.city}`);
         }
+
         return {
           ...candidate,
           score: Math.min(score, 99),
+          sameCity: !!sameCity,
           interests: candidateInterests,
           sharedInterests,
+          sharedFavoriteFoods,
           reasons,
-          rating: await hostRating(candidate.id),
+          rating: await peopleRating(candidate.id),
           tablesJoinedCount: await tablesJoinedCount(candidate.id),
         };
       }),
     )
-  ).sort((a, b) => b.score - a.score);
+  ).sort((a, b) => {
+    // Same-area people first as a whole group (top), everyone else after
+    // (bottom) -- within each group, ranked by taste/interest score.
+    if (a.sameCity !== b.sameCity) return a.sameCity ? -1 : 1;
+    return b.score - a.score;
+  });
 
   res.json({ matches });
 }));

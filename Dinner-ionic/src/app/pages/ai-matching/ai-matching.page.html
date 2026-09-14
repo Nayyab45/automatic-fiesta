@@ -31,7 +31,17 @@
             </p>
 </section>
 
-<section *ngIf="!loading() && match() as m" class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-stack-lg max-w-5xl mx-auto w-full">
+<ng-container *ngIf="!loading()">
+<section *ngFor="let m of matches(); let i = index; let first = first" class="flex flex-col gap-stack-sm max-w-5xl mx-auto w-full">
+
+<h2 *ngIf="first && m.sameCity" class="font-title-lg text-title-lg text-on-background flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">place</span> Near you in {{ m.city }}
+</h2>
+<h2 *ngIf="m.sameCity === false && (i === 0 || matches()[i - 1].sameCity)" class="font-title-lg text-title-lg text-on-background flex items-center gap-2 mt-4">
+<span class="material-symbols-outlined text-on-surface-variant">public</span> From other areas
+</h2>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-stack-lg w-full">
 
 <div class="lg:col-span-7 bg-surface rounded-xl shadow-soft-lift border border-surface-variant overflow-hidden flex flex-col relative group">
 
@@ -55,7 +65,7 @@
 <div class="flex flex-wrap gap-2">
 <span *ngFor="let interest of m.interests" class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full font-label-lg text-label-lg">{{ interest.name }}</span>
 </div>
-<button (click)="go('/discover-people')" class="mt-2 w-full bg-primary-container hover:bg-primary text-on-primary-container hover:text-white transition-colors duration-300 py-3 rounded-lg font-label-lg text-label-lg uppercase tracking-wider">
+<button (click)="go('/profile/' + m.id)" class="mt-2 w-full bg-primary-container hover:bg-primary text-on-primary-container hover:text-white transition-colors duration-300 py-3 rounded-lg font-label-lg text-label-lg uppercase tracking-wider">
                         View Match Profile
                     </button>
 </div>
@@ -79,7 +89,7 @@
 </div>
 <div class="flex items-center gap-2" *ngIf="m.rating">
 <span class="material-symbols-outlined text-primary text-[18px]">star</span>
-<span class="font-body-md text-body-md text-on-surface">Hosted with a {{ m.rating }}/5 rating</span>
+<span class="font-body-md text-body-md text-on-surface">Rated {{ m.rating }}/5 by fellow diners</span>
 </div>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[18px]">task_alt</span>
@@ -107,10 +117,12 @@
 </ul>
 </div>
 </div>
+</div>
 </section>
+</ng-container>
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Finding your best match…</p>
-<p *ngIf="!loading() && !match()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No matches yet — check back soon.</p>
+<p *ngIf="!loading() && matches().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No matches yet — check back soon.</p>
 </main>
 
 <app-bottom-nav active="discover"></app-bottom-nav>

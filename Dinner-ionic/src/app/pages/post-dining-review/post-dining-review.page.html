@@ -62,6 +62,16 @@
 <label class="font-body-lg text-body-lg text-on-surface sr-only" for="review-text">Share your experience</label>
 <textarea [(ngModel)]="comment" name="comment" class="w-full bg-transparent border-b border-outline-variant focus:border-primary-container focus:ring-0 resize-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 p-2 transition-colors" id="review-text" placeholder="Share your experience..." rows="4"></textarea>
 </section>
+
+<section *ngIf="rateablePeople().length > 0" class="flex flex-col gap-stack-md pt-stack-sm border-t border-surface-variant/50">
+<h3 class="font-title-lg text-title-lg text-primary">Rate your dining companions</h3>
+<div *ngFor="let person of rateablePeople()" class="flex items-center justify-between gap-gutter">
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ person.name }}</span>
+<div class="star-rating flex gap-unit">
+<button *ngFor="let star of stars" (click)="ratePerson(person.id, star)" type="button" [class.text-primary]="star <= ratingFor(person.id)" [class.text-outline-variant]="star > ratingFor(person.id)"><span class="material-symbols-outlined text-2xl" [style.font-variation-settings]="star <= ratingFor(person.id) ? '\'FILL\' 1' : '\'FILL\' 0'">star</span></button>
+</div>
+</div>
+</section>
 </div>
 
 <div class="px-container-padding py-stack-md bg-surface border-t border-surface-container-high sticky bottom-0">

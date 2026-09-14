@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
-import { pathToFileURL, fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { initSchema } from './db.js';
 import { authRouter } from './routes/auth.js';
 import { restaurantsRouter } from './routes/restaurants.js';
@@ -85,13 +85,17 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-// Only binds a port when run directly (`node src/server.js`); tests import
-// `app` and call `app.listen(0)` themselves so each test file gets its own
-// ephemeral port instead of colliding with a dev server already on 3000.
-// pathToFileURL (not string concatenation) handles Windows drive letters and
-// slash direction correctly, which a naive `file://${argv[1]}` comparison
-// does not.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Only binds a port unless a test opted out (see test/api.test.js, which
+// imports `app` and calls app.listen(0) itself so each test file gets its
+// own ephemeral port instead of colliding with a dev server already on
+// 3000). Deliberately NOT an "am I the entry module" check (via argv or
+// import.meta.main) -- both silently came out false under PM2's fork-mode
+// launcher, which loads the script through its own ProcessContainerFork.js
+// rather than running it as the literal entry point, so initSchema()/
+// app.listen() never ran at all: PM2 showed the process "online" with zero
+// errors, just no server ever actually listening. An explicit opt-out flag
+// has no such launcher-dependent failure mode.
+if (!process.env.SKIP_SERVER_LISTEN) {
   const port = process.env.PORT || 3000;
   initSchema()
     .then(() => {

@@ -50,6 +50,12 @@ export interface Restaurant {
   createdAt: string;
   /** Up to 3 popular dishes; present on list results, absent elsewhere unless requested. */
   dishes?: Dish[];
+  /** Only present on /recommended results: distance from the coordinates passed to recommended(), if any were. */
+  distanceKm?: number | null;
+  /** Only present on /recommended results: this restaurant's cuisine tags that matched the user's Food Preferences. */
+  matchedFoods?: string[];
+  /** Only present on /recommended results: server-generated reasons this restaurant was picked, in priority order. */
+  reasons?: string[];
 }
 
 export interface RestaurantDetail extends Restaurant {
@@ -103,8 +109,12 @@ export class RestaurantService {
     return this.http.get<{ restaurant: RestaurantDetail }>(`${this.baseUrl}/${id}`);
   }
 
-  recommended(): Observable<{ restaurants: RestaurantDetail[] }> {
-    return this.http.get<{ restaurants: RestaurantDetail[] }>(`${this.baseUrl}/recommended`);
+  recommended(coords?: { lat: number; lng: number }): Observable<{ restaurants: RestaurantDetail[] }> {
+    let httpParams = new HttpParams();
+    if (coords) {
+      httpParams = httpParams.set('lat', coords.lat).set('lng', coords.lng);
+    }
+    return this.http.get<{ restaurants: RestaurantDetail[] }>(`${this.baseUrl}/recommended`, { params: httpParams });
   }
 
   featuredDishes(): Observable<{ dishes: FeaturedDish[] }> {

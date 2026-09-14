@@ -11,7 +11,7 @@
 // across every city in Pakistan would hammer a shared resource nobody here
 // operates. `restaurant_import_log` makes sure a city is only ever fetched
 // once, including cities OSM has zero tagged results for.
-import { getOrCreateCuisinePhoto, getRealPlacePhoto } from './restaurantPhotos.js';
+import { getGooglePlacePhoto, getOrCreateCuisinePhoto, getRealPlacePhoto, getWikipediaPlacePhoto, poolSizeForCount } from './restaurantPhotos.js';
 
 const USER_AGENT = 'WhatShouldWeEat-DevApp/1.0 (contact: nayyabashfaq05@gmail.com)';
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
@@ -108,6 +108,23 @@ export async function fetchOverpassRestaurants(bbox) {
 }
 
 /**
+ * A real photo of this exact place, cheapest/most-likely source first:
+ * Google Places (if GOOGLE_PLACES_API_KEY is set), then OSM's own linked
+ * `image` tag, then Wikipedia/Wikidata for the rare notable place. All three
+ * are free to try when unmatched -- only Google costs anything, and only
+ * when it actually finds a photo.
+ */
+async function fetchRealPhotoForPlace(place, tags, city) {
+  const googlePhoto = await getGooglePlacePhoto({ name: tags.name, address: addressFrom(tags, city), city });
+  if (googlePhoto) return googlePhoto;
+
+  const osmPhoto = await getRealPlacePhoto(place, tags);
+  if (osmPhoto) return osmPhoto;
+
+  return getWikipediaPlacePhoto({ name: tags.name, city });
+}
+
+/**
  * Imports a city's real restaurants from OpenStreetMap into the `restaurants`
  * table, unless it's already been imported before. `fetchBoundingBox`/
  * `fetchPlaces`/`fetchRealPhoto`/`fetchCuisinePhoto` are injectable so tests
@@ -119,7 +136,7 @@ export async function importCityRestaurants(
   {
     fetchBoundingBox = lookupCityBoundingBox,
     fetchPlaces = fetchOverpassRestaurants,
-    fetchRealPhoto = getRealPlacePhoto,
+    fetchRealPhoto = (place, tags) => fetchRealPhotoForPlace(place, tags, city),
     fetchCuisinePhoto = getOrCreateCuisinePhoto,
   } = {},
 ) {
@@ -149,22 +166,44 @@ export async function importCityRestaurants(
   // *distinct* cuisines, and with up to a couple of network calls per photo,
   // doing this sequentially could turn a city's first load into a
   // multi-minute wait. Real per-place photos run in parallel across every
-  // place; cuisine photos run in parallel across only the distinct cuisines
-  // present, then get reused via this map instead of re-fetched per place.
+  // place. Cuisine photos build a small *pool* per cuisine (sized by how
+  // many places share it -- see poolSizeForCount) instead of a single
+  // shared photo, so e.g. ten pizza places don't all render the identical
+  // image; slots within one cuisine are fetched sequentially (each one
+  // depends on the last being cached first) but different cuisines' pools
+  // build in parallel with each other.
   const realPhotos = await Promise.all(places.map((place) => fetchRealPhoto(place, place.tags)));
-  const distinctCuisines = [...new Set(places.map((place) => cuisineTagsFrom(place.tags)))];
-  const cuisinePhotos = new Map(
-    await Promise.all(distinctCuisines.map(async (cuisine) => [cuisine, await fetchCuisinePhoto(db, cuisine)])),
+  const cuisineCounts = new Map();
+  for (const place of places) {
+    const cuisineTags = cuisineTagsFrom(place.tags);
+    cuisineCounts.set(cuisineTags, (cuisineCounts.get(cuisineTags) ?? 0) + 1);
+  }
+  const cuisinePhotoPools = new Map(
+    await Promise.all(
+      [...cuisineCounts.entries()].map(async ([cuisineTags, count]) => {
+        const poolSize = poolSizeForCount(count);
+        const photos = [];
+        for (let slot = 0; slot < poolSize; slot++) {
+          photos.push(await fetchCuisinePhoto(db, cuisineTags, slot));
+        }
+        return [cuisineTags, photos];
+      }),
+    ),
   );
 
+  const cuisineOccurrences = new Map();
   for (const [index, place] of places.entries()) {
     const tags = place.tags;
     const cuisineTags = cuisineTagsFrom(tags);
-    // A real photo of this exact place if OSM has one linked, otherwise a
-    // cuisine-matched stock photo (both already enhanced -- see
-    // restaurantPhotos.js) -- or null, which just means "no photo yet",
-    // handled by the same placeholder the app already shows for that.
-    const photo = realPhotos[index] ?? cuisinePhotos.get(cuisineTags);
+    const occurrence = cuisineOccurrences.get(cuisineTags) ?? 0;
+    cuisineOccurrences.set(cuisineTags, occurrence + 1);
+    const pool = cuisinePhotoPools.get(cuisineTags) ?? [];
+    const cuisinePhoto = pool.length ? pool[occurrence % pool.length] : null;
+    // A real photo of this exact place if OSM/Google/Wikipedia had one,
+    // otherwise a cuisine-matched stock photo from this cuisine's pool
+    // (both already enhanced -- see restaurantPhotos.js) -- or null, which
+    // just means "no photo yet", handled by the app's existing placeholder.
+    const photo = realPhotos[index] ?? cuisinePhoto;
 
     await db
       .prepare(

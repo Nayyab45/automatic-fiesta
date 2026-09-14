@@ -26,4 +26,12 @@ export class NotificationService {
   markAllRead(): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/read-all`, {});
   }
+
+  registerDeviceToken(token: string): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/device-token`, { token });
+  }
+
+  unregisterDeviceToken(token: string): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/device-token`, { body: { token } });
+  }
 }

@@ -63,8 +63,9 @@ keystore.properties
 .externalNativeBuild
 .cxx/
 
-# Google Services (e.g. APIs or Firebase)
-# google-services.json
+# Google Services (e.g. APIs or Firebase) -- identifies this specific
+# Firebase project; anyone who clones the repo sets up their own.
+google-services.json
 
 # Freeline
 freeline.py

@@ -4,6 +4,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
+import { registerDeviceToken, sendPushToUser, unregisterDeviceToken } from '../lib/push.js';
 
 export const conversationsRouter = Router();
 export const notificationsRouter = Router();
@@ -11,16 +12,44 @@ export const notificationsRouter = Router();
 conversationsRouter.use(requireAuth);
 notificationsRouter.use(requireAuth);
 
+// Shared with formatNotification() below so the in-app notifications list
+// and the push notification's body text never drift apart.
+function notificationMessageFor(type, { actorName = 'Someone', restaurantName = 'the restaurant' } = {}) {
+  const messages = {
+    seat_request_received: `${actorName} requested a seat at ${restaurantName}`,
+    seat_request_confirmed: `Your seat request was approved at ${restaurantName}`,
+    seat_request_declined: `Your seat request was declined at ${restaurantName}`,
+    friend_request_received: `${actorName} sent you a friend request`,
+    friend_request_accepted: `${actorName} accepted your friend request`,
+  };
+  return messages[type] ?? 'You have a new notification';
+}
+
+async function actorAndRestaurantNames(actorUserId, tableId) {
+  const actor = actorUserId ? await db.prepare('SELECT name FROM users WHERE id = ?').get(actorUserId) : null;
+  const restaurant = tableId
+    ? await db
+        .prepare('SELECT r.name FROM dining_tables t JOIN restaurants r ON r.id = t.restaurant_id WHERE t.id = ?')
+        .get(tableId)
+    : null;
+  return { actorName: actor?.name, restaurantName: restaurant?.name };
+}
+
 // Inserted from other route files (e.g. seat-request lifecycle) so notification
-// wording stays centralized in formatNotification() below instead of being
-// re-derived at every call site.
+// wording stays centralized in notificationMessageFor() above instead of being
+// re-derived at every call site. Also fires a push (best-effort, see
+// sendPushToUser) to every device the recipient is registered on.
 export async function createNotification(userId, type, { tableId = null, actorUserId = null } = {}) {
-  await db.prepare('INSERT INTO notifications (user_id, type, table_id, actor_user_id) VALUES (?, ?, ?, ?)').run(
-    userId,
-    type,
-    tableId,
-    actorUserId,
-  );
+  const result = await db
+    .prepare('INSERT INTO notifications (user_id, type, table_id, actor_user_id) VALUES (?, ?, ?, ?)')
+    .run(userId, type, tableId, actorUserId);
+
+  const { actorName, restaurantName } = await actorAndRestaurantNames(actorUserId, tableId);
+  await sendPushToUser(userId, {
+    title: 'What Should We Eat',
+    body: notificationMessageFor(type, { actorName, restaurantName }),
+    data: { notificationId: result.lastInsertRowid, type, route: '/notifications' },
+  });
 }
 
 async function otherParticipant(conversationId, userId) {
@@ -174,13 +203,6 @@ conversationsRouter.post('/:id/read', asyncHandler(async (req, res) => {
 function formatNotification(row) {
   const actorName = row.actor_name ?? 'Someone';
   const restaurantName = row.restaurant_name ?? 'the restaurant';
-  const messages = {
-    seat_request_received: `${actorName} requested a seat at ${restaurantName}`,
-    seat_request_confirmed: `Your seat request was approved at ${restaurantName}`,
-    seat_request_declined: `Your seat request was declined at ${restaurantName}`,
-    friend_request_received: `${actorName} sent you a friend request`,
-    friend_request_accepted: `${actorName} accepted your friend request`,
-  };
 
   // row.actor_name comes from a LEFT JOIN, so it's null both when there's no
   // actor and when the actor's account has since been deleted (any user can
@@ -190,7 +212,7 @@ function formatNotification(row) {
   return {
     id: row.id,
     type: row.type,
-    message: messages[row.type] ?? 'You have a new notification',
+    message: notificationMessageFor(row.type, { actorName, restaurantName }),
     tableId: row.table_id,
     actorName: actorStillExists ? actorName : null,
     actorUserId: actorStillExists ? row.actor_user_id : null,
@@ -214,5 +236,29 @@ notificationsRouter.get('/', asyncHandler(async (req, res) => {
 
 notificationsRouter.post('/read-all', asyncHandler(async (req, res) => {
   await db.prepare('UPDATE notifications SET read_at = NOW() WHERE user_id = ? AND read_at IS NULL').run(req.user.sub);
+  res.json({ ok: true });
+}));
+
+// Called once the app has an FCM registration token (see
+// push-notification.service.ts) -- on every launch, since the token can
+// rotate at any time and re-registering an unchanged one is a harmless
+// upsert (see registerDeviceToken).
+notificationsRouter.post('/device-token', asyncHandler(async (req, res) => {
+  const missingFieldsError = requireFields(req.body, ['token']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+  await registerDeviceToken(req.user.sub, req.body.token);
+  res.json({ ok: true });
+}));
+
+// Called on sign-out so a shared/borrowed device stops receiving this
+// user's pushes once they're no longer signed in on it.
+notificationsRouter.delete('/device-token', asyncHandler(async (req, res) => {
+  const missingFieldsError = requireFields(req.body, ['token']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+  await unregisterDeviceToken(req.body.token);
   res.json({ ok: true });
 }));

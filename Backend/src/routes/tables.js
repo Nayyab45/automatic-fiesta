@@ -284,6 +284,79 @@ tablesRouter.get('/:id/reviews', asyncHandler(async (req, res) => {
   res.json({ reviews: toCamelRows(rows) });
 }));
 
+async function attendeeIdsOf(table) {
+  const guests = await db.prepare('SELECT user_id FROM table_guests WHERE table_id = ?').all(table.id);
+  return [table.host_user_id, ...guests.map((g) => g.user_id)];
+}
+
+// Rating another person is only possible for someone you actually shared a
+// (past) table with -- mirrors how Uber/Airbnb gate ratings to a real
+// interaction, rather than letting anyone rate any profile. Both endpoints
+// below re-check table membership + isPast independently of the frontend.
+tablesRouter.get('/:id/rateable', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT id, host_user_id, date_time FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!(await isTableMember(table, req.user.sub))) {
+    return res.status(403).json({ message: 'Not a member of this table' });
+  }
+  if (table.date_time >= new Date().toISOString()) {
+    return res.status(400).json({ message: "This table hasn't happened yet" });
+  }
+
+  const otherIds = (await attendeeIdsOf(table)).filter((id) => id !== req.user.sub);
+  const people = await Promise.all(
+    otherIds.map(async (userId) => {
+      const user = await db
+        .prepare('SELECT u.id, u.name, p.photo_url FROM users u LEFT JOIN user_profiles p ON p.user_id = u.id WHERE u.id = ?')
+        .get(userId);
+      const existing = await db
+        .prepare('SELECT score FROM user_ratings WHERE table_id = ? AND rater_user_id = ? AND rated_user_id = ?')
+        .get(table.id, req.user.sub, userId);
+      return { ...toCamel(user), myRating: existing?.score ?? null };
+    }),
+  );
+  res.json({ people });
+}));
+
+tablesRouter.post('/:id/rate', asyncHandler(async (req, res) => {
+  const missingFieldsError = requireFields(req.body, ['ratedUserId', 'score']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+  const ratedUserId = Number(req.body.ratedUserId);
+  const score = Number(req.body.score);
+  if (!Number.isInteger(score) || score < 1 || score > 5) {
+    return res.status(400).json({ message: 'score must be a whole number from 1 to 5' });
+  }
+  if (ratedUserId === req.user.sub) {
+    return res.status(400).json({ message: "You can't rate yourself" });
+  }
+
+  const table = await db.prepare('SELECT id, host_user_id, date_time FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (table.date_time >= new Date().toISOString()) {
+    return res.status(400).json({ message: "This table hasn't happened yet" });
+  }
+
+  const attendeeIds = await attendeeIdsOf(table);
+  if (!attendeeIds.includes(req.user.sub) || !attendeeIds.includes(ratedUserId)) {
+    return res.status(403).json({ message: 'You both need to have been part of this table' });
+  }
+
+  await db
+    .prepare(
+      `INSERT INTO user_ratings (table_id, rater_user_id, rated_user_id, score) VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE score = VALUES(score)`,
+    )
+    .run(table.id, req.user.sub, ratedUserId, score);
+
+  res.json({ ok: true });
+}));
+
 // Mounted separately at /api/seat-requests since it acts on a seat request
 // by its own id, not scoped under a table.
 seatRequestsRouter.patch('/:id', asyncHandler(async (req, res) => {
