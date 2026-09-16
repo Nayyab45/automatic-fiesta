@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
 import QRCode from 'qrcode';
 import { randomBytes, createHash } from 'node:crypto';
@@ -12,6 +13,15 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { mailer } from '../lib/mailer.js';
 
 export const authRouter = Router();
+
+// Verifies the ID token's signature against Google's own public keys and
+// checks it was actually issued for this app's Web OAuth client (the
+// `aud` claim) -- without that audience check, a token minted for some
+// unrelated Google app would also pass signature verification and let
+// someone sign in as any email. See Dinner-ionic's environment.ts
+// (googleWebClientId) for where this same client ID is configured
+// client-side.
+const googleClient = process.env.GOOGLE_WEB_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_WEB_CLIENT_ID) : null;
 
 // Short-lived access token (used on every request) plus a long-lived,
 // revocable refresh token (used only to mint new access tokens). A stolen
@@ -118,6 +128,63 @@ authRouter.post('/login', asyncHandler(async (req, res) => {
     // Correct password, but the session isn't issued yet -- the client
     // exchanges this challenge token + a TOTP code for the real session via
     // /auth/2fa/verify-login. Never issue real tokens before that check.
+    return res.json({ twoFactorRequired: true, challengeToken: signTwoFactorChallenge(row.id) });
+  }
+
+  res.json(await issueSession(toPublicUser(row)));
+}));
+
+// Signs in an existing account or creates a new one from a real Google
+// identity -- the client got `idToken` from the device's native account
+// picker (see Dinner-ionic's AuthService.signInWithGoogle), not typed in,
+// so there's no password to check; verifying the token here is what proves
+// it actually came from Google for *this* app rather than being forged.
+authRouter.post('/google', asyncHandler(async (req, res) => {
+  const { idToken } = req.body ?? {};
+  const missingFieldsError = requireFields(req.body, ['idToken']);
+  if (missingFieldsError) {
+    return res.status(400).json({ message: missingFieldsError });
+  }
+  if (!googleClient) {
+    return res.status(501).json({ message: 'Google Sign-In is not configured on this server yet.' });
+  }
+
+  let payload;
+  try {
+    const ticket = await googleClient.verifyIdToken({ idToken, audience: process.env.GOOGLE_WEB_CLIENT_ID });
+    payload = ticket.getPayload();
+  } catch {
+    return res.status(401).json({ message: 'Invalid Google credential. Please try again.' });
+  }
+
+  // An unverified email means Google itself isn't vouching that this
+  // account controls that address -- not safe to use for account lookup/
+  // creation (someone could otherwise claim any email as their Google
+  // profile email without proving they own it).
+  if (!payload?.email || !payload.email_verified) {
+    return res.status(401).json({ message: "Google didn't provide a verified email for this account." });
+  }
+
+  const normalizedEmail = payload.email.trim().toLowerCase();
+  let row = await db.prepare('SELECT * FROM users WHERE email = ?').get(normalizedEmail);
+
+  if (!row) {
+    // No password was ever set for a Google-created account -- a random
+    // hash that can't be produced by any real password input, rather than
+    // leaving the column nullable, keeps every other query/constraint
+    // written against "users always has a password_hash" untouched.
+    const unusablePasswordHash = bcrypt.hashSync(randomBytes(32).toString('hex'), 10);
+    const name = payload.name?.trim() || normalizedEmail.split('@')[0];
+    const result = await db
+      .prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
+      .run(name, normalizedEmail, unusablePasswordHash);
+    row = { id: result.lastInsertRowid, name, email: normalizedEmail };
+  }
+
+  // Matches /login's behaviour: a correct external identity still doesn't
+  // skip 2FA if the account has it enabled.
+  const twoFactor = await db.prepare('SELECT enabled FROM two_factor_auth WHERE user_id = ?').get(row.id);
+  if (twoFactor?.enabled) {
     return res.json({ twoFactorRequired: true, challengeToken: signTwoFactorChallenge(row.id) });
   }
 

@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, LoginResult } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -50,19 +50,38 @@ export class LoginPage extends BasePage {
     const { email, password } = this.form.getRawValue();
 
     this.authService.login(email, password).subscribe({
-      next: (result) => {
-        if ('twoFactorRequired' in result) {
-          this.submitting.set(false);
-          this.twoFactorChallengeToken.set(result.challengeToken);
-          return;
-        }
-        this.go('/home');
-      },
+      next: (result) => this.handleLoginResult(result),
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         this.errorMessage.set(err.error?.message ?? 'Unable to sign in. Please try again.');
       },
     });
+  }
+
+  continueWithGoogle(): void {
+    if (this.submitting()) return;
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.authService.signInWithGoogle().subscribe({
+      next: (result) => this.handleLoginResult(result),
+      error: (err) => {
+        this.submitting.set(false);
+        // A user backing out of the account picker isn't an error worth
+        // showing -- same as tapping outside a dialog to dismiss it.
+        if (err?.code === 'USER_CANCELLED') return;
+        this.errorMessage.set(err?.error?.message ?? 'Unable to sign in with Google. Please try again.');
+      },
+    });
+  }
+
+  private handleLoginResult(result: LoginResult): void {
+    if ('twoFactorRequired' in result) {
+      this.submitting.set(false);
+      this.twoFactorChallengeToken.set(result.challengeToken);
+      return;
+    }
+    this.go('/home');
   }
 
   submitTwoFactorCode(): void {

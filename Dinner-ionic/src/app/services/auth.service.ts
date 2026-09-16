@@ -1,9 +1,28 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap } from 'rxjs';
-import { catchError, map, shareReplay, finalize } from 'rxjs/operators';
+import { Observable, from, of, tap, throwError, TimeoutError } from 'rxjs';
+import { catchError, map, shareReplay, finalize, switchMap, timeout } from 'rxjs/operators';
 import { Preferences } from '@capacitor/preferences';
+import { SocialLogin } from '@capgo/capacitor-social-login';
 import { environment } from '../../environments/environment';
+
+// A stalled connection (stale dev-machine IP, a firewall silently dropping
+// SYNs, a dead network) otherwise hangs these calls forever -- HttpClient/
+// RxJS have no default timeout, so the UI is stuck on "Signing In..." with
+// no feedback until the OS-level TCP retry gives up (60s+).
+const AUTH_REQUEST_TIMEOUT_MS = 15000;
+
+function timeoutToHttpLikeError<T>(source: Observable<T>): Observable<T> {
+  return source.pipe(
+    timeout(AUTH_REQUEST_TIMEOUT_MS),
+    catchError((err) => {
+      if (err instanceof TimeoutError) {
+        return throwError(() => ({ error: { message: 'Request timed out. Check your connection and try again.' } }));
+      }
+      return throwError(() => err);
+    }),
+  );
+}
 
 export interface AuthUser {
   id: number;
@@ -66,23 +85,59 @@ export class AuthService {
   }
 
   signup(name: string, email: string, password: string): Observable<AuthSession> {
-    return this.http
-      .post<AuthSession>(`${this.baseUrl}/signup`, { name, email, password })
-      .pipe(tap((session) => this.setSession(session)));
+    return this.http.post<AuthSession>(`${this.baseUrl}/signup`, { name, email, password }).pipe(
+      timeoutToHttpLikeError,
+      tap((session) => this.setSession(session)),
+    );
   }
 
   login(email: string, password: string): Observable<LoginResult> {
     return this.http.post<LoginResult>(`${this.baseUrl}/login`, { email, password }).pipe(
+      timeoutToHttpLikeError,
       tap((result) => {
         if (!('twoFactorRequired' in result)) this.setSession(result);
       }),
     );
   }
 
+  private googleInitialized = false;
+
+  /** Gets a real Google ID token from the device's native account picker
+   * (Android: Credential Manager; requires environment.googleWebClientId --
+   * see its comment) and exchanges it with our own backend for a session,
+   * via the same shape /login already returns (including a 2FA challenge if
+   * the matched account has it enabled), so callers handle it identically. */
+  signInWithGoogle(): Observable<LoginResult> {
+    if (!environment.googleWebClientId) {
+      return throwError(() => ({ error: { message: 'Google Sign-In is not set up yet.' } }));
+    }
+
+    return from(this.googleIdToken()).pipe(
+      switchMap((idToken) => this.http.post<LoginResult>(`${this.baseUrl}/google`, { idToken })),
+      timeoutToHttpLikeError,
+      tap((result) => {
+        if (!('twoFactorRequired' in result)) this.setSession(result);
+      }),
+    );
+  }
+
+  private async googleIdToken(): Promise<string> {
+    if (!this.googleInitialized) {
+      await SocialLogin.initialize({ google: { webClientId: environment.googleWebClientId } });
+      this.googleInitialized = true;
+    }
+    const { result } = await SocialLogin.login({ provider: 'google', options: {} });
+    if (result.responseType !== 'online' || !result.idToken) {
+      throw { error: { message: 'Google did not return an ID token. Please try again.' } };
+    }
+    return result.idToken;
+  }
+
   verify2faLogin(challengeToken: string, code: string): Observable<AuthSession> {
-    return this.http
-      .post<AuthSession>(`${this.baseUrl}/2fa/verify-login`, { challengeToken, code })
-      .pipe(tap((session) => this.setSession(session)));
+    return this.http.post<AuthSession>(`${this.baseUrl}/2fa/verify-login`, { challengeToken, code }).pipe(
+      timeoutToHttpLikeError,
+      tap((session) => this.setSession(session)),
+    );
   }
 
   get2faStatus(): Observable<{ enabled: boolean }> {

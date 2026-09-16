@@ -53,4 +53,30 @@ export class SignupPage extends BasePage {
       },
     });
   }
+
+  continueWithGoogle(): void {
+    if (this.submitting()) return;
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.authService.signInWithGoogle().subscribe({
+      next: (result) => {
+        if ('twoFactorRequired' in result) {
+          // An account with this Google email already exists and has 2FA
+          // enabled -- that flow lives on the login page, not here.
+          this.submitting.set(false);
+          this.errorMessage.set('This account has two-factor authentication enabled. Please sign in instead.');
+          return;
+        }
+        this.go('/profile-creation');
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        // A user backing out of the account picker isn't an error worth
+        // showing -- same as tapping outside a dialog to dismiss it.
+        if (err?.code === 'USER_CANCELLED') return;
+        this.errorMessage.set(err?.error?.message ?? 'Unable to sign up with Google. Please try again.');
+      },
+    });
+  }
 }

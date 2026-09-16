@@ -7,5 +7,13 @@
 // IPv4 address).
 export const environment = {
   production: false,
-  apiUrl: 'http://192.168.43.136:3000/api',
+  apiUrl: 'http://192.168.100.33:3000/api',
+  // The Firebase project's "Web" OAuth client ID (ends in
+  // .apps.googleusercontent.com), from Firebase Console -> Authentication ->
+  // Sign-in method -> Google, after enabling it there. Required for
+  // Google Sign-In on Android too (Credential Manager needs it as
+  // webClientId, not the separate Android client) -- see
+  // AuthService.signInWithGoogle. Empty until that's set up; the Google
+  // button will show a clear error instead of silently failing until then.
+  googleWebClientId: '',
 };
