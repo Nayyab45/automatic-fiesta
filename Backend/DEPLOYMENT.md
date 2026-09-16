@@ -46,10 +46,10 @@ curl http://localhost:3000/api/health
 
 ## Wiring the frontend to the deployed backend
 
-`Dinner-ionic/src/environments/environment.prod.ts` currently points
-`apiUrl` at `https://api.whatshouldweeat.app/api` — a placeholder domain
-that isn't live. Once you have a real deployed URL, update that file (and
-rebuild/re-sync the Android app) to point at it.
+`Dinner-ionic/src/environments/environment.prod.ts` points `apiUrl` at
+`https://weeat.netstech.net/api`, the current live backend. If that
+backend ever moves to a new URL, update that file (and rebuild/re-sync
+the Android app) to point at the new one.
 
 ## Not covered here
 
