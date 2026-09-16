@@ -239,6 +239,15 @@ notificationsRouter.post('/read-all', asyncHandler(async (req, res) => {
   res.json({ ok: true });
 }));
 
+// Scoped to this user (WHERE user_id = ?) so one person can't mark another
+// person's notification read just by guessing/incrementing an id.
+notificationsRouter.post('/:id/read', asyncHandler(async (req, res) => {
+  await db
+    .prepare('UPDATE notifications SET read_at = NOW() WHERE id = ? AND user_id = ? AND read_at IS NULL')
+    .run(req.params.id, req.user.sub);
+  res.json({ ok: true });
+}));
+
 // Called once the app has an FCM registration token (see
 // push-notification.service.ts) -- on every launch, since the token can
 // rotate at any time and re-registering an unchanged one is a harmless

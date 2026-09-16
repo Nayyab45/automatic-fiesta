@@ -46,6 +46,13 @@ export class NotificationsPage extends BasePage {
   }
 
   open(n: AppNotification): void {
+    if (!n.read) {
+      // Fire-and-forget: the dot disappears immediately client-side rather
+      // than waiting on the round-trip, and this doesn't block navigation.
+      this.notificationService.markRead(n.id).subscribe({ error: () => {} });
+      this.notifications.update((list) => list.map((item) => (item.id === n.id ? { ...item, read: true } : item)));
+    }
+
     // A seat-request notification names the table it's about -- route the
     // host to the request they need to act on, or the guest to their
     // request's live status, rather than just their counterpart's profile.

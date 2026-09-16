@@ -27,6 +27,10 @@ export class NotificationService {
     return this.http.post(`${this.baseUrl}/read-all`, {});
   }
 
+  markRead(id: number): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/${id}/read`, {});
+  }
+
   registerDeviceToken(token: string): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/device-token`, { token });
   }
