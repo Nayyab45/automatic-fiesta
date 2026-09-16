@@ -23,6 +23,9 @@
 <span class="material-symbols-outlined text-primary-container text-[18px]" data-icon="face" style="font-variation-settings: 'FILL' 1;">face</span>
 <span class="font-label-sm text-label-sm text-on-surface">{{ preview() ? 'Photo captured' : 'Ready to capture' }}</span>
 </div>
+@if (errorMessage()) {
+<p class="font-body-md text-body-md text-error text-center mt-stack-sm" role="alert">{{ errorMessage() }}</p>
+}
 </main>
 
 <input #selfieInput (change)="onSelfieSelected($event)" accept="image/*" capture="user" class="sr-only" type="file"/>
