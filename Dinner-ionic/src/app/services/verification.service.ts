@@ -9,6 +9,10 @@ export interface VerificationStatus {
   hasIdBack: boolean;
   hasSelfie: boolean;
   submittedAt: string | null;
+  /** The automated selfie/ID match score (0-100) from the most recent
+   * submission -- see Backend's faceMatch.js. Null if that check never ran
+   * (not configured server-side, or no submission yet). */
+  faceMatchConfidence: number | null;
 }
 
 @Injectable({ providedIn: 'root' })

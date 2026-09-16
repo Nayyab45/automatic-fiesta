@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
+import { faceMatch } from '../lib/faceMatch.js';
 
 export const verificationRouter = Router();
 
@@ -10,7 +11,14 @@ verificationRouter.use(requireAuth);
 
 function statusFor(row) {
   if (!row) {
-    return { status: 'not_started', hasIdFront: false, hasIdBack: false, hasSelfie: false, submittedAt: null };
+    return {
+      status: 'not_started',
+      hasIdFront: false,
+      hasIdBack: false,
+      hasSelfie: false,
+      submittedAt: null,
+      faceMatchConfidence: null,
+    };
   }
   return {
     status: row.status,
@@ -18,6 +26,7 @@ function statusFor(row) {
     hasIdBack: !!row.id_back_url,
     hasSelfie: !!row.selfie_url,
     submittedAt: row.submitted_at,
+    faceMatchConfidence: row.face_match_confidence,
   };
 }
 
@@ -70,8 +79,18 @@ verificationRouter.post('/me/submit', asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Upload your ID and a selfie before submitting' });
   }
 
+  // Without this, there's no other mechanism anywhere in this app that
+  // ever moves a submission out of 'pending' -- there's no admin/reviewer
+  // endpoint, so a manual-review-only submission would sit pending forever.
+  // When Face++ is configured, decide immediately from the match; when
+  // it isn't (or it couldn't reach a verdict -- no face detected, bad
+  // lighting, a transient API error), fall back to the original
+  // indefinite-'pending' behavior rather than guessing.
+  const match = faceMatch.isConfigured() ? await faceMatch.compareFaces(row.id_front_url, row.selfie_url) : null;
+  const status = match ? (match.isMatch ? 'approved' : 'rejected') : 'pending';
+
   await db.prepare(
-    "UPDATE identity_verifications SET status = 'pending', submitted_at = NOW(), updated_at = NOW() WHERE user_id = ?",
-  ).run(req.user.sub);
+    'UPDATE identity_verifications SET status = ?, face_match_confidence = ?, submitted_at = NOW(), updated_at = NOW() WHERE user_id = ?',
+  ).run(status, match?.confidence ?? null, req.user.sub);
   res.json(await statusForUser(req.user.sub));
 }));

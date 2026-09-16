@@ -31,6 +31,7 @@ const { app } = await import('../src/server.js');
 const { initSchema, pool, db } = await import('../src/db.js');
 const { importCityRestaurants } = await import('../src/lib/osmPlaces.js');
 const { getRealPlacePhoto, getOrCreateCuisinePhoto, enhancePhoto } = await import('../src/lib/restaurantPhotos.js');
+const { compareFaces } = await import('../src/lib/faceMatch.js');
 const { Jimp } = await import('jimp');
 
 let server;
@@ -972,5 +973,75 @@ describe('restaurant photo enhancement', () => {
     assert.deepEqual(slot0First, slot0Second);
     assert.notEqual(slot0First.url, slot1.url);
     assert.match(slot0First.url, /\/images\/restaurants\/cuisine-.*\.jpg$/);
+  });
+});
+
+describe('identity verification', () => {
+  const TINY_DATA_URL = 'data:image/png;base64,aGVsbG8=';
+
+  test('uploading ID + selfie then submitting moves status to pending when no face-match provider is configured', async () => {
+    const { accessToken } = await signup('verify-pending');
+
+    const afterId = await api('PUT', '/api/verification/me/id', {
+      token: accessToken,
+      body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL },
+    });
+    assert.equal(afterId.status, 200);
+    assert.equal(afterId.body.hasIdFront, true);
+    assert.equal(afterId.body.status, 'not_started');
+
+    const afterSelfie = await api('PUT', '/api/verification/me/selfie', {
+      token: accessToken,
+      body: { selfieUrl: TINY_DATA_URL },
+    });
+    assert.equal(afterSelfie.body.hasSelfie, true);
+
+    // FACEPP_API_KEY/SECRET are unset in this test environment, so
+    // isConfigured() is false and submit() falls back to the original
+    // manual-review 'pending' state instead of calling Face++.
+    const afterSubmit = await api('POST', '/api/verification/me/submit', { token: accessToken });
+    assert.equal(afterSubmit.status, 200);
+    assert.equal(afterSubmit.body.status, 'pending');
+    assert.equal(afterSubmit.body.faceMatchConfidence, null);
+    assert.ok(afterSubmit.body.submittedAt);
+  });
+
+  test('submitting without both ID photos and a selfie is rejected', async () => {
+    const { accessToken } = await signup('verify-incomplete');
+    await api('PUT', '/api/verification/me/id', { token: accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
+
+    const { status, body } = await api('POST', '/api/verification/me/submit', { token: accessToken });
+    assert.equal(status, 400);
+    assert.match(body.message, /upload your id and a selfie/i);
+  });
+
+  test('compareFaces reports a match when confidence clears the 1e-4 threshold', async () => {
+    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
+      fetchCompare: async () => ({ confidence: 92.5, thresholds: { '1e-3': 62.3, '1e-4': 73.8, '1e-5': 83.6 } }),
+    });
+    assert.deepEqual(result, { confidence: 92.5, isMatch: true });
+  });
+
+  test('compareFaces reports no match when confidence falls short of the threshold', async () => {
+    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
+      fetchCompare: async () => ({ confidence: 40.1, thresholds: { '1e-3': 62.3, '1e-4': 73.8, '1e-5': 83.6 } }),
+    });
+    assert.deepEqual(result, { confidence: 40.1, isMatch: false });
+  });
+
+  test('compareFaces returns null (inconclusive) when Face++ found no confidence -- e.g. no face detected', async () => {
+    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
+      fetchCompare: async () => ({ error_message: 'INVALID_IMAGE_SIZE' }),
+    });
+    assert.equal(result, null);
+  });
+
+  test('compareFaces returns null rather than throwing when the request itself fails', async () => {
+    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
+      fetchCompare: async () => {
+        throw new Error('network down');
+      },
+    });
+    assert.equal(result, null);
   });
 });
