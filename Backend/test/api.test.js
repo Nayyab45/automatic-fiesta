@@ -996,14 +996,43 @@ describe('identity verification', () => {
     });
     assert.equal(afterSelfie.body.hasSelfie, true);
 
-    // FACEPP_API_KEY/SECRET are unset in this test environment, so
-    // isConfigured() is false and submit() falls back to the original
-    // manual-review 'pending' state instead of calling Face++.
+    // Force isConfigured() to false for this one test regardless of what's
+    // actually in this machine's .env, so it deterministically covers the
+    // no-provider fallback rather than depending on whether real FACEPP_*
+    // credentials happen to be set locally (they are, once you've followed
+    // the .env.example setup -- but this path still needs coverage for
+    // anyone/any CI run without them).
+    const { FACEPP_API_KEY, FACEPP_API_SECRET } = process.env;
+    delete process.env.FACEPP_API_KEY;
+    delete process.env.FACEPP_API_SECRET;
+    try {
+      const afterSubmit = await api('POST', '/api/verification/me/submit', { token: accessToken });
+      assert.equal(afterSubmit.status, 200);
+      assert.equal(afterSubmit.body.status, 'pending');
+      assert.equal(afterSubmit.body.faceMatchConfidence, null);
+      assert.ok(afterSubmit.body.submittedAt);
+    } finally {
+      if (FACEPP_API_KEY !== undefined) process.env.FACEPP_API_KEY = FACEPP_API_KEY;
+      if (FACEPP_API_SECRET !== undefined) process.env.FACEPP_API_SECRET = FACEPP_API_SECRET;
+    }
+  });
+
+  test('submitting with real face-match credentials configured records a confidence score either way', async () => {
+    if (!process.env.FACEPP_API_KEY || !process.env.FACEPP_API_SECRET) return; // not configured on this machine/CI run -- nothing to test
+    const { accessToken } = await signup('verify-configured');
+
+    await api('PUT', '/api/verification/me/id', { token: accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
+    await api('PUT', '/api/verification/me/selfie', { token: accessToken, body: { selfieUrl: TINY_DATA_URL } });
+
+    // TINY_DATA_URL is a 1x1 pixel, too small for Face++ to find a face in
+    // -- compareFaces() should come back null (inconclusive), so submit()
+    // falls back to 'pending' exactly like the not-configured case, rather
+    // than misreporting a real user's genuinely undecidable submission as
+    // rejected.
     const afterSubmit = await api('POST', '/api/verification/me/submit', { token: accessToken });
     assert.equal(afterSubmit.status, 200);
     assert.equal(afterSubmit.body.status, 'pending');
     assert.equal(afterSubmit.body.faceMatchConfidence, null);
-    assert.ok(afterSubmit.body.submittedAt);
   });
 
   test('submitting without both ID photos and a selfie is rejected', async () => {
