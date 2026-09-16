@@ -7,6 +7,13 @@
       "runtimeArgs": ["ng", "serve", "--port", "4200"],
       "cwd": "Dinner-ionic",
       "port": 4200
+    },
+    {
+      "name": "backend-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--watch", "src/server.js"],
+      "cwd": "Backend",
+      "port": 3113
     }
   ]
 }
