@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LocationService } from '../../services/location.service';
 
 /**
  * The standard top bar for the app's 5 primary tab screens: a location
@@ -21,6 +22,10 @@ import { Router } from '@angular/router';
 export class RootHeaderComponent {
   @Input() cityLabel = '';
   private readonly router = inject(Router);
+  // Reads the *signed-in device user's own* browsing/home city -- never
+  // anything about whichever profile a page might otherwise be showing
+  // (e.g. someone else's, on profile.page). See LocationService.isTraveling.
+  readonly locationService = inject(LocationService);
 
   openLocationPicker(): void {
     this.router.navigateByUrl('/select-location');

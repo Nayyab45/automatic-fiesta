@@ -42,6 +42,12 @@ export class ProfilePage extends BasePage {
       next: ({ profile }) => {
         this.profile.set(profile);
         this.loading.set(false);
+        // Backfills LocationService's home city for an account whose
+        // profile city was set before "traveling" existed as a concept.
+        // Own profile only (id is unset) -- never derive home-city state
+        // from someone else's profile, and this never writes anything
+        // visible on theirs either way.
+        if (!id) this.cityService.syncHomeCityIfUnset(profile.city);
       },
       error: () => this.loading.set(false),
     });

@@ -10,7 +10,10 @@
 
 <section class="col-span-4 flex flex-col gap-unit">
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">{{ greeting }}, {{ firstName() }}</h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant">Where will you dine tonight?</p>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+<ng-container *ngIf="cityService.isTraveling(); else notTraveling">Traveling in {{ cityService.current() }}? Here's the best for lunch, dinner and more.</ng-container>
+<ng-template #notTraveling>Where will you dine tonight?</ng-template>
+</p>
 <div class="grid grid-cols-3 gap-2 mt-stack-md w-full max-w-sm">
 <button (click)="go('/ai-restaurant-recommendation')" class="flex flex-col items-center justify-center gap-1 py-3 px-1 rounded-lg bg-surface soft-shadow text-primary hover:opacity-90 active:scale-95 transition-all">
 <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>

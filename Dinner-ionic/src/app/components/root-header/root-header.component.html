@@ -6,7 +6,10 @@
     tabindex="0"
   >
     <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
-    <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityLabel }}</span>
+    <div class="flex flex-col leading-tight">
+      <span *ngIf="locationService.isTraveling()" class="font-label-sm text-label-sm text-tertiary -mb-0.5">Traveling in</span>
+      <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityLabel }}</span>
+    </div>
   </div>
 
   <div class="flex items-center gap-stack-sm">

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
+import { LocationService } from '../../services/location.service';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
 import { PAKISTAN_CITIES } from '../../data/pakistan-cities';
 
@@ -24,6 +25,7 @@ const OFFICIAL_PROVINCES = ['Punjab', 'Sindh', 'Khyber Pakhtunkhwa', 'Balochista
 export class ProfileCreationPage extends BasePage {
   readonly pageTitle = 'Profile Creation';
   private readonly profileService = inject(ProfileService);
+  private readonly locationService = inject(LocationService);
 
   // /profile-creation also serves as the "Edit Profile" screen for existing
   // users (see profile.page.html) -- ?mode=edit stops submit() from chaining
@@ -101,7 +103,16 @@ export class ProfileCreationPage extends BasePage {
 
     const next = this.isEditMode ? '/profile' : '/personal-interests';
     this.profileService.updateMe({ age: this.age ?? undefined, bio: this.bio, city: this.city, province: this.province }).subscribe({
-      next: () => this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go(next)),
+      next: () => {
+        // The city picked here is the user's home city -- keep it in sync
+        // with LocationService's home/browsing city (normally only set via
+        // /select-location) so it doesn't silently show a stale or
+        // never-set city, and so picking a *different* city later via
+        // Select Location reads as "traveling" rather than as this home
+        // city having silently changed.
+        if (this.city) this.locationService.setHomeCity(this.city);
+        this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go(next));
+      },
       error: () => {
         this.submitting.set(false);
         this.go(next);
