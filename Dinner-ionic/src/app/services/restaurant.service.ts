@@ -16,6 +16,10 @@ export interface Dish {
   price: number | null;
   description: string | null;
   photoUrl: string | null;
+  /** Credit line for photoUrl when it's Creative Commons-licensed (from
+   * Openverse -- see Backend/scripts/fetch-dish-photos.mjs); most CC
+   * licenses require this be shown alongside the photo. */
+  photoAttribution: string | null;
   rating: number | null;
   isPopular: number;
   isFeatured: number;
@@ -35,6 +39,13 @@ export interface Restaurant {
   priceTier: number | null;
   rating: number | null;
   reviewCount: number | null;
+  /** A real, human-verified Google Maps rating -- separate from `rating`
+   * (this app's own, computed from its users' in-app reviews) since the two
+   * shouldn't be conflated. Only set for a small number of restaurants
+   * someone actually checked against Google; null for everything else,
+   * never guessed. See Backend/src/db/migrations/0013_google_rating.js. */
+  googleRating: number | null;
+  googleReviewCount: number | null;
   description: string | null;
   address: string | null;
   photoUrl: string | null;
@@ -76,6 +87,15 @@ export function googleMapsUrl(place: {
     return `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`;
   }
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name || '')}`;
+}
+
+// A small preview map of the restaurant's location, shown above the "Get
+// Directions" link. Wikimedia's Kartotherian renderer (the "osm-intl" style)
+// is free and keyless, consistent with the rest of this app's OSM-based
+// approach to place data (see Backend/src/lib/osmPlaces.js) -- unlike
+// Google's Static Maps API, which needs a billed API key.
+export function staticMapUrl(latitude: number, longitude: number, width = 400, height = 200, zoom = 16): string {
+  return `https://maps.wikimedia.org/img/osm-intl,${zoom},${latitude},${longitude},${width}x${height}.png`;
 }
 
 export interface RestaurantReview {

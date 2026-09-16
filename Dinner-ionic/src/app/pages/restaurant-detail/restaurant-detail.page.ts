@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
-import { googleMapsUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
+import { googleMapsUrl, staticMapUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -122,6 +122,11 @@ export class RestaurantDetailPage extends BasePage {
 
   mapsUrl(restaurant: RestaurantDetail): string {
     return googleMapsUrl(restaurant);
+  }
+
+  mapImageUrl(restaurant: RestaurantDetail): string | null {
+    if (restaurant.latitude == null || restaurant.longitude == null) return null;
+    return staticMapUrl(restaurant.latitude, restaurant.longitude);
   }
 
   share(): void {

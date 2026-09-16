@@ -1,0 +1,42 @@
+<app-header [title]="restaurant()?.name ?? 'Menu'" [subtitle]="restaurant()?.city ?? null" (back)="goBack()"></app-header>
+
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md max-w-md mx-auto w-full">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading menu…</p>
+<p *ngIf="!loading() && !restaurant()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Restaurant not found.</p>
+
+<ng-container *ngIf="!loading() && restaurant()">
+<div *ngIf="dishes().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">restaurant_menu</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No dishes listed yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">This restaurant hasn't added its menu yet.</p>
+</div>
+
+<div *ngFor="let dish of dishes()" class="flex gap-stack-md bg-surface-container-lowest rounded-xl p-stack-sm shadow-sm border border-outline-variant/30">
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-variant shrink-0">
+<img *ngIf="dish.photoUrl" [alt]="dish.name" class="w-full h-full object-cover" [src]="dish.photoUrl"/>
+<div *ngIf="!dish.photoUrl" class="w-full h-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[28px]">restaurant</span>
+</div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col gap-1">
+<div class="flex justify-between items-start gap-2">
+<h3 class="font-title-lg text-title-lg text-on-surface truncate">{{ dish.name }}</h3>
+<span *ngIf="dish.price !== null" class="font-label-lg text-label-lg text-primary shrink-0">Rs {{ dish.price }}</span>
+</div>
+<p *ngIf="dish.description" class="font-body-md text-body-md text-on-surface-variant line-clamp-2">{{ dish.description }}</p>
+<div class="flex items-center gap-2 mt-auto">
+<span *ngIf="dish.rating !== null" class="flex items-center gap-0.5 font-label-sm text-label-sm text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            {{ dish.rating }}
+                        </span>
+<span *ngIf="dish.isPopular" class="font-label-sm text-label-sm text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full">Popular</span>
+<span *ngIf="dish.isFeatured" class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">Featured</span>
+</div>
+<p *ngIf="dish.photoUrl && dish.photoAttribution" class="font-label-sm text-label-sm text-outline truncate">{{ dish.photoAttribution }}</p>
+</div>
+</div>
+</ng-container>
+</main>

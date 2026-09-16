@@ -279,7 +279,7 @@ function dishSearchQueryFor(cuisineTags) {
  * getOrCreateCuisinePhoto) end up with visually different photos instead of
  * the same top hit every time.
  */
-async function searchOpenverseImage(query, page = 1) {
+export async function searchOpenverseImage(query, page = 1) {
   const url = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(query)}&license_type=commercial&page_size=1&page=${page}&orientation=landscape`;
   const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
   if (!response.ok) return null;
@@ -296,7 +296,7 @@ async function searchOpenverseImage(query, page = 1) {
 const PAGES_PER_SLOT = 8;
 const FALLBACK_QUERY = 'Pakistani food dish';
 
-async function findAcceptablePhoto(query, basePage) {
+export async function findAcceptablePhoto(query, basePage) {
   for (let attempt = 0; attempt < PAGES_PER_SLOT; attempt++) {
     const found = await searchOpenverseImage(query, basePage + attempt);
     if (!found) return null; // search exhausted, nothing left to try

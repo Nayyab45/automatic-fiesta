@@ -33,7 +33,7 @@
                             {{ r.city }}
                         </p>
 </div>
-<div class="flex flex-col items-end">
+<div class="flex flex-col items-end gap-1">
 <div class="bg-primary-container text-on-primary font-label-lg text-label-lg px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
 <ng-container *ngIf="r.rating !== null; else notRatedDetail">
 <span class="material-symbols-outlined fill text-[14px]">star</span>
@@ -41,6 +41,10 @@
                         </ng-container>
 <ng-template #notRatedDetail>Not yet rated</ng-template>
 </div>
+<div *ngIf="r.googleRating !== null" class="bg-surface/90 text-on-surface font-label-sm text-label-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            {{ r.googleRating }} on Google<ng-container *ngIf="r.googleReviewCount !== null"> ({{ r.googleReviewCount | number }})</ng-container>
+                        </div>
 </div>
 </div>
 
@@ -57,21 +61,23 @@
 <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{{ r.description }}</p>
 </section>
 
-<section class="flex flex-col gap-stack-md" *ngIf="r.dishes.length > 0">
+<section class="flex flex-col gap-stack-md">
 <div class="flex justify-between items-center">
 <h2 class="font-title-lg text-title-lg text-on-surface">Popular Dishes</h2>
-<button (click)="go('/explore-menu')" class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
+<button (click)="go('/restaurant-menu/' + r.id)" class="font-label-lg text-label-lg text-primary hover:underline">View Menu</button>
 </div>
-<div class="flex gap-gutter overflow-x-auto hide-scrollbar pb-2 -mx-container-padding px-container-padding snap-x">
+<div *ngIf="r.dishes.length > 0" class="flex gap-gutter overflow-x-auto hide-scrollbar pb-2 -mx-container-padding px-container-padding snap-x">
 <div *ngFor="let dish of r.dishes" class="min-w-[160px] max-w-[160px] flex flex-col gap-stack-sm snap-start">
-<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30">
-<img [alt]="dish.name" class="w-full h-full object-cover" [src]="dish.photoUrl"/>
+<div class="w-full aspect-square rounded-xl overflow-hidden bg-surface-variant shadow-sm border border-outline-variant/30 flex items-center justify-center">
+<img *ngIf="dish.photoUrl" [alt]="dish.name" class="w-full h-full object-cover" [src]="dish.photoUrl"/>
+<span *ngIf="!dish.photoUrl" class="material-symbols-outlined text-on-surface-variant text-[28px]">restaurant</span>
 </div>
 <div>
 <h3 class="font-label-lg text-label-lg text-on-surface truncate">{{ dish.name }}</h3>
 </div>
 </div>
 </div>
+<p *ngIf="r.dishes.length === 0" class="font-body-md text-body-md text-on-surface-variant">No dishes listed yet -- tap "View Menu" to check for updates.</p>
 </section>
 
 <section class="flex flex-col gap-stack-md">
@@ -119,7 +125,11 @@
 <section class="flex flex-col gap-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface">Location</h2>
 <div class="w-full h-48 bg-surface-variant rounded-xl overflow-hidden shadow-sm relative border border-outline-variant/50 flex items-center justify-center">
+<img *ngIf="mapImageUrl(r) as mapUrl; else noMapPreview" [src]="mapUrl" [alt]="'Map showing the location of ' + r.name" class="w-full h-full object-cover"/>
+<span *ngIf="mapImageUrl(r)" class="material-symbols-outlined absolute inset-0 m-auto w-fit h-fit text-primary text-5xl drop-shadow-md pointer-events-none">place</span>
+<ng-template #noMapPreview>
 <span class="material-symbols-outlined text-primary text-4xl drop-shadow-md">place</span>
+</ng-template>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant">{{ r.address }}</p>
 <a [href]="mapsUrl(r)" target="_blank" rel="noopener" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">

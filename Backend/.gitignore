@@ -16,3 +16,7 @@ backend_start.log
 # a snapshot of whichever cuisines this dev machine happened to look up.
 src/assets/images/restaurants/cuisine-*.jpg
 src/assets/images/restaurants/osm-*.jpg
+
+# Same reasoning, for dish photos -- see scripts/fetch-dish-photos.mjs.
+# Regenerable from Openverse, keyed by dishes.id in the database.
+src/assets/images/dishes/dish-*.jpg

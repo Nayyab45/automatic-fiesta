@@ -42,6 +42,7 @@ const routeDefinitions: Routes = [
   { path: 'ai-restaurant-recommendation', loadComponent: () => import('./pages/ai-restaurant-recommendation/ai-restaurant-recommendation.page').then((m) => m.AiRestaurantRecommendationPage) },
   { path: 'restaurant-detail', loadComponent: () => import('./pages/restaurant-detail/restaurant-detail.page').then((m) => m.RestaurantDetailPage) },
   { path: 'restaurant-detail/:id', loadComponent: () => import('./pages/restaurant-detail/restaurant-detail.page').then((m) => m.RestaurantDetailPage) },
+  { path: 'restaurant-menu/:id', loadComponent: () => import('./pages/restaurant-menu/restaurant-menu.page').then((m) => m.RestaurantMenuPage) },
   { path: 'my-tables', loadComponent: () => import('./pages/my-tables/my-tables.page').then((m) => m.MyTablesPage) },
   { path: 'empty-state-table', loadComponent: () => import('./pages/empty-state-table/empty-state-table.page').then((m) => m.EmptyStateTablePage) },
   { path: 'create-table', loadComponent: () => import('./pages/create-table/create-table.page').then((m) => m.CreateTablePage) },
