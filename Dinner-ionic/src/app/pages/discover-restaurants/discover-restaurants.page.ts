@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
@@ -51,6 +51,11 @@ export class DiscoverRestaurantsPage extends BasePage {
   selectedRegion = 'All';
   selectedPriceTier: number | null = null;
   private minRating: number | null = null;
+  // Set only when arriving from the search box on search-filter.page --
+  // narrows results by restaurant name in addition to the other filters
+  // rather than replacing them, matching how the backend's `query` param
+  // combines with city/region/cuisine/etc.
+  readonly searchQuery = signal<string | null>(null);
 
   constructor() {
     super();
@@ -58,11 +63,28 @@ export class DiscoverRestaurantsPage extends BasePage {
     const cuisine = params.get('cuisine');
     const priceTier = params.get('priceTier');
     const minRating = params.get('minRating');
+    const query = params.get('query');
     if (cuisine) this.selectedRegion = cuisine;
     if (priceTier) this.selectedPriceTier = Number(priceTier);
     if (minRating) this.minRating = Number(minRating);
-    this.loadRestaurants();
+    if (query) this.searchQuery.set(query);
     this.loadCuisineChips();
+
+    // ion-router-outlet keeps a previously-visited page's component alive
+    // instead of destroying it, so navigating away to /select-location and
+    // back reuses this same instance -- the constructor (and its one-time
+    // loadRestaurants() call) never runs again. Reacting to the city signal
+    // itself instead means picking a different city reloads immediately,
+    // regardless of whether this component is fresh or being reused; this
+    // also covers the initial load, so there's no separate call needed
+    // outside the effect.
+    effect(
+      () => {
+        this.cityService.current();
+        this.loadRestaurants();
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   private loadCuisineChips(): void {
@@ -88,6 +110,7 @@ export class DiscoverRestaurantsPage extends BasePage {
         cuisine,
         priceTier: this.selectedPriceTier ?? undefined,
         minRating: this.minRating ?? undefined,
+        query: this.searchQuery() ?? undefined,
       })
       .subscribe({
         next: ({ restaurants }) => {
@@ -105,6 +128,11 @@ export class DiscoverRestaurantsPage extends BasePage {
 
   selectPriceTier(tier: number | null): void {
     this.selectedPriceTier = this.selectedPriceTier === tier ? null : tier;
+    this.loadRestaurants();
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set(null);
     this.loadRestaurants();
   }
 

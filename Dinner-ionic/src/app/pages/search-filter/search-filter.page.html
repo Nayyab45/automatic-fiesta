@@ -11,12 +11,13 @@
 </header>
 <main class="max-w-4xl mx-auto w-full px-container-padding py-stack-lg pb-32">
 
-<div class="mb-section-gap relative">
+<form (ngSubmit)="showResults()" class="mb-section-gap relative">
 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
 <span class="material-symbols-outlined text-outline">search</span>
 </div>
-<input class="w-full bg-surface border-b border-outline-variant focus:border-primary-container focus:ring-0 pl-12 pr-4 py-4 font-body-lg text-body-lg text-on-surface placeholder-on-surface-variant transition-colors outline-none rounded-t-sm shadow-[0_4px_16px_rgba(0,0,0,0.04)]" placeholder="Search Pakistani restaurants, dishes or people" type="text"/>
-</div>
+<input [(ngModel)]="searchQuery" name="searchQuery" enterkeyhint="search" inputmode="search" autocomplete="off" (keyup.enter)="showResults()" class="w-full bg-surface border-b border-outline-variant focus:border-primary-container focus:ring-0 pl-12 pr-4 py-4 font-body-lg text-body-lg text-on-surface placeholder-on-surface-variant transition-colors outline-none rounded-t-sm shadow-[0_4px_16px_rgba(0,0,0,0.04)]" placeholder="Search Pakistani restaurants, dishes or people" type="text"/>
+<button type="submit" class="sr-only" aria-hidden="true" tabindex="-1">Search</button>
+</form>
 
 <div class="grid grid-cols-1 md:grid-cols-12 gap-section-gap">
 

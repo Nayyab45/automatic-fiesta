@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
@@ -10,7 +11,7 @@ import { RestaurantService } from '../../services/restaurant.service';
 @Component({
   selector: 'app-search-filter',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent, UserAvatarComponent],
   templateUrl: './search-filter.page.html',
   styleUrl: './search-filter.page.scss',
 })
@@ -19,6 +20,11 @@ export class SearchFilterPage extends BasePage {
 
   readonly priceTiers = ['Rs', 'Rs Rs', 'Rs Rs Rs', 'Rs Rs Rs Rs'];
   readonly stars = [1, 2, 3, 4, 5];
+
+  // Wired to the free-text box at the top of this page -- it used to render
+  // with no binding at all, so anything typed there was silently discarded
+  // and only the chip/tier/rating filters below it ever reached the backend.
+  searchQuery = '';
 
   // Cuisine chips are the cuisine_tags that actually occur for this city
   // (freeform text imported from OpenStreetMap -- see osmPlaces.js), fetched
@@ -76,6 +82,7 @@ export class SearchFilterPage extends BasePage {
 
   showResults(): void {
     const params = new URLSearchParams();
+    if (this.searchQuery.trim()) params.set('query', this.searchQuery.trim());
     if (this.selectedCuisines.size) params.set('cuisine', [...this.selectedCuisines].join(','));
     if (this.priceTierIndex !== null) params.set('priceTier', String(this.priceTierIndex + 1));
     if (this.ratingValue !== null) params.set('minRating', String(this.ratingValue));

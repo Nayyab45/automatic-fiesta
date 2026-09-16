@@ -130,7 +130,28 @@ async function fetchRealPhotoForPlace(place, tags, city) {
  * `fetchPlaces`/`fetchRealPhoto`/`fetchCuisinePhoto` are injectable so tests
  * can stub every network call out.
  */
-export async function importCityRestaurants(
+// A city's first request typically fires two of these concurrently --
+// GET /restaurants and GET /restaurants/cuisines both call
+// importCityRestaurants for the same city on page load (see
+// discover-restaurants.page.ts). Without this, both requests' "SELECT 1
+// FROM restaurant_import_log" checks land before either has inserted its
+// row, so both proceed to run the *entire* import (Overpass query + every
+// place's photo fetch) a second time for nothing, and the loser's own
+// INSERT then fails on the city's now-duplicate primary key. Caching the
+// in-flight promise per city means the second caller just awaits the
+// first's result instead of redoing (or colliding with) the same work.
+const inFlightImports = new Map();
+
+export function importCityRestaurants(db, city, options) {
+  if (inFlightImports.has(city)) {
+    return inFlightImports.get(city);
+  }
+  const promise = importCityRestaurantsUncached(db, city, options).finally(() => inFlightImports.delete(city));
+  inFlightImports.set(city, promise);
+  return promise;
+}
+
+async function importCityRestaurantsUncached(
   db,
   city,
   {
@@ -155,7 +176,7 @@ export async function importCityRestaurants(
   if (!bbox) {
     // Records the attempt so an unresolvable city name isn't re-queried on
     // every single request for it.
-    await db.prepare('INSERT INTO restaurant_import_log (city, place_count) VALUES (?, 0)').run(city);
+    await db.prepare('INSERT IGNORE INTO restaurant_import_log (city, place_count) VALUES (?, 0)').run(city);
     return { imported: 0, skipped: false };
   }
 
@@ -228,6 +249,11 @@ export async function importCityRestaurants(
       );
   }
 
-  await db.prepare('INSERT INTO restaurant_import_log (city, place_count) VALUES (?, ?)').run(city, places.length);
+  // IGNORE, not a plain INSERT: the in-flight-promise cache above already
+  // dedupes concurrent calls within this process, but this is the actual
+  // safety net if the backend ever runs as more than one process/instance
+  // -- a second process racing this same import shouldn't crash on the
+  // city's now-duplicate primary key.
+  await db.prepare('INSERT IGNORE INTO restaurant_import_log (city, place_count) VALUES (?, ?)').run(city, places.length);
   return { imported: places.length, skipped: false };
 }

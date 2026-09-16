@@ -10,6 +10,11 @@
 <main class="px-container-padding pt-stack-lg pb-32">
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-stack-lg max-w-sm">Pakistani places worth gathering around.</h2>
 
+<div *ngIf="searchQuery() as q" class="flex items-center gap-2 mb-stack-md font-label-lg text-label-lg text-on-surface-variant">
+<span>Results for "{{ q }}"</span>
+<button (click)="clearSearch()" class="text-primary hover:underline">Clear</button>
+</div>
+
 <div class="flex flex-col gap-3 mb-stack-md">
 <div class="flex gap-stack-sm overflow-x-auto pb-1 scrollbar-hide -mx-container-padding px-container-padding">
 <button *ngFor="let region of regionChips()" (click)="selectRegion(region)" [class.filter-chip-selected]="selectedRegion === region" class="filter-chip text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full border border-outline-variant whitespace-nowrap flex items-center gap-1 transition-all">

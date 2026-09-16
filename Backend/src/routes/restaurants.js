@@ -16,13 +16,32 @@ async function attachDishes(restaurant) {
   return { ...restaurant, dishes };
 }
 
-async function attachPopularDishes(restaurant) {
-  const dishes = toCamelRows(
-    await db
-      .prepare('SELECT * FROM dishes WHERE restaurant_id = ? AND is_popular = 1 LIMIT 3')
-      .all(restaurant.id),
+// Batched dish-attaching for a whole restaurant list -- one query total
+// instead of one per restaurant. With Promise.all(rows.map(attachDishes))
+// each restaurant fired its own query concurrently against a 10-connection
+// pool; a city (or worse, an unfiltered list) with hundreds of restaurants
+// meant hundreds of queries queuing for those 10 connections, turning a
+// simple list into a multi-second wait. Grouping by restaurant_id in JS
+// after one IN(...) query is the fix; `popularOnly` slices to 3 per
+// restaurant in JS too, since "top 3 per group" isn't a plain SQL LIMIT.
+async function attachDishesBatch(restaurants, { popularOnly = false } = {}) {
+  if (restaurants.length === 0) return restaurants;
+  const ids = restaurants.map((r) => r.id);
+  const placeholders = ids.map(() => '?').join(',');
+  const filterClause = popularOnly ? 'AND is_popular = 1' : '';
+  const allDishes = toCamelRows(
+    await db.prepare(`SELECT * FROM dishes WHERE restaurant_id IN (${placeholders}) ${filterClause}`).all(...ids),
   );
-  return { ...restaurant, dishes };
+  const byRestaurantId = new Map();
+  for (const dish of allDishes) {
+    const list = byRestaurantId.get(dish.restaurantId) ?? [];
+    list.push(dish);
+    byRestaurantId.set(dish.restaurantId, list);
+  }
+  return restaurants.map((r) => {
+    const dishes = byRestaurantId.get(r.id) ?? [];
+    return { ...r, dishes: popularOnly ? dishes.slice(0, 3) : dishes };
+  });
 }
 
 // Order matters: these fixed segments must be registered before '/:id' so
@@ -115,7 +134,7 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
   });
 
   scored.sort((a, b) => b.score - a.score);
-  res.json({ restaurants: await Promise.all(scored.slice(0, 10).map(attachDishes)) });
+  res.json({ restaurants: await attachDishesBatch(scored.slice(0, 10)) });
 }));
 
 restaurantsRouter.get('/', asyncHandler(async (req, res) => {
@@ -156,10 +175,15 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
     }
   }
   if (priceTier) {
-    // Restaurants imported from OpenStreetMap have no genuine price_tier (see
-    // migration 0004) rather than a fabricated one -- treat "unknown" as "not
-    // ruled out" so this filter doesn't hide almost every real restaurant.
-    clauses.push('(price_tier = ? OR price_tier IS NULL)');
+    // Most OSM-imported restaurants have no genuine price_tier (see
+    // migration 0004) -- this used to treat that as "not ruled out" and
+    // fold every unpriced restaurant into every tier, which made "Under
+    // 500" and "3000+" return practically the same list. Strict match
+    // instead: only a restaurant with a real, known price_tier (seeded
+    // curated picks, plus real restaurants back-filled from their actual
+    // researched dish prices -- see Backend/scripts/seed-real-menus.mjs)
+    // shows up under a specific tier.
+    clauses.push('price_tier = ?');
     params.push(Number(priceTier));
   }
   if (minRating) {
@@ -173,7 +197,7 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
 
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
   const rows = await db.prepare(`SELECT * FROM restaurants ${where} ORDER BY rating DESC`).all(...params);
-  res.json({ restaurants: await Promise.all(toCamelRows(rows).map(attachPopularDishes)) });
+  res.json({ restaurants: await attachDishesBatch(toCamelRows(rows), { popularOnly: true }) });
 }));
 
 // Real (OSM-imported) cuisine_tags are freeform text from OpenStreetMap, not
