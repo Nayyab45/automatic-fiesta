@@ -266,6 +266,52 @@ describe('seat requests & notifications', () => {
   });
 });
 
+describe('check-in', () => {
+  test('the host and a confirmed guest can check in; a stranger and a pending requester cannot', async () => {
+    const host = await signup('checkin-host');
+    const confirmedGuest = await signup('checkin-confirmed');
+    const pendingGuest = await signup('checkin-pending');
+    const stranger = await signup('checkin-stranger');
+
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const restaurantId = restaurants.body.restaurants[0].id;
+
+    const table = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: {
+        restaurantId,
+        gatheringType: 'dinner',
+        dateTime: new Date(Date.now() + 86400000).toISOString(),
+        seatsTotal: 4,
+      },
+    });
+    const tableId = table.body.table.id;
+
+    const confirmedReq = await api('POST', `/api/tables/${tableId}/seat-requests`, {
+      token: confirmedGuest.accessToken,
+      body: {},
+    });
+    await api('PATCH', `/api/seat-requests/${confirmedReq.body.seatRequest.id}`, {
+      token: host.accessToken,
+      body: { status: 'confirmed' },
+    });
+
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: pendingGuest.accessToken, body: {} });
+
+    const strangerCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: stranger.accessToken });
+    assert.equal(strangerCheckIn.status, 403);
+
+    const pendingCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: pendingGuest.accessToken });
+    assert.equal(pendingCheckIn.status, 403);
+
+    const hostCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: host.accessToken });
+    assert.equal(hostCheckIn.status, 200);
+
+    const guestCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: confirmedGuest.accessToken });
+    assert.equal(guestCheckIn.status, 200);
+  });
+});
+
 describe('reviews', () => {
   test('a table member can list reviews; a non-member cannot', async () => {
     const host = await signup('review-host');

@@ -217,9 +217,12 @@ tablesRouter.get('/:id/seat-requests', asyncHandler(async (req, res) => {
 }));
 
 tablesRouter.post('/:id/check-in', asyncHandler(async (req, res) => {
-  const table = await db.prepare('SELECT id FROM dining_tables WHERE id = ?').get(req.params.id);
+  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!table) {
     return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!(await isTableMember(table, req.user.sub))) {
+    return res.status(403).json({ message: 'Only the host or a confirmed guest can check in to this table' });
   }
   await db.prepare('INSERT IGNORE INTO check_ins (table_id, user_id) VALUES (?, ?)').run(table.id, req.user.sub);
   const row = await db.prepare('SELECT * FROM check_ins WHERE table_id = ? AND user_id = ?').get(table.id, req.user.sub);
