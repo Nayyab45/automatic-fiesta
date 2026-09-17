@@ -39,4 +39,32 @@ async function sendPasswordResetEmail({ to, resetUrl }) {
   }
 }
 
-export const mailer = { isConfigured, sendPasswordResetEmail };
+async function sendBookingNotificationEmail({ to, restaurantName, hostName, gatheringType, dateTime, seatsTotal }) {
+  const when = new Date(dateTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  const res = await fetch(RESEND_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM_EMAIL,
+      to,
+      subject: `New booking at ${restaurantName}`,
+      html: `
+        <p><strong>${hostName}</strong> just booked ${seatsTotal} seat${seatsTotal === 1 ? '' : 's'}
+           at <strong>${restaurantName}</strong> through What Should We Eat.</p>
+        <p>Gathering type: ${gatheringType}</p>
+        <p>Date/time: ${when}</p>
+        <p>This is an automated booking notice -- no action is required unless you need to confirm availability.</p>
+      `,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Resend API responded ${res.status}: ${body}`);
+  }
+}
+
+export const mailer = { isConfigured, sendPasswordResetEmail, sendBookingNotificationEmail };

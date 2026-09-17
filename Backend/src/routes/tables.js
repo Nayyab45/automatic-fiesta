@@ -5,6 +5,7 @@ import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
+import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -95,7 +96,9 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
     return res.status(400).json({ message: missingFieldsError });
   }
 
-  const restaurant = await db.prepare('SELECT id, name FROM restaurants WHERE id = ?').get(restaurantId);
+  const restaurant = await db
+    .prepare('SELECT id, name, contact_email, contact_phone FROM restaurants WHERE id = ?')
+    .get(restaurantId);
   if (!restaurant) {
     return res.status(404).json({ message: 'Restaurant not found' });
   }
@@ -120,6 +123,15 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
     );
 
   const created = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(result.lastInsertRowid);
+
+  const host = await db.prepare('SELECT name FROM users WHERE id = ?').get(req.user.sub);
+  await notifyRestaurantOfBooking(restaurant, {
+    hostName: host.name,
+    gatheringType: created.gathering_type,
+    dateTime: created.date_time,
+    seatsTotal: created.seats_total,
+  });
+
   res.status(201).json({ table: await tableWithContext(created, req.user.sub) });
 }));
 

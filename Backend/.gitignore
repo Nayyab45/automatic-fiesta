@@ -8,6 +8,7 @@ data/
 backend.log
 backend_live.log
 backend_start.log
+app.log
 
 # Auto-generated photo cache for real (OpenStreetMap-imported) restaurants --
 # see src/lib/restaurantPhotos.js -- and dish photos (scripts/fetch-dish-photos.mjs).

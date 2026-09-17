@@ -846,14 +846,14 @@ describe('real restaurant imports (OpenStreetMap)', () => {
         id: 111,
         lat: 30.5,
         lon: 70.5,
-        tags: { name: 'Real Place One', cuisine: 'pakistani;bbq' },
+        tags: { name: 'Real Place One', cuisine: 'pakistani;bbq', phone: '+92 300 1234567', email: 'contact@realplaceone.example' },
       },
       {
         type: 'node',
         id: 222,
         lat: 30.6,
         lon: 70.6,
-        tags: { name: 'Real Place Two' },
+        tags: { name: 'Real Place Two', 'contact:phone': '+92 321 7654321' },
       },
     ];
 
@@ -876,8 +876,13 @@ describe('real restaurant imports (OpenStreetMap)', () => {
     assert.equal(rows[0].rating, null);
     assert.equal(rows[0].photo_url, 'https://example.com/stock/Pakistani,Bbq.jpg');
     assert.equal(rows[0].photo_attribution, 'Photo by Someone, CC BY 4.0');
+    assert.equal(rows[0].contact_phone, '+92 300 1234567');
+    assert.equal(rows[0].contact_email, 'contact@realplaceone.example');
     // Untagged cuisine still gets an honest, non-blank label instead of ''.
     assert.equal(rows[1].cuisine_tags, 'Restaurant');
+    // `contact:phone` (the structured convention) is picked up too, not just plain `phone`.
+    assert.equal(rows[1].contact_phone, '+92 321 7654321');
+    assert.equal(rows[1].contact_email, null);
   });
 
   test('a second import for the same city is a no-op', async () => {

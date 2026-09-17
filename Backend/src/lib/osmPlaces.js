@@ -64,6 +64,18 @@ function addressFrom(tags, city) {
   return streetParts.length ? `${streetParts.join(' ')}, ${city}` : null;
 }
 
+// OSM tags contact info two ways depending on the mapper -- `contact:phone`/
+// `contact:email` (the more structured convention) or the plain `phone`/
+// `email` -- so a place with either still gets picked up. This is what lets
+// a booking notification (see restaurantNotify.js) reach a real, imported
+// restaurant instead of only the hand-seeded ones.
+function contactFrom(tags) {
+  return {
+    phone: tags['contact:phone'] || tags.phone || null,
+    email: tags['contact:email'] || tags.email || null,
+  };
+}
+
 /** One Nominatim lookup for a city's bounding box + province ("state"). */
 export async function lookupCityBoundingBox(city) {
   // accept-language=en pins the province name in `address.state` to English
@@ -225,11 +237,12 @@ async function importCityRestaurantsUncached(
     // (both already enhanced -- see restaurantPhotos.js) -- or null, which
     // just means "no photo yet", handled by the app's existing placeholder.
     const photo = realPhotos[index] ?? cuisinePhoto;
+    const contact = contactFrom(tags);
 
     await db
       .prepare(
-        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, photo_url, photo_attribution, source, external_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?)
+        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, photo_url, photo_attribution, source, external_id, contact_phone, contact_email)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)
          ON DUPLICATE KEY UPDATE
            name = VALUES(name), latitude = VALUES(latitude), longitude = VALUES(longitude),
            cuisine_tags = VALUES(cuisine_tags), address = VALUES(address),
@@ -246,6 +259,8 @@ async function importCityRestaurantsUncached(
         photo?.url ?? null,
         photo?.attribution ?? null,
         `osm:${place.type}/${place.id}`,
+        contact.phone,
+        contact.email,
       );
   }
 
