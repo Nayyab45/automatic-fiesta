@@ -10,13 +10,10 @@ backend_live.log
 backend_start.log
 
 # Auto-generated photo cache for real (OpenStreetMap-imported) restaurants --
-# see src/lib/restaurantPhotos.js. Regenerated on demand from OpenStreetMap
-# tags / Openverse in any environment, keyed by cuisine_stock_photos /
-# restaurants.external_id in the database, so committing them would just be
-# a snapshot of whichever cuisines this dev machine happened to look up.
-src/assets/images/restaurants/cuisine-*.jpg
-src/assets/images/restaurants/osm-*.jpg
-
-# Same reasoning, for dish photos -- see scripts/fetch-dish-photos.mjs.
-# Regenerable from Openverse, keyed by dishes.id in the database.
-src/assets/images/dishes/dish-*.jpg
+# see src/lib/restaurantPhotos.js -- and dish photos (scripts/fetch-dish-photos.mjs).
+# These used to be gitignored on the assumption that each environment would
+# regenerate its own from OpenStreetMap/Openverse, but production never ran
+# that pipeline, so photo_url in the (shared) database pointed at files that
+# only ever existed on whichever dev machine fetched them. Committed instead
+# now so a deploy actually carries them -- see PUBLIC_ASSET_BASE_URL's
+# comment in .env.example and scripts/fix-photo-urls.mjs.

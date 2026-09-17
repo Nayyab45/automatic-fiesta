@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise';
 // LAN-IP drift keeps stranding old hosts in stored photo_url values (see
 // PUBLIC_ASSET_BASE_URL's comment in .env) -- list every host this project
 // has used so a rerun after a future IP change stays a one-liner add here.
-const OLD_HOSTS = ['http://192.168.43.136:3000', 'http://10.43.209.160:3000'];
+const OLD_HOSTS = ['http://192.168.43.136:3000', 'http://10.43.209.160:3000', 'http://192.168.100.33:3113', 'http://192.168.100.33:3000'];
 const NEW_HOST = process.env.PUBLIC_ASSET_BASE_URL;
 const TABLES = ['restaurants', 'dishes', 'cuisine_stock_photos'];
 
