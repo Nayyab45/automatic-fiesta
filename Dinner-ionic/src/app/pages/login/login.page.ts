@@ -67,6 +67,10 @@ export class LoginPage extends BasePage {
       next: (result) => this.handleLoginResult(result),
       error: (err) => {
         this.submitting.set(false);
+        // TEMP diagnostic logging -- remove once the Google Sign-In failure
+        // is root-caused (see conversation). Capacitor forwards WebView
+        // console output to logcat regardless of build type.
+        console.error('[google-signin] raw error:', JSON.stringify(err), err);
         // A user backing out of the account picker isn't an error worth
         // showing -- same as tapping outside a dialog to dismiss it.
         if (err?.code === 'USER_CANCELLED') return;
