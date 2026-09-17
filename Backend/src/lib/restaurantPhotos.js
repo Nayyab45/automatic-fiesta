@@ -112,9 +112,10 @@ export async function getRealPlacePhoto(place, tags, { fetchImage = downloadReal
     const filename = `osm-${place.type}-${place.id}.jpg`;
     const url = await storeEnhanced(result.buffer, filename);
     return { url, attribution: result.attribution };
-  } catch {
+  } catch (err) {
     // A missing/unreachable linked photo shouldn't fail the whole import --
     // the restaurant just falls back to a cuisine stock photo instead.
+    console.error(`[restaurantPhotos] getRealPlacePhoto failed for ${place?.type}/${place?.id}:`, err.message);
     return null;
   }
 }
@@ -158,9 +159,10 @@ export async function getGooglePlacePhoto(restaurant, { fetchImpl = fetch } = {}
     const url = await storeEnhanced(buffer, filename);
     const credit = photo.html_attributions?.[0] ? stripHtml(photo.html_attributions[0]) : null;
     return { url, attribution: credit ? `Photo via Google (${credit})` : 'Photo via Google' };
-  } catch {
+  } catch (err) {
     // A network hiccup, no match, or a match with no photo all just mean
     // this restaurant falls through to the OSM/Openverse fallback instead.
+    console.error(`[restaurantPhotos] getGooglePlacePhoto failed for "${restaurant?.name}":`, err.message);
     return null;
   }
 }
@@ -213,7 +215,8 @@ export async function getWikipediaPlacePhoto(restaurant) {
     const outFilename = `wikidata-${slugify(restaurant.name)}-${restaurant.id ?? Date.now()}.jpg`;
     const url = await storeEnhanced(buffer, outFilename);
     return { url, attribution: 'Photo via Wikimedia Commons' };
-  } catch {
+  } catch (err) {
+    console.error(`[restaurantPhotos] getWikipediaPlacePhoto failed for "${restaurant?.name}":`, err.message);
     return null;
   }
 }
@@ -356,7 +359,8 @@ export async function getOrCreateCuisinePhoto(db, cuisineTags, slot = 0, { fetch
       .prepare('INSERT INTO cuisine_stock_photos (cuisine, photo_url, attribution) VALUES (?, ?, ?)')
       .run(cuisineTags, url, result.attribution);
     return { url, attribution: result.attribution };
-  } catch {
+  } catch (err) {
+    console.error(`[restaurantPhotos] getOrCreateCuisinePhoto failed for "${cuisineTags}" slot ${slot}:`, err.message);
     return rows[0] ? { url: rows[0].photo_url, attribution: rows[0].attribution } : null;
   }
 }
