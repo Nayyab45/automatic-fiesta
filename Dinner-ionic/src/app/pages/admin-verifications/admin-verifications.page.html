@@ -1,0 +1,46 @@
+<app-header title="Review Verifications" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-lg">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && forbidden()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<span class="material-symbols-outlined text-[40px] text-error mb-stack-md">block</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Admins only</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">You don't have access to this page.</p>
+</div>
+
+<div *ngIf="!loading() && !forbidden() && submissions().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">fact_check</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Nothing to review</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">
+                Submissions Face++ couldn't auto-resolve will show up here.
+            </p>
+</div>
+
+<ul class="flex flex-col gap-stack-lg" *ngIf="!loading() && submissions().length > 0">
+<li *ngFor="let submission of submissions()" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-stack-md">
+<div class="flex flex-col gap-unit">
+<span class="font-title-lg text-title-lg text-on-surface">{{ submission.name }}</span>
+<span class="font-body-md text-body-md text-on-surface-variant">{{ submission.email }}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Submitted {{ submission.submittedAt | date: 'medium' }}</span>
+</div>
+
+<div class="flex gap-stack-sm overflow-x-auto">
+<img *ngIf="submission.idFrontUrl" [src]="submission.idFrontUrl" alt="ID front" class="w-28 h-28 object-cover rounded-lg border border-outline-variant/30 shrink-0"/>
+<img *ngIf="submission.idBackUrl" [src]="submission.idBackUrl" alt="ID back" class="w-28 h-28 object-cover rounded-lg border border-outline-variant/30 shrink-0"/>
+<img *ngIf="submission.selfieUrl" [src]="submission.selfieUrl" alt="Selfie" class="w-28 h-28 object-cover rounded-lg border border-outline-variant/30 shrink-0"/>
+</div>
+
+<div class="flex gap-stack-sm">
+<button (click)="decide(submission, 'rejected')" [disabled]="decidingUserId() === submission.userId" class="flex-1 border border-error text-error font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-error/10 transition-colors disabled:opacity-60">
+                        Reject
+                    </button>
+<button (click)="decide(submission, 'approved')" [disabled]="decidingUserId() === submission.userId" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg px-4 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">
+                        Approve
+                    </button>
+</div>
+</li>
+</ul>
+</main>

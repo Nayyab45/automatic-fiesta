@@ -116,10 +116,20 @@ export class ProfileService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/profile`;
 
-  me(): Observable<{ profile: Profile; preferenceChanges: PreferenceChangeStatus; tableCreation: TableCreationStatus; profileViewsCount: number }> {
-    return this.http.get<{ profile: Profile; preferenceChanges: PreferenceChangeStatus; tableCreation: TableCreationStatus; profileViewsCount: number }>(
-      `${this.baseUrl}/me`,
-    );
+  me(): Observable<{
+    profile: Profile;
+    preferenceChanges: PreferenceChangeStatus;
+    tableCreation: TableCreationStatus;
+    profileViewsCount: number;
+    isAdmin: boolean;
+  }> {
+    return this.http.get<{
+      profile: Profile;
+      preferenceChanges: PreferenceChangeStatus;
+      tableCreation: TableCreationStatus;
+      profileViewsCount: number;
+      isAdmin: boolean;
+    }>(`${this.baseUrl}/me`);
   }
 
   /** Premium-only -- 402s for a free account, same shape as other

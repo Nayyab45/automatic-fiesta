@@ -176,11 +176,16 @@ async function profileViewsCount(userId) {
 }
 
 profileRouter.get('/me', asyncHandler(async (req, res) => {
+  const user = await db.prepare('SELECT is_admin FROM users WHERE id = ?').get(req.user.sub);
   res.json({
     profile: await fullProfile(req.user.sub),
     preferenceChanges: await preferenceChangeStatus(req.user.sub),
     tableCreation: await tableCreationStatus(req.user.sub),
     profileViewsCount: await profileViewsCount(req.user.sub),
+    // Self-only, same reasoning as profileViewsCount -- who's an admin
+    // isn't public. Drives whether the app shows the verification-review
+    // entry point at all (see AdminGuard / the settings page link).
+    isAdmin: !!user?.is_admin,
   });
 }));
 

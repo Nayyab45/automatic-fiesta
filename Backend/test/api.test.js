@@ -135,6 +135,10 @@ async function signup(local) {
 // Activates a subscription directly (bypassing checkout/a real gateway) --
 // same shape subscriptionsRouter's activateSubscription writes, for tests
 // that only care about "this user is premium", not the payment flow itself.
+async function makeAdmin(userId) {
+  await pool.query('UPDATE users SET is_admin = 1 WHERE id = ?', [userId]);
+}
+
 async function makePremium(userId) {
   await pool.query(
     `INSERT INTO subscriptions (user_id, status, plan, provider, current_period_end, updated_at)
@@ -1236,6 +1240,45 @@ describe('identity verification', () => {
     const { status, body } = await api('POST', '/api/verification/me/submit', { token: accessToken });
     assert.equal(status, 400);
     assert.match(body.message, /upload your id and a selfie/i);
+  });
+
+  test('admin can approve or reject a pending submission, which sets/clears the verified badge; a non-admin is refused', async () => {
+    const { FACEPP_API_KEY, FACEPP_API_SECRET } = process.env;
+    delete process.env.FACEPP_API_KEY;
+    delete process.env.FACEPP_API_SECRET;
+    let applicant, admin, stranger;
+    try {
+      applicant = await signup('verify-admin-review');
+      admin = await signup('verify-admin-reviewer');
+      stranger = await signup('verify-admin-stranger');
+      await makeAdmin(admin.user.id);
+
+      await api('PUT', '/api/verification/me/id', { token: applicant.accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
+      await api('PUT', '/api/verification/me/selfie', { token: applicant.accessToken, body: { selfieUrl: TINY_DATA_URL } });
+      await api('POST', '/api/verification/me/submit', { token: applicant.accessToken });
+
+      const refused = await api('GET', '/api/verification/admin/pending', { token: stranger.accessToken });
+      assert.equal(refused.status, 403);
+
+      const pending = await api('GET', '/api/verification/admin/pending', { token: admin.accessToken });
+      assert.equal(pending.status, 200);
+      assert.ok(pending.body.submissions.some((s) => s.userId === applicant.user.id));
+
+      const approved = await api('PATCH', `/api/verification/admin/${applicant.user.id}`, { token: admin.accessToken, body: { status: 'approved' } });
+      assert.equal(approved.status, 200);
+      assert.equal(approved.body.status, 'approved');
+
+      const profileAfterApprove = await api('GET', '/api/profile/me', { token: applicant.accessToken });
+      assert.equal(profileAfterApprove.body.profile.verified, true);
+
+      const rejected = await api('PATCH', `/api/verification/admin/${applicant.user.id}`, { token: admin.accessToken, body: { status: 'rejected' } });
+      assert.equal(rejected.status, 200);
+      const profileAfterReject = await api('GET', '/api/profile/me', { token: applicant.accessToken });
+      assert.equal(profileAfterReject.body.profile.verified, false);
+    } finally {
+      if (FACEPP_API_KEY !== undefined) process.env.FACEPP_API_KEY = FACEPP_API_KEY;
+      if (FACEPP_API_SECRET !== undefined) process.env.FACEPP_API_SECRET = FACEPP_API_SECRET;
+    }
   });
 
   test('compareFaces reports a match when confidence clears the 1e-4 threshold', async () => {
