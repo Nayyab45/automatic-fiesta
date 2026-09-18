@@ -25,6 +25,10 @@ const db = {
         const [rows] = await conn.query(sql, params);
         return rows[0] ?? null;
       },
+      async all(...params) {
+        const [rows] = await conn.query(sql, params);
+        return rows;
+      },
       async run(...params) {
         await conn.query(sql, params);
       },
