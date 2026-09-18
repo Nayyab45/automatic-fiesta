@@ -31,7 +31,7 @@ export class TableDetailsGuestsPage extends BasePage {
     this.tableService.get(id).subscribe({
       next: ({ table }) => {
         this.table.set(table);
-        this.availableSeats.set(Math.max(table.seatsTotal - table.guestCount, 0));
+        this.availableSeats.set(table.seatsAvailable);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

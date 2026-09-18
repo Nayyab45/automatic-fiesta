@@ -12,6 +12,7 @@
 // operates. `restaurant_import_log` makes sure a city is only ever fetched
 // once, including cities OSM has zero tagged results for.
 import { getGooglePlacePhoto, getOrCreateCuisinePhoto, getRealPlacePhoto, getWikipediaPlacePhoto, poolSizeForCount } from './restaurantPhotos.js';
+import { enrichRestaurantContact } from './restaurantContactEnrichment.js';
 
 const USER_AGENT = 'WhatShouldWeEat-DevApp/1.0 (contact: nayyabashfaq05@gmail.com)';
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
@@ -73,6 +74,27 @@ function contactFrom(tags) {
   return {
     phone: tags['contact:phone'] || tags.phone || null,
     email: tags['contact:email'] || tags.email || null,
+  };
+}
+
+/**
+ * OSM's own tags first (free, already fetched), topped up with a Google
+ * Places lookup (see restaurantContactEnrichment.js) for whichever of
+ * phone/email OSM didn't have -- most OSM restaurant entries have neither,
+ * so this is what actually gets most restaurants a real, reachable contact.
+ * Google's phone number is preferred over OSM's when both exist -- Google's
+ * is more likely to still be current. Skipped entirely (cheaply -- see
+ * getGooglePlaceContact) when GOOGLE_PLACES_API_KEY isn't set.
+ */
+async function fetchContactForPlace(tags, city) {
+  const osmContact = contactFrom(tags);
+  if (osmContact.phone && osmContact.email) return { ...osmContact, website: null };
+
+  const enriched = await enrichRestaurantContact({ name: tags.name, address: addressFrom(tags, city), city });
+  return {
+    phone: enriched.phone || osmContact.phone,
+    email: osmContact.email || enriched.email,
+    website: enriched.website,
   };
 }
 
@@ -171,6 +193,7 @@ async function importCityRestaurantsUncached(
     fetchPlaces = fetchOverpassRestaurants,
     fetchRealPhoto = (place, tags) => fetchRealPhotoForPlace(place, tags, city),
     fetchCuisinePhoto = getOrCreateCuisinePhoto,
+    fetchContact = (tags) => fetchContactForPlace(tags, city),
   } = {},
 ) {
   const alreadyImported = await db.prepare('SELECT 1 FROM restaurant_import_log WHERE city = ?').get(city);
@@ -205,7 +228,14 @@ async function importCityRestaurantsUncached(
   // image; slots within one cuisine are fetched sequentially (each one
   // depends on the last being cached first) but different cuisines' pools
   // build in parallel with each other.
-  const realPhotos = await Promise.all(places.map((place) => fetchRealPhoto(place, place.tags)));
+  // Photos and contact info are fetched concurrently with each other (not
+  // one after the other) -- both can each involve a Google Places call per
+  // place, and running them sequentially would double a city's first-load
+  // latency for no reason since neither depends on the other's result.
+  const [realPhotos, contacts] = await Promise.all([
+    Promise.all(places.map((place) => fetchRealPhoto(place, place.tags))),
+    Promise.all(places.map((place) => fetchContact(place.tags))),
+  ]);
   const cuisineCounts = new Map();
   for (const place of places) {
     const cuisineTags = cuisineTagsFrom(place.tags);
@@ -237,12 +267,12 @@ async function importCityRestaurantsUncached(
     // (both already enhanced -- see restaurantPhotos.js) -- or null, which
     // just means "no photo yet", handled by the app's existing placeholder.
     const photo = realPhotos[index] ?? cuisinePhoto;
-    const contact = contactFrom(tags);
+    const contact = contacts[index];
 
     await db
       .prepare(
-        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, photo_url, photo_attribution, source, external_id, contact_phone, contact_email)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)
+        `INSERT INTO restaurants (name, city, region, cuisine_tags, address, latitude, longitude, photo_url, photo_attribution, source, external_id, contact_phone, contact_email, website)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
            name = VALUES(name), latitude = VALUES(latitude), longitude = VALUES(longitude),
            cuisine_tags = VALUES(cuisine_tags), address = VALUES(address),
@@ -261,6 +291,7 @@ async function importCityRestaurantsUncached(
         `osm:${place.type}/${place.id}`,
         contact.phone,
         contact.email,
+        contact.website,
       );
   }
 

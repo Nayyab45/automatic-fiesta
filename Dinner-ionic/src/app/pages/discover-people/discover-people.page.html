@@ -1,7 +1,7 @@
 <app-header title="Discover People" (back)="goBack()">
-  <button (click)="go('/search-filter')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface relative" id="filterBtn">
+  <button (click)="openFilterSheet()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-on-surface relative" id="filterBtn">
     <span class="material-symbols-outlined">tune</span>
-    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+    <span *ngIf="activeFilterCount > 0" class="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
   </button>
 </app-header>
 
@@ -14,27 +14,27 @@
 </div>
 
 <div class="flex overflow-x-auto hide-scrollbar gap-unit py-unit -mx-container-padding px-container-padding">
-<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
-                    Age: 25-35
+<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="minAge !== null || maxAge !== null" [class.border-primary]="minAge !== null || maxAge !== null" [class.bg-secondary-container]="minAge !== null || maxAge !== null" [class.bg-opacity-20]="minAge !== null || maxAge !== null" [class.text-on-secondary-container]="minAge !== null || maxAge !== null" [class.border]="minAge === null && maxAge === null" [class.border-outline-variant]="minAge === null && maxAge === null" [class.bg-surface-container-lowest]="minAge === null && maxAge === null" [class.text-on-surface-variant]="minAge === null && maxAge === null">
+                    {{ minAge !== null || maxAge !== null ? 'Age: ' + (minAge ?? 'Any') + '-' + (maxAge ?? 'Any') : 'Age' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
-                    Interests
+<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedInterestIds.size > 0" [class.border-primary]="selectedInterestIds.size > 0" [class.bg-secondary-container]="selectedInterestIds.size > 0" [class.bg-opacity-20]="selectedInterestIds.size > 0" [class.text-on-secondary-container]="selectedInterestIds.size > 0" [class.border]="selectedInterestIds.size === 0" [class.border-outline-variant]="selectedInterestIds.size === 0" [class.bg-surface-container-lowest]="selectedInterestIds.size === 0" [class.text-on-surface-variant]="selectedInterestIds.size === 0">
+                    {{ selectedInterestIds.size > 0 ? 'Interests (' + selectedInterestIds.size + ')' : 'Interests' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
-                    Cuisine
+<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedCuisines.size > 0" [class.border-primary]="selectedCuisines.size > 0" [class.bg-secondary-container]="selectedCuisines.size > 0" [class.bg-opacity-20]="selectedCuisines.size > 0" [class.text-on-secondary-container]="selectedCuisines.size > 0" [class.border]="selectedCuisines.size === 0" [class.border-outline-variant]="selectedCuisines.size === 0" [class.bg-surface-container-lowest]="selectedCuisines.size === 0" [class.text-on-surface-variant]="selectedCuisines.size === 0">
+                    {{ selectedCuisines.size > 0 ? 'Cuisine (' + selectedCuisines.size + ')' : 'Cuisine' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="go('/search-filter')" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container font-label-lg text-label-lg whitespace-nowrap flex-shrink-0 transition-colors">
-                    Distance: &lt;5km
+<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedDistanceKm !== null" [class.border-primary]="selectedDistanceKm !== null" [class.bg-secondary-container]="selectedDistanceKm !== null" [class.bg-opacity-20]="selectedDistanceKm !== null" [class.text-on-secondary-container]="selectedDistanceKm !== null" [class.border]="selectedDistanceKm === null" [class.border-outline-variant]="selectedDistanceKm === null" [class.bg-surface-container-lowest]="selectedDistanceKm === null" [class.text-on-surface-variant]="selectedDistanceKm === null">
+                    {{ selectedDistanceKm !== null ? 'Distance: <' + selectedDistanceKm + 'km' : 'Distance' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
 </div>
 </section>
 
 <p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">Finding people nearby…</p>
-<p *ngIf="!loading() && people().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No one else here yet.</p>
+<p *ngIf="!loading() && people().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No one matches these filters yet.</p>
 
 <section *ngIf="!loading() && people().length > 0" class="flex flex-col gap-stack-md">
 
@@ -44,10 +44,16 @@
 <div class="flex-1 flex flex-col justify-center">
 <div class="flex justify-between items-center">
 <h3 class="font-headline-md text-headline-md text-on-background">{{ person.name }}{{ person.age ? ', ' + person.age : '' }}</h3>
+<span *ngIf="person.distanceKm != null; else cityLabel" class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">place</span>
+                                {{ person.distanceKm }} km
+                            </span>
+<ng-template #cityLabel>
 <span *ngIf="person.city" class="font-label-sm text-label-sm text-outline flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">place</span>
                                 {{ person.city }}
                             </span>
+</ng-template>
 </div>
 <p *ngIf="person.bio" class="font-body-md text-body-md text-on-surface-variant mt-1">{{ person.bio }}</p>
 </div>
@@ -70,60 +76,57 @@
 
 <app-bottom-nav active="discover"></app-bottom-nav>
 
-<div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end opacity-0 pointer-events-none transition-opacity duration-300" id="filterOverlay">
-<div class="bg-surface rounded-t-[24px] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] transform translate-y-full transition-transform duration-300 max-h-[751px] flex flex-col" id="filterSheet">
+<div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end transition-opacity duration-300" [class.opacity-0]="!filterSheetOpen()" [class.pointer-events-none]="!filterSheetOpen()" (click)="closeFilterSheet()">
+<div class="bg-surface rounded-t-[24px] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] transform transition-transform duration-300 max-h-[80vh] flex flex-col" [class.translate-y-full]="!filterSheetOpen()" (click)="$event.stopPropagation()">
 <div class="flex justify-center pt-4 pb-2">
 <div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
 </div>
 <div class="px-container-padding py-stack-md flex justify-between items-center border-b-[0.5px] border-outline-variant">
 <h2 class="font-headline-md text-headline-md text-on-background">Filters</h2>
-<button (click)="goBack()" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors" id="closeFilterBtn">
+<button (click)="closeFilterSheet()" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors" id="closeFilterBtn">
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
 <div class="overflow-y-auto px-container-padding py-stack-lg flex flex-col gap-section-gap">
 
 <div class="flex flex-col gap-stack-md">
-<div class="flex justify-between items-center">
 <h3 class="font-title-lg text-title-lg text-on-background">Age Range</h3>
-<span class="font-label-lg text-label-lg text-primary">25 - 40</span>
-</div>
-
-<div class="relative w-full h-8 flex items-center">
-<div class="absolute w-full h-1 bg-surface-container-highest rounded-full"></div>
-<div class="absolute w-[40%] left-[20%] h-1.5 bg-primary rounded-full"></div>
-<div class="absolute left-[20%] w-6 h-6 bg-primary-container rounded-full border-2 border-surface shadow-sm transform -translate-x-1/2 cursor-grab"></div>
-<div class="absolute left-[60%] w-6 h-6 bg-primary-container rounded-full border-2 border-surface shadow-sm transform -translate-x-1/2 cursor-grab"></div>
+<div class="flex items-center gap-stack-md">
+<input [(ngModel)]="minAge" type="number" min="18" max="99" placeholder="Min" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0"/>
+<span class="text-on-surface-variant">to</span>
+<input [(ngModel)]="maxAge" type="number" min="18" max="99" placeholder="Max" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0"/>
 </div>
 </div>
 
 <div class="flex flex-col gap-stack-md">
 <h3 class="font-title-lg text-title-lg text-on-background">Interests</h3>
 <div class="flex flex-wrap gap-3">
-<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Foodie</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Coffee Lover</button>
-<button (click)="toggleChip($event)" class="chip chip-selected px-4 py-2 rounded-full border-1.5 border-primary bg-secondary-container bg-opacity-20 text-on-secondary-container font-label-lg text-label-lg transition-colors">Live Music</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Fine Dining</button>
-<button (click)="toggleChip($event)" class="chip px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-lg text-label-lg transition-colors">Street Food</button>
+<button *ngFor="let interest of allInterests()" (click)="toggleInterest(interest.id)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedInterestIds.has(interest.id)" [class.border-primary]="selectedInterestIds.has(interest.id)" [class.bg-secondary-container]="selectedInterestIds.has(interest.id)" [class.bg-opacity-20]="selectedInterestIds.has(interest.id)" [class.text-on-secondary-container]="selectedInterestIds.has(interest.id)" [class.border]="!selectedInterestIds.has(interest.id)" [class.border-outline-variant]="!selectedInterestIds.has(interest.id)" [class.bg-surface-container-lowest]="!selectedInterestIds.has(interest.id)" [class.text-on-surface-variant]="!selectedInterestIds.has(interest.id)">{{ interest.name }}</button>
+</div>
+</div>
+
+<div class="flex flex-col gap-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-background">Cuisine</h3>
+<div class="flex flex-wrap gap-3">
+<button *ngFor="let cuisine of cuisineOptions" (click)="toggleCuisine(cuisine)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedCuisines.has(cuisine)" [class.border-primary]="selectedCuisines.has(cuisine)" [class.bg-secondary-container]="selectedCuisines.has(cuisine)" [class.bg-opacity-20]="selectedCuisines.has(cuisine)" [class.text-on-secondary-container]="selectedCuisines.has(cuisine)" [class.border]="!selectedCuisines.has(cuisine)" [class.border-outline-variant]="!selectedCuisines.has(cuisine)" [class.bg-surface-container-lowest]="!selectedCuisines.has(cuisine)" [class.text-on-surface-variant]="!selectedCuisines.has(cuisine)">{{ cuisine }}</button>
 </div>
 </div>
 
 <div class="flex flex-col gap-stack-md pb-stack-lg">
-<div class="flex justify-between items-center">
 <h3 class="font-title-lg text-title-lg text-on-background">Maximum Distance</h3>
-<span class="font-label-lg text-label-lg text-primary">10 km</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant -mt-2">Uses your current location -- only asked for when you pick a distance.</p>
+<div class="flex flex-wrap gap-3">
+<button *ngFor="let km of distanceOptionsKm" (click)="selectDistance(km)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedDistanceKm === km" [class.border-primary]="selectedDistanceKm === km" [class.bg-secondary-container]="selectedDistanceKm === km" [class.bg-opacity-20]="selectedDistanceKm === km" [class.text-on-secondary-container]="selectedDistanceKm === km" [class.border]="selectedDistanceKm !== km" [class.border-outline-variant]="selectedDistanceKm !== km" [class.bg-surface-container-lowest]="selectedDistanceKm !== km" [class.text-on-surface-variant]="selectedDistanceKm !== km">{{ km }} km</button>
 </div>
-
-<div class="relative w-full h-8 flex items-center">
-<div class="absolute w-full h-1 bg-surface-container-highest rounded-full"></div>
-<div class="absolute w-[30%] left-0 h-1.5 bg-primary rounded-full"></div>
-<div class="absolute left-[30%] w-6 h-6 bg-primary-container rounded-full border-2 border-surface shadow-sm transform -translate-x-1/2 cursor-grab"></div>
+<p *ngIf="distanceError()" class="font-body-sm text-body-sm text-error">{{ distanceError() }}</p>
 </div>
 </div>
-</div>
-<div class="p-container-padding border-t-[0.5px] border-outline-variant bg-surface pb-safe mt-auto">
-<button (click)="goBack()" class="w-full bg-primary-container text-on-primary py-4 rounded-lg font-title-lg text-title-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm">
-                    Apply Filters
+<div class="p-container-padding border-t-[0.5px] border-outline-variant bg-surface pb-safe mt-auto flex gap-stack-md">
+<button (click)="resetFilters()" class="px-6 py-4 rounded-lg border border-outline-variant text-on-surface font-title-lg text-title-lg hover:bg-surface-variant transition-colors">
+                    Reset
+                </button>
+<button [disabled]="locatingDistance()" (click)="applyFilters()" class="flex-1 bg-primary-container text-on-primary py-4 rounded-lg font-title-lg text-title-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm disabled:opacity-60">
+                    {{ locatingDistance() ? 'Locating…' : 'Apply Filters' }}
                 </button>
 </div>
 </div>

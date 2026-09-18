@@ -32,6 +32,8 @@ export interface DiningTable {
   restaurant: TableRestaurantSummary;
   host: TableHost;
   guestCount: number;
+  /** seatsTotal - guestCount, floored at 0 -- how many more people can join. */
+  seatsAvailable: number;
   isPast: boolean;
   isHost: boolean;
   hasReviewed: boolean;

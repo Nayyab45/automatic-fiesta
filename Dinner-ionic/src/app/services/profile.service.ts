@@ -39,6 +39,23 @@ export interface Person {
   photoUrl: string | null;
   verified: number;
   interests: Interest[];
+  /** Only present when the distance filter was used -- km from the
+   * coordinates passed to people(), to this person's self-reported city. */
+  distanceKm?: number | null;
+}
+
+export interface PeopleFilters {
+  city?: string;
+  minAge?: number;
+  maxAge?: number;
+  interestIds?: number[];
+  cuisine?: string[];
+  /** Both required together with maxDistanceKm -- the viewer's own live
+   * coordinates, sent fresh on every request and never stored (see
+   * Backend/src/routes/profile.js). */
+  lat?: number;
+  lng?: number;
+  maxDistanceKm?: number;
 }
 
 export interface PreferenceChangeStatus {
@@ -116,9 +133,16 @@ export class ProfileService {
     return this.http.get<{ interests: Interest[] }>(`${environment.apiUrl}/interests`);
   }
 
-  people(city?: string): Observable<{ people: Person[] }> {
+  people(filters: PeopleFilters = {}): Observable<{ people: Person[] }> {
     let params = new HttpParams();
-    if (city) params = params.set('city', city);
+    if (filters.city) params = params.set('city', filters.city);
+    if (filters.minAge) params = params.set('minAge', filters.minAge);
+    if (filters.maxAge) params = params.set('maxAge', filters.maxAge);
+    if (filters.interestIds?.length) params = params.set('interestIds', filters.interestIds.join(','));
+    if (filters.cuisine?.length) params = params.set('cuisine', filters.cuisine.join(','));
+    if (filters.lat !== undefined && filters.lng !== undefined && filters.maxDistanceKm) {
+      params = params.set('lat', filters.lat).set('lng', filters.lng).set('maxDistanceKm', filters.maxDistanceKm);
+    }
     return this.http.get<{ people: Person[] }>(`${environment.apiUrl}/people`, { params });
   }
 

@@ -30,11 +30,14 @@ async function tableWithContext(row, userId) {
     .prepare('SELECT 1 FROM reviews WHERE table_id = ? AND reviewer_user_id = ?')
     .get(row.id, userId);
 
+  const currentGuestCount = await guestCount(row.id);
+
   return {
     ...toCamel(row),
     restaurant: toCamel(restaurant),
     host: toCamel(host),
-    guestCount: await guestCount(row.id),
+    guestCount: currentGuestCount,
+    seatsAvailable: Math.max(row.seats_total - currentGuestCount, 0),
     isPast: row.date_time < new Date().toISOString(),
     isHost: row.host_user_id === userId,
     hasReviewed: !!hasReviewed,
@@ -87,6 +90,41 @@ tablesRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({ table: await tableWithContext(row, req.user.sub) });
 }));
 
+// Popup-notifies every other user in the restaurant's city when a new
+// *public* table is created there -- "near" here means same city, not real
+// GPS distance, since the app has nowhere it persists a user's live location
+// (only ever asked for it transiently, e.g. RestaurantService.recommended()).
+// A private table stays private -- only its invited guests should ever hear
+// about it. Same block-exclusion as GET /discover, so someone who's blocked
+// the host (or been blocked by them) never gets pinged about their tables.
+// Best-effort and never throws, same reasoning as notifyRestaurantOfBooking:
+// a notification failure must not break the booking that triggered it.
+async function notifyNearbyUsersOfNewTable(table, restaurant, hostUserId) {
+  if (table.visibility !== 'public') return;
+
+  const nearbyUsers = await db
+    .prepare(
+      `SELECT p.user_id FROM user_profiles p
+       WHERE p.city = ? AND p.user_id != ?
+         AND p.user_id NOT IN (
+           SELECT blocked_user_id FROM user_blocks WHERE blocker_user_id = ?
+           UNION
+           SELECT blocker_user_id FROM user_blocks WHERE blocked_user_id = ?
+         )
+       LIMIT 500`,
+    )
+    .all(restaurant.city, hostUserId, hostUserId, hostUserId);
+
+  const results = await Promise.allSettled(
+    nearbyUsers.map((user) => createNotification(user.user_id, 'new_table_near_you', { tableId: table.id })),
+  );
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error('[tables] failed to notify a nearby user of a new table:', result.reason?.message);
+    }
+  }
+}
+
 tablesRouter.post('/', asyncHandler(async (req, res) => {
   const { restaurantId, gatheringType, dateTime, seatsTotal, visibility, atmosphere, note, pricePerPerson, title } =
     req.body ?? {};
@@ -97,7 +135,7 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
   }
 
   const restaurant = await db
-    .prepare('SELECT id, name, contact_email, contact_phone FROM restaurants WHERE id = ?')
+    .prepare('SELECT id, name, city, contact_email, contact_phone FROM restaurants WHERE id = ?')
     .get(restaurantId);
   if (!restaurant) {
     return res.status(404).json({ message: 'Restaurant not found' });
@@ -131,6 +169,7 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
     dateTime: created.date_time,
     seatsTotal: created.seats_total,
   });
+  await notifyNearbyUsersOfNewTable(created, restaurant, req.user.sub);
 
   res.status(201).json({ table: await tableWithContext(created, req.user.sub) });
 }));
@@ -385,9 +424,17 @@ seatRequestsRouter.patch('/:id', asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Seat request not found' });
   }
 
-  const table = await db.prepare('SELECT host_user_id FROM dining_tables WHERE id = ?').get(seatRequest.table_id);
+  const table = await db.prepare('SELECT host_user_id, seats_total FROM dining_tables WHERE id = ?').get(seatRequest.table_id);
   if (table.host_user_id !== req.user.sub) {
     return res.status(403).json({ message: 'Only the host can review this request' });
+  }
+
+  // Confirming a seat request is what actually reserves it -- the seat count
+  // sent to the restaurant when the table was booked (see
+  // notifyRestaurantOfBooking in POST /) is a promise this table won't seat
+  // more than seatsTotal people, so it can't be exceeded here.
+  if (status === 'confirmed' && (await guestCount(seatRequest.table_id)) >= table.seats_total) {
+    return res.status(409).json({ message: 'This table is already fully booked -- no seats left to reserve' });
   }
 
   await db.prepare('UPDATE seat_requests SET status = ?, updated_at = NOW() WHERE id = ?').run(

@@ -58,6 +58,15 @@ export interface Restaurant {
    * Backend/scripts/geocode-restaurants.mjs. */
   latitude: number | null;
   longitude: number | null;
+  /** A real, verified phone number for this restaurant (from Google Places,
+   * or OSM's own contact tags -- see Backend/src/lib/osmPlaces.js). Null if
+   * neither source had one; that's also when a booking notification's SMS
+   * side (Backend/src/lib/restaurantNotify.js) simply doesn't go out. */
+  contactPhone: string | null;
+  /** A real contact email, scraped from the restaurant's own website since
+   * Google Places has no email field of its own -- see
+   * Backend/src/lib/emailScraper.js. Null if not found. */
+  contactEmail: string | null;
   createdAt: string;
   /** Up to 3 popular dishes; present on list results, absent elsewhere unless requested. */
   dishes?: Dish[];

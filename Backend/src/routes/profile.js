@@ -3,7 +3,8 @@ import { db } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
-import { tastePrefsFor } from '../lib/taste.js';
+import { tastePrefsFor, distanceKm } from '../lib/taste.js';
+import { cityCoordinates } from '../lib/cityGeocode.js';
 
 export const profileRouter = Router();
 export const interestsRouter = Router();
@@ -66,6 +67,46 @@ async function interestsFor(userId) {
       )
       .all(userId),
   );
+}
+
+// Batched version of interestsFor for a whole candidate list (Discover
+// People) -- one query total instead of one per person, same reasoning as
+// attachDishesBatch in restaurants.js.
+async function interestsForBatch(userIds) {
+  if (!userIds.length) return new Map();
+  const placeholders = userIds.map(() => '?').join(',');
+  const rows = toCamelRows(
+    await db
+      .prepare(
+        `SELECT ui.user_id, i.id, i.name, i.category FROM user_interests ui
+         JOIN interests i ON i.id = ui.interest_id
+         WHERE ui.user_id IN (${placeholders})`,
+      )
+      .all(...userIds),
+  );
+  const byUserId = new Map();
+  for (const row of rows) {
+    const list = byUserId.get(row.userId) ?? [];
+    list.push({ id: row.id, name: row.name, category: row.category });
+    byUserId.set(row.userId, list);
+  }
+  return byUserId;
+}
+
+// Same batching, for the comma-separated favorite_foods each candidate set
+// in Food Preferences (see food-preferences.page.ts) -- what the "Cuisine"
+// filter on Discover People actually matches against.
+async function favoriteFoodsForBatch(userIds) {
+  if (!userIds.length) return new Map();
+  const placeholders = userIds.map(() => '?').join(',');
+  const rows = await db
+    .prepare(`SELECT user_id, favorite_foods FROM food_preferences WHERE user_id IN (${placeholders})`)
+    .all(...userIds);
+  const byUserId = new Map();
+  for (const row of rows) {
+    byUserId.set(row.user_id, row.favorite_foods ? row.favorite_foods.split(',').filter(Boolean) : []);
+  }
+  return byUserId;
 }
 
 async function fullProfile(userId) {
@@ -248,12 +289,23 @@ const PROFILE_VISIBLE_CLAUSE = `u.id NOT IN (
 )`;
 
 peopleRouter.get('/', asyncHandler(async (req, res) => {
-  const { city } = req.query;
+  const { city, minAge, maxAge, interestIds, cuisine, lat, lng, maxDistanceKm } = req.query;
   const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE, PROFILE_VISIBLE_CLAUSE];
   const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
     clauses.push('p.city = ?');
     params.push(city);
+  }
+  // A person with no age on file can't be verified as being "in range", so
+  // an active age filter excludes them rather than silently including
+  // everyone regardless of whether they match.
+  if (minAge) {
+    clauses.push('p.age IS NOT NULL AND p.age >= ?');
+    params.push(Number(minAge));
+  }
+  if (maxAge) {
+    clauses.push('p.age IS NOT NULL AND p.age <= ?');
+    params.push(Number(maxAge));
   }
 
   const rows = await db
@@ -264,10 +316,55 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
     )
     .all(...params);
 
-  const people = await Promise.all(
-    toCamelRows(rows).map(async (person) => ({ ...person, interests: await interestsFor(person.id) })),
-  );
-  res.json({ people });
+  let people = toCamelRows(rows);
+  const ids = people.map((person) => person.id);
+  const [interestsByUserId, favoriteFoodsByUserId] = await Promise.all([interestsForBatch(ids), favoriteFoodsForBatch(ids)]);
+  people = people.map((person) => ({
+    ...person,
+    interests: interestsByUserId.get(person.id) ?? [],
+    favoriteFoods: favoriteFoodsByUserId.get(person.id) ?? [],
+  }));
+
+  const requestedInterestIds = interestIds
+    ? String(interestIds).split(',').map(Number).filter((id) => !Number.isNaN(id))
+    : [];
+  if (requestedInterestIds.length) {
+    people = people.filter((person) => person.interests.some((interest) => requestedInterestIds.includes(interest.id)));
+  }
+
+  const requestedCuisines = cuisine
+    ? String(cuisine).split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
+    : [];
+  if (requestedCuisines.length) {
+    people = people.filter((person) =>
+      person.favoriteFoods.some((food) => requestedCuisines.some((c) => food.toLowerCase().includes(c) || c.includes(food.toLowerCase()))),
+    );
+  }
+
+  // Distance is measured from the viewer's real, live GPS position (lat/lng,
+  // sent fresh on every request -- never stored) to each candidate's
+  // self-reported city center (see cityGeocode.js) -- there's nowhere this
+  // app persists an individual user's own live location. A candidate with
+  // no city, or a city that can't be geocoded, is excluded rather than
+  // guessed into or out of range.
+  const hasCoords = lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
+  if (hasCoords && maxDistanceKm) {
+    const viewerLat = Number(lat);
+    const viewerLng = Number(lng);
+    const radiusKm = Number(maxDistanceKm);
+    const distances = await Promise.all(
+      people.map(async (person) => {
+        if (!person.city) return null;
+        const coords = await cityCoordinates(person.city);
+        return coords ? distanceKm(viewerLat, viewerLng, coords.latitude, coords.longitude) : null;
+      }),
+    );
+    people = people
+      .map((person, index) => ({ ...person, distanceKm: distances[index] !== null ? Math.round(distances[index] * 10) / 10 : null }))
+      .filter((person) => person.distanceKm !== null && person.distanceKm <= radiusKm);
+  }
+
+  res.json({ people: people.map(({ favoriteFoods, ...person }) => person) });
 }));
 
 matchesRouter.get('/', asyncHandler(async (req, res) => {

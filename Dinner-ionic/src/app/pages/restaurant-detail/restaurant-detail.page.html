@@ -136,6 +136,14 @@
 <span class="material-symbols-outlined text-[20px]">directions</span>
                     Get Directions
                 </a>
+<a *ngIf="r.contactPhone" [href]="'tel:' + r.contactPhone" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">call</span>
+                    {{ r.contactPhone }}
+                </a>
+<a *ngIf="r.contactEmail" [href]="'mailto:' + r.contactEmail" class="w-full py-3 px-4 border border-outline text-on-surface font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+                    {{ r.contactEmail }}
+                </a>
 </section>
 </div>
 </main>
