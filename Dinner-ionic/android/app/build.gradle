@@ -22,6 +22,14 @@ android {
         applicationId "com.whatshouldweeat.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        // versionCode: a plain integer, must strictly increase on every Play
+        // Store upload (including internal/closed testing tracks) or the
+        // upload is rejected -- Play Store identifies releases by this, not
+        // versionName. Bump by 1 each release; never reuse or lower it.
+        // versionName: the user-facing string shown on the Play Store listing
+        // and in device settings -- follow semver (major.minor.patch) and
+        // bump it alongside versionCode, but it carries no upload constraint
+        // of its own.
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
