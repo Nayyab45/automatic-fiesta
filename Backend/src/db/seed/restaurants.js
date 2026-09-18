@@ -238,14 +238,20 @@ export async function seedRestaurants(db) {
   `);
 
   for (const restaurant of RESTAURANTS) {
+    // rating/reviewCount always start null/0 here, ignoring whatever's on
+    // the RESTAURANTS object above (leftover placeholder numbers from the
+    // original static prototype -- e.g. "4.9, 920 reviews" for a restaurant
+    // nobody has actually reviewed in the app yet). restaurants.js's own
+    // review-posting handler is the only thing that should ever set these,
+    // same as every real (OSM-imported) restaurant already gets.
     const result = await insertRestaurant.run(
       restaurant.name,
       restaurant.city,
       restaurant.region,
       restaurant.cuisineTags,
       restaurant.priceTier,
-      restaurant.rating,
-      restaurant.reviewCount,
+      null,
+      0,
       restaurant.description ?? null,
       restaurant.address ?? null,
       restaurant.photoUrl ?? null,
