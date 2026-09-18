@@ -126,6 +126,7 @@ async function fullProfile(userId) {
     province: profile?.province ?? null,
     photoUrl: profile?.photo_url ?? null,
     phone: profile?.phone ?? null,
+    gender: profile?.gender ?? null,
     verified: !!profile?.verified,
     tablesJoinedCount: await tablesJoinedCount(userId),
     rating: await peopleRating(userId),
@@ -180,7 +181,7 @@ profileRouter.get('/:id', asyncHandler(async (req, res) => {
 // manage-account's photo picker, phone-only from its edit-phone prompt)
 // alongside profile-creation's full-form save.
 profileRouter.put('/me', asyncHandler(async (req, res) => {
-  const { age, bio, city, province, photoUrl, phone } = req.body ?? {};
+  const { age, bio, city, province, photoUrl, phone, gender } = req.body ?? {};
   const existing = await db.prepare('SELECT * FROM user_profiles WHERE user_id = ?').get(req.user.sub);
 
   const merged = {
@@ -190,14 +191,16 @@ profileRouter.put('/me', asyncHandler(async (req, res) => {
     province: province !== undefined ? province : (existing?.province ?? null),
     photoUrl: photoUrl !== undefined ? photoUrl : (existing?.photo_url ?? null),
     phone: phone !== undefined ? phone : (existing?.phone ?? null),
+    gender: gender !== undefined ? gender : (existing?.gender ?? null),
   };
 
   await db.prepare(
-    `INSERT INTO user_profiles (user_id, age, bio, city, province, photo_url, phone, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+    `INSERT INTO user_profiles (user_id, age, bio, city, province, photo_url, phone, gender, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
      ON DUPLICATE KEY UPDATE age = VALUES(age), bio = VALUES(bio), city = VALUES(city),
-       province = VALUES(province), photo_url = VALUES(photo_url), phone = VALUES(phone), updated_at = NOW()`,
-  ).run(req.user.sub, merged.age, merged.bio, merged.city, merged.province, merged.photoUrl, merged.phone);
+       province = VALUES(province), photo_url = VALUES(photo_url), phone = VALUES(phone),
+       gender = VALUES(gender), updated_at = NOW()`,
+  ).run(req.user.sub, merged.age, merged.bio, merged.city, merged.province, merged.photoUrl, merged.phone, merged.gender);
   res.json({ profile: await fullProfile(req.user.sub) });
 }));
 

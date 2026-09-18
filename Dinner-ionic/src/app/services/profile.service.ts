@@ -9,6 +9,11 @@ export interface Interest {
   category: string;
 }
 
+/** 'woman' is the only value that ever gates anything (a women-only table's
+ * eligibility -- see Backend/src/routes/tables.js); the rest are stored only
+ * to show back on the profile. */
+export type Gender = 'woman' | 'man' | 'non_binary' | 'prefer_not_to_say';
+
 export interface Profile {
   id: number;
   name: string;
@@ -19,6 +24,7 @@ export interface Profile {
   province: string | null;
   photoUrl: string | null;
   phone: string | null;
+  gender: Gender | null;
   verified: boolean;
   tablesJoinedCount: number;
   rating: number | null;
@@ -98,7 +104,7 @@ export class ProfileService {
     return this.http.get<{ profile: Profile }>(`${this.baseUrl}/${id}`);
   }
 
-  updateMe(payload: { age?: number; bio?: string; city?: string; province?: string; photoUrl?: string; phone?: string }): Observable<{ profile: Profile }> {
+  updateMe(payload: { age?: number; bio?: string; city?: string; province?: string; photoUrl?: string; phone?: string; gender?: Gender }): Observable<{ profile: Profile }> {
     return this.http.put<{ profile: Profile }>(`${this.baseUrl}/me`, payload);
   }
 

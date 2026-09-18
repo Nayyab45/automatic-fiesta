@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonRouterOutlet } from '@ionic/angular/standalone';
 import { NetworkService } from './services/network.service';
 import { PushNotificationService } from './services/push-notification.service';
+import { AdmobService } from './services/admob.service';
 
 // PILOT: swapped from a plain <router-outlet> to <ion-router-outlet> to
 // validate whether real Ionic components (native transitions, swipe-back)
@@ -48,11 +49,13 @@ import { PushNotificationService } from './services/push-notification.service';
 })
 export class AppComponent implements OnInit {
   readonly push = inject(PushNotificationService);
+  private readonly admob = inject(AdmobService);
 
   constructor(public network: NetworkService) {}
 
   ngOnInit(): void {
     void this.push.init();
+    void this.admob.init();
   }
 
   dismissBanner(event: Event): void {

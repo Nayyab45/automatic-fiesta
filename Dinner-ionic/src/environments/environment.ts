@@ -7,7 +7,7 @@
 // IPv4 address).
 export const environment = {
   production: false,
-  apiUrl: 'http://192.168.100.33:3113/api',
+  apiUrl: 'http://10.43.209.160:3113/api',
   // The Firebase project's "Web" OAuth client ID (ends in
   // .apps.googleusercontent.com), from Firebase Console -> Authentication ->
   // Sign-in method -> Google, after enabling it there. Required for

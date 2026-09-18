@@ -15,7 +15,11 @@
 </div>
 <div class="p-gutter flex flex-col justify-between flex-grow">
 <div>
+<div class="flex items-center gap-2 flex-wrap">
 <span class="font-label-lg text-label-lg text-primary tracking-widest uppercase">{{ table.gatheringType }}</span>
+<span *ngIf="table.audience === 'women_only'" class="inline-flex items-center px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">Women only</span>
+<span *ngIf="table.audience === 'friends_only'" class="inline-flex items-center px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">Friends only</span>
+</div>
 <h3 class="font-headline-md text-headline-md text-on-surface mb-unit">{{ table.title }}</h3>
 <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]">place</span>

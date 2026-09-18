@@ -27,6 +27,14 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Google's official public TEST App ID, safe to ship as-is (it only
+             ever serves Google's test ads, never real ones, never earns real
+             revenue). Replace with the app's own AdMob App ID from
+             admob.google.com before a real release; see AdmobService. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 
     <!-- Permissions -->
@@ -35,4 +43,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required by Google Mobile Ads SDK on Android 13+ (API 33) to read the
+         advertising ID for ad personalization/frequency-capping. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 </manifest>

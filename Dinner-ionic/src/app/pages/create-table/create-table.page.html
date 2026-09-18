@@ -68,6 +68,13 @@
 <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
 </label>
 </div>
+
+<div *ngIf="visibility" class="relative w-full flex flex-col gap-1 bg-surface-container-low rounded-xl border border-outline-variant/30 px-4 py-3">
+<label class="block font-label-sm text-label-sm text-on-surface-variant" for="audience">Who can join</label>
+<select [(ngModel)]="audience" class="font-body-lg text-on-surface bg-transparent focus:ring-0 appearance-none" id="audience" name="audience">
+<option *ngFor="let a of audienceOptions" [value]="a.value">{{ a.label }}</option>
+</select>
+</div>
 </div>
 </div>
 </section>

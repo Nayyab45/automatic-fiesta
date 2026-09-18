@@ -23,6 +23,34 @@ async function isTableMember(table, userId) {
   return !!(await db.prepare('SELECT 1 FROM table_guests WHERE table_id = ? AND user_id = ?').get(table.id, userId));
 }
 
+const TABLE_AUDIENCES = ['everyone', 'women_only', 'friends_only'];
+
+// A table's audience only restricts who may *discover or request a seat at*
+// it -- the host and anyone already seated (table_guests) are always
+// eligible for their own table regardless of audience, same as
+// isTableMember above.
+async function isEligibleForAudience(table, userId) {
+  if (table.audience === 'everyone' || table.host_user_id === userId) return true;
+
+  if (table.audience === 'women_only') {
+    const profile = await db.prepare('SELECT gender FROM user_profiles WHERE user_id = ?').get(userId);
+    return profile?.gender === 'woman';
+  }
+
+  if (table.audience === 'friends_only') {
+    const friendship = await db
+      .prepare(
+        `SELECT 1 FROM friend_requests
+         WHERE status = 'accepted'
+           AND ((requester_id = ? AND recipient_id = ?) OR (requester_id = ? AND recipient_id = ?))`,
+      )
+      .get(userId, table.host_user_id, table.host_user_id, userId);
+    return !!friendship;
+  }
+
+  return true;
+}
+
 async function tableWithContext(row, userId) {
   const restaurant = await db.prepare('SELECT name, photo_url, address, rating, cuisine_tags FROM restaurants WHERE id = ?').get(row.restaurant_id);
   const host = await db.prepare('SELECT id, name FROM users WHERE id = ?').get(row.host_user_id);
@@ -79,7 +107,16 @@ tablesRouter.get('/discover', asyncHandler(async (req, res) => {
     )
     .all(req.user.sub, new Date().toISOString(), req.user.sub, req.user.sub, req.user.sub);
 
-  res.json({ tables: await Promise.all(rows.map((row) => tableWithContext(row, req.user.sub))) });
+  // Filtered in JS rather than SQL: eligibility for 'women_only'/'friends_only'
+  // needs a per-row lookup (the caller's gender, or their friendship with
+  // that specific host) that doesn't reduce to a single WHERE clause the way
+  // the block/visibility checks above do.
+  const eligibleRows = [];
+  for (const row of rows) {
+    if (await isEligibleForAudience(row, req.user.sub)) eligibleRows.push(row);
+  }
+
+  res.json({ tables: await Promise.all(eligibleRows.map((row) => tableWithContext(row, req.user.sub))) });
 }));
 
 tablesRouter.get('/:id', asyncHandler(async (req, res) => {
@@ -126,12 +163,15 @@ async function notifyNearbyUsersOfNewTable(table, restaurant, hostUserId) {
 }
 
 tablesRouter.post('/', asyncHandler(async (req, res) => {
-  const { restaurantId, gatheringType, dateTime, seatsTotal, visibility, atmosphere, note, pricePerPerson, title } =
+  const { restaurantId, gatheringType, dateTime, seatsTotal, visibility, audience, atmosphere, note, pricePerPerson, title } =
     req.body ?? {};
 
   const missingFieldsError = requireFields(req.body, ['restaurantId', 'gatheringType', 'dateTime', 'seatsTotal']);
   if (missingFieldsError) {
     return res.status(400).json({ message: missingFieldsError });
+  }
+  if (audience !== undefined && !TABLE_AUDIENCES.includes(audience)) {
+    return res.status(400).json({ message: `audience must be one of: ${TABLE_AUDIENCES.join(', ')}` });
   }
 
   const restaurant = await db
@@ -144,8 +184,8 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
   const result = await db
     .prepare(
       `INSERT INTO dining_tables
-       (title, restaurant_id, host_user_id, gathering_type, date_time, seats_total, visibility, atmosphere, note, price_per_person)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (title, restaurant_id, host_user_id, gathering_type, date_time, seats_total, visibility, audience, atmosphere, note, price_per_person)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       title?.trim() || `${gatheringType} at ${restaurant.name}`,
@@ -155,6 +195,7 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
       dateTime,
       seatsTotal,
       visibility ?? 'public',
+      audience ?? 'everyone',
       atmosphere ?? null,
       note ?? null,
       pricePerPerson ?? null,
@@ -205,6 +246,10 @@ tablesRouter.post('/:id/seat-requests', asyncHandler(async (req, res) => {
   }
   if (table.host_user_id === req.user.sub) {
     return res.status(400).json({ message: "You can't request a seat at your own table" });
+  }
+  if (!(await isEligibleForAudience(table, req.user.sub))) {
+    const reason = table.audience === 'women_only' ? 'a women-only' : 'a friends-only';
+    return res.status(403).json({ message: `This is ${reason} table you're not eligible to join` });
   }
 
   const existing = await db

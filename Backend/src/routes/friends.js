@@ -7,7 +7,9 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 
 export const friendsRouter = Router();
+export const followsRouter = Router();
 friendsRouter.use(requireAuth);
+followsRouter.use(requireAuth);
 
 // A friend_requests row is directionless once accepted, and there's never
 // more than one row per pair either way (the unique key covers both
@@ -157,4 +159,68 @@ friendsRouter.delete('/:userId', asyncHandler(async (req, res) => {
     )
     .run(req.user.sub, req.params.userId, req.params.userId, req.user.sub);
   res.json({ ok: true });
+}));
+
+// Following is one-way and needs no acceptance, unlike the mutual
+// friend_requests flow above -- see 0021_user_follows.js.
+followsRouter.get('/status/:userId', asyncHandler(async (req, res) => {
+  const following = await db
+    .prepare('SELECT 1 FROM user_follows WHERE follower_user_id = ? AND followed_user_id = ?')
+    .get(req.user.sub, req.params.userId);
+  res.json({ following: !!following });
+}));
+
+followsRouter.post('/:userId', asyncHandler(async (req, res) => {
+  const followedId = Number(req.params.userId);
+  if (followedId === req.user.sub) {
+    return res.status(400).json({ message: "You can't follow yourself" });
+  }
+
+  const blocked = await db
+    .prepare(
+      `SELECT 1 FROM user_blocks
+       WHERE (blocker_user_id = ? AND blocked_user_id = ?) OR (blocker_user_id = ? AND blocked_user_id = ?)`,
+    )
+    .get(req.user.sub, followedId, followedId, req.user.sub);
+  if (blocked) {
+    return res.status(403).json({ message: 'Cannot follow this user' });
+  }
+
+  await db
+    .prepare('INSERT IGNORE INTO user_follows (follower_user_id, followed_user_id) VALUES (?, ?)')
+    .run(req.user.sub, followedId);
+  res.status(201).json({ following: true });
+}));
+
+followsRouter.delete('/:userId', asyncHandler(async (req, res) => {
+  await db
+    .prepare('DELETE FROM user_follows WHERE follower_user_id = ? AND followed_user_id = ?')
+    .run(req.user.sub, req.params.userId);
+  res.json({ following: false });
+}));
+
+followsRouter.get('/followers', asyncHandler(async (req, res) => {
+  const rows = await db
+    .prepare(
+      `SELECT u.id, u.name, p.photo_url, p.city FROM user_follows f
+       JOIN users u ON u.id = f.follower_user_id
+       LEFT JOIN user_profiles p ON p.user_id = u.id
+       WHERE f.followed_user_id = ?
+       ORDER BY f.created_at DESC`,
+    )
+    .all(req.user.sub);
+  res.json({ followers: toCamelRows(rows) });
+}));
+
+followsRouter.get('/following', asyncHandler(async (req, res) => {
+  const rows = await db
+    .prepare(
+      `SELECT u.id, u.name, p.photo_url, p.city FROM user_follows f
+       JOIN users u ON u.id = f.followed_user_id
+       LEFT JOIN user_profiles p ON p.user_id = u.id
+       WHERE f.follower_user_id = ?
+       ORDER BY f.created_at DESC`,
+    )
+    .all(req.user.sub);
+  res.json({ following: toCamelRows(rows) });
 }));

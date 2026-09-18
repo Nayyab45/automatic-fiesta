@@ -52,6 +52,9 @@
 <button *ngIf="friendStatus() === 'friends'" (click)="unfriend()" class="flex-1 md:flex-none border border-primary-container text-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-sm fill">how_to_reg</span> Friends
                     </button>
+<button (click)="toggleFollow()" [class.bg-primary-container]="isFollowing()" [class.text-on-primary]="isFollowing()" [class.border]="!isFollowing()" [class.border-outline-variant]="!isFollowing()" [class.text-on-surface]="!isFollowing()" class="flex-1 md:flex-none font-label-lg text-label-lg px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">{{ isFollowing() ? 'how_to_reg' : 'add' }}</span> {{ isFollowing() ? 'Following' : 'Follow' }}
+                    </button>
 <button (click)="message()" class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-sm">chat</span> Message
                     </button>
@@ -86,6 +89,16 @@
 <div class="font-headline-md text-headline-md text-primary">{{ friendsCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Friends</div>
 <span *ngIf="pendingRequestsCount() > 0" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</div>
+<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="text-center">
+<div class="font-headline-md text-headline-md text-primary">{{ followersCount() }}</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Followers</div>
+</div>
+<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="text-center">
+<div class="font-headline-md text-headline-md text-primary">{{ followingCount() }}</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Following</div>
 </div>
 </ng-container>
 </div>

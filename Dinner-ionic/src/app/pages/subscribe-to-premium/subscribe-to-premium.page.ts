@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { PaymentMethod, PaymentService } from '../../services/payment.service';
+import { AdmobService } from '../../services/admob.service';
 
 const PLAN_PRICES = { monthly: 9.99, yearly: 95.9 } as const;
 
@@ -19,6 +20,7 @@ const PLAN_PRICES = { monthly: 9.99, yearly: 95.9 } as const;
 export class SubscribeToPremiumPage extends BasePage {
   readonly pageTitle = "Subscribe to Premium";
   private readonly paymentService = inject(PaymentService);
+  private readonly admobService = inject(AdmobService);
 
   selectedPlan: keyof typeof PLAN_PRICES = 'monthly';
   promoMessage = '';
@@ -82,6 +84,7 @@ export class SubscribeToPremiumPage extends BasePage {
     this.paymentService.checkout(method.id, this.selectedPlan, this.cnicLast6 || undefined).subscribe({
       next: (result) => {
         if (result.status === 'succeeded') {
+          this.admobService.refresh();
           this.go('/subscribe-to-premium-success');
         } else if (result.status === 'redirect') {
           // Hosted-checkout gateway (bank/visa): the customer finishes

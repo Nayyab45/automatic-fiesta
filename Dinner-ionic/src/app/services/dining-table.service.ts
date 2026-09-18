@@ -16,6 +16,8 @@ export interface TableHost {
   name: string;
 }
 
+export type TableAudience = 'everyone' | 'women_only' | 'friends_only';
+
 export interface DiningTable {
   id: number;
   title: string;
@@ -25,6 +27,7 @@ export interface DiningTable {
   dateTime: string;
   seatsTotal: number;
   visibility: string;
+  audience: TableAudience;
   atmosphere: string | null;
   note: string | null;
   pricePerPerson: number | null;
@@ -74,6 +77,7 @@ export interface CreateTablePayload {
   dateTime: string;
   seatsTotal: number;
   visibility?: string;
+  audience?: TableAudience;
   atmosphere?: string;
   note?: string;
   pricePerPerson?: number;

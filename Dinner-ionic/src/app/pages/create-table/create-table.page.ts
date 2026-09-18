@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
-import { DiningTableService } from '../../services/dining-table.service';
+import { DiningTableService, TableAudience } from '../../services/dining-table.service';
 
 @Component({
   selector: 'app-create-table',
@@ -21,6 +21,11 @@ export class CreateTablePage extends BasePage {
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
+  readonly audienceOptions: { value: TableAudience; label: string }[] = [
+    { value: 'everyone', label: 'Everyone' },
+    { value: 'women_only', label: 'Women only' },
+    { value: 'friends_only', label: 'Friends only' },
+  ];
   readonly restaurants = signal<Restaurant[]>([]);
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -32,6 +37,9 @@ export class CreateTablePage extends BasePage {
   time = '';
   seatsTotal = 4;
   visibility = true;
+  // Only meaningful while visibility is public -- a private table is already
+  // invite-only regardless of audience (see Backend/src/routes/tables.js).
+  audience: TableAudience = 'everyone';
   note = '';
 
   constructor() {
@@ -70,6 +78,7 @@ export class CreateTablePage extends BasePage {
         dateTime: `${this.date}T${this.time}`,
         seatsTotal: this.seatsTotal,
         visibility: this.visibility ? 'public' : 'private',
+        audience: this.visibility ? this.audience : 'everyone',
         atmosphere: this.atmosphere,
         note: this.note,
       })

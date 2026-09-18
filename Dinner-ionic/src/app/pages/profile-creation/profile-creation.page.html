@@ -51,6 +51,16 @@
 </div>
 </div>
 <div class="flex flex-col relative">
+<label class="font-label-lg text-[10px] text-on-surface-variant uppercase" for="gender">Gender</label>
+<select [(ngModel)]="gender" class="input-underline font-body-md text-body-md text-on-surface focus:ring-0 appearance-none bg-transparent" id="gender" name="gender">
+<option value="">Prefer not to say</option>
+<option *ngFor="let g of genderOptions" [value]="g.value">{{ g.label }}</option>
+</select>
+<div class="absolute right-0 bottom-1 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col relative">
 <label class="font-label-lg text-[10px] text-on-surface-variant uppercase" for="city">City</label>
 <select [(ngModel)]="city" class="input-underline font-body-md text-body-md text-on-surface focus:ring-0 appearance-none bg-transparent" id="city" name="city">
 <option disabled value="">Select City</option><option *ngFor="let c of cities" [value]="c">{{ c }}</option>

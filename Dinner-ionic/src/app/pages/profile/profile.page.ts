@@ -9,6 +9,7 @@ import { Profile, ProfileService } from '../../services/profile.service';
 import { MessagingService } from '../../services/messaging.service';
 import { SafetyService } from '../../services/safety.service';
 import { FriendsService, FriendStatus } from '../../services/friends.service';
+import { FollowService } from '../../services/follow.service';
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +25,7 @@ export class ProfilePage extends BasePage {
   private readonly messagingService = inject(MessagingService);
   private readonly safetyService = inject(SafetyService);
   private readonly friendsService = inject(FriendsService);
+  private readonly followService = inject(FollowService);
 
   readonly profile = signal<Profile | null>(null);
   readonly loading = signal(true);
@@ -33,6 +35,9 @@ export class ProfilePage extends BasePage {
   readonly friendRequestId = signal<number | null>(null);
   readonly friendsCount = signal(0);
   readonly pendingRequestsCount = signal(0);
+  readonly isFollowing = signal(false);
+  readonly followersCount = signal(0);
+  readonly followingCount = signal(0);
 
   constructor() {
     super();
@@ -60,9 +65,12 @@ export class ProfilePage extends BasePage {
         this.friendStatus.set(status);
         this.friendRequestId.set(requestId ?? null);
       });
+      this.followService.status(Number(id)).subscribe(({ following }) => this.isFollowing.set(following));
     } else {
       this.friendsService.list().subscribe(({ friends }) => this.friendsCount.set(friends.length));
       this.friendsService.requests().subscribe(({ requests }) => this.pendingRequestsCount.set(requests.length));
+      this.followService.followers().subscribe(({ followers }) => this.followersCount.set(followers.length));
+      this.followService.following().subscribe(({ following }) => this.followingCount.set(following.length));
     }
   }
 
@@ -119,5 +127,12 @@ export class ProfilePage extends BasePage {
       this.friendStatus.set('none');
       this.friendRequestId.set(null);
     });
+  }
+
+  toggleFollow(): void {
+    const profile = this.profile();
+    if (!profile) return;
+    const request$ = this.isFollowing() ? this.followService.unfollow(profile.id) : this.followService.follow(profile.id);
+    request$.subscribe(({ following }) => this.isFollowing.set(following));
   }
 }

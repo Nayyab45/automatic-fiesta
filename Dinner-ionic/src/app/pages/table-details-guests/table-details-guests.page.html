@@ -15,6 +15,8 @@
 
 <div class="bg-surface-container-low rounded-2xl p-stack-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-white/50 backdrop-blur-md">
 <span class="inline-block bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full mb-stack-sm uppercase tracking-wider">{{ t.gatheringType }}</span>
+<span *ngIf="t.audience === 'women_only'" class="inline-block bg-tertiary/10 text-tertiary font-label-sm text-label-sm px-3 py-1 rounded-full mb-stack-sm ml-2 border border-tertiary/20">Women only</span>
+<span *ngIf="t.audience === 'friends_only'" class="inline-block bg-tertiary/10 text-tertiary font-label-sm text-label-sm px-3 py-1 rounded-full mb-stack-sm ml-2 border border-tertiary/20">Friends only</span>
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-md leading-tight">{{ t.title }}</h2>
 <div class="flex flex-col gap-stack-sm mt-stack-md">
 <div class="flex items-center gap-stack-sm text-on-surface-variant">

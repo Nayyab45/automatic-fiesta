@@ -7,6 +7,14 @@ import { ProfileService } from '../../services/profile.service';
 import { LocationService } from '../../services/location.service';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
 import { PAKISTAN_CITIES } from '../../data/pakistan-cities';
+import { Gender } from '../../services/profile.service';
+
+const GENDER_OPTIONS: { value: Gender; label: string }[] = [
+  { value: 'woman', label: 'Woman' },
+  { value: 'man', label: 'Man' },
+  { value: 'non_binary', label: 'Non-binary' },
+  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+];
 
 // Pakistan's 4 official provinces. Islamabad (a federal territory, not a
 // province), Azad Kashmir and Gilgit-Baltistan are deliberately left out of
@@ -35,6 +43,7 @@ export class ProfileCreationPage extends BasePage {
   readonly isEditMode = this.route.snapshot.queryParamMap.get('mode') === 'edit';
 
   readonly provinces = OFFICIAL_PROVINCES;
+  readonly genderOptions = GENDER_OPTIONS;
 
   cities: string[] = [];
   favoriteFoods: string[] = [];
@@ -43,6 +52,7 @@ export class ProfileCreationPage extends BasePage {
   province = '';
   city = '';
   bio = '';
+  gender: Gender | '' = '';
   avatarUrl: string | null = null;
   readonly submitting = signal(false);
 
@@ -54,6 +64,7 @@ export class ProfileCreationPage extends BasePage {
       this.province = profile.province ?? '';
       this.city = profile.city ?? '';
       this.bio = profile.bio ?? '';
+      this.gender = profile.gender ?? '';
       this.favoriteFoods = profile.favoriteFoods;
       this.avatarUrl = profile.photoUrl;
       this.cities = this.citiesForProvince(this.province);
@@ -102,21 +113,29 @@ export class ProfileCreationPage extends BasePage {
     this.submitting.set(true);
 
     const next = this.isEditMode ? '/profile' : '/personal-interests';
-    this.profileService.updateMe({ age: this.age ?? undefined, bio: this.bio, city: this.city, province: this.province }).subscribe({
-      next: () => {
-        // The city picked here is the user's home city -- keep it in sync
-        // with LocationService's home/browsing city (normally only set via
-        // /select-location) so it doesn't silently show a stale or
-        // never-set city, and so picking a *different* city later via
-        // Select Location reads as "traveling" rather than as this home
-        // city having silently changed.
-        if (this.city) this.locationService.setHomeCity(this.city);
-        this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go(next));
-      },
-      error: () => {
-        this.submitting.set(false);
-        this.go(next);
-      },
-    });
+    this.profileService
+      .updateMe({
+        age: this.age ?? undefined,
+        bio: this.bio,
+        city: this.city,
+        province: this.province,
+        gender: this.gender || undefined,
+      })
+      .subscribe({
+        next: () => {
+          // The city picked here is the user's home city -- keep it in sync
+          // with LocationService's home/browsing city (normally only set via
+          // /select-location) so it doesn't silently show a stale or
+          // never-set city, and so picking a *different* city later via
+          // Select Location reads as "traveling" rather than as this home
+          // city having silently changed.
+          if (this.city) this.locationService.setHomeCity(this.city);
+          this.profileService.setFoodPreferences(this.favoriteFoods).subscribe(() => this.go(next));
+        },
+        error: () => {
+          this.submitting.set(false);
+          this.go(next);
+        },
+      });
   }
 }
