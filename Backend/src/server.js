@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import 'dotenv/config'; // touched to force node --watch to reload .env after a DB credential change
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
@@ -14,6 +14,7 @@ import { verificationRouter } from './routes/verification.js';
 import { paymentMethodsRouter } from './routes/payments.js';
 import { subscriptionsRouter, subscriptionCallbackRouter } from './routes/subscriptions.js';
 import { friendsRouter, followsRouter } from './routes/friends.js';
+import { waitlistRouter } from './routes/waitlist.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -68,6 +69,7 @@ app.use('/api/verification', verificationRouter);
 app.use('/api/payment-methods', paymentMethodsRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/follows', followsRouter);
+app.use('/api/waitlist', waitlistRouter);
 // Mounted before subscriptionsRouter's own requireAuth applies: the gateway
 // calls this directly, not a logged-in user's browser.
 app.use('/api/subscriptions/callback', subscriptionCallbackRouter);

@@ -1,4 +1,4 @@
-<header class="w-full top-0 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant/30 sticky flex justify-between items-center px-gutter h-16">
+<header class="w-full top-0 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant/30 sticky flex justify-between items-center px-gutter pt-safe min-h-16">
 <button (click)="goBack()" aria-label="Menu" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -ml-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
 </button>
@@ -134,12 +134,20 @@
 <p class="text-body-md font-body-md text-on-surface-variant mb-6">
                 Register your interest in our upcoming community features and get early access invitations.
             </p>
-<div class="flex flex-col sm:flex-row gap-3">
-<input class="flex-1 bg-surface-bright border-b border-outline-variant/50 border-t-0 border-l-0 border-r-0 focus:border-primary focus:ring-0 px-4 py-3 text-body-md font-body-md text-on-surface placeholder-on-surface-variant/50 transition-colors" placeholder="Enter your email address" type="email"/>
-<button class="bg-primary-container text-on-primary whitespace-nowrap px-6 py-3 rounded hover:bg-surface-tint transition-colors text-label-lg font-label-lg uppercase tracking-wider">
-                    Notify Me
+
+@if (submitted()) {
+<p class="text-body-md font-body-md text-primary" role="status">You're on the list — we'll email you when these go live.</p>
+} @else {
+@if (errorMessage()) {
+<p class="text-body-md font-body-md text-error mb-3" role="alert">{{ errorMessage() }}</p>
+}
+<form (ngSubmit)="notifyMe()" class="flex flex-col sm:flex-row gap-3">
+<input [(ngModel)]="email" name="waitlistEmail" class="flex-1 bg-surface-bright border-b border-outline-variant/50 border-t-0 border-l-0 border-r-0 focus:border-primary focus:ring-0 px-4 py-3 text-body-md font-body-md text-on-surface placeholder-on-surface-variant/50 transition-colors" placeholder="Enter your email address" type="email"/>
+<button [disabled]="submitting()" class="bg-primary-container text-on-primary whitespace-nowrap px-6 py-3 rounded hover:bg-surface-tint transition-colors text-label-lg font-label-lg uppercase tracking-wider disabled:opacity-60" type="submit">
+                    {{ submitting() ? 'Sending…' : 'Notify Me' }}
                 </button>
-</div>
+</form>
+}
 </section>
 </main>
 
