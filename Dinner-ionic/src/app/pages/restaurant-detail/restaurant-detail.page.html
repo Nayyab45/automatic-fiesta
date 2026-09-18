@@ -1,14 +1,14 @@
 <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 pt-safe" id="main-header">
-<div class="flex justify-between items-center w-full px-container-padding py-stack-md glass shadow-sm">
-<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
+<div class="flex justify-between items-center w-full px-container-padding py-stack-md">
+<button (click)="goBack()" aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
+<span class="material-symbols-outlined text-white">arrow_back</span>
 </button>
 <div class="flex gap-2">
-<button (click)="toggleSave()" aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" [style.font-variation-settings]="saved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
+<button (click)="toggleSave()" aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
+<span class="material-symbols-outlined text-white" [style.font-variation-settings]="saved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
 </button>
-<button (click)="share()" aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">share</span>
+<button (click)="share()" aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
+<span class="material-symbols-outlined text-white">share</span>
 </button>
 </div>
 </div>
@@ -20,7 +20,7 @@
 <div *ngIf="!r.photoUrl" class="w-full h-full flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant text-[64px]">restaurant</span>
 </div>
-<p *ngIf="r.photoUrl && r.photoAttribution" class="absolute top-2 right-2 z-10 font-label-sm text-label-sm text-white/80 bg-black/40 px-2 py-0.5 rounded max-w-[90%] truncate">{{ r.photoAttribution }}</p>
+<p *ngIf="r.photoUrl && r.photoAttribution" class="absolute top-20 right-2 z-10 font-label-sm text-label-sm text-white/80 bg-black/40 px-2 py-0.5 rounded max-w-[90%] truncate">{{ r.photoAttribution }}</p>
 
 <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
 

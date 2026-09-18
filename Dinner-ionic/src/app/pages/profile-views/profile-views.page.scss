@@ -1,0 +1,17 @@
+// Screen-specific styles for "Profile Views". Shared rules live in src/global.scss.
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.fill,
+.material-symbols-outlined.fill-icon {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* Subtle transition for interactive elements */
+.interactive-element {
+  transition: all 0.2s ease-in-out;
+}
+.interactive-element:active {
+  transform: scale(0.98);
+}

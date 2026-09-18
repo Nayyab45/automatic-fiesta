@@ -7,6 +7,9 @@ export interface TableRestaurantSummary {
   name: string;
   photoUrl: string | null;
   address: string | null;
+  /** Fallback when address is null -- not every real (OSM-imported)
+   * restaurant has a street address on file, but city always is. */
+  city: string | null;
   rating: number;
   cuisineTags: string;
 }
@@ -30,7 +33,13 @@ export interface DiningTable {
   audience: TableAudience;
   atmosphere: string | null;
   note: string | null;
+  /** Set at creation as an upfront estimate. Once totalBill is set (see
+   * setBill), this instead reports that split across guestCount -- the
+   * host's estimate is superseded by the real number. */
   pricePerPerson: number | null;
+  /** The real bill amount the host recorded after the meal, if any -- see
+   * setBill(). null until they set it. */
+  totalBill: number | null;
   createdAt: string;
   restaurant: TableRestaurantSummary;
   host: TableHost;
@@ -137,6 +146,12 @@ export class DiningTableService {
 
   create(payload: CreateTablePayload): Observable<{ table: DiningTable }> {
     return this.http.post<{ table: DiningTable }>(this.baseUrl, payload);
+  }
+
+  /** Host-only: records the real bill; pricePerPerson on the returned table
+   * is that split across whoever's currently seated. Re-settable. */
+  setBill(id: number | string, totalBill: number): Observable<{ table: DiningTable }> {
+    return this.http.patch<{ table: DiningTable }>(`${this.baseUrl}/${id}/bill`, { totalBill });
   }
 
   guests(id: number | string): Observable<{ guests: TableGuest[] }> {

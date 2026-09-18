@@ -97,7 +97,12 @@
 <div *ngIf="!match.photoUrl" class="w-14 h-14 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ match.name.charAt(0) }}</div>
 <div class="flex-1 min-w-0">
 <div class="flex justify-between items-center gap-2">
-<h3 class="font-title-lg text-title-lg text-on-surface truncate">{{ match.name }}{{ match.age ? ', ' + match.age : '' }}</h3>
+<h3 class="font-title-lg text-title-lg text-on-surface truncate flex items-center gap-1">
+                                {{ match.name }}{{ match.age ? ', ' + match.age : '' }}
+<span *ngIf="match.isPremium" title="Premium member" class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-tertiary text-on-tertiary shrink-0">
+<span class="material-symbols-outlined text-[11px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</span>
+</h3>
 <span class="font-label-lg text-label-lg text-primary font-bold shrink-0">{{ match.score }}% Vibe</span>
 </div>
 <span *ngIf="match.city" class="font-label-sm text-label-sm text-outline">{{ match.city }}</span>

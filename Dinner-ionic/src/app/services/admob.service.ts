@@ -1,6 +1,6 @@
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AdMob, BannerAdPosition, BannerAdSize, type BannerAdOptions } from '@capacitor-community/admob';
+import { AdMob, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, type BannerAdOptions } from '@capacitor-community/admob';
 import { AuthService } from './auth.service';
 import { PaymentService } from './payment.service';
 
@@ -31,6 +31,12 @@ export class AdmobService {
 
   private initialized = false;
   private bannerShowing = false;
+  private dismissTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** True while the native banner is actually on screen -- drives the
+   * floating close button in AppComponent (there's nothing to close
+   * otherwise). Not affected by a pending dismiss timer's eventual re-show. */
+  readonly bannerVisible = signal(false);
 
   constructor() {
     // Re-checks premium status (and shows/hides the banner accordingly)
@@ -55,6 +61,20 @@ export class AdmobService {
     if (this.initialized || !Capacitor.isNativePlatform()) return;
     this.initialized = true;
     await AdMob.initialize({ testingDevices: [], initializeForTesting: true });
+
+    // showBanner() resolving only means the native banner *container* was
+    // created -- it says nothing about whether an ad creative actually
+    // loaded into it. Without these, a "no fill" response (a real, fairly
+    // common outcome for a test ad unit) left bannerVisible true and the
+    // close button floating over an empty banner with nothing to close.
+    await AdMob.addListener(BannerAdPluginEvents.Loaded, () => this.bannerVisible.set(true));
+    await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => {
+      // Let a later showBanner() (next auth/subscription check, or the
+      // dismiss() retry) try again instead of staying stuck believing a
+      // banner is showing when nothing ever loaded.
+      this.bannerShowing = false;
+      this.bannerVisible.set(false);
+    });
   }
 
   /** Call again after a checkout succeeds, so the banner disappears immediately
@@ -66,13 +86,31 @@ export class AdmobService {
     });
   }
 
+  /** Hides the banner for 15s, then re-checks eligibility and shows it again
+   * if it's still earned (still free-tier, still signed in) -- lets a user
+   * reclaim the screen briefly without permanently losing the ad slot. */
+  dismiss(): void {
+    if (this.dismissTimer || !this.bannerShowing) return;
+    this.hideBanner();
+    this.dismissTimer = setTimeout(() => {
+      this.dismissTimer = null;
+      this.refresh();
+    }, 15000);
+  }
+
   private showBanner(): void {
     if (this.bannerShowing || !this.initialized) return;
     this.bannerShowing = true;
-    AdMob.showBanner(BANNER_OPTIONS).catch(() => (this.bannerShowing = false));
+    // bannerVisible flips true only once the Loaded event actually fires
+    // (see init()) -- not here, since a resolved promise doesn't mean an ad
+    // creative loaded.
+    AdMob.showBanner(BANNER_OPTIONS).catch(() => {
+      this.bannerShowing = false;
+    });
   }
 
   private hideBanner(): void {
+    this.bannerVisible.set(false);
     if (!this.bannerShowing) return;
     this.bannerShowing = false;
     AdMob.hideBanner().catch(() => {});

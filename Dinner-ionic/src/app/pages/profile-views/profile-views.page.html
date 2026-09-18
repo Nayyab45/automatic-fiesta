@@ -1,0 +1,50 @@
+<app-header title="Profile Views" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-lg">
+
+<section class="text-center px-4" *ngIf="!needsPremium()">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                People who viewed your profile and allow their own views to show, most recent first.
+            </p>
+</section>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && needsPremium()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-tertiary/20 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-tertiary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">See who viewed your profile</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[260px] mb-stack-md">
+                Upgrade to Premium to see exactly who's been checking out your profile.
+            </p>
+<button [routerLink]="['/premium-members']" class="bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                Go Premium
+            </button>
+</div>
+
+<ul class="flex flex-col w-full" *ngIf="!loading() && !needsPremium() && viewers().length > 0">
+<li *ngFor="let viewer of viewers()" [routerLink]="['/profile', viewer.id]" class="interactive-element flex items-center gap-gutter py-stack-md border-b border-outline-variant/30 cursor-pointer">
+<img *ngIf="viewer.photoUrl" [alt]="viewer.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" [src]="viewer.photoUrl"/>
+<div *ngIf="!viewer.photoUrl" class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-surface-variant fill-icon">person</span>
+</div>
+<div class="flex flex-col gap-unit">
+<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px] flex items-center gap-1">
+                        {{ viewer.name }}
+<span *ngIf="viewer.verified" class="material-symbols-outlined fill text-primary-container text-[16px]">verified</span>
+</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Viewed on {{ viewer.viewedAt | date: 'mediumDate' }}</span>
+</div>
+</li>
+</ul>
+
+<div *ngIf="!loading() && !needsPremium() && viewers().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">visibility</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No profile views yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">
+                When someone who shares their own viewing activity checks out your profile, they'll appear here.
+            </p>
+</div>
+</main>

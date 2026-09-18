@@ -6,6 +6,7 @@ import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
+import { subscriptionFor } from './subscriptions.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -24,6 +25,33 @@ async function isTableMember(table, userId) {
 }
 
 const TABLE_AUDIENCES = ['everyone', 'women_only', 'friends_only'];
+
+// Free-tier cap on hosting events (see proposal: "Premium ... Unlimited
+// event creation") -- a free account can still host a handful a month, just
+// not without limit. Calendar month, same reasoning as profile.js's
+// MONTHLY_PREFERENCE_CHANGE_LIMIT (a simple "resets on the 1st" the user can
+// be told, rather than a rolling window tied to exactly when they used it).
+const FREE_TIER_MONTHLY_TABLE_LIMIT = 3;
+
+// Exported so profileRouter's /me can surface remaining/nextResetAt
+// proactively (create-table's "X free events left" banner), the same way it
+// already does for preferenceChangeStatus.
+export async function tableCreationStatus(userId) {
+  const isPremium = (await subscriptionFor(userId)).status === 'active';
+  if (isPremium) {
+    return { unlimited: true, remaining: null, nextResetAt: null };
+  }
+  const { usedCount } = await db
+    .prepare(
+      `SELECT COUNT(*) as usedCount FROM dining_tables
+       WHERE host_user_id = ? AND created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')`,
+    )
+    .get(userId);
+  const { nextResetAt } = await db
+    .prepare("SELECT DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y-%m-01') as nextResetAt")
+    .get();
+  return { unlimited: false, remaining: Math.max(0, FREE_TIER_MONTHLY_TABLE_LIMIT - usedCount), nextResetAt };
+}
 
 // A table's audience only restricts who may *discover or request a seat at*
 // it -- the host and anyone already seated (table_guests) are always
@@ -52,7 +80,7 @@ async function isEligibleForAudience(table, userId) {
 }
 
 async function tableWithContext(row, userId) {
-  const restaurant = await db.prepare('SELECT name, photo_url, address, rating, cuisine_tags FROM restaurants WHERE id = ?').get(row.restaurant_id);
+  const restaurant = await db.prepare('SELECT name, photo_url, address, city, rating, cuisine_tags FROM restaurants WHERE id = ?').get(row.restaurant_id);
   const host = await db.prepare('SELECT id, name FROM users WHERE id = ?').get(row.host_user_id);
   const hasReviewed = await db
     .prepare('SELECT 1 FROM reviews WHERE table_id = ? AND reviewer_user_id = ?')
@@ -69,6 +97,10 @@ async function tableWithContext(row, userId) {
     isPast: row.date_time < new Date().toISOString(),
     isHost: row.host_user_id === userId,
     hasReviewed: !!hasReviewed,
+    // Once the host records the real total (see PATCH /:id/bill), that's
+    // split across whoever's actually seated right now -- takes over from
+    // price_per_person, which was only ever an upfront estimate.
+    pricePerPerson: row.total_bill != null ? Math.round((row.total_bill / currentGuestCount) * 100) / 100 : row.price_per_person,
   };
 }
 
@@ -127,6 +159,30 @@ tablesRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({ table: await tableWithContext(row, req.user.sub) });
 }));
 
+// Host records the real bill once it's known (typically after the meal) --
+// tableWithContext then reports pricePerPerson as this split across
+// whoever's currently seated, taking over from the upfront estimate.
+// Re-settable (e.g. the host corrects a typo, or more guests join before
+// the group actually pays) rather than a one-time write.
+tablesRouter.patch('/:id/bill', asyncHandler(async (req, res) => {
+  const row = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!row) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (row.host_user_id !== req.user.sub) {
+    return res.status(403).json({ message: 'Only the host can set the bill for this table' });
+  }
+
+  const { totalBill } = req.body ?? {};
+  if (typeof totalBill !== 'number' || !Number.isFinite(totalBill) || totalBill <= 0) {
+    return res.status(400).json({ message: 'totalBill must be a positive number' });
+  }
+
+  await db.prepare('UPDATE dining_tables SET total_bill = ? WHERE id = ?').run(totalBill, row.id);
+  const updated = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(row.id);
+  res.json({ table: await tableWithContext(updated, req.user.sub) });
+}));
+
 // Popup-notifies every other user in the restaurant's city when a new
 // *public* table is created there -- "near" here means same city, not real
 // GPS distance, since the app has nowhere it persists a user's live location
@@ -172,6 +228,14 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
   }
   if (audience !== undefined && !TABLE_AUDIENCES.includes(audience)) {
     return res.status(400).json({ message: `audience must be one of: ${TABLE_AUDIENCES.join(', ')}` });
+  }
+
+  const creationStatus = await tableCreationStatus(req.user.sub);
+  if (!creationStatus.unlimited && creationStatus.remaining <= 0) {
+    return res.status(429).json({
+      message: `You've used your ${FREE_TIER_MONTHLY_TABLE_LIMIT} free events for this month. Upgrade to Premium for unlimited event creation, or try again ${creationStatus.nextResetAt}.`,
+      tableCreation: creationStatus,
+    });
   }
 
   const restaurant = await db

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
@@ -8,7 +9,7 @@ import { DiningTable, TableGuest, DiningTableService } from '../../services/dini
 @Component({
   selector: 'app-table-details-guests',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent],
+  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
   templateUrl: './table-details-guests.page.html',
   styleUrl: './table-details-guests.page.scss',
 })
@@ -20,6 +21,11 @@ export class TableDetailsGuestsPage extends BasePage {
   readonly guests = signal<TableGuest[]>([]);
   readonly loading = signal(true);
   readonly availableSeats = signal(0);
+
+  readonly editingBill = signal(false);
+  readonly savingBill = signal(false);
+  readonly billError = signal<string | null>(null);
+  billInput: number | null = null;
 
   constructor() {
     super();
@@ -41,6 +47,39 @@ export class TableDetailsGuestsPage extends BasePage {
 
   availableSeatSlots(): number[] {
     return Array.from({ length: this.availableSeats() });
+  }
+
+  startEditingBill(): void {
+    this.billInput = this.table()?.totalBill ?? null;
+    this.billError.set(null);
+    this.editingBill.set(true);
+  }
+
+  cancelEditingBill(): void {
+    this.editingBill.set(false);
+  }
+
+  submitBill(): void {
+    const table = this.table();
+    if (!table || this.savingBill()) return;
+    if (!this.billInput || this.billInput <= 0) {
+      this.billError.set('Enter the total bill amount.');
+      return;
+    }
+
+    this.savingBill.set(true);
+    this.billError.set(null);
+    this.tableService.setBill(table.id, this.billInput).subscribe({
+      next: ({ table: updated }) => {
+        this.table.set(updated);
+        this.savingBill.set(false);
+        this.editingBill.set(false);
+      },
+      error: () => {
+        this.savingBill.set(false);
+        this.billError.set('Could not save the bill. Please try again.');
+      },
+    });
   }
 
   share(): void {

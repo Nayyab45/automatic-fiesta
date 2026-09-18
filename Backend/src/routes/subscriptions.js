@@ -32,7 +32,10 @@ async function activateSubscription(userId, plan, provider) {
   ).run(userId, plan, provider, periodEnd(plan));
 }
 
-async function subscriptionFor(userId) {
+// Exported for other routers that need to know someone's premium status --
+// same pattern as messaging.js's createNotification export (tables.js
+// already imports that one the same way).
+export async function subscriptionFor(userId) {
   const row = await db.prepare('SELECT * FROM subscriptions WHERE user_id = ?').get(userId);
   if (!row) {
     return { status: 'inactive', plan: null, provider: null, currentPeriodEnd: null };
@@ -43,6 +46,18 @@ async function subscriptionFor(userId) {
     provider: row.provider,
     currentPeriodEnd: row.current_period_end,
   };
+}
+
+// Batched premium check for a list of candidates (Discover People/Matches
+// priority placement + premium badge) -- one query instead of one per
+// candidate, same reasoning as profile.js's interestsForBatch.
+export async function activePremiumUserIds(userIds) {
+  if (!userIds.length) return new Set();
+  const placeholders = userIds.map(() => '?').join(',');
+  const rows = await db
+    .prepare(`SELECT user_id FROM subscriptions WHERE status = 'active' AND user_id IN (${placeholders})`)
+    .all(...userIds);
+  return new Set(rows.map((row) => row.user_id));
 }
 
 subscriptionsRouter.use(requireAuth);

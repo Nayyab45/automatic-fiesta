@@ -38,6 +38,7 @@ export class ProfilePage extends BasePage {
   readonly isFollowing = signal(false);
   readonly followersCount = signal(0);
   readonly followingCount = signal(0);
+  readonly profileViewsCount = signal(0);
 
   constructor() {
     super();
@@ -71,6 +72,7 @@ export class ProfilePage extends BasePage {
       this.friendsService.requests().subscribe(({ requests }) => this.pendingRequestsCount.set(requests.length));
       this.followService.followers().subscribe(({ followers }) => this.followersCount.set(followers.length));
       this.followService.following().subscribe(({ following }) => this.followingCount.set(following.length));
+      this.profileService.me().subscribe(({ profileViewsCount }) => this.profileViewsCount.set(profileViewsCount));
     }
   }
 

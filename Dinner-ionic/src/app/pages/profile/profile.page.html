@@ -20,9 +20,12 @@
 </div>
 
 <div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-unit flex items-center gap-2">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-unit flex items-center justify-center md:justify-start gap-2">
                     {{ p.name }}
-                </h1>
+<span *ngIf="p.isPremium" title="Premium member" class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-tertiary text-on-tertiary shrink-0">
+<span class="material-symbols-outlined text-[16px] fill" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</span>
+</h1>
 <p *ngIf="p.city || p.age" class="font-body-md text-body-md text-on-surface-variant mb-stack-sm flex items-center justify-center md:justify-start gap-1">
 <span class="material-symbols-outlined text-sm">place</span> {{ p.city }}
                  <ng-container *ngIf="p.age"> • {{ p.age }} years</ng-container></p>
@@ -71,12 +74,12 @@
 <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
 
 <div class="md:col-span-4 glass-card rounded-xl p-stack-md flex flex-col justify-center items-center gap-stack-sm">
-<div class="flex gap-stack-lg w-full justify-around">
+<div class="grid grid-cols-3 gap-y-stack-md gap-x-2 w-full sm:flex sm:gap-stack-lg sm:justify-around">
 <div class="text-center">
 <div class="font-headline-md text-headline-md text-primary">{{ p.tablesJoinedCount }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Tables Joined</div>
 </div>
-<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
 <div class="text-center">
 <div class="font-headline-md text-headline-md text-primary flex items-center justify-center gap-1">
                             {{ p.rating ?? '—' }} <span *ngIf="p.rating" class="material-symbols-outlined fill text-sm text-primary-container">star</span>
@@ -84,21 +87,26 @@
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Rating</div>
 </div>
 <ng-container *ngIf="isOwnProfile()">
-<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
 <div (click)="go('/friends')" class="text-center cursor-pointer relative">
 <div class="font-headline-md text-headline-md text-primary">{{ friendsCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Friends</div>
 <span *ngIf="pendingRequestsCount() > 0" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
 </div>
-<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
 <div class="text-center">
 <div class="font-headline-md text-headline-md text-primary">{{ followersCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Followers</div>
 </div>
-<div class="w-px bg-outline-variant opacity-50"></div>
+<div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
 <div class="text-center">
 <div class="font-headline-md text-headline-md text-primary">{{ followingCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Following</div>
+</div>
+<div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
+<div (click)="go('/profile-views')" class="text-center cursor-pointer">
+<div class="font-headline-md text-headline-md text-primary">{{ profileViewsCount() }}</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Profile Views</div>
 </div>
 </ng-container>
 </div>

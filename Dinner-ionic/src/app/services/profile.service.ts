@@ -26,6 +26,7 @@ export interface Profile {
   phone: string | null;
   gender: Gender | null;
   verified: boolean;
+  isPremium: boolean;
   tablesJoinedCount: number;
   rating: number | null;
   favoriteFoods: string[];
@@ -44,6 +45,9 @@ export interface Person {
   bio: string | null;
   photoUrl: string | null;
   verified: number;
+  /** Priority profile placement (premium perk) -- premium people sort first
+   * in Discover People/Matches, and get a badge wherever they're shown. */
+  isPremium: boolean;
   interests: Interest[];
   /** Only present when the distance filter was used -- km from the
    * coordinates passed to people(), to this person's self-reported city. */
@@ -71,6 +75,22 @@ export interface PreferenceChangeStatus {
   nextResetAt: string;
 }
 
+export interface TableCreationStatus {
+  /** True for an active Premium subscription -- remaining/nextResetAt are
+   * both null in that case, there's nothing to count down. */
+  unlimited: boolean;
+  remaining: number | null;
+  nextResetAt: string | null;
+}
+
+export interface Viewer {
+  id: number;
+  name: string;
+  photoUrl: string | null;
+  verified: number;
+  viewedAt: string;
+}
+
 export interface PrivacySettings {
   profileVisible: boolean;
   showMutualInterests: boolean;
@@ -96,8 +116,16 @@ export class ProfileService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/profile`;
 
-  me(): Observable<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }> {
-    return this.http.get<{ profile: Profile; preferenceChanges: PreferenceChangeStatus }>(`${this.baseUrl}/me`);
+  me(): Observable<{ profile: Profile; preferenceChanges: PreferenceChangeStatus; tableCreation: TableCreationStatus; profileViewsCount: number }> {
+    return this.http.get<{ profile: Profile; preferenceChanges: PreferenceChangeStatus; tableCreation: TableCreationStatus; profileViewsCount: number }>(
+      `${this.baseUrl}/me`,
+    );
+  }
+
+  /** Premium-only -- 402s for a free account, same shape as other
+   * subscription-gated endpoints (see SubscriptionService/payment flow). */
+  viewers(): Observable<{ viewers: Viewer[] }> {
+    return this.http.get<{ viewers: Viewer[] }>(`${this.baseUrl}/me/viewers`);
   }
 
   get(id: number | string): Observable<{ profile: Profile }> {

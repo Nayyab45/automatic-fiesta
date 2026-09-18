@@ -1,11 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
 import { DiningTableService, TableAudience } from '../../services/dining-table.service';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-create-table',
@@ -18,6 +20,7 @@ export class CreateTablePage extends BasePage {
   readonly pageTitle = 'Create Table';
   private readonly restaurantService = inject(RestaurantService);
   private readonly tableService = inject(DiningTableService);
+  private readonly profileService = inject(ProfileService);
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
@@ -29,6 +32,12 @@ export class CreateTablePage extends BasePage {
   readonly restaurants = signal<Restaurant[]>([]);
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  /** True for an active Premium subscription -- eventsRemaining is
+   * meaningless in that case (see Backend/src/routes/tables.js). */
+  readonly eventsUnlimited = signal(false);
+  /** null while unknown or unlimited; otherwise how many free-tier events
+   * are left this month. */
+  readonly eventsRemaining = signal<number | null>(null);
 
   gatheringType = 'Dinner';
   atmosphere = 'Social Conversation';
@@ -51,6 +60,10 @@ export class CreateTablePage extends BasePage {
       if (!this.restaurantId && restaurants.length > 0) {
         this.restaurantId = restaurants[0].id;
       }
+    });
+    this.profileService.me().subscribe(({ tableCreation }) => {
+      this.eventsUnlimited.set(tableCreation.unlimited);
+      this.eventsRemaining.set(tableCreation.unlimited ? null : tableCreation.remaining);
     });
   }
 
@@ -84,8 +97,13 @@ export class CreateTablePage extends BasePage {
       })
       .subscribe({
         next: ({ table }) => this.go(`/guest-list/${table.id}`),
-        error: () => {
+        error: (err: HttpErrorResponse) => {
           this.submitting.set(false);
+          if (err.status === 429) {
+            this.eventsRemaining.set(0);
+            this.errorMessage.set(err.error?.message ?? "You've used your free events for this month.");
+            return;
+          }
           this.errorMessage.set('Could not create the table. Please try again.');
         },
       });

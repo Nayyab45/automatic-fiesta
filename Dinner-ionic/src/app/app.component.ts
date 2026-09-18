@@ -44,12 +44,22 @@ import { AdmobService } from './services/admob.service';
       </button>
     </div>
 
+    <button
+      *ngIf="admob.bannerVisible()"
+      (click)="admob.dismiss()"
+      aria-label="Close ad"
+      class="fixed right-3 z-[1500] w-7 h-7 flex items-center justify-center rounded-full bg-on-background/70 text-cream-background shadow-md active:scale-95 transition-transform"
+      style="bottom: 150px;"
+    >
+      <span class="material-symbols-outlined text-[16px]">close</span>
+    </button>
+
     <ion-router-outlet></ion-router-outlet>
   `,
 })
 export class AppComponent implements OnInit {
   readonly push = inject(PushNotificationService);
-  private readonly admob = inject(AdmobService);
+  readonly admob = inject(AdmobService);
 
   constructor(public network: NetworkService) {}
 

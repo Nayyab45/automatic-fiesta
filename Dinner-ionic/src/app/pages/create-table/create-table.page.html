@@ -104,8 +104,15 @@
 </section>
 
 <section class="pt-stack-lg pb-section-gap">
+<p *ngIf="!errorMessage() && !eventsUnlimited() && eventsRemaining() !== null" class="font-label-sm text-label-sm text-on-surface-variant mb-stack-sm text-center">
+<ng-container *ngIf="eventsRemaining()! > 0; else noEventsLeft">{{ eventsRemaining() }} free event{{ eventsRemaining() === 1 ? '' : 's' }} left this month</ng-container>
+<ng-template #noEventsLeft>
+                    No free events left this month.
+<a [routerLink]="['/premium-members']" class="text-primary underline">Go Premium</a> for unlimited event creation.
+                </ng-template>
+</p>
 <p *ngIf="errorMessage()" class="text-error font-body-md text-body-md text-center mb-stack-sm" role="alert">{{ errorMessage() }}</p>
-<button (click)="submit()" [disabled]="submitting()" class="w-full bg-primary-container text-on-primary py-4 rounded-xl font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] transform disabled:opacity-60">
+<button (click)="submit()" [disabled]="submitting() || eventsRemaining() === 0" class="w-full bg-primary-container text-on-primary py-4 rounded-xl font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] transform disabled:opacity-60">
                 {{ submitting() ? 'Creating…' : 'Create Table' }}
             </button>
 </section>

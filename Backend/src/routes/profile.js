@@ -5,6 +5,8 @@ import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { tastePrefsFor, distanceKm } from '../lib/taste.js';
 import { cityCoordinates } from '../lib/cityGeocode.js';
+import { subscriptionFor, activePremiumUserIds } from './subscriptions.js';
+import { tableCreationStatus } from './tables.js';
 
 export const profileRouter = Router();
 export const interestsRouter = Router();
@@ -128,6 +130,7 @@ async function fullProfile(userId) {
     phone: profile?.phone ?? null,
     gender: profile?.gender ?? null,
     verified: !!profile?.verified,
+    isPremium: (await subscriptionFor(userId)).status === 'active',
     tablesJoinedCount: await tablesJoinedCount(userId),
     rating: await peopleRating(userId),
     favoriteFoods: foodPrefs?.favorite_foods ? foodPrefs.favorite_foods.split(',') : [],
@@ -164,8 +167,21 @@ async function preferenceChangeStatus(userId) {
   return { remaining: Math.max(0, MONTHLY_PREFERENCE_CHANGE_LIMIT - usedCount), nextResetAt };
 }
 
+// Self-only (not part of fullProfile, which is also used for GET /:id) --
+// a visitor seeing how many people viewed *your* profile would defeat the
+// whole point of the privacy toggle those views are gated behind.
+async function profileViewsCount(userId) {
+  const { count } = await db.prepare('SELECT COUNT(*) as count FROM profile_views WHERE viewed_user_id = ?').get(userId);
+  return count;
+}
+
 profileRouter.get('/me', asyncHandler(async (req, res) => {
-  res.json({ profile: await fullProfile(req.user.sub), preferenceChanges: await preferenceChangeStatus(req.user.sub) });
+  res.json({
+    profile: await fullProfile(req.user.sub),
+    preferenceChanges: await preferenceChangeStatus(req.user.sub),
+    tableCreation: await tableCreationStatus(req.user.sub),
+    profileViewsCount: await profileViewsCount(req.user.sub),
+  });
 }));
 
 profileRouter.get('/:id', asyncHandler(async (req, res) => {
@@ -173,7 +189,47 @@ profileRouter.get('/:id', asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
   }
+  await recordProfileView(req.user.sub, user.id);
   res.json({ profile: await fullProfile(user.id) });
+}));
+
+// Only recorded when the viewer's own "show my profile views" privacy
+// setting is on -- same toggle already used for that purpose (see
+// privacySettingsRouter below) -- and never for a self-view. Upserts rather
+// than inserting so re-visiting someone's profile just bumps viewed_at
+// instead of the "who viewed you" list filling up with repeat entries.
+async function recordProfileView(viewerUserId, viewedUserId) {
+  if (viewerUserId === viewedUserId) return;
+  const { showProfileViews } = await privacySettingsFor(viewerUserId);
+  if (!showProfileViews) return;
+  await db.prepare(
+    `INSERT INTO profile_views (viewer_user_id, viewed_user_id, viewed_at) VALUES (?, ?, NOW())
+     ON DUPLICATE KEY UPDATE viewed_at = NOW()`,
+  ).run(viewerUserId, viewedUserId);
+}
+
+// Premium-only: who has viewed my profile recently (most recent first).
+// Free accounts get a 402 rather than a silently-empty list, matching how
+// subscriptionsRouter's checkout responds to an unconfigured gateway.
+profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
+  const subscription = await subscriptionFor(req.user.sub);
+  if (subscription.status !== 'active') {
+    return res.status(402).json({ message: 'Upgrade to Premium to see who viewed your profile.' });
+  }
+
+  const rows = toCamelRows(
+    await db
+      .prepare(
+        `SELECT u.id, u.name, p.photo_url, p.verified, pv.viewed_at FROM profile_views pv
+         JOIN users u ON u.id = pv.viewer_user_id
+         LEFT JOIN user_profiles p ON p.user_id = u.id
+         WHERE pv.viewed_user_id = ?
+         ORDER BY pv.viewed_at DESC
+         LIMIT 50`,
+      )
+      .all(req.user.sub),
+  );
+  res.json({ viewers: rows });
 }));
 
 // Merges onto the existing row rather than overwriting wholesale, since
@@ -321,11 +377,16 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
 
   let people = toCamelRows(rows);
   const ids = people.map((person) => person.id);
-  const [interestsByUserId, favoriteFoodsByUserId] = await Promise.all([interestsForBatch(ids), favoriteFoodsForBatch(ids)]);
+  const [interestsByUserId, favoriteFoodsByUserId, premiumIds] = await Promise.all([
+    interestsForBatch(ids),
+    favoriteFoodsForBatch(ids),
+    activePremiumUserIds(ids),
+  ]);
   people = people.map((person) => ({
     ...person,
     interests: interestsByUserId.get(person.id) ?? [],
     favoriteFoods: favoriteFoodsByUserId.get(person.id) ?? [],
+    isPremium: premiumIds.has(person.id),
   }));
 
   const requestedInterestIds = interestIds
@@ -367,6 +428,15 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
       .filter((person) => person.distanceKm !== null && person.distanceKm <= radiusKm);
   }
 
+  // Priority profile placement (premium perk): premium profiles sort first
+  // as a whole group, ahead of everyone else -- a stable sort, so within
+  // each group people keep whatever relative order the filters above left
+  // them in rather than being reshuffled.
+  people = people
+    .map((person, index) => ({ person, index }))
+    .sort((a, b) => Number(b.person.isPremium) - Number(a.person.isPremium) || a.index - b.index)
+    .map(({ person }) => person);
+
   res.json({ people: people.map(({ favoriteFoods, ...person }) => person) });
 }));
 
@@ -386,6 +456,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
       )
       .all(req.user.sub, req.user.sub, req.user.sub),
   );
+  const premiumIds = await activePremiumUserIds(candidates.map((c) => c.id));
 
   const matches = (
     await Promise.all(
@@ -438,6 +509,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           ...candidate,
           score: Math.min(score, 99),
           sameCity: !!sameCity,
+          isPremium: premiumIds.has(candidate.id),
           interests: candidateInterests,
           sharedInterests,
           sharedFavoriteFoods,
@@ -449,8 +521,12 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
     )
   ).sort((a, b) => {
     // Same-area people first as a whole group (top), everyone else after
-    // (bottom) -- within each group, ranked by taste/interest score.
+    // (bottom). Priority profile placement (premium perk) breaks ties within
+    // each area group next, ahead of the taste/interest score -- a premium
+    // profile never jumps ahead of a genuinely closer/tastier match from the
+    // other area group, but does rank above an equally-relevant free one.
     if (a.sameCity !== b.sameCity) return a.sameCity ? -1 : 1;
+    if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
     return b.score - a.score;
   });
 

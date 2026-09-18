@@ -70,6 +70,7 @@ const USER_ID_TABLES = [
   ['two_factor_auth', 'user_id'],
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
+  ['subscriptions', 'user_id'],
 ];
 
 async function cleanupTestData() {
@@ -88,6 +89,7 @@ async function cleanupTestData() {
 
   await pool.query('DELETE FROM notifications WHERE user_id IN (?) OR actor_user_id IN (?)', [createdUserIds, createdUserIds]);
   await pool.query('DELETE FROM user_blocks WHERE blocker_user_id IN (?) OR blocked_user_id IN (?)', [createdUserIds, createdUserIds]);
+  await pool.query('DELETE FROM profile_views WHERE viewer_user_id IN (?) OR viewed_user_id IN (?)', [createdUserIds, createdUserIds]);
 
   for (const [table, column] of USER_ID_TABLES) {
     await pool.query(`DELETE FROM ${table} WHERE ${column} IN (?)`, [createdUserIds]);
@@ -128,6 +130,18 @@ async function signup(local) {
   });
   if (body?.user?.id) createdUserIds.push(body.user.id);
   return body; // { accessToken, refreshToken, user }
+}
+
+// Activates a subscription directly (bypassing checkout/a real gateway) --
+// same shape subscriptionsRouter's activateSubscription writes, for tests
+// that only care about "this user is premium", not the payment flow itself.
+async function makePremium(userId) {
+  await pool.query(
+    `INSERT INTO subscriptions (user_id, status, plan, provider, current_period_end, updated_at)
+     VALUES (?, 'active', 'monthly', 'visa', DATE_ADD(NOW(), INTERVAL 1 MONTH), NOW())
+     ON DUPLICATE KEY UPDATE status = 'active'`,
+    [userId],
+  );
 }
 
 describe('auth', () => {
@@ -578,6 +592,135 @@ describe('preference change limit', () => {
       body: { favoriteFoods: ['Onboarding Food'] },
     });
     assert.equal(onboarding.status, 200);
+  });
+});
+
+describe('event creation limit (free tier)', () => {
+  test('caps table creation at 3/month for free accounts, unblocked by an active subscription', async () => {
+    const host = await signup('table-limit-host');
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const restaurantId = restaurants.body.restaurants[0].id;
+
+    const createTable = () =>
+      api('POST', '/api/tables', {
+        token: host.accessToken,
+        body: { restaurantId, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
+      });
+
+    const initial = await api('GET', '/api/profile/me', { token: host.accessToken });
+    assert.equal(initial.body.tableCreation.unlimited, false);
+    assert.equal(initial.body.tableCreation.remaining, 3);
+
+    for (let n = 1; n <= 3; n++) {
+      const created = await createTable();
+      assert.equal(created.status, 201);
+    }
+
+    const fourth = await createTable();
+    assert.equal(fourth.status, 429);
+    assert.match(fourth.body.message, /free events/);
+    assert.equal(fourth.body.tableCreation.remaining, 0);
+
+    await makePremium(host.user.id);
+    const asPremium = await createTable();
+    assert.equal(asPremium.status, 201);
+  });
+});
+
+describe('profile views', () => {
+  test('recorded only when the viewer opts in, visible to the viewed-user only once premium', async () => {
+    const viewer = await signup('view-tracking-viewer');
+    const viewed = await signup('view-tracking-viewed');
+
+    // Default privacy setting (showProfileViews: false) -- visiting the
+    // profile should NOT create a viewable trail.
+    await api('GET', `/api/profile/${viewed.user.id}`, { token: viewer.accessToken });
+
+    await makePremium(viewed.user.id);
+    const noViewYet = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
+    assert.equal(noViewYet.status, 200);
+    assert.deepEqual(noViewYet.body.viewers, []);
+
+    // Opt in, then view again -- now it should show up.
+    await api('PUT', '/api/profile/me/privacy-settings', { token: viewer.accessToken, body: { showProfileViews: true } });
+    await api('GET', `/api/profile/${viewed.user.id}`, { token: viewer.accessToken });
+
+    const withView = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
+    assert.equal(withView.body.viewers.length, 1);
+    assert.equal(withView.body.viewers[0].id, viewer.user.id);
+
+    const viewsCount = await api('GET', '/api/profile/me', { token: viewed.accessToken });
+    assert.equal(viewsCount.body.profileViewsCount, 1);
+  });
+
+  test('a free account gets a 402 instead of the list', async () => {
+    const viewed = await signup('view-tracking-free');
+    const res = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
+    assert.equal(res.status, 402);
+  });
+});
+
+describe('priority profile placement', () => {
+  test('premium candidates sort ahead of free ones in Discover People and Matches', async () => {
+    const me = await signup('priority-me');
+    const freeCandidate = await signup('priority-free');
+    const premiumCandidate = await signup('priority-premium');
+    await makePremium(premiumCandidate.user.id);
+
+    // /people and /matches both INNER JOIN user_profiles -- a fresh signup
+    // has no row there yet (that only exists once profile-creation/PUT
+    // /profile/me runs), so without this neither candidate would appear in
+    // either list at all.
+    await api('PUT', '/api/profile/me', { token: freeCandidate.accessToken, body: { city: 'PriorityTestCity' } });
+    await api('PUT', '/api/profile/me', { token: premiumCandidate.accessToken, body: { city: 'PriorityTestCity' } });
+
+    const people = await api('GET', '/api/people', { token: me.accessToken });
+    const ids = people.body.people.map((p) => p.id);
+    const freeIndex = ids.indexOf(freeCandidate.user.id);
+    const premiumIndex = ids.indexOf(premiumCandidate.user.id);
+    assert.ok(premiumIndex < freeIndex, 'premium candidate should rank before the free one');
+    assert.equal(people.body.people.find((p) => p.id === premiumCandidate.user.id).isPremium, true);
+    assert.equal(people.body.people.find((p) => p.id === freeCandidate.user.id).isPremium, false);
+
+    const matches = await api('GET', '/api/matches', { token: me.accessToken });
+    const matchIds = matches.body.matches.map((m) => m.id);
+    assert.ok(matchIds.indexOf(premiumCandidate.user.id) < matchIds.indexOf(freeCandidate.user.id));
+  });
+});
+
+describe('split bill', () => {
+  test("host's total bill is split across current guests, host-only, and rejects a non-positive amount", async () => {
+    const host = await signup('bill-host');
+    const guest = await signup('bill-guest');
+    const stranger = await signup('bill-stranger');
+
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const restaurantId = restaurants.body.restaurants[0].id;
+
+    const created = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: { restaurantId, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
+    });
+    const tableId = created.body.table.id;
+    assert.equal(created.body.table.pricePerPerson, null);
+
+    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, { token: host.accessToken, body: { status: 'confirmed' } });
+
+    const forbidden = await api('PATCH', `/api/tables/${tableId}/bill`, { token: stranger.accessToken, body: { totalBill: 5000 } });
+    assert.equal(forbidden.status, 403);
+
+    const invalid = await api('PATCH', `/api/tables/${tableId}/bill`, { token: host.accessToken, body: { totalBill: -10 } });
+    assert.equal(invalid.status, 400);
+
+    // 2 guests seated (host + confirmed guest) -- Rs. 5000 split two ways.
+    const set = await api('PATCH', `/api/tables/${tableId}/bill`, { token: host.accessToken, body: { totalBill: 5000 } });
+    assert.equal(set.status, 200);
+    assert.equal(set.body.table.totalBill, 5000);
+    assert.equal(set.body.table.pricePerPerson, 2500);
+
+    const reread = await api('GET', `/api/tables/${tableId}`, { token: guest.accessToken });
+    assert.equal(reread.body.table.pricePerPerson, 2500);
   });
 });
 
