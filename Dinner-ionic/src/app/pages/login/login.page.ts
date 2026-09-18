@@ -5,6 +5,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { AuthService, LoginResult } from '../../services/auth.service';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginPage extends BasePage {
 
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly profileService = inject(ProfileService);
 
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -85,7 +87,18 @@ export class LoginPage extends BasePage {
       this.twoFactorChallengeToken.set(result.challengeToken);
       return;
     }
-    this.go('/home');
+    this.navigateAfterLogin();
+  }
+
+  // An admin account's whole purpose is running the admin panel -- lands
+  // there directly instead of the regular consumer app. Falls back to
+  // /home on any error (e.g. a slow/failed /profile/me) rather than
+  // stranding a successful login on a blank screen.
+  private navigateAfterLogin(): void {
+    this.profileService.me().subscribe({
+      next: ({ isAdmin }) => this.go(isAdmin ? '/admin' : '/home'),
+      error: () => this.go('/home'),
+    });
   }
 
   submitTwoFactorCode(): void {
@@ -95,7 +108,7 @@ export class LoginPage extends BasePage {
     this.submitting.set(true);
     this.errorMessage.set(null);
     this.authService.verify2faLogin(challengeToken, this.twoFactorCode).subscribe({
-      next: () => this.go('/home'),
+      next: () => this.navigateAfterLogin(),
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         this.errorMessage.set(err.error?.message ?? 'Incorrect code. Please try again.');
