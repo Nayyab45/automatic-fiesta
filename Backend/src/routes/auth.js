@@ -335,8 +335,10 @@ authRouter.put('/me', requireAuth, asyncHandler(async (req, res) => {
 // reviews, messages) is left in place rather than cascading a delete across
 // the whole relational graph -- the same trade-off a lot of small apps make
 // before building a real soft-delete/anonymization path.
-authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
-  const userId = req.user.sub;
+// Exported so an admin's permanent-delete action (see safety.js's
+// moderation routes) runs the exact same cascade as a user deleting their
+// own account, rather than a second, drifting copy of this list.
+export async function deleteUserAccount(userId) {
   await db.prepare('DELETE FROM refresh_tokens WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM password_reset_tokens WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM two_factor_auth WHERE user_id = ?').run(userId);
@@ -351,6 +353,10 @@ authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
   await db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
   await db.prepare('DELETE FROM friend_requests WHERE requester_id = ? OR recipient_id = ?').run(userId, userId);
   await db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+}
+
+authRouter.delete('/me', requireAuth, asyncHandler(async (req, res) => {
+  await deleteUserAccount(req.user.sub);
   res.json({ ok: true });
 }));
 

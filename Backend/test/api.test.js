@@ -71,6 +71,7 @@ const USER_ID_TABLES = [
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
   ['subscriptions', 'user_id'],
+  ['support_messages', 'user_id'],
 ];
 
 async function cleanupTestData() {
@@ -848,6 +849,88 @@ describe('payment methods', () => {
       token: intruder.accessToken,
     });
     assert.equal(intruderDelete.status, 404);
+  });
+});
+
+describe('moderation', () => {
+  test('being blocked by 5 distinct people flags the account for review; admin can dismiss or permanently delete', async () => {
+    const target = await signup('mod-target');
+    const admin = await signup('mod-admin');
+    const stranger = await signup('mod-stranger');
+    await makeAdmin(admin.user.id);
+
+    const blockers = await Promise.all([1, 2, 3, 4, 5].map((n) => signup(`mod-blocker-${n}`)));
+    for (const blocker of blockers) {
+      const res = await api('POST', '/api/blocks', { token: blocker.accessToken, body: { userId: target.user.id } });
+      assert.equal(res.status, 201);
+    }
+
+    const refused = await api('GET', '/api/blocks/admin/flagged', { token: stranger.accessToken });
+    assert.equal(refused.status, 403);
+
+    const flagged = await api('GET', '/api/blocks/admin/flagged', { token: admin.accessToken });
+    assert.equal(flagged.status, 200);
+    const entry = flagged.body.flagged.find((f) => f.userId === target.user.id);
+    assert.ok(entry, 'target should be in the flagged queue');
+    assert.equal(entry.blockCount, 5);
+
+    const dismissed = await api('POST', `/api/blocks/admin/${target.user.id}/dismiss`, { token: admin.accessToken });
+    assert.equal(dismissed.status, 200);
+    const afterDismiss = await api('GET', '/api/blocks/admin/flagged', { token: admin.accessToken });
+    assert.ok(!afterDismiss.body.flagged.some((f) => f.userId === target.user.id));
+
+    // Re-flag it (dismiss cleared flagged_at, but the 5 existing block rows
+    // stayed, so a 6th push from a stranger crossing the threshold again
+    // isn't needed to re-test the delete path -- reuse the same target).
+    await db.prepare('UPDATE users SET flagged_at = NOW() WHERE id = ?').run(target.user.id);
+
+    const deleteRefused = await api('DELETE', `/api/blocks/admin/${target.user.id}`, { token: stranger.accessToken });
+    assert.equal(deleteRefused.status, 403);
+
+    const deleted = await api('DELETE', `/api/blocks/admin/${target.user.id}`, { token: admin.accessToken });
+    assert.equal(deleted.status, 200);
+
+    const loginAttempt = await api('POST', '/api/auth/login', { body: { email: target.user.email, password: 'password123!' } });
+    assert.equal(loginAttempt.status, 401);
+
+    // Deleted by the admin action, not this suite's own cleanup -- drop it
+    // from createdUserIds so cleanup doesn't try to delete it again.
+    const idx = createdUserIds.indexOf(target.user.id);
+    if (idx !== -1) createdUserIds.splice(idx, 1);
+  });
+});
+
+describe('support messages', () => {
+  test('a user can submit a message; only an admin can list or resolve it', async () => {
+    const submitter = await signup('support-submitter');
+    const admin = await signup('support-admin');
+    const stranger = await signup('support-stranger');
+    await makeAdmin(admin.user.id);
+
+    const submitted = await api('POST', '/api/support', {
+      token: submitter.accessToken,
+      body: { subject: 'Cannot join a table', message: 'Tapping Request a Seat does nothing.' },
+    });
+    assert.equal(submitted.status, 201);
+
+    const refused = await api('GET', '/api/support/admin', { token: stranger.accessToken });
+    assert.equal(refused.status, 403);
+
+    const list = await api('GET', '/api/support/admin', { token: admin.accessToken });
+    assert.equal(list.status, 200);
+    const entry = list.body.messages.find((m) => m.subject === 'Cannot join a table');
+    assert.ok(entry);
+    assert.equal(entry.status, 'open');
+    assert.equal(entry.email, submitter.user.email);
+
+    const resolveRefused = await api('POST', `/api/support/admin/${entry.id}/resolve`, { token: stranger.accessToken });
+    assert.equal(resolveRefused.status, 403);
+
+    const resolved = await api('POST', `/api/support/admin/${entry.id}/resolve`, { token: admin.accessToken });
+    assert.equal(resolved.status, 200);
+
+    const listAfter = await api('GET', '/api/support/admin', { token: admin.accessToken });
+    assert.equal(listAfter.body.messages.find((m) => m.id === entry.id).status, 'resolved');
   });
 });
 

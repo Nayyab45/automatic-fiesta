@@ -1,0 +1,38 @@
+<app-header title="Support Messages" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-lg">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && forbidden()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<span class="material-symbols-outlined text-[40px] text-error mb-stack-md">block</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Admins only</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">You don't have access to this page.</p>
+</div>
+
+<div *ngIf="!loading() && !forbidden() && messages().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">support_agent</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No messages</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">
+                Support requests submitted from Help &amp; Support will show up here.
+            </p>
+</div>
+
+<ul class="flex flex-col gap-stack-lg" *ngIf="!loading() && messages().length > 0">
+<li *ngFor="let m of messages()" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-stack-sm" [class.opacity-60]="m.status === 'resolved'">
+<div class="flex justify-between items-start gap-stack-sm">
+<div class="flex flex-col gap-unit">
+<span class="font-title-lg text-title-lg text-on-surface">{{ m.subject }}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{{ m.name }} &middot; {{ m.email }}</span>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider px-2 py-1 rounded-md shrink-0" [class.bg-tertiary]="m.status === 'open'" [class.text-on-tertiary]="m.status === 'open'" [class.bg-surface-container]="m.status === 'resolved'" [class.text-on-surface-variant]="m.status === 'resolved'">{{ m.status }}</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface whitespace-pre-line">{{ m.message }}</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{{ m.createdAt | date: 'medium' }}</span>
+<button *ngIf="m.status === 'open'" (click)="resolve(m)" [disabled]="resolvingId() === m.id" class="self-start border border-primary-container text-primary font-label-lg text-label-lg px-4 py-2 rounded-lg hover:bg-primary-container/10 transition-colors disabled:opacity-60">
+                        Mark Resolved
+                    </button>
+</li>
+</ul>
+</main>

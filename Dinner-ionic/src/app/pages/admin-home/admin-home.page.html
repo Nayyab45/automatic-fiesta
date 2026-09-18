@@ -1,0 +1,36 @@
+<app-header title="Admin" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md">
+
+<a (click)="go('/admin/verifications')" class="flex items-center justify-between p-stack-md rounded-xl bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="fact_check">fact_check</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Review Verifications</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{{ pendingVerificationsCount() }} pending</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</a>
+
+<a (click)="go('/admin/moderation')" class="flex items-center justify-between p-stack-md rounded-xl bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="gpp_maybe">gpp_maybe</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Moderation Queue</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{{ flaggedUsersCount() }} flagged</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</a>
+
+<a (click)="go('/admin/support')" class="flex items-center justify-between p-stack-md rounded-xl bg-surface-container-low border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="support_agent">support_agent</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Support Messages</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{{ openSupportCount() }} open</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</a>
+</main>

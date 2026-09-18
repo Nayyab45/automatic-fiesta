@@ -4,20 +4,11 @@ import { requireAuth } from '../middleware/auth.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { faceMatch } from '../lib/faceMatch.js';
+import { requireAdmin } from '../lib/adminAuth.js';
 
 export const verificationRouter = Router();
 
 verificationRouter.use(requireAuth);
-
-// Not from the JWT (issued at login, so a later admin flag flip wouldn't
-// show up without forcing a re-login) -- read fresh from the DB every time.
-async function requireAdmin(req, res, next) {
-  const row = await db.prepare('SELECT is_admin FROM users WHERE id = ?').get(req.user.sub);
-  if (!row?.is_admin) {
-    return res.status(403).json({ message: 'Admin access required' });
-  }
-  next();
-}
 
 // The one place identity_verifications.status='approved' actually becomes
 // the verified badge people see elsewhere (profile.js's fullProfile/people/
