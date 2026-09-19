@@ -17,6 +17,7 @@ import { friendsRouter, followsRouter } from './routes/friends.js';
 import { waitlistRouter } from './routes/waitlist.js';
 import { contentRouter } from './routes/content.js';
 import { supportRouter } from './routes/support.js';
+import { siteRouter } from './routes/site.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -52,6 +53,12 @@ app.use(express.json({ limit: '5mb' }));
 // PUBLIC_ASSET_BASE_URL + this path -- see db/seed/restaurants.js.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use('/images', express.static(path.join(__dirname, 'assets', 'images')));
+
+// Public homepage + privacy policy at the domain root -- nginx proxies "/"
+// on weeat.netstech.net straight to this app, and until now nothing handled
+// it (every hit was a bare 404), which is what Google's OAuth consent
+// screen homepage check was flagging.
+app.use('/', siteRouter);
 
 app.use('/api/auth', authRouter);
 app.use('/api/restaurants', restaurantsRouter);
