@@ -185,6 +185,27 @@ describe('auth', () => {
     assert.equal(reuse.status, 401);
   });
 
+  test('isAdmin comes back on the session itself (login, refresh, /me) -- no separate request needed', async () => {
+    const user = await signup('admin-flag');
+    assert.equal(user.user.isAdmin, false);
+
+    const meBefore = await api('GET', '/api/auth/me', { token: user.accessToken });
+    assert.equal(meBefore.body.user.isAdmin, false);
+
+    await makeAdmin(user.user.id);
+
+    const login = await api('POST', '/api/auth/login', { body: { email: user.user.email, password: 'password123!' } });
+    assert.equal(login.status, 200);
+    assert.equal(login.body.user.isAdmin, true);
+
+    const refreshed = await api('POST', '/api/auth/refresh', { body: { refreshToken: login.body.refreshToken } });
+    assert.equal(refreshed.status, 200);
+    assert.equal(refreshed.body.user.isAdmin, true);
+
+    const meAfter = await api('GET', '/api/auth/me', { token: refreshed.body.accessToken });
+    assert.equal(meAfter.body.user.isAdmin, true);
+  });
+
   test('logout revokes the refresh token', async () => {
     const session = await signup('dave');
 
@@ -1066,6 +1087,10 @@ describe('two-factor auth', () => {
       token: signupRes.body.accessToken,
       body: { code: await generateTotp({ secret: setup.body.secret }) },
     });
+    // isAdmin has its own narrow-SELECT bug history in this exact endpoint
+    // (see toPublicUser's callers) -- worth covering specifically, not just
+    // via the dedicated isAdmin test above, which never goes through 2FA.
+    await makeAdmin(signupRes.body.user.id);
 
     // Password alone no longer issues a session -- it hands back a
     // short-lived challenge instead.
@@ -1085,6 +1110,7 @@ describe('two-factor auth', () => {
     });
     assert.equal(verified.status, 200);
     assert.ok(verified.body.accessToken);
+    assert.equal(verified.body.user.isAdmin, true);
 
     // Disabling requires a current code, not just the access token.
     const disableWrongCode = await api('POST', '/api/auth/2fa/disable', { token: verified.body.accessToken, body: { code: '000000' } });

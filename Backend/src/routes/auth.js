@@ -36,8 +36,13 @@ const RESET_TOKEN_TTL_MINUTES = 60;
 const TWO_FACTOR_CHALLENGE_TTL_MINUTES = 5;
 
 function toPublicUser(row) {
-  const { id, name, email } = toCamel(row);
-  return { id, name, email };
+  const { id, name, email, isAdmin } = toCamel(row);
+  // Included directly in the session response so the client can route an
+  // admin straight to the admin panel without a second request right after
+  // login -- see login.page.ts. That second request was a real failure
+  // point: this host is prone to transient connection flakiness, and losing
+  // just that one call silently dropped an admin onto the regular app.
+  return { id, name, email, isAdmin: !!isAdmin };
 }
 
 function signAccessToken(user) {
@@ -209,7 +214,7 @@ authRouter.post('/refresh', asyncHandler(async (req, res) => {
 
   await db.prepare('UPDATE refresh_tokens SET revoked_at = NOW() WHERE id = ?').run(row.id);
 
-  const user = await db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(row.user_id);
+  const user = await db.prepare('SELECT * FROM users WHERE id = ?').get(row.user_id);
   if (!user) {
     return res.status(401).json({ message: 'Invalid or expired refresh token' });
   }
@@ -300,7 +305,7 @@ authRouter.post('/reset-password', asyncHandler(async (req, res) => {
 }));
 
 authRouter.get('/me', requireAuth, asyncHandler(async (req, res) => {
-  const row = await db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(req.user.sub);
+  const row = await db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.sub);
   if (!row) {
     return res.status(404).json({ message: 'User not found' });
   }
@@ -325,7 +330,7 @@ authRouter.put('/me', requireAuth, asyncHandler(async (req, res) => {
     req.user.sub,
   );
 
-  const updated = await db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(req.user.sub);
+  const updated = await db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.sub);
   res.json({ user: toPublicUser(updated) });
 }));
 
@@ -433,7 +438,7 @@ authRouter.post('/2fa/verify-login', asyncHandler(async (req, res) => {
   }
 
   const twoFactor = await db.prepare('SELECT secret FROM two_factor_auth WHERE user_id = ? AND enabled = 1').get(userId);
-  const user = await db.prepare('SELECT id, name, email FROM users WHERE id = ?').get(userId);
+  const user = await db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
   if (!twoFactor || !user || !(await verifyTotp({ token: String(code), secret: twoFactor.secret })).valid) {
     return res.status(401).json({ message: 'Incorrect code.' });
   }

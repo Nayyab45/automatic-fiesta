@@ -5,7 +5,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { AuthService, LoginResult } from '../../services/auth.service';
-import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +19,6 @@ export class LoginPage extends BasePage {
 
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly profileService = inject(ProfileService);
 
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -91,14 +89,14 @@ export class LoginPage extends BasePage {
   }
 
   // An admin account's whole purpose is running the admin panel -- lands
-  // there directly instead of the regular consumer app. Falls back to
-  // /home on any error (e.g. a slow/failed /profile/me) rather than
-  // stranding a successful login on a blank screen.
+  // there directly instead of the regular consumer app. Reads isAdmin off
+  // the session AuthService just stored (part of the login/2FA response
+  // itself, see Backend's toPublicUser) rather than a separate follow-up
+  // request -- an extra round-trip right after login is one more thing
+  // that can fail on this host's flaky connection, silently dropping an
+  // admin onto the regular app instead.
   private navigateAfterLogin(): void {
-    this.profileService.me().subscribe({
-      next: ({ isAdmin }) => this.go(isAdmin ? '/admin' : '/home'),
-      error: () => this.go('/home'),
-    });
+    this.go(this.authService.currentUser()?.isAdmin ? '/admin' : '/home');
   }
 
   submitTwoFactorCode(): void {
