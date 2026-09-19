@@ -8,77 +8,13 @@
 <div class="max-w-3xl mx-auto px-container-padding py-stack-lg">
 
 <div class="mb-stack-lg border-b border-outline-variant/30 pb-stack-md text-center">
-<p class="font-body-md text-body-md text-on-surface-variant">Last updated: September 2026</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-xl mx-auto">
-                    This describes what What Should We Eat? actually collects, why, and how you can control or remove it.
-                </p>
+<p *ngFor="let line of content().intro.split('\n'); let first = first" class="font-body-md text-body-md text-on-surface-variant" [class.mt-2]="!first" [class.max-w-xl]="!first" [class.mx-auto]="!first">{{ line }}</p>
 </div>
 
 <div class="space-y-section-gap font-body-lg text-body-lg text-on-background leading-relaxed">
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">1. Information We Collect</h2>
-<ul class="list-disc pl-5 space-y-2 text-on-surface-variant marker:text-primary-container">
-<li><strong>Account &amp; profile:</strong> name, email, password (stored hashed, never in plain text), age, city/province, a short bio, a profile photo you upload, and your food/cuisine preferences.</li>
-<li><strong>Identity verification (optional):</strong> if you choose to verify your identity, we store the ID photo and selfie you submit until your verification is reviewed.</li>
-<li><strong>Payment methods (optional):</strong> only the payment type and last 4 digits of a card/account, or a wallet phone number for EasyPaisa/JazzCash. We never store full card numbers, bank account numbers, or CVV codes.</li>
-<li><strong>Dining activity:</strong> tables you host or join, seat requests, reviews you write, and restaurants you save.</li>
-<li><strong>Messages:</strong> direct messages and table group chat messages you send through the app.</li>
-<li><strong>Safety &amp; trust:</strong> emergency contacts you add, and any blocks or reports you file (or that are filed against you).</li>
-</ul>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">2. Location</h2>
-<p class="text-on-surface-variant">
-                        What Should We Eat? does <strong>not</strong> access your device's GPS or precise location, and the app does not request location permission from your device. Restaurant discovery is based entirely on a city you choose yourself from a list, which you can change at any time.
-                    </p>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">3. How We Use Your Data</h2>
-<ul class="list-disc pl-5 space-y-2 text-on-surface-variant marker:text-primary-container">
-<li>To operate the core features you use directly: discovering restaurants and people, hosting/joining dining tables, messaging, and reviews.</li>
-<li>To verify identity and payment methods when you choose to add them, for trust and safety and to process payments through our payment providers.</li>
-<li>To act on safety reports, blocks, and emergency contact information if you use those features.</li>
-<li>To secure your account (password hashing, session tokens, optional two-factor authentication).</li>
-</ul>
-<p class="text-on-surface-variant mt-stack-sm">We do not sell your personal data to third parties or advertisers.</p>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">4. Who Can See Your Data</h2>
-<ul class="list-disc pl-5 space-y-2 text-on-surface-variant marker:text-primary-container">
-<li>Other users see the profile information you choose to make visible, and any messages/reviews you post are visible to their intended recipients or the public dining table.</li>
-<li>Payment providers (e.g. JazzCash, EasyPaisa, or a card/bank gateway) receive only the information needed to process a payment when you make one.</li>
-<li>We do not share your data with advertisers or data brokers.</li>
-</ul>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">5. Your Controls</h2>
-<ul class="list-disc pl-5 space-y-2 text-on-surface-variant marker:text-primary-container">
-<li>Toggle your profile's visibility to other users from Privacy Settings.</li>
-<li>Block or report another user at any time.</li>
-<li>Enable or disable two-factor authentication from Manage Account.</li>
-<li>Delete your account entirely from Manage Account, which removes your profile, preferences, and associated data.</li>
-</ul>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">6. Security</h2>
-<p class="text-on-surface-variant">
-                        Passwords are hashed, never stored in plain text. Sessions use short-lived access tokens with a separate, revocable refresh token. No electronic storage or transmission can be guaranteed 100% secure, but we design for the practices above rather than treating them as optional.
-                    </p>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">7. Children</h2>
-<p class="text-on-surface-variant">
-                        What Should We Eat? is intended for users aged 18 and over, given its social dining-matching features.
-                    </p>
-</section>
-<section>
-<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">8. Contact Us</h2>
-<p class="mb-stack-sm text-on-surface-variant">
-                        Questions about this policy or your data:
-                    </p>
-<p class="text-on-surface-variant font-medium text-primary">
-                        nayyabashfaq05&#64;gmail.com
-                    </p>
+<section *ngFor="let section of content().sections; let i = index">
+<h2 class="font-title-lg text-title-lg text-primary mb-stack-md">{{ i + 1 }}. {{ section.heading }}</h2>
+<app-policy-body [body]="section.body"></app-policy-body>
 </section>
 </div>
 </div>

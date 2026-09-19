@@ -1,7 +1,7 @@
 <app-header title="Event Management" (back)="goBack()"></app-header>
 <main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md">
 
-<div class="relative w-full h-12">
+<div class="relative w-full h-12 shrink-0">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
 <input [ngModel]="query()" (ngModelChange)="query.set($event)" type="search" placeholder="Search by title, host or restaurant" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent"/>
 </div>

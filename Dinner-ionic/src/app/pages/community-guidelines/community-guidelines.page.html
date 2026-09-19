@@ -5,81 +5,33 @@
 <div class="w-20 h-20 rounded-full bg-secondary-container flex items-center justify-center mb-stack-md text-primary">
 <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">handshake</span>
 </div>
-<p class="font-title-lg text-title-lg text-on-surface mb-unit">Our community is built on trust.</p>
-<p class="font-body-md text-body-md text-on-surface-variant">Please read before joining a meal.</p>
+<p class="font-title-lg text-title-lg text-on-surface mb-unit">{{ content().intro.split('\n')[0] }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ content().intro.split('\n').slice(1).join(' ') }}</p>
 </section>
 
 <div class="flex flex-col gap-stack-md">
 
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
+<ng-container *ngFor="let section of content().sections; let i = index">
+<div *ngIf="!isWarning(section.heading)" class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
 <div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined">person</span>
+<span class="material-symbols-outlined">{{ iconForSection(section, i) }}</span>
 </div>
 <div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Be Yourself</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Use real photos and accurate profile info.</p>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">{{ section.heading }}</h3>
+<app-policy-body [body]="section.body" textClass="font-body-md text-body-md text-on-surface-variant"></app-policy-body>
 </div>
 </div>
 
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
-<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
-</div>
-<div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Respect Everyone</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">No discrimination, harassment, or hate speech.</p>
-</div>
-</div>
-
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
-<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined">security</span>
-</div>
-<div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Meet Safely</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Public restaurants only, use check-in/check-out.</p>
-</div>
-</div>
-
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
-<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined">block</span>
-</div>
-<div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">No Solicitation</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">No sales, scams, or dating-app behavior.</p>
-</div>
-</div>
-
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
-<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined">event_available</span>
-</div>
-<div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Show Up</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Respect reservations, cancel properly if you can't attend.</p>
-</div>
-</div>
-
-<div class="bg-surface rounded-2xl p-stack-md shadow-[0_4px_16px_0_rgba(0,0,0,0.04)] border border-surface-variant/50 flex gap-stack-md items-start">
-<div class="bg-secondary-container/50 p-3 rounded-full text-primary shrink-0">
-<span class="material-symbols-outlined">flag</span>
-</div>
-<div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-on-surface mb-1">Report Concerns</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Use our tools to report or block users who break rules.</p>
-</div>
-</div>
-
-<div class="mt-stack-md bg-error-container/20 rounded-2xl p-stack-md border border-error/30 flex gap-stack-md items-start">
+<div *ngIf="isWarning(section.heading)" class="mt-stack-md bg-error-container/20 rounded-2xl p-stack-md border border-error/30 flex gap-stack-md items-start">
 <div class="bg-error/10 p-3 rounded-full text-error shrink-0">
-<span class="material-symbols-outlined">warning</span>
+<span class="material-symbols-outlined">{{ iconForSection(section, i) }}</span>
 </div>
 <div>
-<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-error mb-1">Zero Tolerance</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Harassment, threats, or scams lead to immediate account suspension.</p>
+<h3 class="font-title-lg text-[18px] leading-6 font-semibold text-error mb-1">{{ section.heading }}</h3>
+<app-policy-body [body]="section.body" textClass="font-body-md text-body-md text-on-surface-variant"></app-policy-body>
 </div>
 </div>
+</ng-container>
 </div>
 </main>
 

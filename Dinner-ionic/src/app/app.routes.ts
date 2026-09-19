@@ -78,6 +78,7 @@ const routeDefinitions: Routes = [
   { path: 'admin/users/:id', loadComponent: () => import('./pages/admin-user-detail/admin-user-detail.page').then((m) => m.AdminUserDetailPage) },
   { path: 'admin/events', loadComponent: () => import('./pages/admin-tables/admin-tables.page').then((m) => m.AdminTablesPage) },
   { path: 'admin/restaurants', loadComponent: () => import('./pages/admin-restaurants/admin-restaurants.page').then((m) => m.AdminRestaurantsPage) },
+  { path: 'admin/policies/:slug', loadComponent: () => import('./pages/admin-policy-editor/admin-policy-editor.page').then((m) => m.AdminPolicyEditorPage) },
   { path: 'admin/reviews', loadComponent: () => import('./pages/admin-reviews/admin-reviews.page').then((m) => m.AdminReviewsPage) },
   { path: 'edit-preferences', loadComponent: () => import('./pages/edit-preferences/edit-preferences.page').then((m) => m.EditPreferencesPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage) },

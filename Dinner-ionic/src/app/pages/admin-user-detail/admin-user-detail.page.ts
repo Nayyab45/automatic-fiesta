@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { BasePage } from '../base.page';
@@ -25,8 +25,10 @@ export class AdminUserDetailPage extends BasePage {
 
   constructor() {
     super();
-    effect(() => {
-      const id = this.routeId();
+    // Not an effect(): load() writes signals, which Angular 18 forbids from
+    // inside one (NG0600) -- that silently broke this whole page.
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
       if (id) this.load(id);
     });
   }

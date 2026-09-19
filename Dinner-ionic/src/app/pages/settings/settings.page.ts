@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
-import { ProfileService } from '../../services/profile.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -15,12 +15,9 @@ import { ProfileService } from '../../services/profile.service';
 })
 export class SettingsPage extends BasePage {
   readonly pageTitle = "Settings";
-  private readonly profileService = inject(ProfileService);
+  private readonly authService = inject(AuthService);
 
-  readonly isAdmin = signal(false);
-
-  constructor() {
-    super();
-    this.profileService.me().subscribe({ next: ({ isAdmin }) => this.isAdmin.set(isAdmin), error: () => {} });
-  }
+  // Read straight off the stored session (set at login) instead of a
+  // request, so an admin never sees the regular-user entries flash in first.
+  readonly isAdmin = computed(() => !!this.authService.currentUser()?.isAdmin);
 }

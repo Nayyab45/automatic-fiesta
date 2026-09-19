@@ -1,12 +1,12 @@
 <app-header title="User Management" (back)="goBack()"></app-header>
 <main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md">
 
-<div class="relative w-full h-12">
+<div class="relative w-full h-12 shrink-0">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
 <input [(ngModel)]="search" (keyup.enter)="load()" type="search" placeholder="Search by name or email" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent"/>
 </div>
 
-<div class="flex overflow-x-auto hide-scrollbar gap-unit py-unit">
+<div class="flex overflow-x-auto hide-scrollbar gap-unit py-unit shrink-0">
 <button *ngFor="let f of filters" (click)="selectStatus(f.value)" class="px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 font-label-lg text-label-lg transition-colors" [class.border-1.5]="status === f.value" [class.border-primary]="status === f.value" [class.bg-secondary-container]="status === f.value" [class.text-on-secondary-container]="status === f.value" [class.border]="status !== f.value" [class.border-outline-variant]="status !== f.value" [class.text-on-surface-variant]="status !== f.value">{{ f.label }}</button>
 </div>
 

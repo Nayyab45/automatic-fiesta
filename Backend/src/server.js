@@ -15,6 +15,7 @@ import { paymentMethodsRouter } from './routes/payments.js';
 import { subscriptionsRouter, subscriptionCallbackRouter } from './routes/subscriptions.js';
 import { friendsRouter, followsRouter } from './routes/friends.js';
 import { waitlistRouter } from './routes/waitlist.js';
+import { contentRouter } from './routes/content.js';
 import { supportRouter } from './routes/support.js';
 
 if (!process.env.JWT_SECRET) {
@@ -71,6 +72,7 @@ app.use('/api/payment-methods', paymentMethodsRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/follows', followsRouter);
 app.use('/api/waitlist', waitlistRouter);
+app.use('/api/content', contentRouter);
 app.use('/api/support', supportRouter);
 // Mounted before subscriptionsRouter's own requireAuth applies: the gateway
 // calls this directly, not a logged-in user's browser.
