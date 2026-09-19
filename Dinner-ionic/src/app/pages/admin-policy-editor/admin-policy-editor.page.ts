@@ -5,12 +5,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from '../../components/header/header.component';
 import { BasePage } from '../base.page';
 import { ContentService } from '../../services/content.service';
+import { AutosizeDirective } from '../../shared/autosize.directive';
 import { DEFAULT_POLICIES, POLICY_TITLES, PolicySection, PolicySlug, isPolicySlug } from '../../shared/policy-content';
 
 @Component({
   selector: 'app-admin-policy-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, AutosizeDirective],
   templateUrl: './admin-policy-editor.page.html',
   styleUrl: './admin-policy-editor.page.scss',
 })

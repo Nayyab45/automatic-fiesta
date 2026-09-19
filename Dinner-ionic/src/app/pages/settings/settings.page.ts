@@ -20,4 +20,12 @@ export class SettingsPage extends BasePage {
   // Read straight off the stored session (set at login) instead of a
   // request, so an admin never sees the regular-user entries flash in first.
   readonly isAdmin = computed(() => !!this.authService.currentUser()?.isAdmin);
+
+  // Actually ends the session (clears the stored tokens and revokes the
+  // refresh token) -- this button used to just open the login screen and
+  // leave the user signed in. Same call Manage Account's Log Out makes.
+  logout(): void {
+    this.authService.logout();
+    this.go('/login');
+  }
 }

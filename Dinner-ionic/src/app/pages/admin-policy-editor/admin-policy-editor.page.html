@@ -12,7 +12,7 @@
 
 <div class="flex flex-col gap-unit shrink-0">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Introduction (first line is the title line)</label>
-<textarea [(ngModel)]="intro" name="intro" rows="3" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
+<textarea appAutosize [(ngModel)]="intro" name="intro" rows="3" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
 </div>
 
 <div *ngFor="let section of sections; let i = index" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-stack-sm shrink-0">
@@ -25,7 +25,7 @@
 </div>
 </div>
 <input [(ngModel)]="section.heading" [name]="'heading' + i" placeholder="Heading" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
-<textarea [(ngModel)]="section.body" [name]="'body' + i" rows="6" placeholder="Text" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
+<textarea appAutosize [(ngModel)]="section.body" [name]="'body' + i" rows="6" placeholder="Text" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
 </div>
 
 <button (click)="addSection()" class="shrink-0 border border-dashed border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
