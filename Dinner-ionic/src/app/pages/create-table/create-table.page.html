@@ -21,6 +21,24 @@
 </button></div>
 </section>
 
+<section *ngIf="friends().length > 0" class="space-y-stack-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">Ask AI to Pick For Your Group</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select who you're planning to invite and get a restaurant suggestion that fits everyone's food and dietary preferences.</p>
+<div class="flex flex-wrap gap-stack-sm">
+<button *ngFor="let friend of friends()" type="button" (click)="toggleFriendSelection(friend.id)" [class.gathering-type-selected]="selectedFriendIds().includes(friend.id)" class="gathering-type-btn px-4 py-2 rounded-full border border-outline-variant bg-transparent text-on-surface-variant font-label-md text-label-md hover:border-primary-container/50 transition-all">
+{{ friend.name }}
+</button>
+</div>
+<button type="button" (click)="getAiSuggestion()" [disabled]="selectedFriendIds().length === 0 || aiSuggesting()" class="w-full bg-surface-container-low border border-outline-variant/40 text-on-surface py-3 rounded-xl font-label-lg text-label-lg hover:border-primary-container transition-colors disabled:opacity-50">
+{{ aiSuggesting() ? 'Thinking…' : 'Get AI Suggestion' }}
+</button>
+<p *ngIf="aiSuggestion() as suggestion" class="font-body-sm text-body-sm text-on-surface-variant bg-surface-container-low rounded-xl p-3">
+<span class="font-label-md text-label-md text-on-surface">{{ suggestion.restaurantName }}</span> — {{ suggestion.reason }}
+<span *ngIf="!suggestion.aiPowered" class="block text-outline-variant">(heuristic pick -- no AI key configured)</span>
+</p>
+<p *ngIf="aiError()" class="text-error font-body-sm text-body-sm">{{ aiError() }}</p>
+</section>
+
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">The Details</h2>
 <div class="space-y-stack-sm">

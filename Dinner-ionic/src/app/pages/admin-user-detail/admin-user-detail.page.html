@@ -1,0 +1,63 @@
+<app-header title="User Details" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-lg">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+<p *ngIf="!loading() && !user()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">User not found.</p>
+
+<ng-container *ngIf="user() as u">
+<section class="flex items-center gap-gutter">
+<img *ngIf="u.photoUrl" [src]="u.photoUrl" [alt]="u.name" class="w-16 h-16 rounded-full object-cover border border-outline-variant/30 shrink-0"/>
+<div *ngIf="!u.photoUrl" class="w-16 h-16 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-headline-md text-headline-md shrink-0">{{ u.name.charAt(0) }}</div>
+<div class="flex flex-col gap-unit min-w-0">
+<span class="font-headline-md text-headline-md text-on-surface truncate">{{ u.name }}{{ u.age ? ', ' + u.age : '' }}</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-[13px] truncate">{{ u.email }}</span>
+<div class="flex flex-wrap gap-2 mt-unit">
+<span *ngIf="u.isAdmin" class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded-md">Admin</span>
+<span *ngIf="u.suspendedAt" class="font-label-sm text-label-sm text-error bg-error/10 px-2 py-0.5 rounded-md">Suspended</span>
+<span *ngIf="u.flaggedAt" class="font-label-sm text-label-sm text-error bg-error/10 px-2 py-0.5 rounded-md">Flagged</span>
+<span *ngIf="u.isPremium" class="font-label-sm text-label-sm text-tertiary bg-tertiary-container/30 px-2 py-0.5 rounded-md">Premium</span>
+</div>
+</div>
+</section>
+
+<section *ngIf="u.suspendedAt" class="bg-error/10 border border-error/30 rounded-xl p-stack-md flex flex-col gap-unit">
+<span class="font-title-md text-title-md text-error">Suspended {{ u.suspendedAt | date: 'medium' }}</span>
+<span *ngIf="u.suspendedReason" class="font-body-md text-body-md text-on-surface-variant">{{ u.suspendedReason }}</span>
+</section>
+
+<section class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 grid grid-cols-2 gap-stack-md">
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Verification</span><span class="font-body-lg text-body-lg text-on-surface capitalize">{{ u.verified ? 'Verified' : u.verificationStatus.replace('_', ' ') }}</span></div>
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Rating</span><span class="font-body-lg text-body-lg text-on-surface">{{ u.rating !== null ? u.rating + ' / 5' : 'No ratings' }}</span></div>
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Events joined</span><span class="font-body-lg text-body-lg text-on-surface">{{ u.tablesJoinedCount }}</span></div>
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Blocked by</span><span class="font-body-lg text-body-lg text-on-surface">{{ u.blockCount }} people</span></div>
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">City</span><span class="font-body-lg text-body-lg text-on-surface">{{ u.city || '—' }}</span></div>
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Joined</span><span class="font-body-lg text-body-lg text-on-surface">{{ u.createdAt | date: 'mediumDate' }}</span></div>
+</section>
+
+<section *ngIf="u.bio" class="flex flex-col gap-unit">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bio</span>
+<p class="font-body-md text-body-md text-on-surface">{{ u.bio }}</p>
+</section>
+
+<section class="flex flex-col gap-stack-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface">Reports ({{ reports().length }})</h3>
+<p *ngIf="reports().length === 0" class="font-body-md text-body-md text-on-surface-variant">No one has reported this user.</p>
+<ul class="flex flex-col gap-stack-sm">
+<li *ngFor="let r of reports()" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-unit">
+<span class="font-title-md text-title-md text-on-surface">{{ r.reason }}</span>
+<span *ngIf="r.details" class="font-body-md text-body-md text-on-surface-variant">{{ r.details }}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">By {{ r.reporterName }} · {{ r.createdAt | date: 'medium' }}</span>
+</li>
+</ul>
+</section>
+
+<p *ngIf="error()" class="font-body-md text-body-md text-error">{{ error() }}</p>
+
+<section *ngIf="!u.isAdmin" class="flex flex-col gap-stack-sm pb-stack-lg">
+<button (click)="go('/profile/' + u.id)" class="border border-outline-variant text-on-surface font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-surface-container transition-colors">View Public Profile</button>
+<button *ngIf="!u.suspendedAt" (click)="suspend()" [disabled]="acting()" class="border border-error text-error font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-error/10 transition-colors disabled:opacity-60">Suspend Account</button>
+<button *ngIf="u.suspendedAt" (click)="unsuspend()" [disabled]="acting()" class="bg-primary-container text-on-primary font-label-lg text-label-lg px-4 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">Lift Suspension</button>
+<button (click)="deleteAccount()" [disabled]="acting()" class="bg-error text-on-error font-label-lg text-label-lg px-4 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">Delete Account</button>
+</section>
+</ng-container>
+</main>

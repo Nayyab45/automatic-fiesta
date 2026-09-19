@@ -1,24 +1,24 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, type BannerAdOptions } from '@capacitor-community/admob';
+import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { PaymentService } from './payment.service';
 
-// Google's official public TEST banner unit id -- always serves a clearly
-// labeled "Test Ad", never a real one, so it's safe to ship before the
-// app's own AdMob account/ad units exist. Swap for the real banner ad unit
-// id from admob.google.com (and the App ID in AndroidManifest.xml) before a
-// production release -- see that file's comment.
-const TEST_BANNER_AD_UNIT_ID = 'ca-app-pub-3940256099942544/6300978111';
-
+// adId/isTesting come from environment.ts (dev) / environment.prod.ts (prod
+// release build) rather than being hardcoded here, so swapping in the app's
+// real AdMob banner unit id for a Play Store release is a one-line edit to
+// environment.prod.ts -- see its comment -- not a code change. The App ID
+// (a separate id, native-side) is the AndroidManifest.xml meta-data instead;
+// see android/app/admob.properties.example for that one.
 const BANNER_OPTIONS: BannerAdOptions = {
-  adId: TEST_BANNER_AD_UNIT_ID,
+  adId: environment.adMob.bannerAdUnitId,
   adSize: BannerAdSize.ADAPTIVE_BANNER,
   position: BannerAdPosition.BOTTOM_CENTER,
   // Room for BottomNavComponent's own bar so the ad doesn't sit on top of
   // its tap targets.
   margin: 56,
-  isTesting: true,
+  isTesting: environment.adMob.isTesting,
 };
 
 // Free-tier-only banner ads (see proposal: "Free Version ... Google AdMob
@@ -60,7 +60,7 @@ export class AdmobService {
   async init(): Promise<void> {
     if (this.initialized || !Capacitor.isNativePlatform()) return;
     this.initialized = true;
-    await AdMob.initialize({ testingDevices: [], initializeForTesting: true });
+    await AdMob.initialize({ testingDevices: [], initializeForTesting: environment.adMob.isTesting });
 
     // showBanner() resolving only means the native banner *container* was
     // created -- it says nothing about whether an ad creative actually

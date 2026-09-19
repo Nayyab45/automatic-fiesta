@@ -162,6 +162,24 @@ export class RestaurantService {
     return this.http.get<{ restaurants: RestaurantDetail[] }>(`${this.baseUrl}/recommended`, { params: httpParams });
   }
 
+  /** memberIds must all be friends of the caller -- see Backend's
+   * POST /restaurants/group-recommendation, which enforces that server-side
+   * since it reads each member's food/dietary preferences to pick. `aiPowered`
+   * is false when no ANTHROPIC_API_KEY is configured server-side; the pick
+   * itself still works either way, just from the plain heuristic instead. */
+  groupRecommendation(
+    memberIds: number[],
+    city?: string,
+  ): Observable<{ restaurant: RestaurantDetail; reason: string; aiPowered: boolean }> {
+    let httpParams = new HttpParams();
+    if (city) httpParams = httpParams.set('city', city);
+    return this.http.post<{ restaurant: RestaurantDetail; reason: string; aiPowered: boolean }>(
+      `${this.baseUrl}/group-recommendation`,
+      { memberIds },
+      { params: httpParams },
+    );
+  }
+
   featuredDishes(): Observable<{ dishes: FeaturedDish[] }> {
     return this.http.get<{ dishes: FeaturedDish[] }>(`${this.baseUrl}/featured-dishes`);
   }

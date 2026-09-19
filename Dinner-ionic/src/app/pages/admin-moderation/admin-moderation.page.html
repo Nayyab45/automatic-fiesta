@@ -31,9 +31,14 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Flagged {{ user.flaggedAt | date: 'medium' }}</span>
 </div>
 
+<button (click)="go('/admin/users/' + user.userId)" class="text-left font-label-lg text-label-lg text-primary">View details &amp; reports</button>
+
 <div class="flex gap-stack-sm">
 <button (click)="dismiss(user)" [disabled]="actingOnUserId() === user.userId" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-surface-container transition-colors disabled:opacity-60">
                         Dismiss
+                    </button>
+<button (click)="suspend(user)" [disabled]="actingOnUserId() === user.userId" class="flex-1 border border-error text-error font-label-lg text-label-lg px-4 py-3 rounded-lg hover:bg-error/10 transition-colors disabled:opacity-60">
+                        Suspend
                     </button>
 <button (click)="deleteAccount(user)" [disabled]="actingOnUserId() === user.userId" class="flex-1 bg-error text-on-error font-label-lg text-label-lg px-4 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">
                         Delete Account

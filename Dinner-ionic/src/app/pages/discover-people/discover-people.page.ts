@@ -33,6 +33,11 @@ export class DiscoverPeoplePage extends BasePage {
   readonly people = signal<Person[]>([]);
   readonly loading = signal(true);
   readonly filterSheetOpen = signal(false);
+  /** Advanced search filters (Interest/Cuisine/Distance) are a Premium perk
+   * (see proposal's Revenue Model) -- Age stays free for everyone. Defaults
+   * to false (locked look) until the first load confirms the real status,
+   * same reasoning as ai-matching.page.ts's aiInsightsUnlocked. */
+  readonly advancedFiltersUnlocked = signal(false);
 
   readonly cuisineOptions = CUISINE_OPTIONS;
   readonly distanceOptionsKm = DISTANCE_OPTIONS_KM;
@@ -71,8 +76,9 @@ export class DiscoverPeoplePage extends BasePage {
         maxDistanceKm: this.selectedDistanceKm ?? undefined,
       })
       .subscribe({
-        next: ({ people }) => {
+        next: ({ people, advancedFiltersUnlocked }) => {
           this.people.set(people);
+          this.advancedFiltersUnlocked.set(advancedFiltersUnlocked);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
@@ -96,17 +102,29 @@ export class DiscoverPeoplePage extends BasePage {
     this.filterSheetOpen.set(false);
   }
 
+  /** Entry point for the Interest/Cuisine/Distance filter chips specifically
+   * -- a free account is sent straight to Premium instead of opening the
+   * sheet on a section it can't use. The Age chip and the header's tune icon
+   * still call openFilterSheet() directly, since Age itself is free. */
+  openAdvancedFilterSheet(): void {
+    if (this.advancedFiltersUnlocked()) this.openFilterSheet();
+    else this.go('/subscribe-to-premium');
+  }
+
   toggleInterest(id: number): void {
+    if (!this.advancedFiltersUnlocked()) return;
     if (this.selectedInterestIds.has(id)) this.selectedInterestIds.delete(id);
     else this.selectedInterestIds.add(id);
   }
 
   toggleCuisine(name: string): void {
+    if (!this.advancedFiltersUnlocked()) return;
     if (this.selectedCuisines.has(name)) this.selectedCuisines.delete(name);
     else this.selectedCuisines.add(name);
   }
 
   selectDistance(km: number): void {
+    if (!this.advancedFiltersUnlocked()) return;
     this.selectedDistanceKm = this.selectedDistanceKm === km ? null : km;
   }
 
@@ -151,5 +169,9 @@ export class DiscoverPeoplePage extends BasePage {
 
   message(person: Person): void {
     this.messagingService.getOrCreateWith(person.id).subscribe(({ conversation }) => this.go(`/dining-group-chat/dm/${conversation.id}`));
+  }
+
+  isMutualInterest(person: Person, interest: Interest): boolean {
+    return person.sharedInterests.some((shared) => shared.id === interest.id);
   }
 }

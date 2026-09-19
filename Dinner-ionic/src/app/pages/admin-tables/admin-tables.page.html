@@ -1,0 +1,38 @@
+<app-header title="Event Management" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md">
+
+<div class="relative w-full h-12">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input [ngModel]="query()" (ngModelChange)="query.set($event)" type="search" placeholder="Search by title, host or restaurant" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent"/>
+</div>
+
+<label class="flex items-center gap-2 font-body-md text-body-md text-on-surface-variant">
+<input type="checkbox" [ngModel]="onlyPublic()" (ngModelChange)="onlyPublic.set($event)"/>
+        Public events only
+    </label>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && forbidden()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<span class="material-symbols-outlined text-[40px] text-error mb-stack-md">block</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Admins only</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">You don't have access to this page.</p>
+</div>
+
+<p *ngIf="!loading() && !forbidden() && tables().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No events match.</p>
+
+<ul *ngIf="!loading() && tables().length > 0" class="flex flex-col gap-stack-md">
+<li *ngFor="let t of tables()" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start gap-2">
+<span class="font-title-lg text-title-lg text-on-surface">{{ t.title }}</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-md shrink-0 bg-surface-container" [class.text-primary]="t.visibility === 'public'" [class.text-on-surface-variant]="t.visibility !== 'public'">{{ t.visibility }}</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">{{ t.restaurantName }} · {{ t.gatheringType }}</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">{{ t.dateTime | date: 'medium' }} · {{ t.seatsTotal }} seats · {{ t.audience.replace('_', ' ') }}</span>
+<div class="flex items-center justify-between mt-unit">
+<a (click)="go('/admin/users/' + t.hostUserId)" class="font-label-lg text-label-lg text-primary cursor-pointer">Host: {{ t.hostName }}</a>
+<button (click)="remove(t)" [disabled]="deletingId() === t.id" class="bg-error text-on-error font-label-lg text-label-lg px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">Remove</button>
+</div>
+</li>
+</ul>
+</main>

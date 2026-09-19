@@ -8,6 +8,7 @@ import { BasePage } from '../base.page';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
 import { DiningTableService, TableAudience } from '../../services/dining-table.service';
 import { ProfileService } from '../../services/profile.service';
+import { Friend, FriendsService } from '../../services/friends.service';
 
 @Component({
   selector: 'app-create-table',
@@ -21,6 +22,7 @@ export class CreateTablePage extends BasePage {
   private readonly restaurantService = inject(RestaurantService);
   private readonly tableService = inject(DiningTableService);
   private readonly profileService = inject(ProfileService);
+  private readonly friendsService = inject(FriendsService);
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
@@ -38,6 +40,18 @@ export class CreateTablePage extends BasePage {
   /** null while unknown or unlimited; otherwise how many free-tier events
    * are left this month. */
   readonly eventsRemaining = signal<number | null>(null);
+
+  // "AI suggests restaurants everyone in the group will enjoy" -- lets the
+  // host pick which friends they're planning to invite before picking a
+  // restaurant, then asks the backend (POST /restaurants/group-recommendation)
+  // to pick one everyone's food/dietary preferences actually support, rather
+  // than the host guessing alone. Entirely optional: ignoring this section
+  // and picking from the dropdown above still works exactly as before.
+  readonly friends = signal<Friend[]>([]);
+  readonly selectedFriendIds = signal<number[]>([]);
+  readonly aiSuggesting = signal(false);
+  readonly aiSuggestion = signal<{ restaurantName: string; reason: string; aiPowered: boolean } | null>(null);
+  readonly aiError = signal<string | null>(null);
 
   gatheringType = 'Dinner';
   atmosphere = 'Social Conversation';
@@ -65,6 +79,7 @@ export class CreateTablePage extends BasePage {
       this.eventsUnlimited.set(tableCreation.unlimited);
       this.eventsRemaining.set(tableCreation.unlimited ? null : tableCreation.remaining);
     });
+    this.friendsService.list().subscribe(({ friends }) => this.friends.set(friends));
   }
 
   selectGatheringType(type: string): void {
@@ -73,6 +88,33 @@ export class CreateTablePage extends BasePage {
 
   selectAtmosphere(atmosphere: string): void {
     this.atmosphere = atmosphere;
+  }
+
+  toggleFriendSelection(friendId: number): void {
+    const selected = this.selectedFriendIds();
+    this.selectedFriendIds.set(
+      selected.includes(friendId) ? selected.filter((id) => id !== friendId) : [...selected, friendId],
+    );
+    this.aiSuggestion.set(null);
+  }
+
+  getAiSuggestion(): void {
+    const memberIds = this.selectedFriendIds();
+    if (memberIds.length === 0 || this.aiSuggesting()) return;
+
+    this.aiSuggesting.set(true);
+    this.aiError.set(null);
+    this.restaurantService.groupRecommendation(memberIds).subscribe({
+      next: ({ restaurant, reason, aiPowered }) => {
+        this.restaurantId = restaurant.id;
+        this.aiSuggestion.set({ restaurantName: restaurant.name, reason, aiPowered });
+        this.aiSuggesting.set(false);
+      },
+      error: () => {
+        this.aiError.set("Couldn't get a suggestion right now -- pick a restaurant above instead.");
+        this.aiSuggesting.set(false);
+      },
+    });
   }
 
   submit(): void {

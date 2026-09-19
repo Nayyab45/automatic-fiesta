@@ -6,6 +6,9 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { importCityRestaurants } from '../lib/osmPlaces.js';
 import { requireFields } from '../lib/validate.js';
 import { distanceKm, tastePrefsFor } from '../lib/taste.js';
+import { pickRestaurantForGroup } from '../lib/ai.js';
+import { friendIdsOf } from './friends.js';
+import { requireAdmin } from '../lib/adminAuth.js';
 
 export const restaurantsRouter = Router();
 
@@ -43,6 +46,144 @@ async function attachDishesBatch(restaurants, { popularOnly = false } = {}) {
     return { ...r, dishes: popularOnly ? dishes.slice(0, 3) : dishes };
   });
 }
+
+// ---------------------------------------------------------------------
+// Admin Restaurant Management + Reviews Management. Registered before
+// '/:id' (see the note below) so 'admin' isn't swallowed as an :id value.
+// ---------------------------------------------------------------------
+
+restaurantsRouter.get('/admin', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const { search } = req.query;
+  const rows = await db
+    .prepare(
+      `SELECT id, name, city, region, cuisine_tags, price_tier, rating, review_count, address, source, created_at
+       FROM restaurants
+       ${search ? 'WHERE name LIKE ? OR city LIKE ?' : ''}
+       ORDER BY created_at DESC
+       LIMIT 300`,
+    )
+    .all(...(search ? [`%${search}%`, `%${search}%`] : []));
+  res.json({ restaurants: toCamelRows(rows) });
+}));
+
+// Validates/normalizes the editable fields shared by create and update.
+// Returns { error } or { values }.
+function adminRestaurantFields(body) {
+  const { name, city, region, cuisineTags, priceTier, description, address, photoUrl, latitude, longitude, contactPhone, contactEmail, website } =
+    body ?? {};
+  const missing = requireFields(body, ['name', 'city', 'cuisineTags']);
+  if (missing) return { error: missing };
+
+  const tier = priceTier === undefined || priceTier === null || priceTier === '' ? null : Number(priceTier);
+  if (tier !== null && (!Number.isInteger(tier) || tier < 1 || tier > 4)) {
+    return { error: 'priceTier must be a whole number from 1 to 4' };
+  }
+  const lat = latitude === undefined || latitude === null || latitude === '' ? null : Number(latitude);
+  const lng = longitude === undefined || longitude === null || longitude === '' ? null : Number(longitude);
+  if ((lat !== null && Number.isNaN(lat)) || (lng !== null && Number.isNaN(lng))) {
+    return { error: 'latitude and longitude must be numbers' };
+  }
+
+  return {
+    values: [
+      String(name).trim(),
+      String(city).trim(),
+      // region is NOT NULL in the schema; fall back to the city when the
+      // admin doesn't give one, same as a city-scoped OSM import does.
+      String(region || city).trim(),
+      String(cuisineTags).trim(),
+      tier,
+      description || null,
+      address || null,
+      photoUrl || null,
+      lat,
+      lng,
+      contactPhone || null,
+      contactEmail || null,
+      website || null,
+    ],
+  };
+}
+
+restaurantsRouter.post('/admin', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const { error, values } = adminRestaurantFields(req.body);
+  if (error) return res.status(400).json({ message: error });
+
+  const result = await db
+    .prepare(
+      `INSERT INTO restaurants
+       (name, city, region, cuisine_tags, price_tier, description, address, photo_url, latitude, longitude,
+        contact_phone, contact_email, website, source)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin')`,
+    )
+    .run(...values);
+  const created = await db.prepare('SELECT * FROM restaurants WHERE id = ?').get(result.lastInsertRowid);
+  res.status(201).json({ restaurant: toCamel(created) });
+}));
+
+restaurantsRouter.put('/admin/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const existing = await db.prepare('SELECT id FROM restaurants WHERE id = ?').get(req.params.id);
+  if (!existing) return res.status(404).json({ message: 'Restaurant not found' });
+
+  const { error, values } = adminRestaurantFields(req.body);
+  if (error) return res.status(400).json({ message: error });
+
+  await db
+    .prepare(
+      `UPDATE restaurants SET name = ?, city = ?, region = ?, cuisine_tags = ?, price_tier = ?, description = ?,
+         address = ?, photo_url = ?, latitude = ?, longitude = ?, contact_phone = ?, contact_email = ?, website = ?
+       WHERE id = ?`,
+    )
+    .run(...values, existing.id);
+  const updated = await db.prepare('SELECT * FROM restaurants WHERE id = ?').get(existing.id);
+  res.json({ restaurant: toCamel(updated) });
+}));
+
+// Refuses (409) while any dining table still points at this restaurant --
+// deleting it would leave real hosted events without a restaurant, which
+// every table query JOINs on. An admin who really wants it gone removes
+// those events first (Event Management).
+restaurantsRouter.delete('/admin/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const existing = await db.prepare('SELECT id FROM restaurants WHERE id = ?').get(req.params.id);
+  if (!existing) return res.status(404).json({ message: 'Restaurant not found' });
+
+  const { count } = await db.prepare('SELECT COUNT(*) as count FROM dining_tables WHERE restaurant_id = ?').get(existing.id);
+  if (count > 0) {
+    return res.status(409).json({
+      message: `${count} dining event${count === 1 ? ' is' : 's are'} still hosted at this restaurant. Remove ${count === 1 ? 'it' : 'them'} first.`,
+    });
+  }
+
+  await db.prepare('DELETE FROM dishes WHERE restaurant_id = ?').run(existing.id);
+  await db.prepare('DELETE FROM restaurant_reviews WHERE restaurant_id = ?').run(existing.id);
+  await db.prepare('DELETE FROM saved_restaurants WHERE restaurant_id = ?').run(existing.id);
+  await db.prepare('DELETE FROM restaurants WHERE id = ?').run(existing.id);
+  res.json({ ok: true });
+}));
+
+// Reviews Management, restaurant-review side (see tables.js for the
+// dining-table-review side).
+restaurantsRouter.get('/admin/reviews', requireAuth, requireAdmin, asyncHandler(async (_req, res) => {
+  const rows = await db
+    .prepare(
+      `SELECT rr.id, rr.rating, rr.comment, rr.created_at, u.name as reviewer_name, r.name as restaurant_name
+       FROM restaurant_reviews rr
+       JOIN users u ON u.id = rr.reviewer_user_id
+       JOIN restaurants r ON r.id = rr.restaurant_id
+       ORDER BY rr.created_at DESC
+       LIMIT 300`,
+    )
+    .all();
+  res.json({ reviews: toCamelRows(rows) });
+}));
+
+restaurantsRouter.delete('/admin/reviews/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const review = await db.prepare('SELECT restaurant_id FROM restaurant_reviews WHERE id = ?').get(req.params.id);
+  if (!review) return res.status(404).json({ message: 'Review not found' });
+  await db.prepare('DELETE FROM restaurant_reviews WHERE id = ?').run(req.params.id);
+  await recomputeRestaurantRating(review.restaurant_id);
+  res.json({ ok: true });
+}));
 
 // Order matters: these fixed segments must be registered before '/:id' so
 // Express doesn't treat them as an :id value.
@@ -135,6 +276,73 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
 
   scored.sort((a, b) => b.score - a.score);
   res.json({ restaurants: await attachDishesBatch(scored.slice(0, 10)) });
+}));
+
+// A real (when GEMINI_API_KEY is set) AI pick for a whole group, not
+// just the caller -- see ai.js's pickRestaurantForGroup for how the model
+// is kept to choosing only from a heuristically-scored shortlist. Members
+// must be the caller's friends since this reads their food/dietary
+// preferences, the same privacy boundary friend_requests already enforces
+// on friends.js's own endpoints. Without a key configured, this still
+// works -- it just returns the top heuristic candidate with a templated
+// reason instead of a model-written one, same fallback pattern the payment
+// gateways use for an unconfigured provider.
+restaurantsRouter.post('/group-recommendation', requireAuth, asyncHandler(async (req, res) => {
+  const memberIds = Array.isArray(req.body.memberIds)
+    ? [...new Set(req.body.memberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0))]
+    : [];
+  if (memberIds.length === 0) {
+    return res.status(400).json({ message: 'Pick at least one friend to suggest a restaurant for the group.' });
+  }
+
+  const myFriendIds = new Set(await friendIdsOf(req.user.sub));
+  const notFriends = memberIds.filter((id) => id !== req.user.sub && !myFriendIds.has(id));
+  if (notFriends.length > 0) {
+    return res.status(403).json({ message: 'You can only include friends in a group suggestion.' });
+  }
+
+  const allMemberIds = [...new Set([req.user.sub, ...memberIds])];
+  const memberTastes = await Promise.all(allMemberIds.map((id) => tastePrefsFor(id)));
+  const combinedFavoriteFoods = [...new Set(memberTastes.flatMap((t) => t.favoriteFoods.map((f) => f.toLowerCase())))];
+
+  let effectiveCity = req.query.city;
+  if (!effectiveCity) {
+    const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
+    effectiveCity = myProfile?.city;
+  }
+  const rows = toCamelRows(
+    effectiveCity
+      ? await db.prepare('SELECT * FROM restaurants WHERE city = ?').all(effectiveCity)
+      : await db.prepare('SELECT * FROM restaurants').all(),
+  );
+
+  // Same rating+taste heuristic as /recommended above, just scored against
+  // the whole group's combined favorite foods instead of one person's.
+  const scored = rows
+    .map((restaurant) => {
+      const cuisineTags = restaurant.cuisineTags ? restaurant.cuisineTags.split(',').map((tag) => tag.trim()) : [];
+      const matchedFoods = cuisineTags.filter((tag) =>
+        combinedFavoriteFoods.some((food) => tag.toLowerCase().includes(food) || food.includes(tag.toLowerCase())),
+      );
+      return { ...restaurant, matchedFoods, score: (restaurant.rating ?? 0) * 10 + matchedFoods.length * 25 };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
+
+  if (scored.length === 0) {
+    return res.status(404).json({ message: 'No restaurants found nearby to suggest from.' });
+  }
+
+  const picked = await pickRestaurantForGroup({ candidates: scored, memberTastes });
+  const fallback = scored[0];
+  const restaurant = picked ? (scored.find((r) => r.id === picked.restaurantId) ?? fallback) : fallback;
+  const reason =
+    picked?.reason ||
+    (restaurant.matchedFoods.length > 0
+      ? `Matches the group's love of ${restaurant.matchedFoods[0]}`
+      : `Highly rated${restaurant.rating ? ` (${restaurant.rating}★)` : ''}`);
+
+  res.json({ restaurant: await attachDishes(restaurant), reason, aiPowered: !!picked });
 }));
 
 restaurantsRouter.get('/', asyncHandler(async (req, res) => {

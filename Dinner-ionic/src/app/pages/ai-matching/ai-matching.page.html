@@ -31,6 +31,15 @@
             </p>
 </section>
 
+<div *ngIf="!loading() && !aiInsightsUnlocked() && matches().length > 0" (click)="go('/subscribe-to-premium')" class="max-w-5xl mx-auto w-full bg-tertiary-container/10 border border-tertiary-container rounded-xl px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-tertiary-container/20 transition-colors">
+<span class="material-symbols-outlined text-tertiary text-[28px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<div class="flex-1">
+<p class="font-title-md text-title-md text-on-background">Unlock AI-powered match insights</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">These reasons are our standard match logic. Go Premium to have AI explain your best matches instead.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+
 <ng-container *ngIf="!loading()">
 <section *ngFor="let m of matches(); let i = index; let first = first" class="flex flex-col gap-stack-sm max-w-5xl mx-auto w-full">
 
@@ -98,11 +107,12 @@
 </div>
 </div>
 <ul class="flex flex-col gap-4 mt-2">
-<li *ngFor="let reason of m.reasons" class="flex gap-4 items-start">
+<li *ngFor="let reason of m.reasons; let j = index" class="flex gap-4 items-start">
 <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-on-secondary-container text-sm">handshake</span>
+<span class="material-symbols-outlined text-on-secondary-container text-sm">{{ j === 0 && m.aiPowered ? 'auto_awesome' : 'handshake' }}</span>
 </div>
 <div>
+<span *ngIf="j === 0 && m.aiPowered" class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">AI Insight</span>
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">{{ reason }}</p>
 </div>
 </li>

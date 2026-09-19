@@ -25,12 +25,16 @@ export class AiMatchingPage extends BasePage {
   // only means anything visible with more than one result on screen.
   readonly matches = signal<Match[]>([]);
   readonly loading = signal(true);
+  /** Premium perk (see proposal's Revenue Model) -- false means every reason
+   * below is the plain heuristic one, never AI-written. */
+  readonly aiInsightsUnlocked = signal(false);
 
   constructor() {
     super();
     this.profileService.matches().subscribe({
-      next: ({ matches }) => {
+      next: ({ matches, aiInsightsUnlocked }) => {
         this.matches.set(matches);
+        this.aiInsightsUnlocked.set(aiInsightsUnlocked);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

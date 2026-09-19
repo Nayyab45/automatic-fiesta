@@ -49,6 +49,10 @@ export interface Person {
    * in Discover People/Matches, and get a badge wherever they're shown. */
   isPremium: boolean;
   interests: Interest[];
+  /** Overlap between the viewer's own interests and this person's -- empty
+   * if there's no overlap, or if this person has turned off "Show mutual
+   * interests" in their Privacy Settings. */
+  sharedInterests: Interest[];
   /** Only present when the distance filter was used -- km from the
    * coordinates passed to people(), to this person's self-reported city. */
   distanceKm?: number | null;
@@ -58,6 +62,10 @@ export interface PeopleFilters {
   city?: string;
   minAge?: number;
   maxAge?: number;
+  /** Interest/Cuisine/Distance are "advanced" filters (a Premium perk, see
+   * proposal's Revenue Model) -- silently ignored server-side for a free
+   * account (see peopleRouter in profile.js), so gate the UI that lets a
+   * free account set these too rather than relying on the backend alone. */
   interestIds?: number[];
   cuisine?: string[];
   /** Both required together with maxDistanceKm -- the viewer's own live
@@ -107,6 +115,9 @@ export interface Match extends Person {
   /** Favorite foods (from Food Preferences) this person shares with you -- same vocabulary as restaurant cuisine tags. */
   sharedFavoriteFoods: string[];
   reasons: string[];
+  /** True when reasons[0] was AI-written rather than the plain heuristic --
+   * only ever true when the response's aiInsightsUnlocked (a Premium perk) is true. */
+  aiPowered: boolean;
   rating: number | null;
   tablesJoinedCount: number;
 }
@@ -177,7 +188,7 @@ export class ProfileService {
     return this.http.get<{ interests: Interest[] }>(`${environment.apiUrl}/interests`);
   }
 
-  people(filters: PeopleFilters = {}): Observable<{ people: Person[] }> {
+  people(filters: PeopleFilters = {}): Observable<{ people: Person[]; advancedFiltersUnlocked: boolean }> {
     let params = new HttpParams();
     if (filters.city) params = params.set('city', filters.city);
     if (filters.minAge) params = params.set('minAge', filters.minAge);
@@ -187,11 +198,11 @@ export class ProfileService {
     if (filters.lat !== undefined && filters.lng !== undefined && filters.maxDistanceKm) {
       params = params.set('lat', filters.lat).set('lng', filters.lng).set('maxDistanceKm', filters.maxDistanceKm);
     }
-    return this.http.get<{ people: Person[] }>(`${environment.apiUrl}/people`, { params });
+    return this.http.get<{ people: Person[]; advancedFiltersUnlocked: boolean }>(`${environment.apiUrl}/people`, { params });
   }
 
-  matches(): Observable<{ matches: Match[] }> {
-    return this.http.get<{ matches: Match[] }>(`${environment.apiUrl}/matches`);
+  matches(): Observable<{ matches: Match[]; aiInsightsUnlocked: boolean }> {
+    return this.http.get<{ matches: Match[]; aiInsightsUnlocked: boolean }>(`${environment.apiUrl}/matches`);
   }
 
   privacySettings(): Observable<{ settings: PrivacySettings }> {

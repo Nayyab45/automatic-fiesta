@@ -7,6 +7,7 @@ import { tastePrefsFor, distanceKm } from '../lib/taste.js';
 import { cityCoordinates } from '../lib/cityGeocode.js';
 import { subscriptionFor, activePremiumUserIds } from './subscriptions.js';
 import { tableCreationStatus } from './tables.js';
+import { explainMatch } from '../lib/ai.js';
 
 export const profileRouter = Router();
 export const interestsRouter = Router();
@@ -37,6 +38,23 @@ async function privacySettingsFor(userId) {
     showProfileViews: !!row.show_profile_views,
     locationPrecision: row.location_precision,
   };
+}
+
+// Batched "will this candidate show mutual interests to the viewer" check
+// for Discover People, same batching reasoning as interestsForBatch --
+// a row missing from privacy_settings defaults to visible, matching
+// DEFAULT_PRIVACY_SETTINGS above.
+async function mutualInterestsVisibilityForBatch(userIds) {
+  const byUserId = new Map(userIds.map((id) => [id, DEFAULT_PRIVACY_SETTINGS.showMutualInterests]));
+  if (!userIds.length) return byUserId;
+  const placeholders = userIds.map(() => '?').join(',');
+  const rows = await db
+    .prepare(`SELECT user_id, show_mutual_interests FROM privacy_settings WHERE user_id IN (${placeholders})`)
+    .all(...userIds);
+  for (const row of rows) {
+    byUserId.set(row.user_id, !!row.show_mutual_interests);
+  }
+  return byUserId;
 }
 
 async function tablesJoinedCount(userId) {
@@ -354,6 +372,14 @@ const PROFILE_VISIBLE_CLAUSE = `u.id NOT IN (
 
 peopleRouter.get('/', asyncHandler(async (req, res) => {
   const { city, minAge, maxAge, interestIds, cuisine, lat, lng, maxDistanceKm } = req.query;
+  // Advanced search filters (Interest/Cuisine/Distance) are a Premium perk
+  // (see proposal's Revenue Model) -- Age stays free, same as the basic
+  // city/age narrowing every account gets. A free account sending these
+  // query params anyway just gets them ignored below rather than erroring,
+  // matching how the AI-matching gate degrades (see matchesRouter) --
+  // Discover People itself must never break for a free account, only the
+  // advanced narrowing on top of it does.
+  const advancedFiltersUnlocked = (await subscriptionFor(req.user.sub)).status === 'active';
   const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE, PROFILE_VISIBLE_CLAUSE];
   const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
@@ -382,26 +408,39 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
 
   let people = toCamelRows(rows);
   const ids = people.map((person) => person.id);
-  const [interestsByUserId, favoriteFoodsByUserId, premiumIds] = await Promise.all([
+  const [interestsByUserId, favoriteFoodsByUserId, premiumIds, mutualVisibilityByUserId] = await Promise.all([
     interestsForBatch(ids),
     favoriteFoodsForBatch(ids),
     activePremiumUserIds(ids),
+    mutualInterestsVisibilityForBatch(ids),
   ]);
-  people = people.map((person) => ({
-    ...person,
-    interests: interestsByUserId.get(person.id) ?? [],
-    favoriteFoods: favoriteFoodsByUserId.get(person.id) ?? [],
-    isPremium: premiumIds.has(person.id),
-  }));
+  // Mutual interests: the overlap between the viewer's own interests and
+  // each candidate's, so "3 mutual interests" means something real rather
+  // than just echoing the candidate's full interest list back. Hidden
+  // (empty) for a candidate who's turned off "Show mutual interests" in
+  // their own Privacy Settings, same toggle Edit Preferences already writes.
+  const myInterestIds = new Set((await interestsFor(req.user.sub)).map((interest) => interest.id));
+  people = people.map((person) => {
+    const interests = interestsByUserId.get(person.id) ?? [];
+    return {
+      ...person,
+      interests,
+      favoriteFoods: favoriteFoodsByUserId.get(person.id) ?? [],
+      isPremium: premiumIds.has(person.id),
+      sharedInterests: mutualVisibilityByUserId.get(person.id)
+        ? interests.filter((interest) => myInterestIds.has(interest.id))
+        : [],
+    };
+  });
 
-  const requestedInterestIds = interestIds
+  const requestedInterestIds = advancedFiltersUnlocked && interestIds
     ? String(interestIds).split(',').map(Number).filter((id) => !Number.isNaN(id))
     : [];
   if (requestedInterestIds.length) {
     people = people.filter((person) => person.interests.some((interest) => requestedInterestIds.includes(interest.id)));
   }
 
-  const requestedCuisines = cuisine
+  const requestedCuisines = advancedFiltersUnlocked && cuisine
     ? String(cuisine).split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
     : [];
   if (requestedCuisines.length) {
@@ -416,7 +455,8 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
   // app persists an individual user's own live location. A candidate with
   // no city, or a city that can't be geocoded, is excluded rather than
   // guessed into or out of range.
-  const hasCoords = lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
+  const hasCoords =
+    advancedFiltersUnlocked && lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
   if (hasCoords && maxDistanceKm) {
     const viewerLat = Number(lat);
     const viewerLng = Number(lng);
@@ -442,7 +482,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
     .sort((a, b) => Number(b.person.isPremium) - Number(a.person.isPremium) || a.index - b.index)
     .map(({ person }) => person);
 
-  res.json({ people: people.map(({ favoriteFoods, ...person }) => person) });
+  res.json({ people: people.map(({ favoriteFoods, ...person }) => person), advancedFiltersUnlocked });
 }));
 
 matchesRouter.get('/', asyncHandler(async (req, res) => {
@@ -518,9 +558,16 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           interests: candidateInterests,
           sharedInterests,
           sharedFavoriteFoods,
+          sharedDietaryNeeds,
+          spiceTolerance: sameSpiceTolerance ? candidateTaste.spiceTolerance : null,
           reasons,
           rating: await peopleRating(candidate.id),
           tablesJoinedCount: await tablesJoinedCount(candidate.id),
+          // Flipped true below only for a match that actually got an
+          // AI-written reason -- lets the frontend show which ones are
+          // AI-powered (a Premium perk, see proposal's Revenue Model)
+          // without a second round trip.
+          aiPowered: false,
         };
       }),
     )
@@ -535,7 +582,45 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
     return b.score - a.score;
   });
 
-  res.json({ matches });
+  // AI-powered match insights are a Premium perk (see proposal's Revenue
+  // Model) -- a free account still gets the full ranked list with the
+  // heuristic reasons above, just none of them AI-written. Checked here
+  // rather than filtering the whole endpoint behind a subscription so
+  // Discover/Matches itself (a core, free feature) never breaks for a free
+  // account -- only the AI enhancement on top of it does.
+  const aiInsightsUnlocked = (await subscriptionFor(req.user.sub)).status === 'active';
+
+  if (aiInsightsUnlocked) {
+    // AI-write the top reason for only the highest-ranked matches -- capped
+    // at 5 (confirmed live: Gemini's free tier allows exactly 5
+    // generateContent calls/minute per model, see ai.js) so one page load
+    // can't blow through the whole minute's quota by itself. Falls back to
+    // the heuristic reasons above untouched (see ai.js) when no key is
+    // configured, a call 429s, or there's nothing to explain in the first
+    // place -- so exceeding this cap degrades to the plain heuristic for
+    // the rest, never breaks the page.
+    const AI_EXPLAINED_MATCHES = 5;
+    await Promise.all(
+      matches.slice(0, AI_EXPLAINED_MATCHES).map(async (match) => {
+        const aiReason = await explainMatch({
+          candidateName: match.name,
+          sharedFavoriteFoods: match.sharedFavoriteFoods,
+          sharedDietaryNeeds: match.sharedDietaryNeeds,
+          sameSpiceTolerance: !!match.spiceTolerance,
+          spiceTolerance: match.spiceTolerance,
+          sharedInterests: match.sharedInterests.map((i) => i.name),
+          sameCity: match.sameCity,
+          city: match.city,
+        });
+        if (aiReason) {
+          match.reasons = [aiReason, ...match.reasons];
+          match.aiPowered = true;
+        }
+      }),
+    );
+  }
+
+  res.json({ matches, aiInsightsUnlocked });
 }));
 
 privacySettingsRouter.get('/', asyncHandler(async (req, res) => {

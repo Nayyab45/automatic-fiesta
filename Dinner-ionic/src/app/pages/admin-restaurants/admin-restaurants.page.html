@@ -1,0 +1,81 @@
+<app-header title="Restaurant Management" (back)="goBack()">
+<button (click)="openAdd()" aria-label="Add restaurant" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-primary">
+<span class="material-symbols-outlined">add</span>
+</button>
+</app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md flex flex-col gap-stack-md">
+
+<div class="relative w-full h-12">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input [(ngModel)]="search" (keyup.enter)="load()" type="search" placeholder="Search by name or city" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent"/>
+</div>
+
+<p *ngIf="listError()" class="font-body-md text-body-md text-error">{{ listError() }}</p>
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<div *ngIf="!loading() && forbidden()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<span class="material-symbols-outlined text-[40px] text-error mb-stack-md">block</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Admins only</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px]">You don't have access to this page.</p>
+</div>
+
+<p *ngIf="!loading() && !forbidden() && restaurants().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No restaurants match.</p>
+
+<ul *ngIf="!loading() && restaurants().length > 0" class="flex flex-col gap-stack-md">
+<li *ngFor="let r of restaurants()" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-unit">
+<div class="flex justify-between items-start gap-2">
+<span class="font-title-lg text-title-lg text-on-surface">{{ r.name }}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md shrink-0">{{ r.source }}</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">{{ r.city }} · {{ r.cuisineTags }}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">
+            {{ r.rating !== null ? r.rating + ' ★ (' + (r.reviewCount ?? 0) + ')' : 'No rating yet' }}
+            {{ r.priceTier ? ' · ' + '$'.repeat(r.priceTier) : '' }}
+        </span>
+<div class="flex gap-stack-sm mt-unit">
+<button (click)="openEdit(r)" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg px-4 py-2 rounded-lg hover:bg-surface-container transition-colors">Edit</button>
+<button (click)="remove(r)" class="flex-1 bg-error text-on-error font-label-lg text-label-lg px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">Delete</button>
+</div>
+</li>
+</ul>
+</main>
+
+<div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end transition-opacity duration-300" [class.opacity-0]="!formOpen()" [class.pointer-events-none]="!formOpen()" (click)="closeForm()">
+<div class="bg-surface rounded-t-[24px] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] transform transition-transform duration-300 max-h-[90vh] flex flex-col" [class.translate-y-full]="!formOpen()" (click)="$event.stopPropagation()">
+<div class="px-container-padding py-stack-md flex justify-between items-center border-b-[0.5px] border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-on-background">{{ editingId() === null ? 'Add Restaurant' : 'Edit Restaurant' }}</h2>
+<button (click)="closeForm()" aria-label="Close" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form (ngSubmit)="save()" class="overflow-y-auto px-container-padding py-stack-lg flex flex-col gap-stack-md">
+<input [(ngModel)]="form.name" name="name" placeholder="Name *" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<div class="flex gap-stack-sm">
+<input [(ngModel)]="form.city" name="city" placeholder="City *" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<input [(ngModel)]="form.region" name="region" placeholder="Region (defaults to city)" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+</div>
+<input [(ngModel)]="form.cuisineTags" name="cuisineTags" placeholder="Cuisine tags, comma-separated *" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<select [(ngModel)]="form.priceTier" name="priceTier" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface">
+<option [ngValue]="null">Price tier: not set</option>
+<option [ngValue]="1">$ — Budget</option>
+<option [ngValue]="2">$$ — Moderate</option>
+<option [ngValue]="3">$$$ — Upscale</option>
+<option [ngValue]="4">$$$$ — Fine dining</option>
+</select>
+<input [(ngModel)]="form.address" name="address" placeholder="Address" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<textarea [(ngModel)]="form.description" name="description" rows="3" placeholder="Description" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
+<input [(ngModel)]="form.photoUrl" name="photoUrl" placeholder="Photo URL" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<div class="flex gap-stack-sm">
+<input [(ngModel)]="form.latitude" name="latitude" type="number" step="any" placeholder="Latitude" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<input [(ngModel)]="form.longitude" name="longitude" type="number" step="any" placeholder="Longitude" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+</div>
+<div class="flex gap-stack-sm">
+<input [(ngModel)]="form.contactPhone" name="contactPhone" placeholder="Contact phone" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<input [(ngModel)]="form.contactEmail" name="contactEmail" placeholder="Contact email" class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+</div>
+<input [(ngModel)]="form.website" name="website" placeholder="Website" class="h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface"/>
+<p *ngIf="formError()" class="font-body-md text-body-md text-error">{{ formError() }}</p>
+<button type="submit" [disabled]="saving()" class="bg-primary-container text-on-primary py-4 rounded-lg font-title-lg text-title-lg hover:opacity-90 transition-opacity disabled:opacity-60">{{ saving() ? 'Saving…' : 'Save' }}</button>
+</form>
+</div>
+</div>

@@ -35,6 +35,20 @@ friendsRouter.get('/status/:userId', asyncHandler(async (req, res) => {
   });
 }));
 
+// Shared with restaurants.js's /group-recommendation, which needs to check
+// that every member it's about to read taste/dietary data for is actually a
+// friend of the requester -- the same privacy boundary this router already
+// enforces on its own list/status endpoints.
+export async function friendIdsOf(userId) {
+  const rows = await db
+    .prepare(
+      `SELECT (CASE WHEN requester_id = ? THEN recipient_id ELSE requester_id END) as friend_id
+       FROM friend_requests WHERE status = 'accepted' AND (requester_id = ? OR recipient_id = ?)`,
+    )
+    .all(userId, userId, userId);
+  return rows.map((r) => r.friend_id);
+}
+
 friendsRouter.get('/', asyncHandler(async (req, res) => {
   const rows = await db
     .prepare(

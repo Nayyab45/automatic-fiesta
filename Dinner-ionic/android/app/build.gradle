@@ -15,6 +15,22 @@ if (hasReleaseSigning) {
     logger.info("keystore.properties not found -- release builds will be unsigned. See DEPLOYMENT.md.")
 }
 
+// Same pattern as keystore.properties above: the app's real AdMob App ID
+// (from admob.google.com, format ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY --
+// NOT the banner ad unit id, which lives in environment.prod.ts instead)
+// lives in this gitignored file, copied from admob.properties.example.
+// Missing it falls back to Google's public TEST App ID, which is safe to
+// ship (it only ever serves Google's own test ads) but must not go to a
+// real Play Store release -- see AndroidManifest.xml's meta-data comment.
+def admobPropertiesFile = file('admob.properties')
+def admobProperties = new Properties()
+if (admobPropertiesFile.exists()) {
+    admobProperties.load(new FileInputStream(admobPropertiesFile))
+} else {
+    logger.info("admob.properties not found -- shipping Google's TEST AdMob App ID. See admob.properties.example.")
+}
+def admobAppId = admobProperties.getProperty('admobAppId', 'ca-app-pub-3940256099942544~3347511713')
+
 android {
     namespace = "com.whatshouldweeat.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -33,6 +49,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [admobAppId: admobAppId]
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61

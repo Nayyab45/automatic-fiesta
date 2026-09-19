@@ -18,15 +18,18 @@
                     {{ minAge !== null || maxAge !== null ? 'Age: ' + (minAge ?? 'Any') + '-' + (maxAge ?? 'Any') : 'Age' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedInterestIds.size > 0" [class.border-primary]="selectedInterestIds.size > 0" [class.bg-secondary-container]="selectedInterestIds.size > 0" [class.bg-opacity-20]="selectedInterestIds.size > 0" [class.text-on-secondary-container]="selectedInterestIds.size > 0" [class.border]="selectedInterestIds.size === 0" [class.border-outline-variant]="selectedInterestIds.size === 0" [class.bg-surface-container-lowest]="selectedInterestIds.size === 0" [class.text-on-surface-variant]="selectedInterestIds.size === 0">
+<button (click)="openAdvancedFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedInterestIds.size > 0" [class.border-primary]="selectedInterestIds.size > 0" [class.bg-secondary-container]="selectedInterestIds.size > 0" [class.bg-opacity-20]="selectedInterestIds.size > 0" [class.text-on-secondary-container]="selectedInterestIds.size > 0" [class.border]="selectedInterestIds.size === 0" [class.border-outline-variant]="selectedInterestIds.size === 0" [class.bg-surface-container-lowest]="selectedInterestIds.size === 0" [class.text-on-surface-variant]="selectedInterestIds.size === 0">
+<span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px]">lock</span>
                     {{ selectedInterestIds.size > 0 ? 'Interests (' + selectedInterestIds.size + ')' : 'Interests' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedCuisines.size > 0" [class.border-primary]="selectedCuisines.size > 0" [class.bg-secondary-container]="selectedCuisines.size > 0" [class.bg-opacity-20]="selectedCuisines.size > 0" [class.text-on-secondary-container]="selectedCuisines.size > 0" [class.border]="selectedCuisines.size === 0" [class.border-outline-variant]="selectedCuisines.size === 0" [class.bg-surface-container-lowest]="selectedCuisines.size === 0" [class.text-on-surface-variant]="selectedCuisines.size === 0">
+<button (click)="openAdvancedFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedCuisines.size > 0" [class.border-primary]="selectedCuisines.size > 0" [class.bg-secondary-container]="selectedCuisines.size > 0" [class.bg-opacity-20]="selectedCuisines.size > 0" [class.text-on-secondary-container]="selectedCuisines.size > 0" [class.border]="selectedCuisines.size === 0" [class.border-outline-variant]="selectedCuisines.size === 0" [class.bg-surface-container-lowest]="selectedCuisines.size === 0" [class.text-on-surface-variant]="selectedCuisines.size === 0">
+<span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px]">lock</span>
                     {{ selectedCuisines.size > 0 ? 'Cuisine (' + selectedCuisines.size + ')' : 'Cuisine' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
-<button (click)="openFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedDistanceKm !== null" [class.border-primary]="selectedDistanceKm !== null" [class.bg-secondary-container]="selectedDistanceKm !== null" [class.bg-opacity-20]="selectedDistanceKm !== null" [class.text-on-secondary-container]="selectedDistanceKm !== null" [class.border]="selectedDistanceKm === null" [class.border-outline-variant]="selectedDistanceKm === null" [class.bg-surface-container-lowest]="selectedDistanceKm === null" [class.text-on-surface-variant]="selectedDistanceKm === null">
+<button (click)="openAdvancedFilterSheet()" class="flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition-colors font-label-lg text-label-lg" [class.border-1.5]="selectedDistanceKm !== null" [class.border-primary]="selectedDistanceKm !== null" [class.bg-secondary-container]="selectedDistanceKm !== null" [class.bg-opacity-20]="selectedDistanceKm !== null" [class.text-on-secondary-container]="selectedDistanceKm !== null" [class.border]="selectedDistanceKm === null" [class.border-outline-variant]="selectedDistanceKm === null" [class.bg-surface-container-lowest]="selectedDistanceKm === null" [class.text-on-surface-variant]="selectedDistanceKm === null">
+<span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px]">lock</span>
                     {{ selectedDistanceKm !== null ? 'Distance: <' + selectedDistanceKm + 'km' : 'Distance' }}
                     <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
 </button>
@@ -63,8 +66,14 @@
 <p *ngIf="person.bio" class="font-body-md text-body-md text-on-surface-variant mt-1">{{ person.bio }}</p>
 </div>
 </div>
-<div class="flex flex-wrap gap-2" *ngIf="person.interests.length > 0">
-<span *ngFor="let interest of person.interests" class="px-3 py-1 rounded-full bg-tertiary-container bg-opacity-10 text-tertiary font-label-sm text-label-sm border-[0.5px] border-tertiary-container">{{ interest.name }}</span>
+<div class="flex flex-col gap-1" *ngIf="person.interests.length > 0">
+<span *ngIf="person.sharedInterests.length > 0" class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        {{ person.sharedInterests.length }} mutual interest{{ person.sharedInterests.length > 1 ? 's' : '' }}
+                    </span>
+<div class="flex flex-wrap gap-2">
+<span *ngFor="let interest of person.interests" class="px-3 py-1 rounded-full font-label-sm text-label-sm border-[0.5px]" [class.bg-primary-container]="isMutualInterest(person, interest)" [class.text-on-primary-container]="isMutualInterest(person, interest)" [class.border-primary]="isMutualInterest(person, interest)" [class.bg-tertiary-container]="!isMutualInterest(person, interest)" [class.bg-opacity-10]="!isMutualInterest(person, interest)" [class.text-tertiary]="!isMutualInterest(person, interest)" [class.border-tertiary-container]="!isMutualInterest(person, interest)">{{ interest.name }}</span>
+</div>
 </div>
 <div class="flex items-center justify-end gap-2 mt-2 pt-4 border-t-[0.5px] border-outline-variant">
 <button (click)="message(person)" aria-label="Message" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-10 h-10 rounded-full border border-outline-variant hover:border-primary">
@@ -103,25 +112,43 @@
 </div>
 </div>
 
-<div class="flex flex-col gap-stack-md">
-<h3 class="font-title-lg text-title-lg text-on-background">Interests</h3>
+<div *ngIf="!advancedFiltersUnlocked()" (click)="closeFilterSheet(); go('/subscribe-to-premium')" class="flex items-center gap-3 bg-tertiary-container/10 border border-tertiary-container rounded-xl px-4 py-3 cursor-pointer hover:bg-tertiary-container/20 transition-colors">
+<span class="material-symbols-outlined text-tertiary text-[24px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<div class="flex-1">
+<p class="font-title-md text-title-md text-on-background">Interest, Cuisine & Distance are Premium</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Age filtering is free. Upgrade to narrow by interest, cuisine, or distance too.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+
+<div class="flex flex-col gap-stack-md" [class.opacity-50]="!advancedFiltersUnlocked()">
+<h3 class="font-title-lg text-title-lg text-on-background flex items-center gap-2">
+                    Interests
+                    <span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px] text-on-surface-variant">lock</span>
+</h3>
 <div class="flex flex-wrap gap-3">
-<button *ngFor="let interest of allInterests()" (click)="toggleInterest(interest.id)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedInterestIds.has(interest.id)" [class.border-primary]="selectedInterestIds.has(interest.id)" [class.bg-secondary-container]="selectedInterestIds.has(interest.id)" [class.bg-opacity-20]="selectedInterestIds.has(interest.id)" [class.text-on-secondary-container]="selectedInterestIds.has(interest.id)" [class.border]="!selectedInterestIds.has(interest.id)" [class.border-outline-variant]="!selectedInterestIds.has(interest.id)" [class.bg-surface-container-lowest]="!selectedInterestIds.has(interest.id)" [class.text-on-surface-variant]="!selectedInterestIds.has(interest.id)">{{ interest.name }}</button>
+<button *ngFor="let interest of allInterests()" [disabled]="!advancedFiltersUnlocked()" (click)="toggleInterest(interest.id)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors disabled:cursor-not-allowed" [class.border-1.5]="selectedInterestIds.has(interest.id)" [class.border-primary]="selectedInterestIds.has(interest.id)" [class.bg-secondary-container]="selectedInterestIds.has(interest.id)" [class.bg-opacity-20]="selectedInterestIds.has(interest.id)" [class.text-on-secondary-container]="selectedInterestIds.has(interest.id)" [class.border]="!selectedInterestIds.has(interest.id)" [class.border-outline-variant]="!selectedInterestIds.has(interest.id)" [class.bg-surface-container-lowest]="!selectedInterestIds.has(interest.id)" [class.text-on-surface-variant]="!selectedInterestIds.has(interest.id)">{{ interest.name }}</button>
 </div>
 </div>
 
-<div class="flex flex-col gap-stack-md">
-<h3 class="font-title-lg text-title-lg text-on-background">Cuisine</h3>
+<div class="flex flex-col gap-stack-md" [class.opacity-50]="!advancedFiltersUnlocked()">
+<h3 class="font-title-lg text-title-lg text-on-background flex items-center gap-2">
+                    Cuisine
+                    <span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px] text-on-surface-variant">lock</span>
+</h3>
 <div class="flex flex-wrap gap-3">
-<button *ngFor="let cuisine of cuisineOptions" (click)="toggleCuisine(cuisine)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedCuisines.has(cuisine)" [class.border-primary]="selectedCuisines.has(cuisine)" [class.bg-secondary-container]="selectedCuisines.has(cuisine)" [class.bg-opacity-20]="selectedCuisines.has(cuisine)" [class.text-on-secondary-container]="selectedCuisines.has(cuisine)" [class.border]="!selectedCuisines.has(cuisine)" [class.border-outline-variant]="!selectedCuisines.has(cuisine)" [class.bg-surface-container-lowest]="!selectedCuisines.has(cuisine)" [class.text-on-surface-variant]="!selectedCuisines.has(cuisine)">{{ cuisine }}</button>
+<button *ngFor="let cuisine of cuisineOptions" [disabled]="!advancedFiltersUnlocked()" (click)="toggleCuisine(cuisine)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors disabled:cursor-not-allowed" [class.border-1.5]="selectedCuisines.has(cuisine)" [class.border-primary]="selectedCuisines.has(cuisine)" [class.bg-secondary-container]="selectedCuisines.has(cuisine)" [class.bg-opacity-20]="selectedCuisines.has(cuisine)" [class.text-on-secondary-container]="selectedCuisines.has(cuisine)" [class.border]="!selectedCuisines.has(cuisine)" [class.border-outline-variant]="!selectedCuisines.has(cuisine)" [class.bg-surface-container-lowest]="!selectedCuisines.has(cuisine)" [class.text-on-surface-variant]="!selectedCuisines.has(cuisine)">{{ cuisine }}</button>
 </div>
 </div>
 
-<div class="flex flex-col gap-stack-md pb-stack-lg">
-<h3 class="font-title-lg text-title-lg text-on-background">Maximum Distance</h3>
+<div class="flex flex-col gap-stack-md pb-stack-lg" [class.opacity-50]="!advancedFiltersUnlocked()">
+<h3 class="font-title-lg text-title-lg text-on-background flex items-center gap-2">
+                    Maximum Distance
+                    <span *ngIf="!advancedFiltersUnlocked()" class="material-symbols-outlined text-[16px] text-on-surface-variant">lock</span>
+</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant -mt-2">Uses your current location -- only asked for when you pick a distance.</p>
 <div class="flex flex-wrap gap-3">
-<button *ngFor="let km of distanceOptionsKm" (click)="selectDistance(km)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors" [class.border-1.5]="selectedDistanceKm === km" [class.border-primary]="selectedDistanceKm === km" [class.bg-secondary-container]="selectedDistanceKm === km" [class.bg-opacity-20]="selectedDistanceKm === km" [class.text-on-secondary-container]="selectedDistanceKm === km" [class.border]="selectedDistanceKm !== km" [class.border-outline-variant]="selectedDistanceKm !== km" [class.bg-surface-container-lowest]="selectedDistanceKm !== km" [class.text-on-surface-variant]="selectedDistanceKm !== km">{{ km }} km</button>
+<button *ngFor="let km of distanceOptionsKm" [disabled]="!advancedFiltersUnlocked()" (click)="selectDistance(km)" class="chip px-4 py-2 rounded-full font-label-lg text-label-lg transition-colors disabled:cursor-not-allowed" [class.border-1.5]="selectedDistanceKm === km" [class.border-primary]="selectedDistanceKm === km" [class.bg-secondary-container]="selectedDistanceKm === km" [class.bg-opacity-20]="selectedDistanceKm === km" [class.text-on-secondary-container]="selectedDistanceKm === km" [class.border]="selectedDistanceKm !== km" [class.border-outline-variant]="selectedDistanceKm !== km" [class.bg-surface-container-lowest]="selectedDistanceKm !== km" [class.text-on-surface-variant]="selectedDistanceKm !== km">{{ km }} km</button>
 </div>
 <p *ngIf="distanceError()" class="font-body-sm text-body-sm text-error">{{ distanceError() }}</p>
 </div>

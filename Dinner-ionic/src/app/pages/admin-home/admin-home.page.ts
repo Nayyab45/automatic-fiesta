@@ -2,9 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { BasePage } from '../base.page';
-import { VerificationService } from '../../services/verification.service';
-import { ModerationService } from '../../services/moderation.service';
-import { SupportService } from '../../services/support.service';
+import { AdminService, AdminStats } from '../../services/admin.service';
 
 @Component({
   selector: 'app-admin-home',
@@ -15,21 +13,12 @@ import { SupportService } from '../../services/support.service';
 })
 export class AdminHomePage extends BasePage {
   readonly pageTitle = 'Admin';
-  private readonly verificationService = inject(VerificationService);
-  private readonly moderationService = inject(ModerationService);
-  private readonly supportService = inject(SupportService);
+  private readonly adminService = inject(AdminService);
 
-  readonly pendingVerificationsCount = signal(0);
-  readonly flaggedUsersCount = signal(0);
-  readonly openSupportCount = signal(0);
+  readonly stats = signal<AdminStats | null>(null);
 
   constructor() {
     super();
-    this.verificationService.pending().subscribe({ next: ({ submissions }) => this.pendingVerificationsCount.set(submissions.length), error: () => {} });
-    this.moderationService.flagged().subscribe({ next: ({ flagged }) => this.flaggedUsersCount.set(flagged.length), error: () => {} });
-    this.supportService.list().subscribe({
-      next: ({ messages }) => this.openSupportCount.set(messages.filter((m) => m.status === 'open').length),
-      error: () => {},
-    });
+    this.adminService.stats().subscribe({ next: (stats) => this.stats.set(stats), error: () => {} });
   }
 }
