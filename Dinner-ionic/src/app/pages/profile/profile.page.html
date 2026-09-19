@@ -33,12 +33,15 @@
                     "{{ p.bio }}"
                 </p>
 
-<div *ngIf="isOwnProfile()" class="flex gap-stack-sm w-full md:w-auto mt-2">
-<button (click)="go('/profile-creation?mode=edit')" class="flex-1 md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+<div *ngIf="isOwnProfile()" class="flex flex-wrap gap-stack-sm w-full md:w-auto mt-2">
+<button (click)="go('/profile-creation?mode=edit')" class="flex-1 min-w-[140px] md:flex-none bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
                         Edit Profile
                     </button>
-<button (click)="go('/edit-preferences')" class="flex-1 md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<button (click)="go('/edit-preferences')" class="flex-1 min-w-[140px] md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-sm">settings</span> Preferences
+                    </button>
+<button (click)="go('/followers')" class="flex-1 min-w-[140px] md:flex-none border border-outline-variant text-on-surface font-label-lg text-label-lg px-6 py-3 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">group</span> Followers ({{ followersCount() }})
                     </button>
 </div>
 
@@ -94,12 +97,12 @@
 <span *ngIf="pendingRequestsCount() > 0" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
 </div>
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div class="text-center">
+<div (click)="go('/followers?tab=followers')" class="text-center cursor-pointer">
 <div class="font-headline-md text-headline-md text-primary">{{ followersCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Followers</div>
 </div>
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div class="text-center">
+<div (click)="go('/followers?tab=following')" class="text-center cursor-pointer">
 <div class="font-headline-md text-headline-md text-primary">{{ followingCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Following</div>
 </div>

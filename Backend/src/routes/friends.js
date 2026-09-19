@@ -213,17 +213,36 @@ followsRouter.delete('/:userId', asyncHandler(async (req, res) => {
   res.json({ following: false });
 }));
 
+// Excluded from both lists: anyone in either direction of a block, so a block
+// really removes them from the people you manage here -- the same rule
+// people/matches already apply (see NOT_BLOCKED_CLAUSE in profile.js).
+const NOT_BLOCKED_USER = `u.id NOT IN (
+  SELECT blocked_user_id FROM user_blocks WHERE blocker_user_id = ?
+  UNION
+  SELECT blocker_user_id FROM user_blocks WHERE blocked_user_id = ?
+)`;
+
 followsRouter.get('/followers', asyncHandler(async (req, res) => {
   const rows = await db
     .prepare(
       `SELECT u.id, u.name, p.photo_url, p.city FROM user_follows f
        JOIN users u ON u.id = f.follower_user_id
        LEFT JOIN user_profiles p ON p.user_id = u.id
-       WHERE f.followed_user_id = ?
+       WHERE f.followed_user_id = ? AND ${NOT_BLOCKED_USER}
        ORDER BY f.created_at DESC`,
     )
-    .all(req.user.sub);
+    .all(req.user.sub, req.user.sub, req.user.sub);
   res.json({ followers: toCamelRows(rows) });
+}));
+
+// Remove someone who follows me -- they stop following, and can follow again
+// (following needs no approval). Registered as its own path so it can't be
+// confused with DELETE /:userId above, which is *me* unfollowing them.
+followsRouter.delete('/followers/:userId', asyncHandler(async (req, res) => {
+  await db
+    .prepare('DELETE FROM user_follows WHERE follower_user_id = ? AND followed_user_id = ?')
+    .run(req.params.userId, req.user.sub);
+  res.json({ removed: true });
 }));
 
 followsRouter.get('/following', asyncHandler(async (req, res) => {
@@ -232,9 +251,9 @@ followsRouter.get('/following', asyncHandler(async (req, res) => {
       `SELECT u.id, u.name, p.photo_url, p.city FROM user_follows f
        JOIN users u ON u.id = f.followed_user_id
        LEFT JOIN user_profiles p ON p.user_id = u.id
-       WHERE f.follower_user_id = ?
+       WHERE f.follower_user_id = ? AND ${NOT_BLOCKED_USER}
        ORDER BY f.created_at DESC`,
     )
-    .all(req.user.sub);
+    .all(req.user.sub, req.user.sub, req.user.sub);
   res.json({ following: toCamelRows(rows) });
 }));

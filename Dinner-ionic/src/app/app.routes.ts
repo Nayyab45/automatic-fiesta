@@ -68,6 +68,7 @@ const routeDefinitions: Routes = [
   { path: 'notifications', loadComponent: () => import('./pages/notifications/notifications.page').then((m) => m.NotificationsPage) },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage) },
   { path: 'profile/:id', loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage) },
+  { path: 'followers', loadComponent: () => import('./pages/followers/followers.page').then((m) => m.FollowersPage) },
   { path: 'friends', loadComponent: () => import('./pages/friends-list/friends-list.page').then((m) => m.FriendsListPage) },
   { path: 'profile-views', loadComponent: () => import('./pages/profile-views/profile-views.page').then((m) => m.ProfileViewsPage) },
   { path: 'admin', loadComponent: () => import('./pages/admin-home/admin-home.page').then((m) => m.AdminHomePage) },

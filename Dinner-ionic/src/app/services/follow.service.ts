@@ -30,6 +30,11 @@ export class FollowService {
     return this.http.delete<{ following: boolean }>(`${this.baseUrl}/${userId}`);
   }
 
+  /** Makes someone who follows me stop following me. */
+  removeFollower(userId: number): Observable<{ removed: boolean }> {
+    return this.http.delete<{ removed: boolean }>(`${this.baseUrl}/followers/${userId}`);
+  }
+
   followers(): Observable<{ followers: FollowedUser[] }> {
     return this.http.get<{ followers: FollowedUser[] }>(`${this.baseUrl}/followers`);
   }

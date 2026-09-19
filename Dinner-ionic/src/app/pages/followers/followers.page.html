@@ -1,0 +1,77 @@
+<app-header title="Followers" (back)="goBack()"></app-header>
+
+<div class="flex gap-stack-lg px-container-padding border-b border-outline-variant/30 sticky top-[65px] bg-background z-10">
+<button (click)="selectTab('followers')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors" [class.text-primary]="activeTab() === 'followers'" [class.font-bold]="activeTab() === 'followers'" [class.text-on-surface-variant]="activeTab() !== 'followers'">
+        Followers ({{ followers().length }})
+        <div *ngIf="activeTab() === 'followers'" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-primary rounded-t-sm"></div>
+</button>
+<button (click)="selectTab('following')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 transition-colors" [class.text-primary]="activeTab() === 'following'" [class.font-bold]="activeTab() === 'following'" [class.text-on-surface-variant]="activeTab() !== 'following'">
+        Following ({{ following().length }})
+        <div *ngIf="activeTab() === 'following'" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-primary rounded-t-sm"></div>
+</button>
+</div>
+
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md pb-[100px] flex flex-col gap-stack-md">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+<p *ngIf="!loading() && failed()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Couldn't load your followers. Check your connection and try again.</p>
+<p *ngIf="error()" class="font-body-md text-body-md text-error shrink-0" role="alert">{{ error() }}</p>
+
+<ng-container *ngIf="!loading() && !failed()">
+
+<ng-container *ngIf="activeTab() === 'followers'">
+<p *ngIf="followers().length > 0" class="font-body-md text-body-md text-on-surface-variant shrink-0">People who follow you. Removing someone stops them following you; they can follow again.</p>
+<ul *ngIf="followers().length > 0" class="flex flex-col">
+<li *ngFor="let user of followers()" class="flex items-center gap-3 py-stack-md border-b border-outline-variant/30">
+<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+<img *ngIf="user.photoUrl" [src]="user.photoUrl" [alt]="user.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0"/>
+<div *ngIf="!user.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ user.name.charAt(0) }}</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px] truncate">{{ user.name }}</span>
+<span *ngIf="user.city" class="font-body-md text-body-md text-on-surface-variant text-[13px] truncate">{{ user.city }}</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button *ngIf="!followsBack(user)" (click)="followBack(user)" [disabled]="busyId() === user.id" class="px-3 py-1.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-opacity disabled:opacity-60 whitespace-nowrap">Follow back</button>
+<span *ngIf="followsBack(user)" class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Following</span>
+<button (click)="removeFollower(user)" [disabled]="busyId() === user.id" aria-label="Remove follower" class="w-9 h-9 flex items-center justify-center rounded-full border border-outline-variant text-on-surface-variant hover:text-error hover:border-error transition-colors disabled:opacity-60">
+<span class="material-symbols-outlined text-[18px]">person_remove</span>
+</button>
+</div>
+</li>
+</ul>
+<div *ngIf="followers().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">group</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">No followers yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[260px]">When someone follows you, they'll show up here.</p>
+</div>
+</ng-container>
+
+<ng-container *ngIf="activeTab() === 'following'">
+<ul *ngIf="following().length > 0" class="flex flex-col">
+<li *ngFor="let user of following()" class="flex items-center gap-3 py-stack-md border-b border-outline-variant/30">
+<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+<img *ngIf="user.photoUrl" [src]="user.photoUrl" [alt]="user.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0"/>
+<div *ngIf="!user.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ user.name.charAt(0) }}</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-lg text-title-lg text-on-surface leading-tight text-[16px] truncate">{{ user.name }}</span>
+<span *ngIf="user.city" class="font-body-md text-body-md text-on-surface-variant text-[13px] truncate">{{ user.city }}</span>
+</div>
+</div>
+<button (click)="unfollow(user)" [disabled]="busyId() === user.id" class="shrink-0 px-4 py-1.5 rounded-full border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors disabled:opacity-60">Unfollow</button>
+</li>
+</ul>
+<div *ngIf="following().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container">person_add</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">Not following anyone</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[260px] mb-stack-md">Open someone's profile and tap Follow to see them here.</p>
+<button (click)="go('/discover-people')" class="px-6 py-3 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:opacity-90 transition-opacity">Discover People</button>
+</div>
+</ng-container>
+
+</ng-container>
+</main>
