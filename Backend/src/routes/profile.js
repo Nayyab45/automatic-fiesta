@@ -5,7 +5,7 @@ import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { tastePrefsFor, distanceKm } from '../lib/taste.js';
 import { cityCoordinates } from '../lib/cityGeocode.js';
-import { subscriptionFor, activePremiumUserIds } from './subscriptions.js';
+import { subscriptionFor, activePremiumUserIds, hasPremiumFeatures } from './subscriptions.js';
 import { tableCreationStatus } from './tables.js';
 import { explainMatch } from '../lib/ai.js';
 
@@ -235,8 +235,7 @@ async function recordProfileView(viewerUserId, viewedUserId) {
 // Free accounts get a 402 rather than a silently-empty list, matching how
 // subscriptionsRouter's checkout responds to an unconfigured gateway.
 profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
-  const subscription = await subscriptionFor(req.user.sub);
-  if (subscription.status !== 'active') {
+  if (!(await hasPremiumFeatures(req.user.sub))) {
     return res.status(402).json({ message: 'Upgrade to Premium to see who viewed your profile.' });
   }
 
@@ -379,7 +378,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
   // matching how the AI-matching gate degrades (see matchesRouter) --
   // Discover People itself must never break for a free account, only the
   // advanced narrowing on top of it does.
-  const advancedFiltersUnlocked = (await subscriptionFor(req.user.sub)).status === 'active';
+  const advancedFiltersUnlocked = await hasPremiumFeatures(req.user.sub);
   const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE, PROFILE_VISIBLE_CLAUSE];
   const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
@@ -588,7 +587,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
   // rather than filtering the whole endpoint behind a subscription so
   // Discover/Matches itself (a core, free feature) never breaks for a free
   // account -- only the AI enhancement on top of it does.
-  const aiInsightsUnlocked = (await subscriptionFor(req.user.sub)).status === 'active';
+  const aiInsightsUnlocked = await hasPremiumFeatures(req.user.sub);
 
   if (aiInsightsUnlocked) {
     // AI-write the top reason for only the highest-ranked matches -- capped

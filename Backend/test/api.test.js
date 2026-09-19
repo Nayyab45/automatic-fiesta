@@ -140,6 +140,21 @@ async function makeAdmin(userId) {
   await pool.query('UPDATE users SET is_admin = 1 WHERE id = ?', [userId]);
 }
 
+// Every "Premium" feature is free for everyone by default now (see
+// premiumFeaturesFree() in routes/subscriptions.js). Tests of the paid gating
+// -- the proposal's Revenue Model, switched back on with
+// PREMIUM_FEATURES_FREE_FOR_ALL=false -- run inside this for their duration.
+async function inPaidMode(fn) {
+  const previous = process.env.PREMIUM_FEATURES_FREE_FOR_ALL;
+  process.env.PREMIUM_FEATURES_FREE_FOR_ALL = 'false';
+  try {
+    await fn();
+  } finally {
+    if (previous === undefined) delete process.env.PREMIUM_FEATURES_FREE_FOR_ALL;
+    else process.env.PREMIUM_FEATURES_FREE_FOR_ALL = previous;
+  }
+}
+
 async function makePremium(userId) {
   await pool.query(
     `INSERT INTO subscriptions (user_id, status, plan, provider, current_period_end, updated_at)
@@ -622,7 +637,7 @@ describe('preference change limit', () => {
 });
 
 describe('event creation limit (free tier)', () => {
-  test('caps table creation at 3/month for free accounts, unblocked by an active subscription', async () => {
+  test('caps table creation at 3/month for free accounts, unblocked by an active subscription (paid mode)', async () => inPaidMode(async () => {
     const host = await signup('table-limit-host');
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
     const restaurantId = restaurants.body.restaurants[0].id;
@@ -650,7 +665,7 @@ describe('event creation limit (free tier)', () => {
     await makePremium(host.user.id);
     const asPremium = await createTable();
     assert.equal(asPremium.status, 201);
-  });
+  }));
 });
 
 describe('profile views', () => {
@@ -679,10 +694,45 @@ describe('profile views', () => {
     assert.equal(viewsCount.body.profileViewsCount, 1);
   });
 
-  test('a free account gets a 402 instead of the list', async () => {
+  test('a free account gets a 402 instead of the list (paid mode)', async () => inPaidMode(async () => {
     const viewed = await signup('view-tracking-free');
     const res = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
     assert.equal(res.status, 402);
+  }));
+});
+
+describe('premium features free for everyone (default)', () => {
+  test('a plain account gets every premium feature, and the switch turns the gating back on', async () => {
+    const user = await signup('free-for-all');
+    const token = user.accessToken;
+
+    // Unlimited events: a fourth one in the same month is fine.
+    const restaurants = await api('GET', '/api/restaurants', { token });
+    const restaurantId = restaurants.body.restaurants[0].id;
+    for (let n = 1; n <= 4; n++) {
+      const created = await api('POST', '/api/tables', {
+        token,
+        body: { restaurantId, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
+      });
+      assert.equal(created.status, 201, `event ${n}`);
+    }
+    assert.equal((await api('GET', '/api/profile/me', { token })).body.tableCreation.unlimited, true);
+
+    // Who viewed me, advanced people filters, AI match insights, no ads.
+    assert.equal((await api('GET', '/api/profile/me/viewers', { token })).status, 200);
+    assert.equal((await api('GET', '/api/people', { token })).body.advancedFiltersUnlocked, true);
+    assert.equal((await api('GET', '/api/matches', { token })).body.aiInsightsUnlocked, true);
+    const sub = await api('GET', '/api/subscriptions/me', { token });
+    assert.equal(sub.body.premiumFeaturesFree, true);
+    assert.equal(sub.body.subscription.status, 'inactive', 'nobody paid -- isPremium (badge/priority) stays honest');
+
+    // Same account with the paid gating switched back on.
+    await inPaidMode(async () => {
+      assert.equal((await api('GET', '/api/profile/me/viewers', { token })).status, 402);
+      assert.equal((await api('GET', '/api/people', { token })).body.advancedFiltersUnlocked, false);
+      assert.equal((await api('GET', '/api/matches', { token })).body.aiInsightsUnlocked, false);
+      assert.equal((await api('GET', '/api/subscriptions/me', { token })).body.premiumFeaturesFree, false);
+    });
   });
 });
 

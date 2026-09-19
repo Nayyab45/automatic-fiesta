@@ -6,7 +6,7 @@ import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
-import { subscriptionFor } from './subscriptions.js';
+import { hasPremiumFeatures } from './subscriptions.js';
 import { requireAdmin } from '../lib/adminAuth.js';
 
 export const tablesRouter = Router();
@@ -38,8 +38,7 @@ const FREE_TIER_MONTHLY_TABLE_LIMIT = 3;
 // proactively (create-table's "X free events left" banner), the same way it
 // already does for preferenceChangeStatus.
 export async function tableCreationStatus(userId) {
-  const isPremium = (await subscriptionFor(userId)).status === 'active';
-  if (isPremium) {
+  if (await hasPremiumFeatures(userId)) {
     return { unlimited: true, remaining: null, nextResetAt: null };
   }
   const { usedCount } = await db

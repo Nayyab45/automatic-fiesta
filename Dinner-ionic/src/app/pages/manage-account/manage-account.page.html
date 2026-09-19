@@ -61,7 +61,7 @@
 </div>
 </section>
 
-<section class="flex flex-col gap-stack-md">
+<section *ngIf="!paymentService.premiumFeaturesFree()" class="flex flex-col gap-stack-md">
 <h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Billing</h3>
 <div class="bg-surface rounded-xl ambient-shadow card-inner-stroke overflow-hidden flex flex-col">
 <button (click)="go('/payment-methods')" class="w-full flex items-center justify-between p-stack-md hover:bg-surface-container-low interaction-stroke transition-all text-left group">

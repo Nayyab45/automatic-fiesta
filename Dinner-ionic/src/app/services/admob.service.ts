@@ -21,9 +21,13 @@ const BANNER_OPTIONS: BannerAdOptions = {
   isTesting: environment.adMob.isTesting,
 };
 
-// Free-tier-only banner ads (see proposal: "Free Version ... Google AdMob
-// advertisements" / "Premium ... No advertisements"). Native-only -- there's
-// no ad SDK to initialize on the plain web build (`ng serve`).
+// Banner ads for accounts without Premium (see proposal: "Free Version ...
+// Google AdMob advertisements" / "Premium ... No advertisements"). While every
+// Premium feature is free for everyone (the server default, see
+// PaymentService.premiumFeaturesFree) nobody qualifies, so no ad is shown --
+// turning the paid gating back on on the server brings ads back for free
+// accounts with no app change. Native-only -- there's no ad SDK to initialize
+// on the plain web build (`ng serve`).
 @Injectable({ providedIn: 'root' })
 export class AdmobService {
   private readonly authService = inject(AuthService);
@@ -48,8 +52,10 @@ export class AdmobService {
         return;
       }
       this.paymentService.getSubscription().subscribe({
-        next: ({ subscription }) => {
-          if (subscription.status === 'active') this.hideBanner();
+        // "No advertisements" is a Premium perk -- and with every Premium
+        // feature free for everyone, nobody sees ads.
+        next: ({ subscription, premiumFeaturesFree }) => {
+          if (premiumFeaturesFree || subscription.status === 'active') this.hideBanner();
           else this.showBanner();
         },
         error: () => {},
@@ -81,7 +87,8 @@ export class AdmobService {
    * instead of waiting for the next sign-in-state change to re-check it. */
   refresh(): void {
     this.paymentService.getSubscription().subscribe({
-      next: ({ subscription }) => (subscription.status === 'active' ? this.hideBanner() : this.showBanner()),
+      next: ({ subscription, premiumFeaturesFree }) =>
+        premiumFeaturesFree || subscription.status === 'active' ? this.hideBanner() : this.showBanner(),
       error: () => {},
     });
   }

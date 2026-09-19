@@ -48,6 +48,22 @@ export async function subscriptionFor(userId) {
   };
 }
 
+// Product decision: every "Premium" feature (unlimited events, advanced
+// people filters, profile viewers, AI match reasons, no ads) is available to
+// everyone, no payment needed. Set PREMIUM_FEATURES_FREE_FOR_ALL=false in the
+// server's .env to bring back the paid gating from the proposal's Revenue
+// Model -- every gate calls hasPremiumFeatures() below, so that one setting
+// is the only thing that changes. Read on every call (not cached at import).
+// Deliberately separate from a real subscription: isPremium (the badge and
+// priority placement) still means "actually paid".
+export function premiumFeaturesFree() {
+  return process.env.PREMIUM_FEATURES_FREE_FOR_ALL !== 'false';
+}
+
+export async function hasPremiumFeatures(userId) {
+  return premiumFeaturesFree() || (await subscriptionFor(userId)).status === 'active';
+}
+
 // Batched premium check for a list of candidates (Discover People/Matches
 // priority placement + premium badge) -- one query instead of one per
 // candidate, same reasoning as profile.js's interestsForBatch.
@@ -63,7 +79,7 @@ export async function activePremiumUserIds(userIds) {
 subscriptionsRouter.use(requireAuth);
 
 subscriptionsRouter.get('/me', asyncHandler(async (req, res) => {
-  res.json({ subscription: await subscriptionFor(req.user.sub) });
+  res.json({ subscription: await subscriptionFor(req.user.sub), premiumFeaturesFree: premiumFeaturesFree() });
 }));
 
 subscriptionsRouter.post('/checkout', asyncHandler(async (req, res) => {

@@ -95,8 +95,16 @@ export class PaymentService {
       .pipe(tap(({ paymentMethods }) => this.methods.set(paymentMethods)));
   }
 
-  getSubscription(): Observable<{ subscription: Subscription }> {
-    return this.http.get<{ subscription: Subscription }>(`${this.subscriptionsUrl}/me`);
+  /** True when every Premium feature is free for everyone -- the server's
+   * default (see premiumFeaturesFree() in Backend/src/routes/subscriptions.js).
+   * Starts true so subscription/payment entry points never flash in before
+   * the first response says otherwise. */
+  readonly premiumFeaturesFree = signal(true);
+
+  getSubscription(): Observable<{ subscription: Subscription; premiumFeaturesFree: boolean }> {
+    return this.http
+      .get<{ subscription: Subscription; premiumFeaturesFree: boolean }>(`${this.subscriptionsUrl}/me`)
+      .pipe(tap(({ premiumFeaturesFree }) => this.premiumFeaturesFree.set(premiumFeaturesFree)));
   }
 
   /** cnicLast6 is only meaningful (and only required server-side) when the
