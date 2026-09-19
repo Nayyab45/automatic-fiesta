@@ -17,21 +17,12 @@
 </div>
 </section>
 
-<section>
-<div class="flex overflow-x-auto no-scrollbar gap-stack-sm pb-2">
-<button (click)="toggleChip($event)" class="chip flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Halal</button>
-<button (click)="toggleChip($event)" class="chip flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Vegetarian</button>
-<button (click)="toggleChip($event)" class="chip flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Fine Dining</button>
-<button (click)="toggleChip($event)" class="chip flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Street Food</button>
-<button (click)="toggleChip($event)" class="chip flex-shrink-0 px-4 py-2 bg-tertiary-container/10 text-tertiary border border-tertiary/20 rounded-full font-label-lg text-label-lg transition-colors hover:bg-tertiary-container/20">Nearby Me</button>
-</div>
-</section>
 </div>
 
 <section class="space-y-stack-md">
 <div class="px-container-padding flex justify-between items-end">
 <h2 class="font-headline-lg text-title-lg text-on-surface">Featured Dishes</h2>
-<a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
+<a (click)="go('/all-dishes')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
 <div *ngFor="let dish of featuredDishes()" class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
@@ -40,10 +31,7 @@
 <span *ngIf="!dish.photoUrl" class="material-symbols-outlined text-on-surface-variant text-[32px]">restaurant</span>
 </div>
 <div class="p-4 space-y-1">
-<div class="flex justify-between items-start">
 <h3 class="font-title-lg text-body-lg font-bold text-on-surface">{{ dish.name }}</h3>
-<span class="font-label-lg text-primary">Rs {{ dish.price }}</span>
-</div>
 <p class="font-body-md text-on-surface-variant text-sm line-clamp-1">{{ dish.description }}</p>
 <div *ngIf="dish.rating !== null" class="flex items-center gap-1 pt-2">
 <span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>

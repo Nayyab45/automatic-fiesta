@@ -10,7 +10,7 @@
 <section class="flex flex-col gap-stack-sm">
 <div class="relative w-full h-12">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
-<input class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent" placeholder="Search by name or interest" type="text"/>
+<input [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent" placeholder="Search by name or interest" type="search"/>
 </div>
 
 <div class="flex overflow-x-auto hide-scrollbar gap-unit py-unit -mx-container-padding px-container-padding">
@@ -36,8 +36,8 @@
 </div>
 </section>
 
-<p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">Finding people nearby…</p>
-<p *ngIf="!loading() && people().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No one matches these filters yet.</p>
+<p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">Finding people in {{ cityService.current() }}…</p>
+<p *ngIf="!loading() && people().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">{{ searchQuery() || activeFilterCount > 0 ? 'No one matches your search or filters.' : 'No one in ' + cityService.current() + ' yet. Try another city from the location picker.' }}</p>
 
 <section *ngIf="!loading() && people().length > 0" class="flex flex-col gap-stack-md">
 

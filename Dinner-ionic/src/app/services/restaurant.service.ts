@@ -184,6 +184,11 @@ export class RestaurantService {
     return this.http.get<{ dishes: FeaturedDish[] }>(`${this.baseUrl}/featured-dishes`);
   }
 
+  /** Every dish across all restaurants -- what Featured Dishes' "See All" opens. */
+  allDishes(): Observable<{ dishes: FeaturedDish[] }> {
+    return this.http.get<{ dishes: FeaturedDish[] }>(`${this.baseUrl}/dishes`).pipe(timeout(REQUEST_TIMEOUT_MS));
+  }
+
   saved(): Observable<{ restaurants: Restaurant[] }> {
     return this.http.get<{ restaurants: Restaurant[] }>(`${this.baseUrl}/saved`);
   }

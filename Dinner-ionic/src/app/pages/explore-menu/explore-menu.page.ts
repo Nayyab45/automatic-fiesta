@@ -31,8 +31,4 @@ export class ExploreMenuPage extends BasePage {
     this.restaurantService.list().subscribe(({ restaurants }) => this.topRatedRestaurants.set(restaurants.slice(0, 5)));
     this.profileService.people().subscribe(({ people }) => this.peopleToMeet.set(people.slice(0, 5)));
   }
-
-  toggleChip(event: Event): void {
-    (event.currentTarget as HTMLElement).classList.toggle('chip-selected');
-  }
 }

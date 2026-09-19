@@ -103,6 +103,7 @@ const routeDefinitions: Routes = [
   { path: 'help-support', loadComponent: () => import('./pages/help-support/help-support.page').then((m) => m.HelpSupportPage) },
   { path: 'subscribe-to-premium', loadComponent: () => import('./pages/subscribe-to-premium/subscribe-to-premium.page').then((m) => m.SubscribeToPremiumPage) },
   { path: 'subscribe-to-premium-success', loadComponent: () => import('./pages/subscribe-to-premium-success/subscribe-to-premium-success.page').then((m) => m.SubscribeToPremiumSuccessPage) },
+  { path: 'all-dishes', loadComponent: () => import('./pages/all-dishes/all-dishes.page').then((m) => m.AllDishesPage) },
   { path: 'explore-menu', loadComponent: () => import('./pages/explore-menu/explore-menu.page').then((m) => m.ExploreMenuPage) },
   { path: 'explore-menu/:id', loadComponent: () => import('./pages/explore-menu/explore-menu.page').then((m) => m.ExploreMenuPage) },
   { path: 'identity-verification-id-upload', loadComponent: () => import('./pages/identity-verification-id-upload/identity-verification-id-upload.page').then((m) => m.IdentityVerificationIdUploadPage) },

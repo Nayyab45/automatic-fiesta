@@ -1,0 +1,36 @@
+<app-header title="All Dishes" (back)="goBack()"></app-header>
+<main class="flex-1 overflow-y-auto px-container-padding py-stack-md pb-[100px] flex flex-col gap-stack-md">
+
+<div class="relative w-full h-12 shrink-0">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input [ngModel]="query()" (ngModelChange)="query.set($event)" type="search" placeholder="Search dishes or restaurants" class="w-full h-full pl-12 pr-4 bg-surface-container-lowest border-b border-outline-variant focus:border-primary-container focus:ring-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-outline bg-transparent"/>
+</div>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading dishes…</p>
+<p *ngIf="!loading() && failed()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Couldn't load dishes. Check your connection and try again.</p>
+<p *ngIf="!loading() && !failed() && dishes().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">{{ query() ? 'No dishes match your search.' : 'No dishes yet.' }}</p>
+
+<ul *ngIf="!loading() && dishes().length > 0" class="flex flex-col gap-stack-md">
+<li *ngFor="let dish of dishes()" (click)="go('/restaurant-detail/' + dish.restaurantId)" (keydown.enter)="go('/restaurant-detail/' + dish.restaurantId)" role="button" tabindex="0" class="flex gap-gutter bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden cursor-pointer">
+<div class="h-28 w-28 shrink-0 bg-surface-variant flex items-center justify-center">
+<img *ngIf="dish.photoUrl" [src]="dish.photoUrl" [alt]="dish.name" class="w-full h-full object-cover"/>
+<span *ngIf="!dish.photoUrl" class="material-symbols-outlined text-on-surface-variant text-[32px]">restaurant</span>
+</div>
+<div class="flex-1 min-w-0 py-3 pr-3 flex flex-col gap-1">
+<h3 class="font-title-lg text-body-lg font-bold text-on-surface">{{ dish.name }}</h3>
+<p *ngIf="dish.description" class="font-body-md text-on-surface-variant text-sm line-clamp-2">{{ dish.description }}</p>
+<div class="flex items-center gap-1 mt-auto">
+<ng-container *ngIf="dish.rating !== null">
+<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-on-surface">{{ dish.rating }}</span>
+<span class="font-label-sm text-on-surface-variant ml-1">·</span>
+</ng-container>
+<span class="font-label-sm text-on-surface-variant truncate">{{ dish.restaurantName }}</span>
+</div>
+<p *ngIf="dish.photoUrl && dish.photoAttribution" class="font-label-sm text-label-sm text-outline truncate">{{ dish.photoAttribution }}</p>
+</div>
+</li>
+</ul>
+</main>
+
+<app-bottom-nav active="discover"></app-bottom-nav>

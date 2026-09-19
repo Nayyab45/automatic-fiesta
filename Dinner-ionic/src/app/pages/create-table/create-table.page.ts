@@ -9,6 +9,7 @@ import { Restaurant, RestaurantService } from '../../services/restaurant.service
 import { DiningTableService, TableAudience } from '../../services/dining-table.service';
 import { ProfileService } from '../../services/profile.service';
 import { Friend, FriendsService } from '../../services/friends.service';
+import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-create-table',
@@ -23,6 +24,7 @@ export class CreateTablePage extends BasePage {
   private readonly tableService = inject(DiningTableService);
   private readonly profileService = inject(ProfileService);
   private readonly friendsService = inject(FriendsService);
+  private readonly locationService = inject(LocationService);
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
@@ -69,17 +71,31 @@ export class CreateTablePage extends BasePage {
     super();
     const restaurantIdParam = this.route.snapshot.queryParamMap.get('restaurantId');
     this.restaurantId = restaurantIdParam ? Number(restaurantIdParam) : null;
-    this.restaurantService.list().subscribe(({ restaurants }) => {
-      this.restaurants.set(restaurants);
-      if (!this.restaurantId && restaurants.length > 0) {
-        this.restaurantId = restaurants[0].id;
-      }
-    });
+    // Only the city being browsed (same one Discover uses) -- except when
+    // arriving from one specific restaurant's page, whose own city wins so
+    // that restaurant is always in the list.
+    if (this.restaurantId) {
+      this.restaurantService.get(this.restaurantId).subscribe({
+        next: ({ restaurant }) => this.loadRestaurants(restaurant.city),
+        error: () => this.loadRestaurants(this.locationService.current()),
+      });
+    } else {
+      this.loadRestaurants(this.locationService.current());
+    }
     this.profileService.me().subscribe(({ tableCreation }) => {
       this.eventsUnlimited.set(tableCreation.unlimited);
       this.eventsRemaining.set(tableCreation.unlimited ? null : tableCreation.remaining);
     });
     this.friendsService.list().subscribe(({ friends }) => this.friends.set(friends));
+  }
+
+  private loadRestaurants(city: string): void {
+    this.restaurantService.list({ city }).subscribe(({ restaurants }) => {
+      this.restaurants.set(restaurants);
+      if (!this.restaurantId && restaurants.length > 0) {
+        this.restaurantId = restaurants[0].id;
+      }
+    });
   }
 
   selectGatheringType(type: string): void {
@@ -104,8 +120,13 @@ export class CreateTablePage extends BasePage {
 
     this.aiSuggesting.set(true);
     this.aiError.set(null);
-    this.restaurantService.groupRecommendation(memberIds).subscribe({
+    this.restaurantService.groupRecommendation(memberIds, this.locationService.current()).subscribe({
       next: ({ restaurant, reason, aiPowered }) => {
+        // Keep the picked restaurant selectable even if it isn't in the
+        // city list above (e.g. the list is still loading).
+        if (!this.restaurants().some((r) => r.id === restaurant.id)) {
+          this.restaurants.update((list) => [restaurant, ...list]);
+        }
         this.restaurantId = restaurant.id;
         this.aiSuggestion.set({ restaurantName: restaurant.name, reason, aiPowered });
         this.aiSuggesting.set(false);

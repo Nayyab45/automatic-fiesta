@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -8,6 +8,7 @@ import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { Interest, Person, ProfileService } from '../../services/profile.service';
 import { MessagingService } from '../../services/messaging.service';
+import { LocationService } from '../../services/location.service';
 
 // Same curated vocabulary Food Preferences lets a person pick their own
 // favorites from (food-preferences.page.ts's pakistaniFavorites) -- matching
@@ -29,8 +30,18 @@ export class DiscoverPeoplePage extends BasePage {
   readonly pageTitle = 'Discover People';
   private readonly profileService = inject(ProfileService);
   private readonly messagingService = inject(MessagingService);
+  readonly cityService = inject(LocationService);
 
-  readonly people = signal<Person[]>([]);
+  private readonly allPeople = signal<Person[]>([]);
+  /** Typed into the search box -- narrows the loaded list by name or interest, client-side. */
+  readonly searchQuery = signal('');
+  readonly people = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) return this.allPeople();
+    return this.allPeople().filter(
+      (person) => person.name.toLowerCase().includes(q) || person.interests.some((interest) => interest.name.toLowerCase().includes(q)),
+    );
+  });
   readonly loading = signal(true);
   readonly filterSheetOpen = signal(false);
   /** Advanced search filters (Interest/Cuisine/Distance) are a Premium perk
@@ -67,6 +78,10 @@ export class DiscoverPeoplePage extends BasePage {
     this.loading.set(true);
     this.profileService
       .people({
+        // "Nearby" = the city being browsed, same as Discover Restaurants.
+        // An applied distance filter (Premium) replaces it: that already
+        // measures how far people are, possibly across city lines.
+        city: this.selectedDistanceKm !== null && this.appliedLat !== null ? undefined : this.cityService.current(),
         minAge: this.minAge ?? undefined,
         maxAge: this.maxAge ?? undefined,
         interestIds: this.selectedInterestIds.size ? [...this.selectedInterestIds] : undefined,
@@ -77,7 +92,7 @@ export class DiscoverPeoplePage extends BasePage {
       })
       .subscribe({
         next: ({ people, advancedFiltersUnlocked }) => {
-          this.people.set(people);
+          this.allPeople.set(people);
           this.advancedFiltersUnlocked.set(advancedFiltersUnlocked);
           this.loading.set(false);
         },

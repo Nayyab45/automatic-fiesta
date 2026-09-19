@@ -199,6 +199,20 @@ restaurantsRouter.get('/featured-dishes', asyncHandler(async (req, res) => {
   res.json({ dishes: toCamelRows(rows) });
 }));
 
+// Every dish across every restaurant (the "See All" behind Featured Dishes),
+// featured ones first, then best rated. Public like /featured-dishes above.
+restaurantsRouter.get('/dishes', asyncHandler(async (_req, res) => {
+  const rows = await db
+    .prepare(
+      `SELECT d.*, r.name as restaurant_name FROM dishes d
+       JOIN restaurants r ON r.id = d.restaurant_id
+       ORDER BY d.is_featured DESC, d.rating DESC, d.name ASC
+       LIMIT 500`,
+    )
+    .all();
+  res.json({ dishes: toCamelRows(rows) });
+}));
+
 restaurantsRouter.get('/saved', requireAuth, asyncHandler(async (req, res) => {
   const rows = await db
     .prepare(
