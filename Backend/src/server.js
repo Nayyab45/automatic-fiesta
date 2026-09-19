@@ -54,6 +54,13 @@ app.use(express.json({ limit: '5mb' }));
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use('/images', express.static(path.join(__dirname, 'assets', 'images')));
 
+// Google Search Console's HTML-file domain-verification files (e.g.
+// /google<token>.html), needed to prove ownership of weeat.netstech.net for
+// the OAuth consent screen. nginx proxies every path here to this app --
+// there's no separate static file server in front of it -- so this is
+// where such a file has to be served from.
+app.use(express.static(path.join(__dirname, 'assets', 'site-verification')));
+
 // Public homepage + privacy policy at the domain root -- nginx proxies "/"
 // on weeat.netstech.net straight to this app, and until now nothing handled
 // it (every hit was a bare 404), which is what Google's OAuth consent
