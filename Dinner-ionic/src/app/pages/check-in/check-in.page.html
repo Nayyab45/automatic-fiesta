@@ -36,6 +36,9 @@
 </div>
 
 <div class="flex flex-col gap-stack-md">
+<p *ngIf="errorMessage()" class="text-error font-body-md text-body-md text-center" role="alert">{{ errorMessage() }}</p>
+
+<ng-container *ngIf="t.isMember; else notMember">
 <button *ngIf="!checkedIn()" (click)="checkIn()" class="w-full min-h-[48px] bg-primary-container text-on-primary font-title-lg text-title-lg rounded-full py-3 px-6 shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
 <span class="material-symbols-outlined">how_to_reg</span>
                 Check In
@@ -44,6 +47,11 @@
 <span class="material-symbols-outlined">check_circle</span>
                 Checked In
             </button>
+</ng-container>
+<ng-template #notMember>
+<p class="text-center font-body-md text-body-md text-on-surface-variant">You'll be able to check in once the host accepts your request for this table.</p>
+</ng-template>
+
 <button (click)="go('/dining-group-chat')" class="w-full min-h-[48px] border border-secondary-fixed text-on-surface font-title-lg text-title-lg rounded-full py-3 px-6 hover:bg-surface-container-low transition-colors flex justify-center items-center gap-2">
 <span class="material-symbols-outlined">call</span>
                 Contact Host

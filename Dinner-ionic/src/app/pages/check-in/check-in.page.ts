@@ -18,6 +18,7 @@ export class CheckInPage extends BasePage {
   readonly table = signal<DiningTable | null>(null);
   readonly loading = signal(true);
   readonly checkedIn = signal(false);
+  readonly errorMessage = signal<string | null>(null);
 
   constructor() {
     super();
@@ -39,6 +40,10 @@ export class CheckInPage extends BasePage {
   checkIn(): void {
     const id = this.routeId();
     if (!id) return;
-    this.tableService.checkIn(id).subscribe(() => this.checkedIn.set(true));
+    this.errorMessage.set(null);
+    this.tableService.checkIn(id).subscribe({
+      next: () => this.checkedIn.set(true),
+      error: (err) => this.errorMessage.set(err.error?.message ?? 'Could not check in. Please try again.'),
+    });
   }
 }

@@ -48,6 +48,8 @@ export interface DiningTable {
   seatsAvailable: number;
   isPast: boolean;
   isHost: boolean;
+  /** Host or a confirmed guest -- false for a pending/declined/no seat request. */
+  isMember: boolean;
   hasReviewed: boolean;
 }
 

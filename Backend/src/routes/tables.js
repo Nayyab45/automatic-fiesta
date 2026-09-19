@@ -96,6 +96,7 @@ async function tableWithContext(row, userId) {
     seatsAvailable: Math.max(row.seats_total - currentGuestCount, 0),
     isPast: row.date_time < new Date().toISOString(),
     isHost: row.host_user_id === userId,
+    isMember: await isTableMember(row, userId),
     hasReviewed: !!hasReviewed,
     // Once the host records the real total (see PATCH /:id/bill), that's
     // split across whoever's actually seated right now -- takes over from
@@ -151,10 +152,20 @@ tablesRouter.get('/discover', asyncHandler(async (req, res) => {
   res.json({ tables: await Promise.all(eligibleRows.map((row) => tableWithContext(row, req.user.sub))) });
 }));
 
+// Members can always see their own table's details. A non-member can only
+// preview a public table they're eligible for (audience-wise) -- the same
+// visibility a public table already has on GET /discover -- so someone can
+// look before requesting a seat. A private table, or a public one whose
+// audience excludes this caller, stays invisible to anyone who merely knows
+// its numeric id.
 tablesRouter.get('/:id', asyncHandler(async (req, res) => {
   const row = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!row) {
     return res.status(404).json({ message: 'Table not found' });
+  }
+  const canPreview = row.visibility === 'public' && (await isEligibleForAudience(row, req.user.sub));
+  if (!(await isTableMember(row, req.user.sub)) && !canPreview) {
+    return res.status(403).json({ message: 'Not a member of this table' });
   }
   res.json({ table: await tableWithContext(row, req.user.sub) });
 }));
