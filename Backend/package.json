@@ -11,8 +11,9 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "build": "echo 'No build step -- plain Node/Express, nothing to compile.'",
-    "test": "node --test",
-    "test:unit": "node --test \"tests/**/*.test.js\""
+    "test": "node --test \"tests/**/*.test.js\"",
+    "test:unit": "node --test \"tests/**/*.test.js\"",
+    "test:api": "node --test test/api.test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
