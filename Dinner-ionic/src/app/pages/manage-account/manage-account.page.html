@@ -4,7 +4,7 @@
 
 <section class="flex flex-col items-center gap-stack-md mt-4">
 <div class="relative group">
-<div (click)="avatarFileInput.click()" class="w-24 h-24 rounded-full overflow-hidden bg-surface-container-high card-inner-stroke flex items-center justify-center relative cursor-pointer">
+<div (click)="avatarFileInput.click()" class="w-24 h-24 rounded-full overflow-hidden bg-surface-container-high card-inner-stroke flex items-center justify-center relative cursor-pointer" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && avatarFileInput.click()" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && avatarFileInput.click()">
 <img *ngIf="avatarUrl" alt="Profile Picture" class="w-full h-full object-cover" [src]="avatarUrl"/>
 <span *ngIf="!avatarUrl" class="font-display-lg text-display-lg text-tertiary">{{ fullName.charAt(0) }}</span>
 <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">

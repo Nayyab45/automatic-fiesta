@@ -46,12 +46,11 @@ module.exports = tseslint.config(
       ...angular.configs.templateAccessibility,
     ],
     rules: {
-      // TODO(a11y): 74 violations remain -- click handlers sit on <div>/<span>
-      // rather than real controls, so they are unreachable by keyboard. Fixing
-      // them means changing element semantics across the templates, which needs
-      // visual checking page by page. Kept visible as warnings, not silenced.
-      "@angular-eslint/template/click-events-have-key-events": "warn",
-      "@angular-eslint/template/interactive-supports-focus": "warn",
+      // Click handlers on non-button elements must be keyboard-reachable
+      // (role + tabindex + Enter/Space handler). All existing templates comply,
+      // so these are errors to stop new violations creeping back in.
+      "@angular-eslint/template/click-events-have-key-events": "error",
+      "@angular-eslint/template/interactive-supports-focus": "error",
     },
   },
 );

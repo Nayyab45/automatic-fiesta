@@ -1,5 +1,5 @@
 <header class="flex justify-between items-center w-full px-container-padding pt-safe pb-stack-md bg-surface dark:bg-surface sticky top-0 z-40">
-<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0">
+<div (click)="go('/select-location')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/select-location')" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/select-location')">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">place</span>
 <h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">{{ cityService.label() }}</h1>
 </div>
@@ -22,7 +22,7 @@
 <section class="space-y-stack-md">
 <div class="px-container-padding flex justify-between items-end">
 <h2 class="font-headline-lg text-title-lg text-on-surface">Featured Dishes</h2>
-<a (click)="go('/all-dishes')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
+<a (click)="go('/all-dishes')" class="font-label-lg text-primary hover:text-primary-container transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/all-dishes')">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
 <div *ngFor="let dish of featuredDishes()" class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden group cursor-pointer">
@@ -47,7 +47,7 @@
 <section class="space-y-stack-md bg-surface-container-low py-stack-md">
 <div class="px-container-padding flex justify-between items-end">
 <h2 class="font-headline-lg text-title-lg text-on-surface">Top-Rated Restaurants</h2>
-<a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
+<a (click)="go('/discover-restaurants')" class="font-label-lg text-primary hover:text-primary-container transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/discover-restaurants')">See All</a>
 </div>
 <div class="px-container-padding space-y-gutter">
 <div *ngFor="let restaurant of topRatedRestaurants()" (click)="go('/restaurant-detail/' + restaurant.id)" (keydown.enter)="go('/restaurant-detail/' + restaurant.id)" role="button" tabindex="0" class="flex bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 overflow-hidden p-3 gap-4 group cursor-pointer hover:bg-surface transition-colors">
@@ -72,7 +72,7 @@
 <section class="space-y-stack-md pb-section-gap" *ngIf="peopleToMeet().length > 0">
 <div class="px-container-padding flex justify-between items-end">
 <h2 class="font-headline-lg text-title-lg text-on-surface">People to Meet</h2>
-<a (click)="go('/discover-people')" class="font-label-lg text-primary hover:text-primary-container transition-colors">See All</a>
+<a (click)="go('/discover-people')" class="font-label-lg text-primary hover:text-primary-container transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/discover-people')">See All</a>
 </div>
 <div class="flex overflow-x-auto no-scrollbar gap-gutter px-container-padding pb-4">
 <div *ngFor="let person of peopleToMeet()" (click)="go('/profile/' + person.id)" (keydown.enter)="go('/profile/' + person.id)" role="button" tabindex="0" class="flex-shrink-0 w-36 flex flex-col items-center bg-surface-container-lowest p-4 rounded-lg shadow-sm border border-outline-variant/30 group cursor-pointer hover:border-primary-container/50 transition-colors">

@@ -31,6 +31,10 @@ import { AdmobService } from './services/admob.service';
     <div
       *ngIf="push.banner() as notification"
       (click)="push.onBannerTapped()"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="$event.target === $event.currentTarget && push.onBannerTapped()"
+      (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && push.onBannerTapped()"
       class="fixed left-4 right-4 z-[2000] bg-on-background text-cream-background rounded-2xl shadow-xl px-4 py-3 flex items-start gap-3 active:scale-[0.98] transition-transform"
       style="top: max(12px, env(safe-area-inset-top, 12px));"
     >

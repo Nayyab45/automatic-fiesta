@@ -11,7 +11,7 @@
 <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
 <ul class="divide-y divide-secondary-container/50">
 <li class="">
-<a (click)="go('/manage-account')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/manage-account')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/manage-account')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="person_outline">person</span>
 <span class="font-body-lg text-body-lg text-on-surface">Account</span>
@@ -20,7 +20,7 @@
 </a>
 </li>
 <li class="">
-<a (click)="go('/privacy-settings')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/privacy-settings')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/privacy-settings')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="lock_outline">lock</span>
 <span class="font-body-lg text-body-lg text-on-surface">Privacy</span>
@@ -29,7 +29,7 @@
 </a>
 </li>
 <li class="">
-<a (click)="go('/notifications')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/notifications')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/notifications')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="notifications_none">notifications</span>
 <span class="font-body-lg text-body-lg text-on-surface">Notifications</span>
@@ -46,7 +46,7 @@
 <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
 <ul class="divide-y divide-secondary-container/50">
 <li *ngIf="!isAdmin()">
-<a (click)="go('/edit-preferences')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/edit-preferences')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/edit-preferences')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="restaurant_menu">restaurant_menu</span>
 <span class="font-body-lg text-body-lg text-on-surface">Dining Preferences</span>
@@ -55,7 +55,7 @@
 </a>
 </li>
 <li class="">
-<a (click)="go('/safety-center')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/safety-center')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/safety-center')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="shield_with_heart">shield_with_heart</span>
 <span class="font-body-lg text-body-lg text-on-surface">Safety</span>
@@ -63,7 +63,7 @@
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
 </a>
 </li><li *ngIf="!isAdmin()">
-<a (click)="go('/emergency-contacts')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/emergency-contacts')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/emergency-contacts')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="contact_phone">contact_phone</span>
 <span class="font-body-lg text-body-lg text-on-surface">Emergency Contact</span>
@@ -72,7 +72,7 @@
 </a>
 </li>
 <li class="">
-<a (click)="go('/identity-verification')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/identity-verification')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/identity-verification')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="verified_user">verified_user</span>
 <span class="font-body-lg text-body-lg text-on-surface">Verification</span>
@@ -81,7 +81,7 @@
 </a>
 </li>
 <li *ngIf="!isAdmin() && !paymentService.premiumFeaturesFree()">
-<a (click)="go('/premium-members')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/premium-members')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/premium-members')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="card_membership">card_membership</span>
 <span class="font-body-lg text-body-lg text-on-surface">Subscription</span>
@@ -98,7 +98,7 @@
 <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
 <ul class="divide-y divide-secondary-container/50">
 <li *ngIf="!isAdmin()">
-<a (click)="go('/future-features')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/future-features')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/future-features')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="rocket_launch">rocket_launch</span>
 <span class="font-body-lg text-body-lg text-on-surface">Future Features</span>
@@ -106,7 +106,7 @@
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
 </a>
 </li><li *ngIf="!isAdmin()">
-<a (click)="go('/help-support')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/help-support')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/help-support')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="help_outline">help</span>
 <span class="font-body-lg text-body-lg text-on-surface">Help &amp; Support</span>
@@ -115,7 +115,7 @@
 </a>
 </li>
 <li *ngIf="!isAdmin()">
-<a (click)="go('/community-guidelines')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/community-guidelines')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/community-guidelines')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="policy">policy</span>
 <span class="font-body-lg text-body-lg text-on-surface">Community Guidelines</span>
@@ -124,7 +124,7 @@
 </a>
 </li>
 <li *ngIf="isAdmin()">
-<a (click)="go('/admin/policies/privacy-policy')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/admin/policies/privacy-policy')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/admin/policies/privacy-policy')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="edit_document">edit_document</span>
 <span class="font-body-lg text-body-lg text-on-surface">Edit Privacy Policy</span>
@@ -133,7 +133,7 @@
 </a>
 </li>
 <li *ngIf="isAdmin()">
-<a (click)="go('/admin/policies/community-guidelines')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group">
+<a (click)="go('/admin/policies/community-guidelines')" class="flex items-center justify-between p-stack-md hover:bg-surface-container-low transition-colors group" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/admin/policies/community-guidelines')">
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" data-icon="edit_document">edit_document</span>
 <span class="font-body-lg text-body-lg text-on-surface">Edit Community Guidelines</span>

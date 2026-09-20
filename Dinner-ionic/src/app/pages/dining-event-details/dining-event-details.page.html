@@ -69,7 +69,7 @@
 <section class="space-y-stack-md">
 <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
 <h2 class="font-headline-md text-headline-md text-on-surface">The Guest List</h2>
-<span (click)="go('/table-details-guests/' + t.id)" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0">{{ t.guestCount }} Attending</span>
+<span (click)="go('/table-details-guests/' + t.id)" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/table-details-guests/' + t.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/table-details-guests/' + t.id)">{{ t.guestCount }} Attending</span>
 </div>
 <div class="flex items-center pt-2">
 <div class="h-12 w-12 rounded-full ring-1 ring-outline-variant border-2 border-surface border-dashed bg-surface-container-lowest flex items-center justify-center relative">
@@ -82,7 +82,7 @@
 <section class="space-y-stack-md" *ngIf="t.isPast">
 <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
 <h2 class="font-headline-md text-headline-md text-on-surface">Reviews</h2>
-<span (click)="go('/table-reviews/' + t.id)" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0">See All</span>
+<span (click)="go('/table-reviews/' + t.id)" class="font-label-sm text-label-sm text-on-surface-variant uppercase bg-surface-container py-1 px-2 rounded-md cursor-pointer hover:text-primary transition-colors" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/table-reviews/' + t.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/table-reviews/' + t.id)">See All</span>
 </div>
 <button *ngIf="!t.hasReviewed && !t.isHost" (click)="go('/post-dining-review/' + t.id)" class="w-full text-left flex items-center justify-between p-stack-md rounded-xl bg-surface-container-low border-[0.5px] border-outline-variant/30 hover:bg-surface-container transition-colors">
 <span class="font-body-lg text-body-lg text-primary">Leave a review</span>

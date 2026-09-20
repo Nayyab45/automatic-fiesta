@@ -23,7 +23,7 @@
 
 <ul *ngIf="!loading() && friends().length > 0" class="flex flex-col w-full">
 <li *ngFor="let friend of friends()" class="flex items-center justify-between py-stack-md border-b border-outline-variant/30">
-<div (click)="go('/profile/' + friend.id)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0">
+<div (click)="go('/profile/' + friend.id)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + friend.id)">
 <img *ngIf="friend.photoUrl" [alt]="friend.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="friend.photoUrl"/>
 <div *ngIf="!friend.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ friend.name.charAt(0) }}</div>
 <div class="flex flex-col gap-unit min-w-0">
@@ -56,7 +56,7 @@
 
 <div *ngIf="!loading() && requests().length > 0" class="flex flex-col gap-stack-md">
 <div *ngFor="let request of requests()" class="flex items-center justify-between gap-gutter py-stack-sm border-b border-outline-variant/30">
-<div (click)="go('/profile/' + request.requesterId)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0">
+<div (click)="go('/profile/' + request.requesterId)" class="flex items-center gap-gutter cursor-pointer flex-1 min-w-0" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + request.requesterId)">
 <img *ngIf="request.photoUrl" [alt]="request.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="request.photoUrl"/>
 <div *ngIf="!request.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ request.name.charAt(0) }}</div>
 <span class="font-title-lg text-title-lg text-on-surface truncate">{{ request.name }}</span>
@@ -92,7 +92,7 @@
 
 <div *ngIf="!loadingSuggestions() && suggestions().length > 0" class="flex flex-col gap-stack-md">
 <div *ngFor="let match of suggestions()" class="bg-surface-container-lowest rounded-xl p-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-low flex flex-col gap-stack-sm">
-<div (click)="go('/profile/' + match.id)" class="flex items-start gap-gutter cursor-pointer">
+<div (click)="go('/profile/' + match.id)" class="flex items-start gap-gutter cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + match.id)">
 <img *ngIf="match.photoUrl" [alt]="match.name" class="w-14 h-14 rounded-full object-cover border border-outline-variant/30 shrink-0" [src]="match.photoUrl"/>
 <div *ngIf="!match.photoUrl" class="w-14 h-14 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ match.name.charAt(0) }}</div>
 <div class="flex-1 min-w-0">

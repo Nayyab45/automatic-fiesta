@@ -64,7 +64,7 @@
 </div>
 
 <div class="flex justify-end mt-unit">
-<a (click)="go('/reset-password')" class="font-label-sm text-label-sm text-primary hover:text-primary-fixed-dim transition-colors py-2">Forgot Password?</a>
+<a (click)="go('/reset-password')" class="font-label-sm text-label-sm text-primary hover:text-primary-fixed-dim transition-colors py-2" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/reset-password')">Forgot Password?</a>
 </div>
 
 <button [disabled]="submitting()" class="w-full h-12 mt-stack-sm bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full flex items-center justify-center gap-unit hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-[0.98] shadow-sm disabled:opacity-60" type="submit">
@@ -96,7 +96,7 @@
 <div class="mt-stack-lg text-center">
 <p class="font-body-md text-body-md text-on-surface-variant">
                     Don't have an account?
-                    <a (click)="go('/signup')" class="text-primary font-label-lg text-label-lg hover:text-primary-fixed-dim hover:underline underline-offset-4 transition-colors ml-unit">Sign Up</a>
+                    <a (click)="go('/signup')" class="text-primary font-label-lg text-label-lg hover:text-primary-fixed-dim hover:underline underline-offset-4 transition-colors ml-unit" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/signup')">Sign Up</a>
 </p>
 </div>
 }

@@ -23,7 +23,7 @@
 <p *ngIf="followers().length > 0" class="font-body-md text-body-md text-on-surface-variant shrink-0">People who follow you. Removing someone stops them following you; they can follow again.</p>
 <ul *ngIf="followers().length > 0" class="flex flex-col">
 <li *ngFor="let user of followers()" class="flex items-center gap-3 py-stack-md border-b border-outline-variant/30">
-<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + user.id)">
 <img *ngIf="user.photoUrl" [src]="user.photoUrl" [alt]="user.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0"/>
 <div *ngIf="!user.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ user.name.charAt(0) }}</div>
 <div class="flex flex-col min-w-0">
@@ -52,7 +52,7 @@
 <ng-container *ngIf="activeTab() === 'following'">
 <ul *ngIf="following().length > 0" class="flex flex-col">
 <li *ngFor="let user of following()" class="flex items-center gap-3 py-stack-md border-b border-outline-variant/30">
-<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+<div (click)="go('/profile/' + user.id)" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + user.id)">
 <img *ngIf="user.photoUrl" [src]="user.photoUrl" [alt]="user.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30 shrink-0"/>
 <div *ngIf="!user.photoUrl" class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center border border-outline-variant/30 shrink-0 font-title-lg text-title-lg">{{ user.name.charAt(0) }}</div>
 <div class="flex flex-col min-w-0">

@@ -32,7 +32,7 @@
 <section class="col-span-4 flex flex-col gap-stack-md">
 <div class="flex justify-between items-end">
 <h2 class="font-title-lg text-title-lg text-on-surface">Tonight's Tables</h2>
-<a (click)="go('/my-tables')" class="font-label-lg text-label-lg text-primary uppercase tracking-widest hover:opacity-80 transition-opacity">View All</a>
+<a (click)="go('/my-tables')" class="font-label-lg text-label-lg text-primary uppercase tracking-widest hover:opacity-80 transition-opacity" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/my-tables')">View All</a>
 </div>
 
 <div class="relative w-full rounded-xl bg-surface-container border-2 border-dashed border-primary/30 p-stack-md flex flex-col items-center justify-center gap-stack-sm interactive-card mb-stack-md">
@@ -48,7 +48,7 @@
   </button>
 </div>
 
-<div *ngIf="!loadingTables() && upcomingTable() as table" (click)="go('/dining-event-details/' + table.id)" class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col cursor-pointer" role="button" tabindex="0">
+<div *ngIf="!loadingTables() && upcomingTable() as table" (click)="go('/dining-event-details/' + table.id)" class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col cursor-pointer" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/dining-event-details/' + table.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/dining-event-details/' + table.id)">
 
 <div class="w-full h-48 relative border-b-[0.5px] border-outline-variant">
 <img [alt]="table.restaurant.name" class="w-full h-full object-cover" [src]="table.restaurant.photoUrl"/>
@@ -92,7 +92,7 @@
 <div class="flex overflow-x-auto no-scrollbar gap-stack-md pb-stack-sm -mx-container-padding px-container-padding md:mx-0 md:px-0">
 
 <div *ngFor="let match of matches()" class="flex-none w-64 rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant p-stack-md flex flex-col gap-stack-sm interactive-card">
-<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm cursor-pointer" (click)="go('/profile/' + match.id)">
+<div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm cursor-pointer" (click)="go('/profile/' + match.id)" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile/' + match.id)">
 <div class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-lg text-title-lg shrink-0 border border-outline-variant">{{ match.name.charAt(0) }}</div>
 <div class="flex flex-col">
 <h3 class="font-body-lg text-body-lg font-medium text-on-surface">{{ match.name }}</h3>

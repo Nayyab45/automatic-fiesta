@@ -8,7 +8,7 @@
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-stack-lg mb-stack-lg">Public tables near you</h1>
 <div class="flex flex-col gap-gutter">
 
-<div *ngFor="let table of tables()" (click)="go('/table-details-guests/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
+<div *ngFor="let table of tables()" (click)="go('/table-details-guests/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/table-details-guests/' + table.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/table-details-guests/' + table.id)">
 <div class="flex flex-col sm:flex-row">
 <div class="w-full sm:w-1/3 h-40 sm:h-auto">
 <img [alt]="table.restaurant.name" class="w-full h-full object-cover" [src]="table.restaurant.photoUrl"/>

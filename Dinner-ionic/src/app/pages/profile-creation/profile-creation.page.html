@@ -14,7 +14,7 @@
 <p class="font-body-md text-body-md text-on-surface-variant leading-tight mt-1">We'll use this to personalize your dining experience.</p>
 </div>
 <div class="flex flex-row items-center justify-center gap-4 flex-shrink-0 md:justify-start">
-<div (click)="avatarFileInput.click()" class="relative group cursor-pointer">
+<div (click)="avatarFileInput.click()" class="relative group cursor-pointer" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && avatarFileInput.click()" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && avatarFileInput.click()">
 <div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-300 group-hover:border-primary-container">
 <img *ngIf="avatarUrl" alt="Your profile photo" class="w-full h-full object-cover" [src]="avatarUrl"/>
 <span *ngIf="!avatarUrl" class="material-symbols-outlined text-3xl text-on-surface-variant opacity-50">person</span>
@@ -81,7 +81,7 @@
 <div class="flex flex-wrap gap-1.5">
 <span *ngFor="let food of favoriteFoods; let i = index" class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-sm text-[11px] border border-tertiary/20">
                             {{ food }}
-                            <span (click)="removeFavoriteFood(i)" class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface">close</span>
+                            <span (click)="removeFavoriteFood(i)" [attr.aria-label]="'Remove ' + food" class="material-symbols-outlined text-[14px] ml-0.5 cursor-pointer hover:text-on-surface" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && removeFavoriteFood(i)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && removeFavoriteFood(i)">close</span>
 </span>
 <button (click)="addFavoriteFood()" class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-sm text-[11px]" type="button">
 <span class="material-symbols-outlined text-[14px] mr-0.5">add</span> Add More

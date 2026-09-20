@@ -23,7 +23,7 @@
 <h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Upcoming</h2>
 <div class="flex flex-col gap-gutter">
 
-<div *ngFor="let table of upcoming()" (click)="go('/dining-event-details/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0">
+<div *ngFor="let table of upcoming()" (click)="go('/dining-event-details/' + table.id)" class="bg-surface rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-high overflow-hidden cursor-pointer hover:border-primary-container transition-colors duration-200" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/dining-event-details/' + table.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/dining-event-details/' + table.id)">
 <div class="flex flex-col sm:flex-row">
 <div class="w-full sm:w-1/3 h-48 sm:h-auto">
 <img [alt]="table.restaurant.name" class="w-full h-full object-cover border-r-[0.5px] border-surface-container-high" [src]="table.restaurant.photoUrl"/>
@@ -61,7 +61,7 @@
 <h2 class="font-title-lg text-title-lg text-on-surface-variant border-b-0.5 border-outline-variant pb-stack-sm mb-gutter">Past</h2>
 <div class="flex flex-col gap-gutter opacity-80 hover:opacity-100 transition-opacity">
 
-<div *ngFor="let table of past()" (click)="go(table.hasReviewed ? '/dining-event-details/' + table.id : '/post-dining-review/' + table.id)" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0">
+<div *ngFor="let table of past()" (click)="go(table.hasReviewed ? '/dining-event-details/' + table.id : '/post-dining-review/' + table.id)" class="bg-surface-container-lowest rounded-lg border border-surface-container-high overflow-hidden cursor-pointer" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go(table.hasReviewed ? '/dining-event-details/' + table.id : '/post-dining-review/' + table.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go(table.hasReviewed ? '/dining-event-details/' + table.id : '/post-dining-review/' + table.id)">
 <div class="p-gutter">
 <div class="flex justify-between items-start mb-stack-sm">
 <span class="font-label-lg text-label-lg text-on-surface-variant tracking-widest uppercase">{{ table.gatheringType }}</span>

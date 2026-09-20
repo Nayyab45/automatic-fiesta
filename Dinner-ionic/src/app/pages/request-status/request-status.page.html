@@ -1,5 +1,5 @@
 <header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-container-padding pt-safe pb-stack-md sticky top-0 z-40">
-<div (click)="go('/select-location')" class="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95 duration-150" role="button" tabindex="0">
+<div (click)="go('/select-location')" class="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95 duration-150" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/select-location')" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/select-location')">
 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">place</span>
 <span class="font-headline-md text-headline-md text-primary">{{ cityService.label() }}</span>
 </div>

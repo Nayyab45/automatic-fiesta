@@ -40,8 +40,8 @@
             I Agree &amp; Continue
         </button>
 <div class="mt-stack-md flex justify-center gap-4 font-label-sm text-label-sm text-on-surface-variant">
-<a (click)="go('/report-users')" class="underline decoration-outline-variant hover:text-primary transition-colors">Report a safety concern</a>
+<a (click)="go('/report-users')" class="underline decoration-outline-variant hover:text-primary transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/report-users')">Report a safety concern</a>
 <span>•</span>
-<a (click)="go('/full-community-policy')" class="underline decoration-outline-variant hover:text-primary transition-colors">View full policy</a>
+<a (click)="go('/full-community-policy')" class="underline decoration-outline-variant hover:text-primary transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/full-community-policy')">View full policy</a>
 </div>
 </div>

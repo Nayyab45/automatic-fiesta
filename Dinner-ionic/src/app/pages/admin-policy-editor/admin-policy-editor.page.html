@@ -11,8 +11,8 @@
     </p>
 
 <div class="flex flex-col gap-unit shrink-0">
-<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Introduction (first line is the title line)</label>
-<textarea appAutosize [(ngModel)]="intro" name="intro" rows="3" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
+<label for="policy-intro" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Introduction (first line is the title line)</label>
+<textarea id="policy-intro" appAutosize [(ngModel)]="intro" name="intro" rows="3" class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface"></textarea>
 </div>
 
 <div *ngFor="let section of sections; let i = index" class="bg-surface-container-low rounded-xl p-stack-md border border-outline-variant/30 flex flex-col gap-stack-sm shrink-0">

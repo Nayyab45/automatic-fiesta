@@ -99,15 +99,15 @@
 
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">Atmosphere &amp; Intent</h2>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-unit"><div (click)="selectAtmosphere('Casual Dinner')" [class.atmosphere-selected]="atmosphere === 'Casual Dinner'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-unit"><div (click)="selectAtmosphere('Casual Dinner')" [class.atmosphere-selected]="atmosphere === 'Casual Dinner'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && selectAtmosphere('Casual Dinner')" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && selectAtmosphere('Casual Dinner')">
 <span class="material-symbols-outlined text-outline-variant text-[28px] atmosphere-icon">restaurant</span>
 <span class="font-label-lg text-label-lg text-on-surface atmosphere-label">Casual Dinner</span>
 </div>
-<div (click)="selectAtmosphere('Social Conversation')" [class.atmosphere-selected]="atmosphere === 'Social Conversation'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer transition-colors relative overflow-hidden">
+<div (click)="selectAtmosphere('Social Conversation')" [class.atmosphere-selected]="atmosphere === 'Social Conversation'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer transition-colors relative overflow-hidden" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && selectAtmosphere('Social Conversation')" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && selectAtmosphere('Social Conversation')">
 <span class="material-symbols-outlined text-outline-variant text-[28px] z-10 atmosphere-icon">forum</span>
 <span class="font-label-lg text-label-lg text-on-surface z-10 atmosphere-label">Social Conversation</span>
 </div>
-<div (click)="selectAtmosphere('Business Networking')" [class.atmosphere-selected]="atmosphere === 'Business Networking'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors md:col-span-1 col-span-2">
+<div (click)="selectAtmosphere('Business Networking')" [class.atmosphere-selected]="atmosphere === 'Business Networking'" class="atmosphere-card bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 flex flex-col items-center text-center gap-2 cursor-pointer hover:border-primary-container transition-colors md:col-span-1 col-span-2" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && selectAtmosphere('Business Networking')" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && selectAtmosphere('Business Networking')">
 <span class="material-symbols-outlined text-outline-variant text-[28px] atmosphere-icon">handshake</span>
 <span class="font-label-lg text-label-lg text-on-surface atmosphere-label">Business Networking</span>
 </div></div>

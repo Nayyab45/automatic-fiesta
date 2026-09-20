@@ -91,23 +91,23 @@
 </div>
 <ng-container *ngIf="isOwnProfile()">
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div (click)="go('/friends')" class="text-center cursor-pointer relative">
+<div (click)="go('/friends')" class="text-center cursor-pointer relative" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/friends')">
 <div class="font-headline-md text-headline-md text-primary">{{ friendsCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Friends</div>
 <span *ngIf="pendingRequestsCount() > 0" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
 </div>
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div (click)="go('/followers?tab=followers')" class="text-center cursor-pointer">
+<div (click)="go('/followers?tab=followers')" class="text-center cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/followers?tab=followers')">
 <div class="font-headline-md text-headline-md text-primary">{{ followersCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Followers</div>
 </div>
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div (click)="go('/followers?tab=following')" class="text-center cursor-pointer">
+<div (click)="go('/followers?tab=following')" class="text-center cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/followers?tab=following')">
 <div class="font-headline-md text-headline-md text-primary">{{ followingCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Following</div>
 </div>
 <div class="hidden sm:block w-px bg-outline-variant opacity-50"></div>
-<div (click)="go('/profile-views')" class="text-center cursor-pointer">
+<div (click)="go('/profile-views')" class="text-center cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/profile-views')">
 <div class="font-headline-md text-headline-md text-primary">{{ profileViewsCount() }}</div>
 <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Profile Views</div>
 </div>

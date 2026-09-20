@@ -30,7 +30,7 @@
 <span class="font-body-md text-body-md text-on-surface-variant">{{ t.restaurantName }} · {{ t.gatheringType }}</span>
 <span class="font-body-md text-body-md text-on-surface-variant text-[13px]">{{ t.dateTime | date: 'medium' }} · {{ t.seatsTotal }} seats · {{ t.audience.replace('_', ' ') }}</span>
 <div class="flex items-center justify-between mt-unit">
-<a (click)="go('/admin/users/' + t.hostUserId)" class="font-label-lg text-label-lg text-primary cursor-pointer">Host: {{ t.hostName }}</a>
+<a (click)="go('/admin/users/' + t.hostUserId)" class="font-label-lg text-label-lg text-primary cursor-pointer" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/admin/users/' + t.hostUserId)">Host: {{ t.hostName }}</a>
 <button (click)="remove(t)" [disabled]="deletingId() === t.id" class="bg-error text-on-error font-label-lg text-label-lg px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">Remove</button>
 </div>
 </li>

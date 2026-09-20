@@ -14,7 +14,7 @@
 <h2 class="font-title-lg text-title-lg text-primary">Frequently Asked Questions</h2>
 <div class="glass-card flex flex-col overflow-hidden border border-surface-variant">
 
-<div *ngFor="let faq of faqs; let i = index" (click)="toggleFaq(i)" class="border-b-[0.5px] border-outline-variant last:border-b-0 cursor-pointer hover:bg-surface-container-low transition-colors group">
+<div *ngFor="let faq of faqs; let i = index" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaqIndex === i"class="border-b-[0.5px] border-outline-variant last:border-b-0 cursor-pointer hover:bg-surface-container-low transition-colors group" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && toggleFaq(i)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && toggleFaq(i)">
 <div class="flex justify-between items-center p-stack-md">
 <span class="font-body-lg text-body-lg text-on-surface font-medium">{{ faq.question }}</span>
 <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" [class.rotate-180]="openFaqIndex === i" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>

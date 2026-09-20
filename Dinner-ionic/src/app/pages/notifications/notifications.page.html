@@ -12,7 +12,7 @@
 
 <div class="flex flex-col gap-0" *ngIf="!loading() && notifications().length > 0">
 
-<div *ngFor="let n of notifications()" (click)="open(n)" class="flex items-start gap-gutter py-stack-md border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors group" [class.opacity-70]="n.read" [class.cursor-pointer]="n.actorUserId">
+<div *ngFor="let n of notifications()" (click)="open(n)" class="flex items-start gap-gutter py-stack-md border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors group" [class.opacity-70]="n.read" [class.cursor-pointer]="n.actorUserId" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && open(n)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && open(n)">
 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-surface-container flex items-center justify-center relative">
 <span class="material-symbols-outlined text-primary">{{ iconFor(n.type) }}</span>
 </div>
