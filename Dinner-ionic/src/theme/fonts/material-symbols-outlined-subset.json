@@ -1,7 +1,5 @@
 {
   "icons": [
-    "account_balance",
-    "account_balance_wallet",
     "account_circle",
     "add",
     "add_a_photo",
@@ -23,8 +21,6 @@
     "calendar_today",
     "call",
     "camera",
-    "card_membership",
-    "celebration",
     "chair",
     "chair_alt",
     "chat",
@@ -36,8 +32,6 @@
     "close",
     "contact_emergency",
     "contact_phone",
-    "credit_card",
-    "credit_card_off",
     "dark_mode",
     "delete",
     "dinner_dining",
@@ -51,6 +45,7 @@
     "error",
     "event",
     "event_available",
+    "event_busy",
     "expand_more",
     "explore",
     "face",
@@ -83,7 +78,6 @@
     "mark_email_read",
     "menu",
     "menu_book",
-    "moped",
     "notifications",
     "payments",
     "person",
@@ -111,7 +105,6 @@
     "share",
     "shield_person",
     "shield_with_heart",
-    "smart_toy",
     "star",
     "stars",
     "storefront",
@@ -123,14 +116,12 @@
     "tune",
     "verified",
     "verified_user",
-    "vertical_align_top",
     "visibility",
     "visibility_off",
     "warning",
     "wb_sunny",
     "wb_twilight",
     "wifi_off",
-    "work",
-    "workspace_premium"
+    "work"
   ]
 }

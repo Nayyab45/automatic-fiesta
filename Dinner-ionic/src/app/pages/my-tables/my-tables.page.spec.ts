@@ -25,7 +25,13 @@ describe('MyTablesPage', () => {
         { provide: ProfileService, useValue: profileServiceSpy },
       ],
     });
-    return TestBed.createComponent(MyTablesPage);
+    const fixture = TestBed.createComponent(MyTablesPage);
+    // The real fetch now runs on Ionic's ionViewWillEnter lifecycle event
+    // (see my-tables.page.ts), which only a live ion-router-outlet dispatches
+    // -- TestBed.createComponent() alone doesn't, so tests fire it manually,
+    // same as Ionic does when this page actually becomes the active view.
+    fixture.nativeElement.dispatchEvent(new Event('ionViewWillEnter'));
+    return fixture;
   }
 
   beforeEach(() => {
