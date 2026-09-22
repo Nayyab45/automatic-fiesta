@@ -9,6 +9,8 @@ import { environment } from '../../environments/environment';
 // environment.prod.ts -- see its comment -- not a code change. The App ID
 // (a separate id, native-side) is the AndroidManifest.xml meta-data instead;
 // see android/app/admob.properties.example for that one.
+const RESHOW_DELAY_MS = 5000;
+
 const BANNER_OPTIONS: BannerAdOptions = {
   adId: environment.adMob.bannerAdUnitId,
   adSize: BannerAdSize.ADAPTIVE_BANNER,
@@ -19,19 +21,17 @@ const BANNER_OPTIONS: BannerAdOptions = {
   isTesting: environment.adMob.isTesting,
 };
 
-// Ads are permanently off: every feature is free for everyone, with no paid
-// tier to show ads to as an alternative. The native AdMob plugin wiring is
-// kept below (unused) rather than ripped out, in case ads are ever wanted
-// again -- but nothing in the app calls showBanner() anymore. Native-only --
-// there's no ad SDK to initialize on the plain web build (`ng serve`).
+// Native-only -- there's no ad SDK to initialize on the plain web build
+// (`ng serve`).
 @Injectable({ providedIn: 'root' })
 export class AdmobService {
   private initialized = false;
   private bannerShowing = false;
+  private reshowTimeout: ReturnType<typeof setTimeout> | null = null;
 
   /** True while the native banner is actually on screen -- drives the
    * floating close button in AppComponent (there's nothing to close
-   * otherwise). Always false now that nothing ever calls showBanner(). */
+   * otherwise). */
   readonly bannerVisible = signal(false);
 
   async init(): Promise<void> {
@@ -49,11 +49,21 @@ export class AdmobService {
       this.bannerShowing = false;
       this.bannerVisible.set(false);
     });
+
+    this.showBanner();
   }
 
-  /** Closes the floating close button's banner, if one were ever showing. */
+  /** Closes the banner from its floating close button -- not for good,
+   * though: it reappears RESHOW_DELAY_MS later rather than staying
+   * dismissed for the rest of the session, same as the person would see it
+   * again on the next screen anyway. */
   dismiss(): void {
     this.hideBanner();
+    if (this.reshowTimeout) clearTimeout(this.reshowTimeout);
+    this.reshowTimeout = setTimeout(() => {
+      this.reshowTimeout = null;
+      this.showBanner();
+    }, RESHOW_DELAY_MS);
   }
 
   private showBanner(): void {
