@@ -1,12 +1,11 @@
 // Sends transactional email via Resend's HTTP API (https://resend.com).
-// No SDK dependency -- it's a single POST, and every other integration in
-// this codebase (the payment gateways) already talks to third parties over
-// plain fetch rather than pulling in a client library.
+// No SDK dependency -- it's a single POST, and every other third-party
+// integration in this codebase talks to its provider over plain fetch
+// rather than pulling in a client library.
 //
-// isConfigured() mirrors the payment-gateway pattern: a provider whose
-// credentials aren't set just gets skipped by the caller (auth.js falls
-// back to logging the reset link server-side) instead of the app failing
-// to start.
+// isConfigured() means a provider whose credentials aren't set just gets
+// skipped by the caller (auth.js falls back to logging the reset link
+// server-side) instead of the app failing to start.
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
 

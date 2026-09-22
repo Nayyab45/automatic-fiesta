@@ -375,7 +375,6 @@ export async function deleteUserAccount(userId) {
   await db.prepare('DELETE FROM match_preferences WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM privacy_settings WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM emergency_contacts WHERE user_id = ?').run(userId);
-  await db.prepare('DELETE FROM payment_methods WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM user_profiles WHERE user_id = ?').run(userId);
   await db.prepare('DELETE FROM user_blocks WHERE blocker_user_id = ? OR blocked_user_id = ?').run(userId, userId);
   await db.prepare('DELETE FROM friend_requests WHERE requester_id = ? OR recipient_id = ?').run(userId, userId);
@@ -540,8 +539,7 @@ authRouter.get('/admin/users', requireAuth, requireAdmin, asyncHandler(async (re
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
   const rows = await db
     .prepare(
-      `SELECT u.id, u.name, u.email, u.created_at, u.is_admin, u.suspended_at, u.flagged_at, p.verified,
-         EXISTS(SELECT 1 FROM subscriptions s WHERE s.user_id = u.id AND s.status = 'active') as is_premium
+      `SELECT u.id, u.name, u.email, u.created_at, u.is_admin, u.suspended_at, u.flagged_at, p.verified
        FROM users u
        LEFT JOIN user_profiles p ON p.user_id = u.id
        ${where}
@@ -550,7 +548,7 @@ authRouter.get('/admin/users', requireAuth, requireAdmin, asyncHandler(async (re
     )
     .all(...params);
 
-  res.json({ users: toCamelRows(rows).map((u) => ({ ...u, verified: !!u.verified, isPremium: !!u.isPremium, isAdmin: !!u.isAdmin })) });
+  res.json({ users: toCamelRows(rows).map((u) => ({ ...u, verified: !!u.verified, isAdmin: !!u.isAdmin })) });
 }));
 
 authRouter.get('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
@@ -560,10 +558,9 @@ authRouter.get('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async
     return res.status(404).json({ message: 'User not found' });
   }
 
-  const [profile, verification, subscription, rating, blockCount, reportCount, tablesJoined] = await Promise.all([
+  const [profile, verification, rating, blockCount, reportCount, tablesJoined] = await Promise.all([
     db.prepare('SELECT * FROM user_profiles WHERE user_id = ?').get(userId),
     db.prepare('SELECT status, submitted_at FROM identity_verifications WHERE user_id = ?').get(userId),
-    db.prepare("SELECT status FROM subscriptions WHERE user_id = ? AND status = 'active'").get(userId),
     db.prepare('SELECT AVG(score) as avg FROM user_ratings WHERE rated_user_id = ?').get(userId),
     db.prepare('SELECT COUNT(*) as count FROM user_blocks WHERE blocked_user_id = ?').get(userId),
     db.prepare('SELECT COUNT(*) as count FROM user_reports WHERE reported_user_id = ?').get(userId),
@@ -592,7 +589,6 @@ authRouter.get('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async
       photoUrl: profile?.photo_url ?? null,
       gender: profile?.gender ?? null,
       verified: !!profile?.verified,
-      isPremium: !!subscription,
       verificationStatus: verification?.status ?? 'not_started',
       verificationSubmittedAt: verification?.submitted_at ?? null,
       rating: rating.avg ? Math.round(rating.avg * 10) / 10 : null,

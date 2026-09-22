@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 import { AuthService } from '../../services/auth.service';
-import { PaymentService } from '../../services/payment.service';
 import { ProfileService } from '../../services/profile.service';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
 
@@ -20,7 +19,6 @@ import { resizeImageToDataUrl } from '../../shared/image-resize';
 export class ManageAccountPage extends BasePage {
   readonly pageTitle = "Manage Account";
   private readonly authService = inject(AuthService);
-  readonly paymentService = inject(PaymentService);
   private readonly profileService = inject(ProfileService);
 
   readonly loading = signal(true);

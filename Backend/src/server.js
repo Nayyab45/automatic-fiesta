@@ -11,8 +11,6 @@ import { profileRouter, interestsRouter, peopleRouter, matchesRouter, privacySet
 import { conversationsRouter, notificationsRouter } from './routes/messaging.js';
 import { emergencyContactsRouter, blocksRouter, reportsRouter } from './routes/safety.js';
 import { verificationRouter } from './routes/verification.js';
-import { paymentMethodsRouter } from './routes/payments.js';
-import { subscriptionsRouter, subscriptionCallbackRouter } from './routes/subscriptions.js';
 import { friendsRouter, followsRouter } from './routes/friends.js';
 import { waitlistRouter } from './routes/waitlist.js';
 import { contentRouter } from './routes/content.js';
@@ -21,15 +19,6 @@ import { siteRouter } from './routes/site.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
-  process.exit(1);
-}
-
-// PAYMENT_MOCK_MODE fakes a successful charge for every payment method,
-// with no real processor involved -- useful for testing checkout before a
-// merchant account exists, but it must never be reachable in production
-// (a real user would "pay" and get premium activated for free).
-if (process.env.PAYMENT_MOCK_MODE === 'true' && process.env.NODE_ENV === 'production') {
-  console.error('PAYMENT_MOCK_MODE=true is not allowed with NODE_ENV=production -- it fakes successful payments for real users.');
   process.exit(1);
 }
 
@@ -82,16 +71,11 @@ app.use('/api/emergency-contacts', emergencyContactsRouter);
 app.use('/api/blocks', blocksRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/verification', verificationRouter);
-app.use('/api/payment-methods', paymentMethodsRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/follows', followsRouter);
 app.use('/api/waitlist', waitlistRouter);
 app.use('/api/content', contentRouter);
 app.use('/api/support', supportRouter);
-// Mounted before subscriptionsRouter's own requireAuth applies: the gateway
-// calls this directly, not a logged-in user's browser.
-app.use('/api/subscriptions/callback', subscriptionCallbackRouter);
-app.use('/api/subscriptions', subscriptionsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

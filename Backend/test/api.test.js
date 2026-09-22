@@ -55,7 +55,6 @@ const USER_ID_TABLES = [
   ['privacy_settings', 'user_id'],
   ['identity_verifications', 'user_id'],
   ['emergency_contacts', 'user_id'],
-  ['payment_methods', 'user_id'],
   ['user_profiles', 'user_id'],
   ['seat_requests', 'user_id'],
   ['table_guests', 'user_id'],
@@ -70,8 +69,8 @@ const USER_ID_TABLES = [
   ['two_factor_auth', 'user_id'],
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
-  ['subscriptions', 'user_id'],
   ['support_messages', 'user_id'],
+  ['feature_waitlist', 'user_id'],
 ];
 
 async function cleanupTestData() {
@@ -133,35 +132,8 @@ async function signup(local) {
   return body; // { accessToken, refreshToken, user }
 }
 
-// Activates a subscription directly (bypassing checkout/a real gateway) --
-// same shape subscriptionsRouter's activateSubscription writes, for tests
-// that only care about "this user is premium", not the payment flow itself.
 async function makeAdmin(userId) {
   await pool.query('UPDATE users SET is_admin = 1 WHERE id = ?', [userId]);
-}
-
-// Every "Premium" feature is free for everyone by default now (see
-// premiumFeaturesFree() in routes/subscriptions.js). Tests of the paid gating
-// -- the proposal's Revenue Model, switched back on with
-// PREMIUM_FEATURES_FREE_FOR_ALL=false -- run inside this for their duration.
-async function inPaidMode(fn) {
-  const previous = process.env.PREMIUM_FEATURES_FREE_FOR_ALL;
-  process.env.PREMIUM_FEATURES_FREE_FOR_ALL = 'false';
-  try {
-    await fn();
-  } finally {
-    if (previous === undefined) delete process.env.PREMIUM_FEATURES_FREE_FOR_ALL;
-    else process.env.PREMIUM_FEATURES_FREE_FOR_ALL = previous;
-  }
-}
-
-async function makePremium(userId) {
-  await pool.query(
-    `INSERT INTO subscriptions (user_id, status, plan, provider, current_period_end, updated_at)
-     VALUES (?, 'active', 'monthly', 'visa', DATE_ADD(NOW(), INTERVAL 1 MONTH), NOW())
-     ON DUPLICATE KEY UPDATE status = 'active'`,
-    [userId],
-  );
 }
 
 describe('auth', () => {
@@ -636,8 +608,8 @@ describe('preference change limit', () => {
   });
 });
 
-describe('event creation limit (free tier)', () => {
-  test('caps table creation at 3/month for free accounts, unblocked by an active subscription (paid mode)', async () => inPaidMode(async () => {
+describe('event creation', () => {
+  test('is unlimited', async () => {
     const host = await signup('table-limit-host');
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
     const restaurantId = restaurants.body.restaurants[0].id;
@@ -649,27 +621,17 @@ describe('event creation limit (free tier)', () => {
       });
 
     const initial = await api('GET', '/api/profile/me', { token: host.accessToken });
-    assert.equal(initial.body.tableCreation.unlimited, false);
-    assert.equal(initial.body.tableCreation.remaining, 3);
+    assert.equal(initial.body.tableCreation.unlimited, true);
 
-    for (let n = 1; n <= 3; n++) {
+    for (let n = 1; n <= 4; n++) {
       const created = await createTable();
-      assert.equal(created.status, 201);
+      assert.equal(created.status, 201, `event ${n}`);
     }
-
-    const fourth = await createTable();
-    assert.equal(fourth.status, 429);
-    assert.match(fourth.body.message, /free events/);
-    assert.equal(fourth.body.tableCreation.remaining, 0);
-
-    await makePremium(host.user.id);
-    const asPremium = await createTable();
-    assert.equal(asPremium.status, 201);
-  }));
+  });
 });
 
 describe('profile views', () => {
-  test('recorded only when the viewer opts in, visible to the viewed-user only once premium', async () => {
+  test('recorded only when the viewer opts in', async () => {
     const viewer = await signup('view-tracking-viewer');
     const viewed = await signup('view-tracking-viewed');
 
@@ -677,7 +639,6 @@ describe('profile views', () => {
     // profile should NOT create a viewable trail.
     await api('GET', `/api/profile/${viewed.user.id}`, { token: viewer.accessToken });
 
-    await makePremium(viewed.user.id);
     const noViewYet = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
     assert.equal(noViewYet.status, 200);
     assert.deepEqual(noViewYet.body.viewers, []);
@@ -692,75 +653,6 @@ describe('profile views', () => {
 
     const viewsCount = await api('GET', '/api/profile/me', { token: viewed.accessToken });
     assert.equal(viewsCount.body.profileViewsCount, 1);
-  });
-
-  test('a free account gets a 402 instead of the list (paid mode)', async () => inPaidMode(async () => {
-    const viewed = await signup('view-tracking-free');
-    const res = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
-    assert.equal(res.status, 402);
-  }));
-});
-
-describe('premium features free for everyone (default)', () => {
-  test('a plain account gets every premium feature, and the switch turns the gating back on', async () => {
-    const user = await signup('free-for-all');
-    const token = user.accessToken;
-
-    // Unlimited events: a fourth one in the same month is fine.
-    const restaurants = await api('GET', '/api/restaurants', { token });
-    const restaurantId = restaurants.body.restaurants[0].id;
-    for (let n = 1; n <= 4; n++) {
-      const created = await api('POST', '/api/tables', {
-        token,
-        body: { restaurantId, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
-      });
-      assert.equal(created.status, 201, `event ${n}`);
-    }
-    assert.equal((await api('GET', '/api/profile/me', { token })).body.tableCreation.unlimited, true);
-
-    // Who viewed me, advanced people filters, AI match insights, no ads.
-    assert.equal((await api('GET', '/api/profile/me/viewers', { token })).status, 200);
-    assert.equal((await api('GET', '/api/people', { token })).body.advancedFiltersUnlocked, true);
-    assert.equal((await api('GET', '/api/matches', { token })).body.aiInsightsUnlocked, true);
-    const sub = await api('GET', '/api/subscriptions/me', { token });
-    assert.equal(sub.body.premiumFeaturesFree, true);
-    assert.equal(sub.body.subscription.status, 'inactive', 'nobody paid -- isPremium (badge/priority) stays honest');
-
-    // Same account with the paid gating switched back on.
-    await inPaidMode(async () => {
-      assert.equal((await api('GET', '/api/profile/me/viewers', { token })).status, 402);
-      assert.equal((await api('GET', '/api/people', { token })).body.advancedFiltersUnlocked, false);
-      assert.equal((await api('GET', '/api/matches', { token })).body.aiInsightsUnlocked, false);
-      assert.equal((await api('GET', '/api/subscriptions/me', { token })).body.premiumFeaturesFree, false);
-    });
-  });
-});
-
-describe('priority profile placement', () => {
-  test('premium candidates sort ahead of free ones in Discover People and Matches', async () => {
-    const me = await signup('priority-me');
-    const freeCandidate = await signup('priority-free');
-    const premiumCandidate = await signup('priority-premium');
-    await makePremium(premiumCandidate.user.id);
-
-    // /people and /matches both INNER JOIN user_profiles -- a fresh signup
-    // has no row there yet (that only exists once profile-creation/PUT
-    // /profile/me runs), so without this neither candidate would appear in
-    // either list at all.
-    await api('PUT', '/api/profile/me', { token: freeCandidate.accessToken, body: { city: 'PriorityTestCity' } });
-    await api('PUT', '/api/profile/me', { token: premiumCandidate.accessToken, body: { city: 'PriorityTestCity' } });
-
-    const people = await api('GET', '/api/people', { token: me.accessToken });
-    const ids = people.body.people.map((p) => p.id);
-    const freeIndex = ids.indexOf(freeCandidate.user.id);
-    const premiumIndex = ids.indexOf(premiumCandidate.user.id);
-    assert.ok(premiumIndex < freeIndex, 'premium candidate should rank before the free one');
-    assert.equal(people.body.people.find((p) => p.id === premiumCandidate.user.id).isPremium, true);
-    assert.equal(people.body.people.find((p) => p.id === freeCandidate.user.id).isPremium, false);
-
-    const matches = await api('GET', '/api/matches', { token: me.accessToken });
-    const matchIds = matches.body.matches.map((m) => m.id);
-    assert.ok(matchIds.indexOf(premiumCandidate.user.id) < matchIds.indexOf(freeCandidate.user.id));
   });
 });
 
@@ -848,78 +740,6 @@ describe('people matching', () => {
     const sameCityIndex = result.body.matches.indexOf(sameCityEntry);
     const otherCityIndex = result.body.matches.indexOf(otherCityEntry);
     assert.ok(sameCityIndex < otherCityIndex);
-  });
-});
-
-describe('payment methods', () => {
-  test('rejects a submitted number longer than last4 (i.e. refuses a full card/account number)', async () => {
-    const user = await signup('payer-reject');
-    const res = await api('POST', '/api/payment-methods', {
-      token: user.accessToken,
-      body: { type: 'visa', last4: '4242424242424242', expiryMonth: 8, expiryYear: 2027, cardholderName: 'Test User' },
-    });
-    assert.equal(res.status, 400);
-  });
-
-  test('adding the first method makes it default; adding a second does not', async () => {
-    const user = await signup('payer-default');
-
-    const visa = await api('POST', '/api/payment-methods', {
-      token: user.accessToken,
-      body: { type: 'visa', last4: '4242', expiryMonth: 8, expiryYear: 2027, cardholderName: 'Test User' },
-    });
-    assert.equal(visa.status, 201);
-    assert.equal(visa.body.paymentMethod.isDefault, true);
-    assert.equal(visa.body.paymentMethod.label, 'Visa •••• 4242');
-
-    const easypaisa = await api('POST', '/api/payment-methods', {
-      token: user.accessToken,
-      body: { type: 'easypaisa', walletPhone: '03001234567' },
-    });
-    assert.equal(easypaisa.status, 201);
-    assert.equal(easypaisa.body.paymentMethod.isDefault, false);
-    assert.match(easypaisa.body.paymentMethod.label, /^EasyPaisa .*4567$/);
-  });
-
-  test('setting a new default flips off the old one; removing the default promotes another', async () => {
-    const user = await signup('payer-switch');
-    const first = await api('POST', '/api/payment-methods', {
-      token: user.accessToken,
-      body: { type: 'bank', bankName: 'Meezan Bank', accountTitle: 'Test User', last4: '1234' },
-    });
-    const second = await api('POST', '/api/payment-methods', {
-      token: user.accessToken,
-      body: { type: 'jazzcash', walletPhone: '03111234567' },
-    });
-
-    const switched = await api('PUT', `/api/payment-methods/${second.body.paymentMethod.id}/default`, { token: user.accessToken });
-    assert.equal(switched.status, 200);
-    const byId = Object.fromEntries(switched.body.paymentMethods.map((m) => [m.id, m]));
-    assert.equal(byId[first.body.paymentMethod.id].isDefault, false);
-    assert.equal(byId[second.body.paymentMethod.id].isDefault, true);
-
-    const afterRemove = await api('DELETE', `/api/payment-methods/${second.body.paymentMethod.id}`, { token: user.accessToken });
-    assert.equal(afterRemove.status, 200);
-    assert.equal(afterRemove.body.paymentMethods.length, 1);
-    assert.equal(afterRemove.body.paymentMethods[0].isDefault, true);
-  });
-
-  test("a user cannot see or delete another user's payment methods", async () => {
-    const owner = await signup('payer-owner');
-    const intruder = await signup('payer-intruder');
-
-    const created = await api('POST', '/api/payment-methods', {
-      token: owner.accessToken,
-      body: { type: 'visa', last4: '9999', expiryMonth: 1, expiryYear: 2030, cardholderName: 'Owner' },
-    });
-
-    const intrudersList = await api('GET', '/api/payment-methods', { token: intruder.accessToken });
-    assert.equal(intrudersList.body.paymentMethods.length, 0);
-
-    const intruderDelete = await api('DELETE', `/api/payment-methods/${created.body.paymentMethod.id}`, {
-      token: intruder.accessToken,
-    });
-    assert.equal(intruderDelete.status, 404);
   });
 });
 
@@ -1468,5 +1288,199 @@ describe('identity verification', () => {
       },
     });
     assert.equal(result, null);
+  });
+});
+
+describe('messaging (conversations & notifications)', () => {
+  test('starting a conversation is idempotent and both sides can send/read messages', async () => {
+    const ivy = await signup('msg-ivy');
+    const jack = await signup('msg-jack');
+
+    const start = await api('POST', '/api/conversations', { token: ivy.accessToken, body: { recipientId: jack.user.id } });
+    assert.equal(start.status, 201);
+    const conversationId = start.body.conversation.id;
+    assert.equal(start.body.conversation.person.id, jack.user.id);
+
+    const startAgain = await api('POST', '/api/conversations', { token: ivy.accessToken, body: { recipientId: jack.user.id } });
+    assert.equal(startAgain.body.conversation.id, conversationId);
+
+    const send = await api('POST', `/api/conversations/${conversationId}/messages`, { token: ivy.accessToken, body: { body: 'hey!' } });
+    assert.equal(send.status, 201);
+    assert.equal(send.body.message.body, 'hey!');
+    assert.equal(send.body.message.senderId, ivy.user.id);
+
+    const jackMessages = await api('GET', `/api/conversations/${conversationId}/messages`, { token: jack.accessToken });
+    assert.equal(jackMessages.status, 200);
+    assert.ok(jackMessages.body.messages.some((m) => m.body === 'hey!'));
+
+    const jackList = await api('GET', '/api/conversations', { token: jack.accessToken });
+    const found = jackList.body.conversations.find((c) => c.id === conversationId);
+    assert.equal(found.unreadCount, 1);
+    assert.equal(found.lastMessage.body, 'hey!');
+
+    await api('POST', `/api/conversations/${conversationId}/read`, { token: jack.accessToken });
+    const jackListAfterRead = await api('GET', '/api/conversations', { token: jack.accessToken });
+    assert.equal(jackListAfterRead.body.conversations.find((c) => c.id === conversationId).unreadCount, 0);
+  });
+
+  test('a non-participant cannot read or post into someone else\'s conversation', async () => {
+    const kim = await signup('msg-kim');
+    const lee = await signup('msg-lee');
+    const mona = await signup('msg-mona');
+
+    const start = await api('POST', '/api/conversations', { token: kim.accessToken, body: { recipientId: lee.user.id } });
+    const conversationId = start.body.conversation.id;
+
+    const read = await api('GET', `/api/conversations/${conversationId}/messages`, { token: mona.accessToken });
+    assert.equal(read.status, 403);
+
+    const post = await api('POST', `/api/conversations/${conversationId}/messages`, { token: mona.accessToken, body: { body: 'sneaky' } });
+    assert.equal(post.status, 403);
+  });
+
+  test('cannot start a conversation with yourself or a nonexistent user', async () => {
+    const nia = await signup('msg-nia');
+
+    const self = await api('POST', '/api/conversations', { token: nia.accessToken, body: { recipientId: nia.user.id } });
+    assert.equal(self.status, 400);
+
+    const ghost = await api('POST', '/api/conversations', { token: nia.accessToken, body: { recipientId: 999999999 } });
+    assert.equal(ghost.status, 404);
+  });
+
+  test('notifications: read-all and single read, scoped to the owning user', async () => {
+    const owen = await signup('msg-owen');
+    const petra = await signup('msg-petra');
+
+    const start = await api('POST', '/api/conversations', { token: petra.accessToken, body: { recipientId: owen.user.id } });
+    await api('POST', `/api/conversations/${start.body.conversation.id}/messages`, { token: petra.accessToken, body: { body: 'hi' } });
+
+    // Friend requests generate real notifications via createNotification(), reused here.
+    const req = await api('POST', '/api/friends/requests', { token: petra.accessToken, body: { recipientId: owen.user.id } });
+    assert.equal(req.status, 201);
+
+    const owenNotifs = await api('GET', '/api/notifications', { token: owen.accessToken });
+    assert.equal(owenNotifs.status, 200);
+    const notif = owenNotifs.body.notifications.find((n) => n.type === 'friend_request_received');
+    assert.ok(notif);
+    assert.equal(notif.read, false);
+
+    const petraTouchingOwenNotif = await api('POST', `/api/notifications/${notif.id}/read`, { token: petra.accessToken });
+    assert.equal(petraTouchingOwenNotif.status, 200);
+    const stillUnread = await api('GET', '/api/notifications', { token: owen.accessToken });
+    assert.equal(stillUnread.body.notifications.find((n) => n.id === notif.id).read, false);
+
+    await api('POST', '/api/notifications/read-all', { token: owen.accessToken });
+    const afterReadAll = await api('GET', '/api/notifications', { token: owen.accessToken });
+    assert.ok(afterReadAll.body.notifications.every((n) => n.read));
+  });
+
+  test('device-token register/unregister require a token field', async () => {
+    const quinn = await signup('msg-quinn');
+
+    const missing = await api('POST', '/api/notifications/device-token', { token: quinn.accessToken, body: {} });
+    assert.equal(missing.status, 400);
+
+    const registered = await api('POST', '/api/notifications/device-token', { token: quinn.accessToken, body: { token: 'fake-fcm-token' } });
+    assert.equal(registered.status, 200);
+
+    const unregistered = await api('DELETE', '/api/notifications/device-token', { token: quinn.accessToken, body: { token: 'fake-fcm-token' } });
+    assert.equal(unregistered.status, 200);
+  });
+});
+
+describe('site content (admin-editable privacy policy / community guidelines)', () => {
+  test('an unedited slug returns null content, and an unknown slug 404s', async () => {
+    const unknown = await api('GET', '/api/content/not-a-real-page');
+    assert.equal(unknown.status, 404);
+  });
+
+  test('only an admin can edit content, and non-editable slugs are rejected even for an admin', async () => {
+    const rae = await signup('content-rae');
+
+    const asNonAdmin = await api('PUT', '/api/content/community-guidelines', {
+      token: rae.accessToken,
+      body: { content: { sections: [{ heading: 'Be nice', body: 'Be kind to others.' }] } },
+    });
+    assert.equal(asNonAdmin.status, 403);
+
+    await makeAdmin(rae.user.id);
+    const notEditable = await api('PUT', '/api/content/some-other-page', {
+      token: rae.accessToken,
+      body: { content: { sections: [{ heading: 'x', body: 'y' }] } },
+    });
+    assert.equal(notEditable.status, 404);
+
+    const badShape = await api('PUT', '/api/content/community-guidelines', { token: rae.accessToken, body: { content: { sections: [] } } });
+    assert.equal(badShape.status, 400);
+
+    const edit = await api('PUT', '/api/content/community-guidelines', {
+      token: rae.accessToken,
+      body: { content: { intro: 'Read this first.', sections: [{ heading: 'Be nice', body: 'Be kind to others.' }] } },
+    });
+    assert.equal(edit.status, 200);
+    assert.equal(edit.body.content.sections[0].heading, 'Be nice');
+
+    const publicRead = await api('GET', '/api/content/community-guidelines');
+    assert.equal(publicRead.status, 200);
+    assert.equal(publicRead.body.content.intro, 'Read this first.');
+
+    const reset = await api('DELETE', '/api/content/community-guidelines', { token: rae.accessToken });
+    assert.equal(reset.status, 200);
+    const afterReset = await api('GET', '/api/content/community-guidelines');
+    assert.equal(afterReset.body.content, null);
+  });
+});
+
+describe('public site pages (homepage + privacy policy HTML)', () => {
+  test('the homepage renders HTML with a link to the privacy policy', async () => {
+    const res = await fetch(`${baseUrl}/`);
+    assert.equal(res.status, 200);
+    const html = await res.text();
+    assert.match(html, /What Should We Eat/);
+    assert.match(html, /href="\/privacy-policy"/);
+  });
+
+  test('the privacy policy page renders HTML and reflects an admin edit made via the content API', async () => {
+    const sam = await signup('site-sam');
+    await makeAdmin(sam.user.id);
+
+    const fresh = await fetch(`${baseUrl}/privacy-policy`);
+    assert.equal(fresh.status, 200);
+    assert.match(await fresh.text(), /Privacy Policy/);
+
+    await api('PUT', '/api/content/privacy-policy', {
+      token: sam.accessToken,
+      body: { content: { intro: 'Custom intro for this test run.', sections: [{ heading: 'Test Section', body: 'Test body.' }] } },
+    });
+
+    const edited = await fetch(`${baseUrl}/privacy-policy`);
+    const html = await edited.text();
+    assert.match(html, /Custom intro for this test run\./);
+    assert.match(html, /Test Section/);
+
+    // Reset so this doesn't leak into other tests reading the default policy.
+    await api('DELETE', '/api/content/privacy-policy', { token: sam.accessToken });
+  });
+});
+
+describe('feature waitlist', () => {
+  test('requires auth, validates the email, and a duplicate signup is a silent no-op', async () => {
+    const unauth = await api('POST', '/api/waitlist', { body: { email: 'x@example.com' } });
+    assert.equal(unauth.status, 401);
+
+    const tina = await signup('waitlist-tina');
+
+    const missing = await api('POST', '/api/waitlist', { token: tina.accessToken, body: {} });
+    assert.equal(missing.status, 400);
+
+    const invalid = await api('POST', '/api/waitlist', { token: tina.accessToken, body: { email: 'not-an-email' } });
+    assert.equal(invalid.status, 400);
+
+    const first = await api('POST', '/api/waitlist', { token: tina.accessToken, body: { email: 'tina@example.com' } });
+    assert.equal(first.status, 201);
+
+    const duplicate = await api('POST', '/api/waitlist', { token: tina.accessToken, body: { email: 'tina@example.com' } });
+    assert.equal(duplicate.status, 201);
   });
 });

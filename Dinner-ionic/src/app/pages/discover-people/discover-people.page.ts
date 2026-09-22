@@ -44,11 +44,6 @@ export class DiscoverPeoplePage extends BasePage {
   });
   readonly loading = signal(true);
   readonly filterSheetOpen = signal(false);
-  /** Advanced search filters (Interest/Cuisine/Distance) are a Premium perk
-   * (see proposal's Revenue Model) -- Age stays free for everyone. Defaults
-   * to false (locked look) until the first load confirms the real status,
-   * same reasoning as ai-matching.page.ts's aiInsightsUnlocked. */
-  readonly advancedFiltersUnlocked = signal(false);
 
   readonly cuisineOptions = CUISINE_OPTIONS;
   readonly distanceOptionsKm = DISTANCE_OPTIONS_KM;
@@ -79,8 +74,8 @@ export class DiscoverPeoplePage extends BasePage {
     this.profileService
       .people({
         // "Nearby" = the city being browsed, same as Discover Restaurants.
-        // An applied distance filter (Premium) replaces it: that already
-        // measures how far people are, possibly across city lines.
+        // An applied distance filter replaces it: that already measures how
+        // far people are, possibly across city lines.
         city: this.selectedDistanceKm !== null && this.appliedLat !== null ? undefined : this.cityService.current(),
         minAge: this.minAge ?? undefined,
         maxAge: this.maxAge ?? undefined,
@@ -91,9 +86,8 @@ export class DiscoverPeoplePage extends BasePage {
         maxDistanceKm: this.selectedDistanceKm ?? undefined,
       })
       .subscribe({
-        next: ({ people, advancedFiltersUnlocked }) => {
+        next: ({ people }) => {
           this.allPeople.set(people);
-          this.advancedFiltersUnlocked.set(advancedFiltersUnlocked);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
@@ -117,29 +111,17 @@ export class DiscoverPeoplePage extends BasePage {
     this.filterSheetOpen.set(false);
   }
 
-  /** Entry point for the Interest/Cuisine/Distance filter chips specifically
-   * -- a free account is sent straight to Premium instead of opening the
-   * sheet on a section it can't use. The Age chip and the header's tune icon
-   * still call openFilterSheet() directly, since Age itself is free. */
-  openAdvancedFilterSheet(): void {
-    if (this.advancedFiltersUnlocked()) this.openFilterSheet();
-    else this.go('/subscribe-to-premium');
-  }
-
   toggleInterest(id: number): void {
-    if (!this.advancedFiltersUnlocked()) return;
     if (this.selectedInterestIds.has(id)) this.selectedInterestIds.delete(id);
     else this.selectedInterestIds.add(id);
   }
 
   toggleCuisine(name: string): void {
-    if (!this.advancedFiltersUnlocked()) return;
     if (this.selectedCuisines.has(name)) this.selectedCuisines.delete(name);
     else this.selectedCuisines.add(name);
   }
 
   selectDistance(km: number): void {
-    if (!this.advancedFiltersUnlocked()) return;
     this.selectedDistanceKm = this.selectedDistanceKm === km ? null : km;
   }
 

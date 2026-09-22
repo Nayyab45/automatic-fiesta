@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
 import { adminGuard } from './services/admin.guard';
+import { redirectIfAuthenticatedGuard } from './services/redirect-if-authenticated.guard';
 
 // Routes reachable without being signed in. Every other route requires auth
 // (see the `.map()` below) now that a real user/session model exists.
@@ -27,10 +28,10 @@ const publicPaths = new Set([
 // form is what real data will use. Read the value via `BasePage.routeId`.
 const routeDefinitions: Routes = [
   { path: '', redirectTo: 'splash', pathMatch: 'full' },
-  { path: 'splash', loadComponent: () => import('./pages/splash/splash.page').then((m) => m.SplashPage) },
+  { path: 'splash', canActivate: [redirectIfAuthenticatedGuard], loadComponent: () => import('./pages/splash/splash.page').then((m) => m.SplashPage) },
   { path: 'loading', loadComponent: () => import('./pages/loading/loading.page').then((m) => m.LoadingPage) },
-  { path: 'login', loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage) },
-  { path: 'signup', loadComponent: () => import('./pages/signup/signup.page').then((m) => m.SignupPage) },
+  { path: 'login', canActivate: [redirectIfAuthenticatedGuard], loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage) },
+  { path: 'signup', canActivate: [redirectIfAuthenticatedGuard], loadComponent: () => import('./pages/signup/signup.page').then((m) => m.SignupPage) },
   { path: 'profile-creation', loadComponent: () => import('./pages/profile-creation/profile-creation.page').then((m) => m.ProfileCreationPage) },
   { path: 'personal-interests', loadComponent: () => import('./pages/personal-interests/personal-interests.page').then((m) => m.PersonalInterestsPage) },
   { path: 'food-preferences', loadComponent: () => import('./pages/food-preferences/food-preferences.page').then((m) => m.FoodPreferencesPage) },
@@ -83,7 +84,6 @@ const routeDefinitions: Routes = [
   { path: 'admin/reviews', loadComponent: () => import('./pages/admin-reviews/admin-reviews.page').then((m) => m.AdminReviewsPage) },
   { path: 'edit-preferences', loadComponent: () => import('./pages/edit-preferences/edit-preferences.page').then((m) => m.EditPreferencesPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage) },
-  { path: 'premium-members', loadComponent: () => import('./pages/premium-members/premium-members.page').then((m) => m.PremiumMembersPage) },
   { path: 'safety-center', loadComponent: () => import('./pages/safety-center/safety-center.page').then((m) => m.SafetyCenterPage) },
   { path: 'safety-checkin', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },
   { path: 'safety-checkin/:id', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },
@@ -102,8 +102,6 @@ const routeDefinitions: Routes = [
   { path: 'blocked-users', loadComponent: () => import('./pages/blocked-users/blocked-users.page').then((m) => m.BlockedUsersPage) },
   { path: 'full-community-policy', loadComponent: () => import('./pages/full-community-policy/full-community-policy.page').then((m) => m.FullCommunityPolicyPage) },
   { path: 'help-support', loadComponent: () => import('./pages/help-support/help-support.page').then((m) => m.HelpSupportPage) },
-  { path: 'subscribe-to-premium', loadComponent: () => import('./pages/subscribe-to-premium/subscribe-to-premium.page').then((m) => m.SubscribeToPremiumPage) },
-  { path: 'subscribe-to-premium-success', loadComponent: () => import('./pages/subscribe-to-premium-success/subscribe-to-premium-success.page').then((m) => m.SubscribeToPremiumSuccessPage) },
   { path: 'all-dishes', loadComponent: () => import('./pages/all-dishes/all-dishes.page').then((m) => m.AllDishesPage) },
   { path: 'explore-menu', loadComponent: () => import('./pages/explore-menu/explore-menu.page').then((m) => m.ExploreMenuPage) },
   { path: 'explore-menu/:id', loadComponent: () => import('./pages/explore-menu/explore-menu.page').then((m) => m.ExploreMenuPage) },
@@ -114,7 +112,6 @@ const routeDefinitions: Routes = [
   { path: 'table-details-guests', loadComponent: () => import('./pages/table-details-guests/table-details-guests.page').then((m) => m.TableDetailsGuestsPage) },
   { path: 'table-details-guests/:id', loadComponent: () => import('./pages/table-details-guests/table-details-guests.page').then((m) => m.TableDetailsGuestsPage) },
   { path: 'select-location', loadComponent: () => import('./pages/select-location/select-location.page').then((m) => m.SelectLocationPage) },
-  { path: 'payment-methods', loadComponent: () => import('./pages/payment-methods/payment-methods.page').then((m) => m.PaymentMethodsPage) },
   { path: 'error', loadComponent: () => import('./pages/error/error.page').then((m) => m.ErrorPage) },
   { path: '**', loadComponent: () => import('./pages/error/error.page').then((m) => m.ErrorPage) },
 ];

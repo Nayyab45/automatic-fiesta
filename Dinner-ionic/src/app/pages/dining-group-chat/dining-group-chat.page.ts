@@ -40,6 +40,7 @@ export class DiningGroupChatPage extends BasePage {
   readonly loading = signal(true);
   readonly sending = signal(false);
   readonly bubbles = signal<ChatBubble[]>([]);
+  readonly sendError = signal<string | null>(null);
 
   private readonly conversationOrTableId = this.routeId();
   private readonly myId = this.authService.currentUser()?.id ?? null;
@@ -96,6 +97,7 @@ export class DiningGroupChatPage extends BasePage {
     if (!text || !id || this.sending()) return;
 
     this.sending.set(true);
+    this.sendError.set(null);
     const request$: Observable<{ message: TableMessage | DirectMessage }> = this.isDm
       ? this.messagingService.sendMessage(id, text)
       : this.tableService.sendMessage(id, text);
@@ -105,7 +107,14 @@ export class DiningGroupChatPage extends BasePage {
         this.sending.set(false);
         input.value = '';
       },
-      error: () => this.sending.set(false),
+      // The auth interceptor already retries once on an expired access
+      // token; if the message is still stuck in the input, the retry didn't
+      // land (e.g. the refresh itself failed) rather than nothing happening,
+      // so say so instead of leaving the tap looking like it did nothing.
+      error: () => {
+        this.sending.set(false);
+        this.sendError.set("Message didn't send. Check your connection and try again.");
+      },
     });
   }
 }

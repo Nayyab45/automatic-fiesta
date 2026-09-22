@@ -118,6 +118,6 @@ describe('ProfileService', () => {
     service.matches().subscribe();
     const req = httpMock.expectOne(`${environment.apiUrl}/matches`);
     expect(req.request.method).toBe('GET');
-    req.flush({ matches: [], aiInsightsUnlocked: false });
+    req.flush({ matches: [] });
   });
 });

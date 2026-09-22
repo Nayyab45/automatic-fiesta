@@ -25,7 +25,7 @@ export const DEFAULT_PRIVACY_POLICY: PolicyContent = {
   sections: [
     {
       heading: "Information We Collect",
-      body: "- **Account & profile:** name, email, password (stored hashed, never in plain text), age, city/province, a short bio, a profile photo you upload, and your food/cuisine preferences.\n- **Identity verification (optional):** if you choose to verify your identity, we store the ID photo and selfie you submit until your verification is reviewed.\n- **Payment methods (optional):** only the payment type and last 4 digits of a card/account, or a wallet phone number for EasyPaisa/JazzCash. We never store full card numbers, bank account numbers, or CVV codes.\n- **Dining activity:** tables you host or join, seat requests, reviews you write, and restaurants you save.\n- **Messages:** direct messages and table group chat messages you send through the app.\n- **Safety & trust:** emergency contacts you add, and any blocks or reports you file (or that are filed against you)."
+      body: "- **Account & profile:** name, email, password (stored hashed, never in plain text), age, city/province, a short bio, a profile photo you upload, and your food/cuisine preferences.\n- **Identity verification (optional):** if you choose to verify your identity, we store the ID photo and selfie you submit until your verification is reviewed.\n- **Dining activity:** tables you host or join, seat requests, reviews you write, and restaurants you save.\n- **Messages:** direct messages and table group chat messages you send through the app.\n- **Safety & trust:** emergency contacts you add, and any blocks or reports you file (or that are filed against you)."
     },
     {
       heading: "Location",
@@ -33,11 +33,11 @@ export const DEFAULT_PRIVACY_POLICY: PolicyContent = {
     },
     {
       heading: "How We Use Your Data",
-      body: "- To operate the core features you use directly: discovering restaurants and people, hosting/joining dining tables, messaging, and reviews.\n- To verify identity and payment methods when you choose to add them, for trust and safety and to process payments through our payment providers.\n- To act on safety reports, blocks, and emergency contact information if you use those features.\n- To secure your account (password hashing, session tokens, optional two-factor authentication).\nWe do not sell your personal data to third parties or advertisers."
+      body: "- To operate the core features you use directly: discovering restaurants and people, hosting/joining dining tables, messaging, and reviews.\n- To verify identity when you choose to, for trust and safety.\n- To act on safety reports, blocks, and emergency contact information if you use those features.\n- To secure your account (password hashing, session tokens, optional two-factor authentication).\nWe do not sell your personal data to third parties or advertisers."
     },
     {
       heading: "Who Can See Your Data",
-      body: "- Other users see the profile information you choose to make visible, and any messages/reviews you post are visible to their intended recipients or the public dining table.\n- Payment providers (e.g. JazzCash, EasyPaisa, or a card/bank gateway) receive only the information needed to process a payment when you make one.\n- We do not share your data with advertisers or data brokers."
+      body: "- Other users see the profile information you choose to make visible, and any messages/reviews you post are visible to their intended recipients or the public dining table.\n- We do not share your data with advertisers or data brokers."
     },
     {
       heading: "Your Controls",

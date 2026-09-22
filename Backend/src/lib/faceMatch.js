@@ -1,11 +1,11 @@
 // Compares the selfie against the ID photo taken during identity
 // verification, via Face++'s Compare API (faceplusplus.com). No SDK
 // dependency -- a single POST, consistent with this codebase's other
-// third-party integrations (see mailer.js, paymentGateways/).
+// third-party integrations (see mailer.js).
 //
-// isConfigured() mirrors the mailer.js/paymentGateways pattern: a provider
-// whose credentials aren't set just gets skipped by the caller (submit()
-// in routes/verification.js falls back to the old manual-review "pending"
+// isConfigured() mirrors the mailer.js pattern: a provider whose
+// credentials aren't set just gets skipped by the caller (submit() in
+// routes/verification.js falls back to the old manual-review "pending"
 // state) instead of the app failing to start or blocking every signup on a
 // missing API key.
 

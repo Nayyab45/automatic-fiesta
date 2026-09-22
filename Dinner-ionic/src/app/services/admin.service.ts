@@ -30,7 +30,6 @@ export interface AdminUserRow {
   suspendedAt: string | null;
   flaggedAt: string | null;
   verified: boolean;
-  isPremium: boolean;
 }
 
 export interface AdminUserDetail {
@@ -48,7 +47,6 @@ export interface AdminUserDetail {
   photoUrl: string | null;
   gender: string | null;
   verified: boolean;
-  isPremium: boolean;
   verificationStatus: string;
   verificationSubmittedAt: string | null;
   rating: number | null;

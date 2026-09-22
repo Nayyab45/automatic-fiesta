@@ -5,7 +5,6 @@ import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { tastePrefsFor, distanceKm } from '../lib/taste.js';
 import { cityCoordinates } from '../lib/cityGeocode.js';
-import { subscriptionFor, activePremiumUserIds, hasPremiumFeatures } from './subscriptions.js';
 import { tableCreationStatus } from './tables.js';
 import { explainMatch } from '../lib/ai.js';
 
@@ -148,7 +147,6 @@ async function fullProfile(userId) {
     phone: profile?.phone ?? null,
     gender: profile?.gender ?? null,
     verified: !!profile?.verified,
-    isPremium: (await subscriptionFor(userId)).status === 'active',
     tablesJoinedCount: await tablesJoinedCount(userId),
     rating: await peopleRating(userId),
     favoriteFoods: foodPrefs?.favorite_foods ? foodPrefs.favorite_foods.split(',') : [],
@@ -231,14 +229,8 @@ async function recordProfileView(viewerUserId, viewedUserId) {
   ).run(viewerUserId, viewedUserId);
 }
 
-// Premium-only: who has viewed my profile recently (most recent first).
-// Free accounts get a 402 rather than a silently-empty list, matching how
-// subscriptionsRouter's checkout responds to an unconfigured gateway.
+// Who has viewed my profile recently (most recent first).
 profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
-  if (!(await hasPremiumFeatures(req.user.sub))) {
-    return res.status(402).json({ message: 'Upgrade to Premium to see who viewed your profile.' });
-  }
-
   const rows = toCamelRows(
     await db
       .prepare(
@@ -371,14 +363,6 @@ const PROFILE_VISIBLE_CLAUSE = `u.id NOT IN (
 
 peopleRouter.get('/', asyncHandler(async (req, res) => {
   const { city, minAge, maxAge, interestIds, cuisine, lat, lng, maxDistanceKm } = req.query;
-  // Advanced search filters (Interest/Cuisine/Distance) are a Premium perk
-  // (see proposal's Revenue Model) -- Age stays free, same as the basic
-  // city/age narrowing every account gets. A free account sending these
-  // query params anyway just gets them ignored below rather than erroring,
-  // matching how the AI-matching gate degrades (see matchesRouter) --
-  // Discover People itself must never break for a free account, only the
-  // advanced narrowing on top of it does.
-  const advancedFiltersUnlocked = await hasPremiumFeatures(req.user.sub);
   const clauses = ['u.id != ?', NOT_BLOCKED_CLAUSE, PROFILE_VISIBLE_CLAUSE];
   const params = [req.user.sub, req.user.sub, req.user.sub];
   if (city) {
@@ -407,10 +391,9 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
 
   let people = toCamelRows(rows);
   const ids = people.map((person) => person.id);
-  const [interestsByUserId, favoriteFoodsByUserId, premiumIds, mutualVisibilityByUserId] = await Promise.all([
+  const [interestsByUserId, favoriteFoodsByUserId, mutualVisibilityByUserId] = await Promise.all([
     interestsForBatch(ids),
     favoriteFoodsForBatch(ids),
-    activePremiumUserIds(ids),
     mutualInterestsVisibilityForBatch(ids),
   ]);
   // Mutual interests: the overlap between the viewer's own interests and
@@ -425,21 +408,20 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
       ...person,
       interests,
       favoriteFoods: favoriteFoodsByUserId.get(person.id) ?? [],
-      isPremium: premiumIds.has(person.id),
       sharedInterests: mutualVisibilityByUserId.get(person.id)
         ? interests.filter((interest) => myInterestIds.has(interest.id))
         : [],
     };
   });
 
-  const requestedInterestIds = advancedFiltersUnlocked && interestIds
+  const requestedInterestIds = interestIds
     ? String(interestIds).split(',').map(Number).filter((id) => !Number.isNaN(id))
     : [];
   if (requestedInterestIds.length) {
     people = people.filter((person) => person.interests.some((interest) => requestedInterestIds.includes(interest.id)));
   }
 
-  const requestedCuisines = advancedFiltersUnlocked && cuisine
+  const requestedCuisines = cuisine
     ? String(cuisine).split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
     : [];
   if (requestedCuisines.length) {
@@ -454,8 +436,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
   // app persists an individual user's own live location. A candidate with
   // no city, or a city that can't be geocoded, is excluded rather than
   // guessed into or out of range.
-  const hasCoords =
-    advancedFiltersUnlocked && lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
+  const hasCoords = lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
   if (hasCoords && maxDistanceKm) {
     const viewerLat = Number(lat);
     const viewerLng = Number(lng);
@@ -472,16 +453,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
       .filter((person) => person.distanceKm !== null && person.distanceKm <= radiusKm);
   }
 
-  // Priority profile placement (premium perk): premium profiles sort first
-  // as a whole group, ahead of everyone else -- a stable sort, so within
-  // each group people keep whatever relative order the filters above left
-  // them in rather than being reshuffled.
-  people = people
-    .map((person, index) => ({ person, index }))
-    .sort((a, b) => Number(b.person.isPremium) - Number(a.person.isPremium) || a.index - b.index)
-    .map(({ person }) => person);
-
-  res.json({ people: people.map(({ favoriteFoods, ...person }) => person), advancedFiltersUnlocked });
+  res.json({ people: people.map(({ favoriteFoods, ...person }) => person) });
 }));
 
 matchesRouter.get('/', asyncHandler(async (req, res) => {
@@ -500,7 +472,6 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
       )
       .all(req.user.sub, req.user.sub, req.user.sub),
   );
-  const premiumIds = await activePremiumUserIds(candidates.map((c) => c.id));
 
   const matches = (
     await Promise.all(
@@ -553,7 +524,6 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           ...candidate,
           score: Math.min(score, 99),
           sameCity: !!sameCity,
-          isPremium: premiumIds.has(candidate.id),
           interests: candidateInterests,
           sharedInterests,
           sharedFavoriteFoods,
@@ -564,32 +534,19 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           tablesJoinedCount: await tablesJoinedCount(candidate.id),
           // Flipped true below only for a match that actually got an
           // AI-written reason -- lets the frontend show which ones are
-          // AI-powered (a Premium perk, see proposal's Revenue Model)
-          // without a second round trip.
+          // AI-powered without a second round trip.
           aiPowered: false,
         };
       }),
     )
   ).sort((a, b) => {
     // Same-area people first as a whole group (top), everyone else after
-    // (bottom). Priority profile placement (premium perk) breaks ties within
-    // each area group next, ahead of the taste/interest score -- a premium
-    // profile never jumps ahead of a genuinely closer/tastier match from the
-    // other area group, but does rank above an equally-relevant free one.
+    // (bottom), then by the taste/interest score.
     if (a.sameCity !== b.sameCity) return a.sameCity ? -1 : 1;
-    if (a.isPremium !== b.isPremium) return a.isPremium ? -1 : 1;
     return b.score - a.score;
   });
 
-  // AI-powered match insights are a Premium perk (see proposal's Revenue
-  // Model) -- a free account still gets the full ranked list with the
-  // heuristic reasons above, just none of them AI-written. Checked here
-  // rather than filtering the whole endpoint behind a subscription so
-  // Discover/Matches itself (a core, free feature) never breaks for a free
-  // account -- only the AI enhancement on top of it does.
-  const aiInsightsUnlocked = await hasPremiumFeatures(req.user.sub);
-
-  if (aiInsightsUnlocked) {
+  {
     // AI-write the top reason for only the highest-ranked matches -- capped
     // at 5 (confirmed live: Gemini's free tier allows exactly 5
     // generateContent calls/minute per model, see ai.js) so one page load
@@ -619,7 +576,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
     );
   }
 
-  res.json({ matches, aiInsightsUnlocked });
+  res.json({ matches });
 }));
 
 privacySettingsRouter.get('/', asyncHandler(async (req, res) => {

@@ -1,9 +1,7 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, type BannerAdOptions } from '@capacitor-community/admob';
 import { environment } from '../../environments/environment';
-import { AuthService } from './auth.service';
-import { PaymentService } from './payment.service';
 
 // adId/isTesting come from environment.ts (dev) / environment.prod.ts (prod
 // release build) rather than being hardcoded here, so swapping in the app's
@@ -21,47 +19,20 @@ const BANNER_OPTIONS: BannerAdOptions = {
   isTesting: environment.adMob.isTesting,
 };
 
-// Banner ads for accounts without Premium (see proposal: "Free Version ...
-// Google AdMob advertisements" / "Premium ... No advertisements"). While every
-// Premium feature is free for everyone (the server default, see
-// PaymentService.premiumFeaturesFree) nobody qualifies, so no ad is shown --
-// turning the paid gating back on on the server brings ads back for free
-// accounts with no app change. Native-only -- there's no ad SDK to initialize
-// on the plain web build (`ng serve`).
+// Ads are permanently off: every feature is free for everyone, with no paid
+// tier to show ads to as an alternative. The native AdMob plugin wiring is
+// kept below (unused) rather than ripped out, in case ads are ever wanted
+// again -- but nothing in the app calls showBanner() anymore. Native-only --
+// there's no ad SDK to initialize on the plain web build (`ng serve`).
 @Injectable({ providedIn: 'root' })
 export class AdmobService {
-  private readonly authService = inject(AuthService);
-  private readonly paymentService = inject(PaymentService);
-
   private initialized = false;
   private bannerShowing = false;
-  private dismissTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** True while the native banner is actually on screen -- drives the
    * floating close button in AppComponent (there's nothing to close
-   * otherwise). Not affected by a pending dismiss timer's eventual re-show. */
+   * otherwise). Always false now that nothing ever calls showBanner(). */
   readonly bannerVisible = signal(false);
-
-  constructor() {
-    // Re-checks premium status (and shows/hides the banner accordingly)
-    // every time sign-in state changes -- covers logging in as a premium
-    // account, logging out, and switching accounts on the same device.
-    effect(() => {
-      if (!this.authService.isAuthenticated()) {
-        this.hideBanner();
-        return;
-      }
-      this.paymentService.getSubscription().subscribe({
-        // "No advertisements" is a Premium perk -- and with every Premium
-        // feature free for everyone, nobody sees ads.
-        next: ({ subscription, premiumFeaturesFree }) => {
-          if (premiumFeaturesFree || subscription.status === 'active') this.hideBanner();
-          else this.showBanner();
-        },
-        error: () => {},
-      });
-    });
-  }
 
   async init(): Promise<void> {
     if (this.initialized || !Capacitor.isNativePlatform()) return;
@@ -75,34 +46,14 @@ export class AdmobService {
     // close button floating over an empty banner with nothing to close.
     await AdMob.addListener(BannerAdPluginEvents.Loaded, () => this.bannerVisible.set(true));
     await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => {
-      // Let a later showBanner() (next auth/subscription check, or the
-      // dismiss() retry) try again instead of staying stuck believing a
-      // banner is showing when nothing ever loaded.
       this.bannerShowing = false;
       this.bannerVisible.set(false);
     });
   }
 
-  /** Call again after a checkout succeeds, so the banner disappears immediately
-   * instead of waiting for the next sign-in-state change to re-check it. */
-  refresh(): void {
-    this.paymentService.getSubscription().subscribe({
-      next: ({ subscription, premiumFeaturesFree }) =>
-        premiumFeaturesFree || subscription.status === 'active' ? this.hideBanner() : this.showBanner(),
-      error: () => {},
-    });
-  }
-
-  /** Hides the banner for 15s, then re-checks eligibility and shows it again
-   * if it's still earned (still free-tier, still signed in) -- lets a user
-   * reclaim the screen briefly without permanently losing the ad slot. */
+  /** Closes the floating close button's banner, if one were ever showing. */
   dismiss(): void {
-    if (this.dismissTimer || !this.bannerShowing) return;
     this.hideBanner();
-    this.dismissTimer = setTimeout(() => {
-      this.dismissTimer = null;
-      this.refresh();
-    }, 15000);
   }
 
   private showBanner(): void {

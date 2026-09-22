@@ -6,7 +6,6 @@ import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
-import { hasPremiumFeatures } from './subscriptions.js';
 import { requireAdmin } from '../lib/adminAuth.js';
 
 export const tablesRouter = Router();
@@ -27,30 +26,11 @@ async function isTableMember(table, userId) {
 
 const TABLE_AUDIENCES = ['everyone', 'women_only', 'friends_only'];
 
-// Free-tier cap on hosting events (see proposal: "Premium ... Unlimited
-// event creation") -- a free account can still host a handful a month, just
-// not without limit. Calendar month, same reasoning as profile.js's
-// MONTHLY_PREFERENCE_CHANGE_LIMIT (a simple "resets on the 1st" the user can
-// be told, rather than a rolling window tied to exactly when they used it).
-const FREE_TIER_MONTHLY_TABLE_LIMIT = 3;
-
-// Exported so profileRouter's /me can surface remaining/nextResetAt
-// proactively (create-table's "X free events left" banner), the same way it
-// already does for preferenceChangeStatus.
-export async function tableCreationStatus(userId) {
-  if (await hasPremiumFeatures(userId)) {
-    return { unlimited: true, remaining: null, nextResetAt: null };
-  }
-  const { usedCount } = await db
-    .prepare(
-      `SELECT COUNT(*) as usedCount FROM dining_tables
-       WHERE host_user_id = ? AND created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')`,
-    )
-    .get(userId);
-  const { nextResetAt } = await db
-    .prepare("SELECT DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y-%m-01') as nextResetAt")
-    .get();
-  return { unlimited: false, remaining: Math.max(0, FREE_TIER_MONTHLY_TABLE_LIMIT - usedCount), nextResetAt };
+// Event creation is unlimited for every account. Exported so profileRouter's
+// /me can surface this shape, the same way it already does for
+// preferenceChangeStatus.
+export async function tableCreationStatus() {
+  return { unlimited: true, remaining: null, nextResetAt: null };
 }
 
 // A table's audience only restricts who may *discover or request a seat at*
@@ -297,14 +277,6 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
   }
   if (audience !== undefined && !TABLE_AUDIENCES.includes(audience)) {
     return res.status(400).json({ message: `audience must be one of: ${TABLE_AUDIENCES.join(', ')}` });
-  }
-
-  const creationStatus = await tableCreationStatus(req.user.sub);
-  if (!creationStatus.unlimited && creationStatus.remaining <= 0) {
-    return res.status(429).json({
-      message: `You've used your ${FREE_TIER_MONTHLY_TABLE_LIMIT} free events for this month. Upgrade to Premium for unlimited event creation, or try again ${creationStatus.nextResetAt}.`,
-      tableCreation: creationStatus,
-    });
   }
 
   const restaurant = await db

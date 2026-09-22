@@ -2,9 +2,8 @@
 // dependency, matching mailer.js's approach for Resend -- a single POST
 // with Basic Auth is all this needs.
 //
-// isConfigured() mirrors the payment-gateway pattern: a provider whose
-// credentials aren't set just gets skipped by the caller instead of the
-// app failing to start.
+// isConfigured() means a provider whose credentials aren't set just gets
+// skipped by the caller instead of the app failing to start.
 
 function isConfigured() {
   return !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM_NUMBER);

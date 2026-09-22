@@ -70,6 +70,7 @@
 </main>
 
 <div class="bg-surface border-t border-outline-variant/30 px-container-padding py-stack-sm pb-[calc(16px+env(safe-area-inset-bottom)+70px)] fixed bottom-0 left-0 w-full z-20">
+<p *ngIf="sendError()" class="font-body-sm text-body-sm text-error px-2 pb-2" role="alert">{{ sendError() }}</p>
 <div class="flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/50 focus-within:border-primary transition-colors">
 <input #messageInput (keyup.enter)="sendMessage(messageInput)" [disabled]="sending()" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/70 py-2" placeholder="Type a message..." type="text"/>
 <button (click)="sendMessage(messageInput)" [disabled]="sending()" aria-label="Send message" class="text-primary hover:opacity-80 transition-opacity bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center disabled:opacity-50">

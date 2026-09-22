@@ -299,8 +299,7 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
 // preferences, the same privacy boundary friend_requests already enforces
 // on friends.js's own endpoints. Without a key configured, this still
 // works -- it just returns the top heuristic candidate with a templated
-// reason instead of a model-written one, same fallback pattern the payment
-// gateways use for an unconfigured provider.
+// reason instead of a model-written one.
 restaurantsRouter.post('/group-recommendation', requireAuth, asyncHandler(async (req, res) => {
   const memberIds = Array.isArray(req.body.memberIds)
     ? [...new Set(req.body.memberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0))]
