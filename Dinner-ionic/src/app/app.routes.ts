@@ -38,6 +38,7 @@ const routeDefinitions: Routes = [
   { path: 'dietary-preferences', loadComponent: () => import('./pages/dietary-preferences/dietary-preferences.page').then((m) => m.DietaryPreferencesPage) },
   { path: 'home', loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage) },
   { path: 'discover-restaurants', loadComponent: () => import('./pages/discover-restaurants/discover-restaurants.page').then((m) => m.DiscoverRestaurantsPage) },
+  { path: 'saved-restaurants', loadComponent: () => import('./pages/saved-restaurants/saved-restaurants.page').then((m) => m.SavedRestaurantsPage) },
   { path: 'discover-people', loadComponent: () => import('./pages/discover-people/discover-people.page').then((m) => m.DiscoverPeoplePage) },
   { path: 'search-filter', loadComponent: () => import('./pages/search-filter/search-filter.page').then((m) => m.SearchFilterPage) },
   { path: 'ai-matching', loadComponent: () => import('./pages/ai-matching/ai-matching.page').then((m) => m.AiMatchingPage) },

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Share } from '@capacitor/share';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
 import { googleMapsUrl, staticMapUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
@@ -129,14 +130,14 @@ export class RestaurantDetailPage extends BasePage {
     return staticMapUrl(restaurant.latitude, restaurant.longitude);
   }
 
-  share(): void {
+  async share(): Promise<void> {
     const restaurant = this.restaurant();
     if (!restaurant) return;
     const shareData = { title: restaurant.name, text: `Check out ${restaurant.name}`, url: window.location.href };
-    if (navigator.share) {
-      navigator.share(shareData).catch(() => {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareData.url).catch(() => {});
+    try {
+      await Share.share(shareData);
+    } catch {
+      navigator.clipboard?.writeText(shareData.url).catch(() => {});
     }
   }
 }

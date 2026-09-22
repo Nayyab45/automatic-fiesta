@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
+import { Share } from '@capacitor/share';
 import { BasePage } from '../base.page';
 import { DiningTable, TableGuest, DiningTableService } from '../../services/dining-table.service';
 
@@ -44,14 +45,14 @@ export class TableDetailsGuestsPage extends BasePage {
     return Array.from({ length: this.availableSeats() });
   }
 
-  share(): void {
+  async share(): Promise<void> {
     const table = this.table();
     if (!table) return;
     const shareData = { title: table.restaurant.name, text: `Join me at ${table.restaurant.name}`, url: window.location.href };
-    if (navigator.share) {
-      navigator.share(shareData).catch(() => {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareData.url).catch(() => {});
+    try {
+      await Share.share(shareData);
+    } catch {
+      navigator.clipboard?.writeText(shareData.url).catch(() => {});
     }
   }
 }

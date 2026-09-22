@@ -13,6 +13,7 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { mailer } from '../lib/mailer.js';
 import { requireAdmin } from '../lib/adminAuth.js';
 import { toCamelRows } from '../lib/serialize.js';
+import { nowAsTableTimeString } from '../lib/tableTime.js';
 
 export const authRouter = Router();
 
@@ -498,10 +499,9 @@ authRouter.get('/admin/stats', requireAuth, requireAdmin, asyncHandler(async (_r
     db.prepare('SELECT COUNT(*) as count FROM restaurants').get(),
     db.prepare('SELECT COUNT(*) as count FROM dining_tables').get(),
     // Same "upcoming" comparison as tablesRouter's /discover in tables.js --
-    // date_time is a plain 'YYYY-MM-DDTHH:mm' string, not a real DATETIME
-    // column, but it sorts/compares lexicographically the same as
-    // chronologically against an ISO timestamp string.
-    db.prepare('SELECT COUNT(*) as count FROM dining_tables WHERE date_time > ?').get(new Date().toISOString()),
+    // see lib/tableTime.js for why this needs to be in the same naive
+    // Pakistan-local shape as what's stored, not a UTC ISO string.
+    db.prepare('SELECT COUNT(*) as count FROM dining_tables WHERE date_time > ?').get(nowAsTableTimeString()),
     db.prepare("SELECT COUNT(*) as count FROM identity_verifications WHERE status = 'pending'").get(),
     db.prepare('SELECT COUNT(*) as count FROM users WHERE flagged_at IS NOT NULL').get(),
     db.prepare('SELECT COUNT(*) as count FROM users WHERE suspended_at IS NOT NULL').get(),

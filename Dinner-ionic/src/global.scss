@@ -62,13 +62,24 @@ ion-content {
    "fixed" elements would scroll along with it instead of staying put. Making
    <main> (a plain element, not a containing block) the scroll container keeps
    header/nav outside the scrolling region, so they stay visually pinned while
-   only the content in between scrolls. */
+   only the content in between scrolls.
+
+   Descendant selector, not `.ion-page > main`: several page templates wrap
+   their whole body (header + main) in one extra div carried over from the
+   original static prototype, which a direct-child selector never matches --
+   <main> silently kept its default (unbounded, un-scrollable) sizing on
+   those pages, clipped by ion-page's own overflow:hidden with no way to
+   reach the content below the fold (e.g. Privacy Settings). Matching at any
+   depth fixes that without having to flatten every page's markup, as long
+   as a page's own wrapper div (if any) is itself height-bound to fill
+   ion-page (`h-full`, not `min-h-screen`, which only sets a floor and lets
+   the wrapper grow past the viewport instead of constraining <main>). */
 .ion-page {
   display: flex;
   flex-direction: column;
 }
 
-.ion-page > main {
+.ion-page main {
   flex: 1 1 0%;
   min-height: 0;
   overflow-y: auto;

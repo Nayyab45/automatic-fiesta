@@ -1,4 +1,7 @@
 <app-root-header [cityLabel]="cityService.label()">
+  <button (click)="go('/saved-restaurants')" aria-label="Saved restaurants" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+  </button>
   <button (click)="go('/search-filter')" aria-label="Search this area" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
     <span class="material-symbols-outlined">search</span>
   </button>
@@ -23,6 +26,13 @@
 <div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding">
 <button *ngFor="let price of priceChips" (click)="selectPriceTier(price.tier)" [class.filter-chip-selected]="selectedPriceTier === price.tier" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">{{ price.label }}</button>
 </div>
+<!-- Most listed restaurants are imported from OpenStreetMap with no real
+     price data (see restaurants.js's price_tier comment) -- rather than
+     fabricate a tier for them, a price filter only ever matches the small
+     set of restaurants with a confirmed price, so this explains why it
+     looks so much narrower than the other filters instead of just looking
+     broken. -->
+<p *ngIf="selectedPriceTier !== null" class="font-label-sm text-label-sm text-on-surface-variant -mt-1">Only showing restaurants with confirmed pricing for this range.</p>
 </div>
 
 <p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant py-section-gap text-center">Loading restaurants…</p>

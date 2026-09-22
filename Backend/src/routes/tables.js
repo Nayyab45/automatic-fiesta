@@ -7,6 +7,7 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
 import { requireAdmin } from '../lib/adminAuth.js';
+import { isTablePast, nowAsTableTimeString } from '../lib/tableTime.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -74,7 +75,7 @@ async function tableWithContext(row, userId) {
     host: toCamel(host),
     guestCount: currentGuestCount,
     seatsAvailable: Math.max(row.seats_total - currentGuestCount, 0),
-    isPast: row.date_time < new Date().toISOString(),
+    isPast: isTablePast(row.date_time),
     isHost: row.host_user_id === userId,
     isMember: await isTableMember(row, userId),
     hasReviewed: !!hasReviewed,
@@ -118,7 +119,7 @@ tablesRouter.get('/discover', asyncHandler(async (req, res) => {
        ORDER BY t.date_time ASC
        LIMIT 50`,
     )
-    .all(req.user.sub, new Date().toISOString(), req.user.sub, req.user.sub, req.user.sub);
+    .all(req.user.sub, nowAsTableTimeString(), req.user.sub, req.user.sub, req.user.sub);
 
   // Filtered in JS rather than SQL: eligibility for 'women_only'/'friends_only'
   // needs a per-row lookup (the caller's gender, or their friendship with
@@ -505,7 +506,7 @@ tablesRouter.get('/:id/rateable', asyncHandler(async (req, res) => {
   if (!(await isTableMember(table, req.user.sub))) {
     return res.status(403).json({ message: 'Not a member of this table' });
   }
-  if (table.date_time >= new Date().toISOString()) {
+  if (!isTablePast(table.date_time)) {
     return res.status(400).json({ message: "This table hasn't happened yet" });
   }
 
@@ -542,7 +543,7 @@ tablesRouter.post('/:id/rate', asyncHandler(async (req, res) => {
   if (!table) {
     return res.status(404).json({ message: 'Table not found' });
   }
-  if (table.date_time >= new Date().toISOString()) {
+  if (!isTablePast(table.date_time)) {
     return res.status(400).json({ message: "This table hasn't happened yet" });
   }
 

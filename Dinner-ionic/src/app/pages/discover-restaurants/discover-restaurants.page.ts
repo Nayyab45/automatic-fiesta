@@ -96,16 +96,27 @@ export class DiscoverRestaurantsPage extends BasePage {
 
   private loadRestaurants(): void {
     this.loading.set(true);
+    const searching = !!this.searchQuery();
     const province = REGION_TO_PROVINCE[this.selectedRegion];
     const cuisine = this.selectedRegion === 'All' || province ? undefined : this.selectedRegion;
     this.restaurantService
       .list({
-        // A province chip browses that whole province, not just the
-        // currently selected city -- city and region both narrow by
-        // location and every city implies exactly one region, so sending
-        // both ANDs them together and returns nothing unless the city
-        // happens to already be in that province.
-        city: province ? undefined : this.cityService.current(),
+        // A name search looks for that restaurant everywhere, not just the
+        // city currently being browsed -- someone searching "Kolachi"
+        // almost certainly doesn't know (or care) which city it's filed
+        // under, and ANDing the search with that ambient city filter
+        // silently returned zero results instead of the restaurant they
+        // were looking for. Region/cuisine are different: those are filters
+        // the person deliberately chose (a province chip here, or a cuisine
+        // chip on search-filter.page alongside its search box), so a search
+        // still combines with them same as before -- only the current city,
+        // which nothing on screen suggests is part of this search, drops
+        // out. A province chip still browses that whole province rather
+        // than just the currently selected city -- city and region both
+        // narrow by location and every city implies exactly one region, so
+        // sending both ANDs them together and returns nothing unless the
+        // city happens to already be in that province.
+        city: searching || province ? undefined : this.cityService.current(),
         region: province,
         cuisine,
         priceTier: this.selectedPriceTier ?? undefined,
