@@ -15,16 +15,6 @@ export interface VerificationStatus {
   faceMatchConfidence: number | null;
 }
 
-export interface PendingVerification {
-  userId: number;
-  name: string;
-  email: string;
-  idFrontUrl: string | null;
-  idBackUrl: string | null;
-  selfieUrl: string | null;
-  submittedAt: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class VerificationService {
   private readonly http = inject(HttpClient);
@@ -44,14 +34,5 @@ export class VerificationService {
 
   submit(): Observable<VerificationStatus> {
     return this.http.post<VerificationStatus>(`${this.baseUrl}/me/submit`, {});
-  }
-
-  /** Admin-only (403 otherwise) -- submissions Face++ couldn't auto-resolve. */
-  pending(): Observable<{ submissions: PendingVerification[] }> {
-    return this.http.get<{ submissions: PendingVerification[] }>(`${this.baseUrl}/admin/pending`);
-  }
-
-  decide(userId: number, status: 'approved' | 'rejected'): Observable<VerificationStatus> {
-    return this.http.patch<VerificationStatus>(`${this.baseUrl}/admin/${userId}`, { status });
   }
 }

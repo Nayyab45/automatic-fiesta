@@ -1,45 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
-import { SupportService } from '../../services/support.service';
 
 @Component({
   selector: 'app-help-support',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './help-support.page.html',
   styleUrl: './help-support.page.scss',
 })
 export class HelpSupportPage extends BasePage {
   readonly pageTitle = "Help & Support";
-  private readonly supportService = inject(SupportService);
-
-  readonly showContactForm = signal(false);
-  readonly sending = signal(false);
-  readonly sent = signal(false);
-  subject = '';
-  message = '';
-
-  toggleContactForm(): void {
-    this.showContactForm.update((v) => !v);
-  }
-
-  sendMessage(): void {
-    if (this.sending() || !this.subject.trim() || !this.message.trim()) return;
-    this.sending.set(true);
-    this.supportService.submit(this.subject.trim(), this.message.trim()).subscribe({
-      next: () => {
-        this.sending.set(false);
-        this.sent.set(true);
-        this.subject = '';
-        this.message = '';
-      },
-      error: () => this.sending.set(false),
-    });
-  }
 
   readonly faqs = [
     {

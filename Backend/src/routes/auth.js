@@ -11,23 +11,9 @@ import { toCamel } from '../lib/serialize.js';
 import { requireFields, passwordStrengthError } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { mailer } from '../lib/mailer.js';
-import { requireAdmin } from '../lib/adminAuth.js';
-import { toCamelRows } from '../lib/serialize.js';
-import { nowAsTableTimeString } from '../lib/tableTime.js';
 import { loginLimiter, signupLimiter, forgotPasswordLimiter } from '../middleware/rateLimit.js';
 
 export const authRouter = Router();
-
-// Shared by /login, /google, and /2fa/verify-login -- a suspended account
-// (see authRouter's /admin/users/:id/suspend below) must never get a session
-// issued through any of the three sign-in paths, not just the plain
-// password one.
-function suspensionMessage(row) {
-  if (!row?.suspended_at) return null;
-  return row.suspended_reason
-    ? `Your account has been suspended: ${row.suspended_reason}`
-    : 'Your account has been suspended. Contact support for details.';
-}
 
 // Verifies the ID token's signature against Google's own public keys and
 // checks it was actually issued for this app's Web OAuth client (the
@@ -51,13 +37,8 @@ const RESET_TOKEN_TTL_MINUTES = 60;
 const TWO_FACTOR_CHALLENGE_TTL_MINUTES = 5;
 
 function toPublicUser(row) {
-  const { id, name, email, isAdmin } = toCamel(row);
-  // Included directly in the session response so the client can route an
-  // admin straight to the admin panel without a second request right after
-  // login -- see login.page.ts. That second request was a real failure
-  // point: this host is prone to transient connection flakiness, and losing
-  // just that one call silently dropped an admin onto the regular app.
-  return { id, name, email, isAdmin: !!isAdmin };
+  const { id, name, email } = toCamel(row);
+  return { id, name, email };
 }
 
 function signAccessToken(user) {
@@ -142,10 +123,6 @@ authRouter.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   if (!row || !bcrypt.compareSync(password, row.password_hash)) {
     return res.status(401).json({ message: 'Invalid email or password' });
   }
-  const suspendedMessage = suspensionMessage(row);
-  if (suspendedMessage) {
-    return res.status(403).json({ message: suspendedMessage });
-  }
 
   const twoFactor = await db.prepare('SELECT enabled FROM two_factor_auth WHERE user_id = ?').get(row.id);
   if (twoFactor?.enabled) {
@@ -203,13 +180,6 @@ authRouter.post('/google', asyncHandler(async (req, res) => {
       .prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
       .run(name, normalizedEmail, unusablePasswordHash);
     row = { id: result.lastInsertRowid, name, email: normalizedEmail };
-  }
-
-  // Matches /login's behaviour: a correct external identity doesn't bypass
-  // a suspension, and still doesn't skip 2FA if the account has it enabled.
-  const suspendedMessage = suspensionMessage(row);
-  if (suspendedMessage) {
-    return res.status(403).json({ message: suspendedMessage });
   }
 
   const twoFactor = await db.prepare('SELECT enabled FROM two_factor_auth WHERE user_id = ?').get(row.id);
@@ -472,195 +442,6 @@ authRouter.post('/2fa/verify-login', asyncHandler(async (req, res) => {
   if (!twoFactor || !user || !(await verifyTotp({ token: String(code), secret: twoFactor.secret })).valid) {
     return res.status(401).json({ message: 'Incorrect code.' });
   }
-  // Covers the (rare) race where an admin suspends the account in the
-  // window between the password step and this 2FA step -- /login already
-  // checked suspension, but that check is now stale.
-  const suspendedMessage = suspensionMessage(user);
-  if (suspendedMessage) {
-    return res.status(403).json({ message: suspendedMessage });
-  }
 
   res.json(await issueSession(toPublicUser(user)));
-}));
-
-// ---------------------------------------------------------------------
-// Admin: dashboard stats + User Management. Nested under this router (same
-// convention as blocksRouter's /admin/flagged in safety.js and
-// verificationRouter's /admin/pending) rather than a separate top-level
-// router, since this is all still "the users table" -- auth.js already
-// owns account creation/deletion for it.
-// ---------------------------------------------------------------------
-
-authRouter.get('/admin/stats', requireAuth, requireAdmin, asyncHandler(async (_req, res) => {
-  const [
-    { count: totalUsers },
-    { count: totalRestaurants },
-    { count: totalEvents },
-    { count: activeEvents },
-    { count: pendingVerifications },
-    { count: flaggedUsers },
-    { count: suspendedUsers },
-    { count: openSupportTickets },
-    { count: totalReports },
-  ] = await Promise.all([
-    db.prepare('SELECT COUNT(*) as count FROM users').get(),
-    db.prepare('SELECT COUNT(*) as count FROM restaurants').get(),
-    db.prepare('SELECT COUNT(*) as count FROM dining_tables').get(),
-    // Same "upcoming" comparison as tablesRouter's /discover in tables.js --
-    // see lib/tableTime.js for why this needs to be in the same naive
-    // Pakistan-local shape as what's stored, not a UTC ISO string.
-    db.prepare('SELECT COUNT(*) as count FROM dining_tables WHERE date_time > ?').get(nowAsTableTimeString()),
-    db.prepare("SELECT COUNT(*) as count FROM identity_verifications WHERE status = 'pending'").get(),
-    db.prepare('SELECT COUNT(*) as count FROM users WHERE flagged_at IS NOT NULL').get(),
-    db.prepare('SELECT COUNT(*) as count FROM users WHERE suspended_at IS NOT NULL').get(),
-    db.prepare("SELECT COUNT(*) as count FROM support_messages WHERE status = 'open'").get(),
-    db.prepare('SELECT COUNT(*) as count FROM user_reports').get(),
-  ]);
-
-  res.json({
-    totalUsers,
-    totalRestaurants,
-    totalEvents,
-    activeEvents,
-    pendingVerifications,
-    flaggedUsers,
-    suspendedUsers,
-    openSupportTickets,
-    totalReports,
-  });
-}));
-
-authRouter.get('/admin/users', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const { search, status } = req.query;
-  const clauses = [];
-  const params = [];
-
-  if (search) {
-    clauses.push('(u.name LIKE ? OR u.email LIKE ?)');
-    params.push(`%${search}%`, `%${search}%`);
-  }
-  if (status === 'suspended') clauses.push('u.suspended_at IS NOT NULL');
-  else if (status === 'flagged') clauses.push('u.flagged_at IS NOT NULL');
-  else if (status === 'unverified') clauses.push('(p.verified IS NULL OR p.verified = 0)');
-  else if (status === 'admin') clauses.push('u.is_admin = 1');
-
-  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
-  const rows = await db
-    .prepare(
-      `SELECT u.id, u.name, u.email, u.created_at, u.is_admin, u.suspended_at, u.flagged_at, p.verified
-       FROM users u
-       LEFT JOIN user_profiles p ON p.user_id = u.id
-       ${where}
-       ORDER BY u.created_at DESC
-       LIMIT 300`,
-    )
-    .all(...params);
-
-  res.json({ users: toCamelRows(rows).map((u) => ({ ...u, verified: !!u.verified, isAdmin: !!u.isAdmin })) });
-}));
-
-authRouter.get('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const userId = req.params.id;
-  const user = await db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  const [profile, verification, rating, blockCount, reportCount, tablesJoined] = await Promise.all([
-    db.prepare('SELECT * FROM user_profiles WHERE user_id = ?').get(userId),
-    db.prepare('SELECT status, submitted_at FROM identity_verifications WHERE user_id = ?').get(userId),
-    db.prepare('SELECT AVG(score) as avg FROM user_ratings WHERE rated_user_id = ?').get(userId),
-    db.prepare('SELECT COUNT(*) as count FROM user_blocks WHERE blocked_user_id = ?').get(userId),
-    db.prepare('SELECT COUNT(*) as count FROM user_reports WHERE reported_user_id = ?').get(userId),
-    db
-      .prepare(
-        `SELECT COUNT(DISTINCT t.id) as count FROM dining_tables t
-         LEFT JOIN table_guests g ON g.table_id = t.id AND g.user_id = ?
-         WHERE t.host_user_id = ? OR g.user_id = ?`,
-      )
-      .get(userId, userId, userId),
-  ]);
-
-  res.json({
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.created_at,
-      isAdmin: !!user.is_admin,
-      suspendedAt: user.suspended_at,
-      suspendedReason: user.suspended_reason,
-      flaggedAt: user.flagged_at,
-      age: profile?.age ?? null,
-      city: profile?.city ?? null,
-      bio: profile?.bio ?? null,
-      photoUrl: profile?.photo_url ?? null,
-      gender: profile?.gender ?? null,
-      verified: !!profile?.verified,
-      verificationStatus: verification?.status ?? 'not_started',
-      verificationSubmittedAt: verification?.submitted_at ?? null,
-      rating: rating.avg ? Math.round(rating.avg * 10) / 10 : null,
-      blockCount: blockCount.count,
-      reportCount: reportCount.count,
-      tablesJoinedCount: tablesJoined.count,
-    },
-  });
-}));
-
-authRouter.get('/admin/users/:id/reports', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const rows = await db
-    .prepare(
-      `SELECT r.id, r.reason, r.details, r.created_at, u.name as reporter_name FROM user_reports r
-       JOIN users u ON u.id = r.reporter_user_id
-       WHERE r.reported_user_id = ?
-       ORDER BY r.created_at DESC`,
-    )
-    .all(req.params.id);
-  res.json({ reports: toCamelRows(rows) });
-}));
-
-authRouter.post('/admin/users/:id/suspend', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const { reason } = req.body ?? {};
-  const missingFieldsError = requireFields(req.body, ['reason']);
-  if (missingFieldsError) {
-    return res.status(400).json({ message: missingFieldsError });
-  }
-
-  const user = await db.prepare('SELECT id, is_admin FROM users WHERE id = ?').get(req.params.id);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-  if (user.is_admin) {
-    return res.status(400).json({ message: "Can't suspend an admin account" });
-  }
-
-  await db.prepare('UPDATE users SET suspended_at = NOW(), suspended_reason = ? WHERE id = ?').run(reason, req.params.id);
-  // Same reasoning as password-reset: a suspension should end every session
-  // this account currently has, not just block its next login.
-  await db.prepare('UPDATE refresh_tokens SET revoked_at = NOW() WHERE user_id = ? AND revoked_at IS NULL').run(req.params.id);
-  res.json({ ok: true });
-}));
-
-authRouter.post('/admin/users/:id/unsuspend', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  await db.prepare('UPDATE users SET suspended_at = NULL, suspended_reason = NULL WHERE id = ?').run(req.params.id);
-  res.json({ ok: true });
-}));
-
-// Reuses the same cascade as self-delete (DELETE /me) -- this schema has no
-// FK constraints, so deleteUserAccount's manual cleanup across every
-// referencing table is the only thing standing between a raw `DELETE FROM
-// users` and orphaned rows everywhere else. For clearing out test/dummy
-// accounts (e.g. ones created directly in the DB or by a script) that were
-// never going to self-delete through the app.
-authRouter.delete('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const user = await db.prepare('SELECT id, is_admin FROM users WHERE id = ?').get(req.params.id);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-  if (user.is_admin) {
-    return res.status(400).json({ message: "Can't delete an admin account" });
-  }
-
-  await deleteUserAccount(req.params.id);
-  res.json({ ok: true });
 }));

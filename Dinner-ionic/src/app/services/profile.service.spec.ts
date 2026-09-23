@@ -27,7 +27,7 @@ describe('ProfileService', () => {
 
     const req = httpMock.expectOne(`${baseUrl}/me`);
     expect(req.request.method).toBe('GET');
-    const payload = { profile: { id: 1 }, isAdmin: false };
+    const payload = { profile: { id: 1 } };
     req.flush(payload);
 
     expect(result).toEqual(payload as never);

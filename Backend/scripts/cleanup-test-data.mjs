@@ -121,7 +121,6 @@ await del('user_reports', `DELETE FROM user_reports WHERE reporter_user_id IN ($
 await del('user_ratings', `DELETE FROM user_ratings WHERE rater_user_id IN (${i}) OR rated_user_id IN (${i})`);
 await del('user_follows', `DELETE FROM user_follows WHERE follower_user_id IN (${i}) OR followed_user_id IN (${i})`);
 await del('profile_views', `DELETE FROM profile_views WHERE viewer_user_id IN (${i}) OR viewed_user_id IN (${i})`);
-await del('support_messages', `DELETE FROM support_messages WHERE user_id IN (${i})`);
 await del('preference_updates', `DELETE FROM preference_updates WHERE user_id IN (${i})`);
 await del('device_tokens', `DELETE FROM device_tokens WHERE user_id IN (${i})`);
 await del('identity_verifications', `DELETE FROM identity_verifications WHERE user_id IN (${i})`);

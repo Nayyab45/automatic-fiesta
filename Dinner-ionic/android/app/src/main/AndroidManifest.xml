@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -27,16 +27,6 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
-
-        <!-- Value comes from build.gradle's admobAppId (defaults to Google's
-             official public TEST App ID, safe to ship as-is: it only ever
-             serves Google's test ads, never real ones, never earns real
-             revenue). To ship the app's own real AdMob App ID for a Play
-             Store release, create android/app/admob.properties from
-             admob.properties.example instead of editing this file. -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${admobAppId}" />
     </application>
 
     <!-- Permissions -->
@@ -45,7 +35,16 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Required by Google Mobile Ads SDK on Android 13+ (API 33) to read the
-         advertising ID for ad personalization/frequency-capping. -->
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+    <!-- No ads are shown in this app (AdMob was removed entirely). These
+         three are pulled in by facebook-core's own manifest (used for
+         Facebook Login, not ads) for its own ad-attribution/analytics,
+         suppressed via tools:node="remove" so the merged manifest doesn't
+         carry ad-related permissions this app has no use for. Facebook
+         sign-in itself doesn't need any of these. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_CUSTOM_AUDIENCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS" tools:node="remove" />
 </manifest>

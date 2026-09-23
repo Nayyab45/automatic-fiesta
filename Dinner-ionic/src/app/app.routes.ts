@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
-import { adminGuard } from './services/admin.guard';
 import { redirectIfAuthenticatedGuard } from './services/redirect-if-authenticated.guard';
 
 // Routes reachable without being signed in. Every other route requires auth
@@ -73,16 +72,6 @@ const routeDefinitions: Routes = [
   { path: 'followers', loadComponent: () => import('./pages/followers/followers.page').then((m) => m.FollowersPage) },
   { path: 'friends', loadComponent: () => import('./pages/friends-list/friends-list.page').then((m) => m.FriendsListPage) },
   { path: 'profile-views', loadComponent: () => import('./pages/profile-views/profile-views.page').then((m) => m.ProfileViewsPage) },
-  { path: 'admin', loadComponent: () => import('./pages/admin-home/admin-home.page').then((m) => m.AdminHomePage) },
-  { path: 'admin/verifications', loadComponent: () => import('./pages/admin-verifications/admin-verifications.page').then((m) => m.AdminVerificationsPage) },
-  { path: 'admin/moderation', loadComponent: () => import('./pages/admin-moderation/admin-moderation.page').then((m) => m.AdminModerationPage) },
-  { path: 'admin/support', loadComponent: () => import('./pages/admin-support/admin-support.page').then((m) => m.AdminSupportPage) },
-  { path: 'admin/users', loadComponent: () => import('./pages/admin-users/admin-users.page').then((m) => m.AdminUsersPage) },
-  { path: 'admin/users/:id', loadComponent: () => import('./pages/admin-user-detail/admin-user-detail.page').then((m) => m.AdminUserDetailPage) },
-  { path: 'admin/events', loadComponent: () => import('./pages/admin-tables/admin-tables.page').then((m) => m.AdminTablesPage) },
-  { path: 'admin/restaurants', loadComponent: () => import('./pages/admin-restaurants/admin-restaurants.page').then((m) => m.AdminRestaurantsPage) },
-  { path: 'admin/policies/:slug', loadComponent: () => import('./pages/admin-policy-editor/admin-policy-editor.page').then((m) => m.AdminPolicyEditorPage) },
-  { path: 'admin/reviews', loadComponent: () => import('./pages/admin-reviews/admin-reviews.page').then((m) => m.AdminReviewsPage) },
   { path: 'edit-preferences', loadComponent: () => import('./pages/edit-preferences/edit-preferences.page').then((m) => m.EditPreferencesPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage) },
   { path: 'safety-center', loadComponent: () => import('./pages/safety-center/safety-center.page').then((m) => m.SafetyCenterPage) },
@@ -122,11 +111,7 @@ function isPublic(path: string | undefined): boolean {
   return publicPaths.has(path.split('/')[0]);
 }
 
-function isAdminPath(path: string | undefined): boolean {
-  return path?.split('/')[0] === 'admin';
-}
-
 export const routes: Routes = routeDefinitions.map((route) => {
   if (isPublic(route.path)) return route;
-  return { ...route, canActivate: isAdminPath(route.path) ? [authGuard, adminGuard] : [authGuard] };
+  return { ...route, canActivate: [authGuard] };
 });

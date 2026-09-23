@@ -27,20 +27,4 @@ describe('ContentService', () => {
     expect(req.request.method).toBe('GET');
     req.flush({ content: null, updatedAt: null });
   });
-
-  it('save() PUTs the content wrapped in a { content } body', () => {
-    const content = { intro: 'x', sections: [{ heading: 'A', body: 'B' }] };
-    service.save('community-guidelines', content).subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/community-guidelines`);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual({ content });
-    req.flush({ content });
-  });
-
-  it('reset() DELETEs /content/:slug', () => {
-    service.reset('privacy-policy').subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/privacy-policy`);
-    expect(req.request.method).toBe('DELETE');
-    req.flush({});
-  });
 });

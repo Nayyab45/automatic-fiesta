@@ -14,7 +14,6 @@ import { verificationRouter } from './routes/verification.js';
 import { friendsRouter, followsRouter } from './routes/friends.js';
 import { waitlistRouter } from './routes/waitlist.js';
 import { contentRouter } from './routes/content.js';
-import { supportRouter } from './routes/support.js';
 import { siteRouter } from './routes/site.js';
 
 if (!process.env.JWT_SECRET) {
@@ -83,7 +82,6 @@ app.use('/api/friends', friendsRouter);
 app.use('/api/follows', followsRouter);
 app.use('/api/waitlist', waitlistRouter);
 app.use('/api/content', contentRouter);
-app.use('/api/support', supportRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

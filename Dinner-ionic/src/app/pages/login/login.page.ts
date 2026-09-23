@@ -88,15 +88,8 @@ export class LoginPage extends BasePage {
     this.navigateAfterLogin();
   }
 
-  // An admin account's whole purpose is running the admin panel -- lands
-  // there directly instead of the regular consumer app. Reads isAdmin off
-  // the session AuthService just stored (part of the login/2FA response
-  // itself, see Backend's toPublicUser) rather than a separate follow-up
-  // request -- an extra round-trip right after login is one more thing
-  // that can fail on this host's flaky connection, silently dropping an
-  // admin onto the regular app instead.
   private navigateAfterLogin(): void {
-    this.go(this.authService.currentUser()?.isAdmin ? '/admin' : '/home');
+    this.go('/home');
   }
 
   submitTwoFactorCode(): void {

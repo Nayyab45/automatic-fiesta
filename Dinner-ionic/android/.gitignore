@@ -59,11 +59,6 @@ captures/
 *.keystore
 keystore.properties
 
-# Real AdMob App ID -- see app/admob.properties.example. Not secret the way
-# the keystore is, but keeping it out of version control means a clone of
-# this repo can't accidentally ship under this app's real AdMob identity.
-admob.properties
-
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
 .cxx/

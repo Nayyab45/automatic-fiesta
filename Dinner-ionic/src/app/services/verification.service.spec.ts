@@ -50,19 +50,4 @@ describe('VerificationService', () => {
     expect(req.request.method).toBe('POST');
     req.flush({ status: 'pending' });
   });
-
-  it('pending() GETs /verification/admin/pending', () => {
-    service.pending().subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/admin/pending`);
-    expect(req.request.method).toBe('GET');
-    req.flush({ submissions: [] });
-  });
-
-  it('decide() PATCHes the status to /verification/admin/:userId', () => {
-    service.decide(11, 'approved').subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/admin/11`);
-    expect(req.request.method).toBe('PATCH');
-    expect(req.request.body).toEqual({ status: 'approved' });
-    req.flush({ status: 'approved' });
-  });
 });

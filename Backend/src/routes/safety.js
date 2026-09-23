@@ -4,14 +4,6 @@ import { requireAuth } from '../middleware/auth.js';
 import { toCamel, toCamelRows } from '../lib/serialize.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
-import { requireAdmin } from '../lib/adminAuth.js';
-import { deleteUserAccount } from './auth.js';
-
-// No reason required for a block (unlike a report), so this needs to stay
-// high enough that a handful of people coordinating to grief someone can't
-// trivially get them flagged -- but low enough that a real pattern of bad
-// behavior surfaces for review before it piles up further.
-const BLOCK_FLAG_THRESHOLD = 5;
 
 export const emergencyContactsRouter = Router();
 export const blocksRouter = Router();
@@ -93,56 +85,7 @@ blocksRouter.post('/', asyncHandler(async (req, res) => {
     )
     .run(req.user.sub, userId, userId, req.user.sub);
 
-  const { count } = await db.prepare('SELECT COUNT(*) as count FROM user_blocks WHERE blocked_user_id = ?').get(userId);
-  if (count >= BLOCK_FLAG_THRESHOLD) {
-    // Only ever set, never bumped forward -- so a user already in the
-    // review queue doesn't quietly fall behind newer flags in
-    // oldest-first order just because they picked up another block.
-    await db.prepare('UPDATE users SET flagged_at = COALESCE(flagged_at, NOW()) WHERE id = ?').run(userId);
-  }
-
   res.status(201).json({ ok: true });
-}));
-
-// Admin moderation queue: accounts blocked by BLOCK_FLAG_THRESHOLD+ distinct
-// people. Report count is shown for context only -- reports don't trigger
-// flagging themselves (see BLOCK_FLAG_THRESHOLD), a block needs no reason
-// while a report always carries one, so they're not really the same signal.
-blocksRouter.get('/admin/flagged', requireAdmin, asyncHandler(async (_req, res) => {
-  const rows = await db
-    .prepare(
-      `SELECT u.id as user_id, u.name, u.email, u.flagged_at,
-         (SELECT COUNT(*) FROM user_blocks WHERE blocked_user_id = u.id) as block_count,
-         (SELECT COUNT(*) FROM user_reports WHERE reported_user_id = u.id) as report_count
-       FROM users u
-       WHERE u.flagged_at IS NOT NULL
-       ORDER BY u.flagged_at ASC`,
-    )
-    .all();
-  res.json({
-    flagged: rows.map((r) => ({
-      userId: r.user_id,
-      name: r.name,
-      email: r.email,
-      flaggedAt: r.flagged_at,
-      blockCount: r.block_count,
-      reportCount: r.report_count,
-    })),
-  });
-}));
-
-blocksRouter.post('/admin/:userId/dismiss', requireAdmin, asyncHandler(async (req, res) => {
-  await db.prepare('UPDATE users SET flagged_at = NULL WHERE id = ?').run(req.params.userId);
-  res.json({ ok: true });
-}));
-
-blocksRouter.delete('/admin/:userId', requireAdmin, asyncHandler(async (req, res) => {
-  const user = await db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.userId);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-  await deleteUserAccount(req.params.userId);
-  res.json({ ok: true });
 }));
 
 blocksRouter.delete('/:userId', asyncHandler(async (req, res) => {

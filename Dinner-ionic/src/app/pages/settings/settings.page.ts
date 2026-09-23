@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
@@ -16,10 +16,6 @@ import { AuthService } from '../../services/auth.service';
 export class SettingsPage extends BasePage {
   readonly pageTitle = "Settings";
   private readonly authService = inject(AuthService);
-
-  // Read straight off the stored session (set at login) instead of a
-  // request, so an admin never sees the regular-user entries flash in first.
-  readonly isAdmin = computed(() => !!this.authService.currentUser()?.isAdmin);
 
   // Actually ends the session (clears the stored tokens and revokes the
   // refresh token) -- this button used to just open the login screen and

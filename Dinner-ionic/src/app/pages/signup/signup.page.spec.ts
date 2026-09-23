@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 const SESSION = {
   accessToken: 'access-token',
   refreshToken: 'refresh-token',
-  user: { id: 1, name: 'Sam Ali', email: 'sam@example.com', isAdmin: false },
+  user: { id: 1, name: 'Sam Ali', email: 'sam@example.com' },
 };
 
 describe('SignupPage', () => {

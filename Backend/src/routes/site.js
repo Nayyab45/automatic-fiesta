@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { db } from '../db.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 
 // Public marketing homepage + privacy policy, served at the domain root
@@ -151,14 +150,11 @@ siteRouter.get('/', (_req, res) => {
 </html>`);
 });
 
-// Public: readable without signing in. Prefers an admin's edited text from
-// site_content (same row the in-app page reads via GET /api/content/:slug),
-// falling back to the built-in copy above so this never renders empty.
+// Public: readable without signing in.
 siteRouter.get(
   '/privacy-policy',
   asyncHandler(async (_req, res) => {
-    const row = await db.prepare('SELECT body FROM site_content WHERE slug = ?').get('privacy-policy');
-    const content = row ? JSON.parse(row.body) : DEFAULT_PRIVACY_POLICY;
+    const content = DEFAULT_PRIVACY_POLICY;
 
     const introHtml = content.intro
       .split('\n')

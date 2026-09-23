@@ -122,14 +122,12 @@ export class ProfileService {
     preferenceChanges: PreferenceChangeStatus;
     tableCreation: TableCreationStatus;
     profileViewsCount: number;
-    isAdmin: boolean;
   }> {
     return this.http.get<{
       profile: Profile;
       preferenceChanges: PreferenceChangeStatus;
       tableCreation: TableCreationStatus;
       profileViewsCount: number;
-      isAdmin: boolean;
     }>(`${this.baseUrl}/me`);
   }
 

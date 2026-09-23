@@ -6,7 +6,6 @@ import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
-import { requireAdmin } from '../lib/adminAuth.js';
 import { isTablePast, nowAsTableTimeString } from '../lib/tableTime.js';
 
 export const tablesRouter = Router();
@@ -131,64 +130,6 @@ tablesRouter.get('/discover', asyncHandler(async (req, res) => {
   }
 
   res.json({ tables: await Promise.all(eligibleRows.map((row) => tableWithContext(row, req.user.sub))) });
-}));
-
-// Admin Meal/Event Management -- registered before '/:id' (same reasoning
-// as '/discover' above) so Express doesn't swallow 'admin' as an :id value.
-// Every event regardless of host/visibility/audience, most recent first, so
-// an admin can find and remove an inappropriate one -- unlike every other
-// route in this file, membership/audience eligibility doesn't apply here.
-tablesRouter.get('/admin', requireAdmin, asyncHandler(async (_req, res) => {
-  const rows = await db
-    .prepare(
-      `SELECT t.*, u.name as host_name, r.name as restaurant_name FROM dining_tables t
-       JOIN users u ON u.id = t.host_user_id
-       JOIN restaurants r ON r.id = t.restaurant_id
-       ORDER BY t.created_at DESC
-       LIMIT 300`,
-    )
-    .all();
-  res.json({ tables: toCamelRows(rows) });
-}));
-
-// Deletes an inappropriate event outright -- unlike a user's own account
-// deletion (see auth.js's deleteUserAccount), there's no "leave the content
-// behind" option here, since the event itself is the thing being removed.
-// Manually cascades the same way that function does, since none of these
-// tables declare a real FK (see db/schema/tables.js).
-tablesRouter.delete('/admin/:id', requireAdmin, asyncHandler(async (req, res) => {
-  const table = await db.prepare('SELECT id FROM dining_tables WHERE id = ?').get(req.params.id);
-  if (!table) {
-    return res.status(404).json({ message: 'Table not found' });
-  }
-  await db.prepare('DELETE FROM table_messages WHERE table_id = ?').run(table.id);
-  await db.prepare('DELETE FROM reviews WHERE table_id = ?').run(table.id);
-  await db.prepare('DELETE FROM check_ins WHERE table_id = ?').run(table.id);
-  await db.prepare('DELETE FROM seat_requests WHERE table_id = ?').run(table.id);
-  await db.prepare('DELETE FROM table_guests WHERE table_id = ?').run(table.id);
-  await db.prepare('DELETE FROM dining_tables WHERE id = ?').run(table.id);
-  res.json({ ok: true });
-}));
-
-// Admin Reviews Management (the dining-table side -- see restaurants.js for
-// the restaurant-review side of it). Every review regardless of who wrote
-// it, most recent first.
-tablesRouter.get('/admin/reviews', requireAdmin, asyncHandler(async (_req, res) => {
-  const rows = await db
-    .prepare(
-      `SELECT rv.*, u.name as reviewer_name, t.title as table_title FROM reviews rv
-       JOIN users u ON u.id = rv.reviewer_user_id
-       JOIN dining_tables t ON t.id = rv.table_id
-       ORDER BY rv.created_at DESC
-       LIMIT 300`,
-    )
-    .all();
-  res.json({ reviews: toCamelRows(rows) });
-}));
-
-tablesRouter.delete('/admin/reviews/:id', requireAdmin, asyncHandler(async (req, res) => {
-  await db.prepare('DELETE FROM reviews WHERE id = ?').run(req.params.id);
-  res.json({ ok: true });
 }));
 
 // Members can always see their own table's details. A non-member can only

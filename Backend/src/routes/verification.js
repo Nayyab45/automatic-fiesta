@@ -4,7 +4,6 @@ import { requireAuth } from '../middleware/auth.js';
 import { requireFields } from '../lib/validate.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { faceMatch } from '../lib/faceMatch.js';
-import { requireAdmin } from '../lib/adminAuth.js';
 
 export const verificationRouter = Router();
 
@@ -107,47 +106,4 @@ verificationRouter.post('/me/submit', asyncHandler(async (req, res) => {
   ).run(status, match?.confidence ?? null, req.user.sub);
   if (status === 'approved') await setVerifiedStatus(req.user.sub, true);
   res.json(await statusForUser(req.user.sub));
-}));
-
-// Admin-only: submissions Face++ couldn't resolve on its own (not
-// configured, no face detected, a transient API error) -- the only
-// remaining 'pending' cases, since a real verdict already auto-resolves
-// above.
-verificationRouter.get('/admin/pending', requireAdmin, asyncHandler(async (_req, res) => {
-  const rows = await db
-    .prepare(
-      `SELECT u.id as user_id, u.name, u.email, v.id_front_url, v.id_back_url, v.selfie_url, v.submitted_at
-       FROM identity_verifications v
-       JOIN users u ON u.id = v.user_id
-       WHERE v.status = 'pending'
-       ORDER BY v.submitted_at ASC`,
-    )
-    .all();
-  res.json({
-    submissions: rows.map((r) => ({
-      userId: r.user_id,
-      name: r.name,
-      email: r.email,
-      idFrontUrl: r.id_front_url,
-      idBackUrl: r.id_back_url,
-      selfieUrl: r.selfie_url,
-      submittedAt: r.submitted_at,
-    })),
-  });
-}));
-
-verificationRouter.patch('/admin/:userId', requireAdmin, asyncHandler(async (req, res) => {
-  const { status } = req.body ?? {};
-  if (status !== 'approved' && status !== 'rejected') {
-    return res.status(400).json({ message: "status must be 'approved' or 'rejected'" });
-  }
-
-  const row = await db.prepare('SELECT * FROM identity_verifications WHERE user_id = ?').get(req.params.userId);
-  if (!row) {
-    return res.status(404).json({ message: 'No submission for this user' });
-  }
-
-  await db.prepare('UPDATE identity_verifications SET status = ?, updated_at = NOW() WHERE user_id = ?').run(status, req.params.userId);
-  await setVerifiedStatus(req.params.userId, status === 'approved');
-  res.json(await statusForUser(req.params.userId));
 }));

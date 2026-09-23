@@ -69,7 +69,6 @@ const USER_ID_TABLES = [
   ['two_factor_auth', 'user_id'],
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
-  ['support_messages', 'user_id'],
   ['feature_waitlist', 'user_id'],
 ];
 
@@ -132,10 +131,6 @@ async function signup(local) {
   return body; // { accessToken, refreshToken, user }
 }
 
-async function makeAdmin(userId) {
-  await pool.query('UPDATE users SET is_admin = 1 WHERE id = ?', [userId]);
-}
-
 describe('auth', () => {
   test('signup issues a session and rejects a duplicate email', async () => {
     const session = await signup('alice');
@@ -170,27 +165,6 @@ describe('auth', () => {
 
     const reuse = await api('POST', '/api/auth/refresh', { body: { refreshToken: session.refreshToken } });
     assert.equal(reuse.status, 401);
-  });
-
-  test('isAdmin comes back on the session itself (login, refresh, /me) -- no separate request needed', async () => {
-    const user = await signup('admin-flag');
-    assert.equal(user.user.isAdmin, false);
-
-    const meBefore = await api('GET', '/api/auth/me', { token: user.accessToken });
-    assert.equal(meBefore.body.user.isAdmin, false);
-
-    await makeAdmin(user.user.id);
-
-    const login = await api('POST', '/api/auth/login', { body: { email: user.user.email, password: 'password123!' } });
-    assert.equal(login.status, 200);
-    assert.equal(login.body.user.isAdmin, true);
-
-    const refreshed = await api('POST', '/api/auth/refresh', { body: { refreshToken: login.body.refreshToken } });
-    assert.equal(refreshed.status, 200);
-    assert.equal(refreshed.body.user.isAdmin, true);
-
-    const meAfter = await api('GET', '/api/auth/me', { token: refreshed.body.accessToken });
-    assert.equal(meAfter.body.user.isAdmin, true);
   });
 
   test('logout revokes the refresh token', async () => {
@@ -743,88 +717,6 @@ describe('people matching', () => {
   });
 });
 
-describe('moderation', () => {
-  test('being blocked by 5 distinct people flags the account for review; admin can dismiss or permanently delete', async () => {
-    const target = await signup('mod-target');
-    const admin = await signup('mod-admin');
-    const stranger = await signup('mod-stranger');
-    await makeAdmin(admin.user.id);
-
-    const blockers = await Promise.all([1, 2, 3, 4, 5].map((n) => signup(`mod-blocker-${n}`)));
-    for (const blocker of blockers) {
-      const res = await api('POST', '/api/blocks', { token: blocker.accessToken, body: { userId: target.user.id } });
-      assert.equal(res.status, 201);
-    }
-
-    const refused = await api('GET', '/api/blocks/admin/flagged', { token: stranger.accessToken });
-    assert.equal(refused.status, 403);
-
-    const flagged = await api('GET', '/api/blocks/admin/flagged', { token: admin.accessToken });
-    assert.equal(flagged.status, 200);
-    const entry = flagged.body.flagged.find((f) => f.userId === target.user.id);
-    assert.ok(entry, 'target should be in the flagged queue');
-    assert.equal(entry.blockCount, 5);
-
-    const dismissed = await api('POST', `/api/blocks/admin/${target.user.id}/dismiss`, { token: admin.accessToken });
-    assert.equal(dismissed.status, 200);
-    const afterDismiss = await api('GET', '/api/blocks/admin/flagged', { token: admin.accessToken });
-    assert.ok(!afterDismiss.body.flagged.some((f) => f.userId === target.user.id));
-
-    // Re-flag it (dismiss cleared flagged_at, but the 5 existing block rows
-    // stayed, so a 6th push from a stranger crossing the threshold again
-    // isn't needed to re-test the delete path -- reuse the same target).
-    await db.prepare('UPDATE users SET flagged_at = NOW() WHERE id = ?').run(target.user.id);
-
-    const deleteRefused = await api('DELETE', `/api/blocks/admin/${target.user.id}`, { token: stranger.accessToken });
-    assert.equal(deleteRefused.status, 403);
-
-    const deleted = await api('DELETE', `/api/blocks/admin/${target.user.id}`, { token: admin.accessToken });
-    assert.equal(deleted.status, 200);
-
-    const loginAttempt = await api('POST', '/api/auth/login', { body: { email: target.user.email, password: 'password123!' } });
-    assert.equal(loginAttempt.status, 401);
-
-    // Deleted by the admin action, not this suite's own cleanup -- drop it
-    // from createdUserIds so cleanup doesn't try to delete it again.
-    const idx = createdUserIds.indexOf(target.user.id);
-    if (idx !== -1) createdUserIds.splice(idx, 1);
-  });
-});
-
-describe('support messages', () => {
-  test('a user can submit a message; only an admin can list or resolve it', async () => {
-    const submitter = await signup('support-submitter');
-    const admin = await signup('support-admin');
-    const stranger = await signup('support-stranger');
-    await makeAdmin(admin.user.id);
-
-    const submitted = await api('POST', '/api/support', {
-      token: submitter.accessToken,
-      body: { subject: 'Cannot join a table', message: 'Tapping Request a Seat does nothing.' },
-    });
-    assert.equal(submitted.status, 201);
-
-    const refused = await api('GET', '/api/support/admin', { token: stranger.accessToken });
-    assert.equal(refused.status, 403);
-
-    const list = await api('GET', '/api/support/admin', { token: admin.accessToken });
-    assert.equal(list.status, 200);
-    const entry = list.body.messages.find((m) => m.subject === 'Cannot join a table');
-    assert.ok(entry);
-    assert.equal(entry.status, 'open');
-    assert.equal(entry.email, submitter.user.email);
-
-    const resolveRefused = await api('POST', `/api/support/admin/${entry.id}/resolve`, { token: stranger.accessToken });
-    assert.equal(resolveRefused.status, 403);
-
-    const resolved = await api('POST', `/api/support/admin/${entry.id}/resolve`, { token: admin.accessToken });
-    assert.equal(resolved.status, 200);
-
-    const listAfter = await api('GET', '/api/support/admin', { token: admin.accessToken });
-    assert.equal(listAfter.body.messages.find((m) => m.id === entry.id).status, 'resolved');
-  });
-});
-
 describe('friends', () => {
   test('send -> accept moves both sides to friends, and notifies the requester', async () => {
     const alice = await signup('friend-alice');
@@ -957,11 +849,6 @@ describe('two-factor auth', () => {
       token: signupRes.body.accessToken,
       body: { code: await generateTotp({ secret: setup.body.secret }) },
     });
-    // isAdmin has its own narrow-SELECT bug history in this exact endpoint
-    // (see toPublicUser's callers) -- worth covering specifically, not just
-    // via the dedicated isAdmin test above, which never goes through 2FA.
-    await makeAdmin(signupRes.body.user.id);
-
     // Password alone no longer issues a session -- it hands back a
     // short-lived challenge instead.
     const loginAttempt = await api('POST', '/api/auth/login', { body: { email, password } });
@@ -980,7 +867,6 @@ describe('two-factor auth', () => {
     });
     assert.equal(verified.status, 200);
     assert.ok(verified.body.accessToken);
-    assert.equal(verified.body.user.isAdmin, true);
 
     // Disabling requires a current code, not just the access token.
     const disableWrongCode = await api('POST', '/api/auth/2fa/disable', { token: verified.body.accessToken, body: { code: '000000' } });
@@ -1221,45 +1107,6 @@ describe('identity verification', () => {
     assert.match(body.message, /upload your id and a selfie/i);
   });
 
-  test('admin can approve or reject a pending submission, which sets/clears the verified badge; a non-admin is refused', async () => {
-    const { FACEPP_API_KEY, FACEPP_API_SECRET } = process.env;
-    delete process.env.FACEPP_API_KEY;
-    delete process.env.FACEPP_API_SECRET;
-    let applicant, admin, stranger;
-    try {
-      applicant = await signup('verify-admin-review');
-      admin = await signup('verify-admin-reviewer');
-      stranger = await signup('verify-admin-stranger');
-      await makeAdmin(admin.user.id);
-
-      await api('PUT', '/api/verification/me/id', { token: applicant.accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
-      await api('PUT', '/api/verification/me/selfie', { token: applicant.accessToken, body: { selfieUrl: TINY_DATA_URL } });
-      await api('POST', '/api/verification/me/submit', { token: applicant.accessToken });
-
-      const refused = await api('GET', '/api/verification/admin/pending', { token: stranger.accessToken });
-      assert.equal(refused.status, 403);
-
-      const pending = await api('GET', '/api/verification/admin/pending', { token: admin.accessToken });
-      assert.equal(pending.status, 200);
-      assert.ok(pending.body.submissions.some((s) => s.userId === applicant.user.id));
-
-      const approved = await api('PATCH', `/api/verification/admin/${applicant.user.id}`, { token: admin.accessToken, body: { status: 'approved' } });
-      assert.equal(approved.status, 200);
-      assert.equal(approved.body.status, 'approved');
-
-      const profileAfterApprove = await api('GET', '/api/profile/me', { token: applicant.accessToken });
-      assert.equal(profileAfterApprove.body.profile.verified, true);
-
-      const rejected = await api('PATCH', `/api/verification/admin/${applicant.user.id}`, { token: admin.accessToken, body: { status: 'rejected' } });
-      assert.equal(rejected.status, 200);
-      const profileAfterReject = await api('GET', '/api/profile/me', { token: applicant.accessToken });
-      assert.equal(profileAfterReject.body.profile.verified, false);
-    } finally {
-      if (FACEPP_API_KEY !== undefined) process.env.FACEPP_API_KEY = FACEPP_API_KEY;
-      if (FACEPP_API_SECRET !== undefined) process.env.FACEPP_API_SECRET = FACEPP_API_SECRET;
-    }
-  });
-
   test('compareFaces reports a match when confidence clears the 1e-4 threshold', async () => {
     const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
       fetchCompare: async () => ({ confidence: 92.5, thresholds: { '1e-3': 62.3, '1e-4': 73.8, '1e-5': 83.6 } }),
@@ -1389,46 +1236,14 @@ describe('messaging (conversations & notifications)', () => {
   });
 });
 
-describe('site content (admin-editable privacy policy / community guidelines)', () => {
-  test('an unedited slug returns null content, and an unknown slug 404s', async () => {
+describe('site content (fixed privacy policy / community guidelines text)', () => {
+  test('a known slug always returns null content (the app shows its built-in text), and an unknown slug 404s', async () => {
+    const guidelines = await api('GET', '/api/content/community-guidelines');
+    assert.equal(guidelines.status, 200);
+    assert.equal(guidelines.body.content, null);
+
     const unknown = await api('GET', '/api/content/not-a-real-page');
     assert.equal(unknown.status, 404);
-  });
-
-  test('only an admin can edit content, and non-editable slugs are rejected even for an admin', async () => {
-    const rae = await signup('content-rae');
-
-    const asNonAdmin = await api('PUT', '/api/content/community-guidelines', {
-      token: rae.accessToken,
-      body: { content: { sections: [{ heading: 'Be nice', body: 'Be kind to others.' }] } },
-    });
-    assert.equal(asNonAdmin.status, 403);
-
-    await makeAdmin(rae.user.id);
-    const notEditable = await api('PUT', '/api/content/some-other-page', {
-      token: rae.accessToken,
-      body: { content: { sections: [{ heading: 'x', body: 'y' }] } },
-    });
-    assert.equal(notEditable.status, 404);
-
-    const badShape = await api('PUT', '/api/content/community-guidelines', { token: rae.accessToken, body: { content: { sections: [] } } });
-    assert.equal(badShape.status, 400);
-
-    const edit = await api('PUT', '/api/content/community-guidelines', {
-      token: rae.accessToken,
-      body: { content: { intro: 'Read this first.', sections: [{ heading: 'Be nice', body: 'Be kind to others.' }] } },
-    });
-    assert.equal(edit.status, 200);
-    assert.equal(edit.body.content.sections[0].heading, 'Be nice');
-
-    const publicRead = await api('GET', '/api/content/community-guidelines');
-    assert.equal(publicRead.status, 200);
-    assert.equal(publicRead.body.content.intro, 'Read this first.');
-
-    const reset = await api('DELETE', '/api/content/community-guidelines', { token: rae.accessToken });
-    assert.equal(reset.status, 200);
-    const afterReset = await api('GET', '/api/content/community-guidelines');
-    assert.equal(afterReset.body.content, null);
   });
 });
 
@@ -1441,26 +1256,10 @@ describe('public site pages (homepage + privacy policy HTML)', () => {
     assert.match(html, /href="\/privacy-policy"/);
   });
 
-  test('the privacy policy page renders HTML and reflects an admin edit made via the content API', async () => {
-    const sam = await signup('site-sam');
-    await makeAdmin(sam.user.id);
-
-    const fresh = await fetch(`${baseUrl}/privacy-policy`);
-    assert.equal(fresh.status, 200);
-    assert.match(await fresh.text(), /Privacy Policy/);
-
-    await api('PUT', '/api/content/privacy-policy', {
-      token: sam.accessToken,
-      body: { content: { intro: 'Custom intro for this test run.', sections: [{ heading: 'Test Section', body: 'Test body.' }] } },
-    });
-
-    const edited = await fetch(`${baseUrl}/privacy-policy`);
-    const html = await edited.text();
-    assert.match(html, /Custom intro for this test run\./);
-    assert.match(html, /Test Section/);
-
-    // Reset so this doesn't leak into other tests reading the default policy.
-    await api('DELETE', '/api/content/privacy-policy', { token: sam.accessToken });
+  test('the privacy policy page renders the built-in default text', async () => {
+    const res = await fetch(`${baseUrl}/privacy-policy`);
+    assert.equal(res.status, 200);
+    assert.match(await res.text(), /Privacy Policy/);
   });
 });
 

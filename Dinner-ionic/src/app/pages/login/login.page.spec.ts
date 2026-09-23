@@ -12,12 +12,7 @@ import { AuthService } from '../../services/auth.service';
 const SESSION = {
   accessToken: 'access-token',
   refreshToken: 'refresh-token',
-  user: { id: 1, name: 'Sam Ali', email: 'sam@example.com', isAdmin: false },
-};
-const ADMIN_SESSION = {
-  accessToken: 'access-token',
-  refreshToken: 'refresh-token',
-  user: { id: 1, name: 'Admin', email: 'admin@example.com', isAdmin: true },
+  user: { id: 1, name: 'Sam Ali', email: 'sam@example.com' },
 };
 
 describe('LoginPage', () => {
@@ -45,8 +40,7 @@ describe('LoginPage', () => {
     expect(page.form.controls.email.touched).toBeTrue();
   });
 
-  it('navigates to /home on a successful login for a non-admin user', () => {
-    authServiceSpy.currentUser.and.returnValue({ isAdmin: false } as never);
+  it('navigates to /home on a successful login', () => {
     authServiceSpy.login.and.returnValue(of(SESSION));
 
     const fixture = createComponent();
@@ -61,21 +55,6 @@ describe('LoginPage', () => {
     // submitting is deliberately left true on a successful, navigating-away
     // login -- there's no next state where the form should re-enable.
     expect(navigateSpy).toHaveBeenCalledWith('/home');
-  });
-
-  it('navigates to /admin instead of /home when the signed-in user is an admin', () => {
-    authServiceSpy.currentUser.and.returnValue({ isAdmin: true } as never);
-    authServiceSpy.login.and.returnValue(of(ADMIN_SESSION));
-
-    const fixture = createComponent();
-    const page = fixture.componentInstance;
-    const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigateByUrl');
-
-    page.form.setValue({ email: 'admin@example.com', password: 'password123!' });
-    page.submit();
-
-    expect(navigateSpy).toHaveBeenCalledWith('/admin');
   });
 
   it('switches to the 2FA step instead of navigating when a challenge is returned', () => {
@@ -118,7 +97,6 @@ describe('LoginPage', () => {
   });
 
   it('submitTwoFactorCode() verifies the code and navigates on success', () => {
-    authServiceSpy.currentUser.and.returnValue({ isAdmin: false } as never);
     authServiceSpy.verify2faLogin.and.returnValue(of(SESSION));
 
     const fixture = createComponent();

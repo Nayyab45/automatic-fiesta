@@ -7,7 +7,7 @@
 // IPv4 address).
 export const environment = {
   production: false,
-  apiUrl: 'http://192.168.100.33:3113/api',
+  apiUrl: 'http://192.168.8.251:3113/api',
   // The Firebase project's "Web" OAuth client ID (ends in
   // .apps.googleusercontent.com), from Firebase Console -> Authentication ->
   // Sign-in method -> Google, after enabling it there. Required for
@@ -16,11 +16,4 @@ export const environment = {
   // AuthService.signInWithGoogle. Empty until that's set up; the Google
   // button will show a clear error instead of silently failing until then.
   googleWebClientId: '213347467379-1m4n20msv4o6blto7qh3nq3aeluhhj4g.apps.googleusercontent.com',
-  // Google's official public TEST banner unit id -- always serves a clearly
-  // labeled "Test Ad", never a real one. Correct as-is for a debug build.
-  // See environment.prod.ts for what changes before a real Play Store release.
-  adMob: {
-    bannerAdUnitId: 'ca-app-pub-3940256099942544/6300978111',
-    isTesting: true,
-  },
 };

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
 import { authRouter } from '../../src/routes/auth.js';
 import { startTestServer } from '../helpers/testServer.js';
-import { stubDbSequence, stubDbMatching } from '../helpers/mockDb.js';
+import { stubDbSequence } from '../helpers/mockDb.js';
 
 let server;
 let restoreDb = () => {};
@@ -33,11 +33,6 @@ async function post(path, body, headers = {}) {
 
 async function get(path, headers = {}) {
   const res = await fetch(`${server.baseUrl}${path}`, { headers });
-  return { status: res.status, body: await res.json() };
-}
-
-async function del(path, headers = {}) {
-  const res = await fetch(`${server.baseUrl}${path}`, { method: 'DELETE', headers });
   return { status: res.status, body: await res.json() };
 }
 
@@ -79,7 +74,6 @@ describe('POST /signup', () => {
     assert.equal(status, 201);
     assert.equal(body.user.name, 'Jane');
     assert.equal(body.user.email, 'jane@example.com');
-    assert.equal(body.user.isAdmin, false);
     assert.ok(body.accessToken);
     assert.ok(body.refreshToken);
     assert.equal('passwordHash' in body.user, false);
@@ -110,7 +104,7 @@ describe('POST /login', () => {
   test('200s with a session when 2FA is not enabled', async () => {
     const passwordHash = bcrypt.hashSync('password1!', 10);
     restoreDb = stubDbSequence([
-      { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash, isAdmin: 0 } },
+      { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash } },
       { get: null }, // two_factor_auth lookup -- not enabled
       { run: { lastInsertRowid: 1, changes: 1 } }, // INSERT INTO refresh_tokens
     ]);
@@ -124,7 +118,7 @@ describe('POST /login', () => {
   test('responds with a challenge (no tokens) when 2FA is enabled', async () => {
     const passwordHash = bcrypt.hashSync('password1!', 10);
     restoreDb = stubDbSequence([
-      { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash, isAdmin: 0 } },
+      { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash } },
       { get: { enabled: 1 } },
     ]);
     const { status, body } = await post('/login', { email: 'jane@example.com', password: 'password1!' });
@@ -180,7 +174,7 @@ describe('POST /refresh', () => {
     restoreDb = stubDbSequence([
       { get: { id: 1, user_id: 5, revoked_at: null, expires_at: '2999-01-01T00:00:00.000Z' } }, // find token
       { run: { changes: 1 } }, // revoke old token
-      { get: { id: 5, name: 'Jane', email: 'jane@example.com', isAdmin: 0 } }, // load user
+      { get: { id: 5, name: 'Jane', email: 'jane@example.com' } }, // load user
       { run: { lastInsertRowid: 2, changes: 1 } }, // insert new refresh token
     ]);
     const { status, body } = await post('/refresh', { refreshToken: 'some-token' });
@@ -205,7 +199,7 @@ describe('GET /me', () => {
 
   test("200s with the caller's own user", async () => {
     const { accessToken, userId } = await signUpAndAuthenticate();
-    restoreDb = stubDbSequence([{ get: { id: userId, name: 'Jane', email: 'jane@example.com', isAdmin: 0 } }]);
+    restoreDb = stubDbSequence([{ get: { id: userId, name: 'Jane', email: 'jane@example.com' } }]);
     const { status, body } = await get('/me', { authorization: `Bearer ${accessToken}` });
     assert.equal(status, 200);
     assert.equal(body.user.id, userId);
@@ -223,61 +217,3 @@ async function signUpAndAuthenticate() {
   });
   return { accessToken, userId };
 }
-
-describe('DELETE /admin/users/:id', () => {
-  test('403s a non-admin caller', async () => {
-    const { accessToken } = await signUpAndAuthenticate();
-    restoreDb = stubDbMatching([{ match: 'is_admin FROM users WHERE id = ?', get: { is_admin: 0 } }]);
-    const { status } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
-    assert.equal(status, 403);
-  });
-
-  test('404s for an unknown target user', async () => {
-    const { accessToken } = await signUpAndAuthenticate();
-    const stub = stubDbMatching([
-      { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
-      { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: null },
-    ]);
-    restoreDb = stub;
-    const { status } = await del('/admin/users/999', { authorization: `Bearer ${accessToken}` });
-    assert.equal(status, 404);
-  });
-
-  test("400s trying to delete an admin account", async () => {
-    const { accessToken } = await signUpAndAuthenticate();
-    restoreDb = stubDbMatching([
-      { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
-      { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: { id: 5, is_admin: 1 } },
-    ]);
-    const { status, body } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
-    assert.equal(status, 400);
-    assert.match(body.message, /admin account/);
-  });
-
-  test('200s and cascades the delete across every referencing table for a normal user', async () => {
-    const { accessToken } = await signUpAndAuthenticate();
-    const deletedFrom = [];
-    const stub = stubDbMatching(
-      [
-        { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
-        { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: { id: 5, is_admin: 0 } },
-      ],
-      {
-        run: (...args) => {
-          deletedFrom.push(args);
-          return { changes: 1 };
-        },
-      },
-    );
-    restoreDb = stub;
-    const { status, body } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
-    assert.equal(status, 200);
-    assert.equal(body.ok, true);
-    // deleteUserAccount fires 13 DELETE statements (12 referencing tables + users itself).
-    assert.equal(deletedFrom.length, 13);
-    assert.ok(
-      stub.calls.some((sql) => sql.includes('DELETE FROM users WHERE id = ?')),
-      'must actually delete the users row, not just its related data',
-    );
-  });
-});
