@@ -1,13 +1,16 @@
+<main class="min-h-screen relative flex flex-col items-center justify-center p-container-padding overflow-hidden">
+
 <div class="absolute top-0 left-0 w-32 h-32 opacity-20 pointer-events-none" style="background: radial-gradient(circle at top left, #b89b5e, transparent 70%);"></div>
 <div class="absolute bottom-0 right-0 w-48 h-48 opacity-10 pointer-events-none" style="background: radial-gradient(circle at bottom right, #b89b5e, transparent 70%);"></div>
-<main class="w-full max-w-md p-container-padding relative z-10">
+
+<div class="relative z-10 w-full max-w-[420px] flex flex-col items-center">
 
 <header class="text-center mb-stack-lg">
 <h1 class="font-display-lg text-headline-lg text-primary mb-unit">What Should We Eat?</h1>
 <p class="font-body-md text-body-md text-on-surface-variant">Join our exclusive dining concierge</p>
 </header>
 
-<div class="bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-8 border border-outline-variant/30">
+<div class="w-full bg-surface rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-8 sm:p-10 border border-outline-variant/30">
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-stack-md">
 
 @if (errorMessage()) {
@@ -74,5 +77,6 @@
                 Already a member? 
                 <a (click)="go('/login')" class="text-primary font-semibold hover:text-primary-container transition-colors" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/login')">Sign In</a>
 </p>
+</div>
 </div>
 </main>

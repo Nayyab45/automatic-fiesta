@@ -6,6 +6,7 @@ import { Restaurant, RestaurantDetail, RestaurantService } from '../../services/
 import { DiningTable, DiningTableService } from '../../services/dining-table.service';
 import { Friend, FriendsService } from '../../services/friends.service';
 import { LocationService } from '../../services/location.service';
+import { Match, ProfileService } from '../../services/profile.service';
 
 function makeRestaurant(id: number, overrides: Partial<Restaurant> = {}): Restaurant {
   return { id, name: `Restaurant ${id}`, city: 'Karachi', cuisineTags: 'Pakistani', rating: 4.5, ...overrides } as unknown as Restaurant;
@@ -16,11 +17,13 @@ function makeRestaurantDetail(id: number, overrides: Partial<Restaurant> = {}): 
 }
 
 const FRIEND: Friend = { id: 9, name: 'Bilal', photoUrl: null, city: 'Karachi' };
+const SUGGESTION = { id: 20, name: 'Zara' } as unknown as Match;
 
 describe('CreateTablePage', () => {
   let restaurantServiceSpy: jasmine.SpyObj<RestaurantService>;
   let tableServiceSpy: jasmine.SpyObj<DiningTableService>;
   let friendsServiceSpy: jasmine.SpyObj<FriendsService>;
+  let profileServiceSpy: jasmine.SpyObj<ProfileService>;
 
   function createComponent(routeOverride?: Partial<ActivatedRoute>) {
     const providers: unknown[] = [
@@ -28,6 +31,7 @@ describe('CreateTablePage', () => {
       { provide: RestaurantService, useValue: restaurantServiceSpy },
       { provide: DiningTableService, useValue: tableServiceSpy },
       { provide: FriendsService, useValue: friendsServiceSpy },
+      { provide: ProfileService, useValue: profileServiceSpy },
     ];
     if (routeOverride) {
       providers.push({ provide: ActivatedRoute, useValue: routeOverride });
@@ -38,10 +42,12 @@ describe('CreateTablePage', () => {
 
   beforeEach(() => {
     restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['get', 'list', 'groupRecommendation']);
-    tableServiceSpy = jasmine.createSpyObj('DiningTableService', ['create']);
+    tableServiceSpy = jasmine.createSpyObj('DiningTableService', ['create', 'invite']);
     friendsServiceSpy = jasmine.createSpyObj('FriendsService', ['list']);
+    profileServiceSpy = jasmine.createSpyObj('ProfileService', ['matches']);
 
     friendsServiceSpy.list.and.returnValue(of({ friends: [FRIEND] }));
+    profileServiceSpy.matches.and.returnValue(of({ matches: [SUGGESTION, { id: 9, name: 'Bilal' } as unknown as Match] }));
     restaurantServiceSpy.list.and.returnValue(of({ restaurants: [makeRestaurant(1), makeRestaurant(2)] }));
   });
 
@@ -57,6 +63,22 @@ describe('CreateTablePage', () => {
   it('loads friends into the friends signal on construction', () => {
     const fixture = createComponent();
     expect(fixture.componentInstance.friends()).toEqual([FRIEND]);
+  });
+
+  it('loads suggestions from matches(), excluding anyone already a friend', () => {
+    const fixture = createComponent();
+    expect(fixture.componentInstance.suggestions()).toEqual([SUGGESTION]);
+  });
+
+  it('toggleInvitee() adds then removes an id', () => {
+    const fixture = createComponent();
+    const page = fixture.componentInstance;
+
+    page.toggleInvitee(20);
+    expect(page.selectedInviteeIds()).toEqual([20]);
+
+    page.toggleInvitee(20);
+    expect(page.selectedInviteeIds()).toEqual([]);
   });
 
   it('when arriving with a ?restaurantId query param, loads restaurants for that restaurant\'s own city', () => {
@@ -166,6 +188,42 @@ describe('CreateTablePage', () => {
     expect(tableServiceSpy.create).toHaveBeenCalledWith(
       jasmine.objectContaining({ dateTime: '2026-10-01T19:00', visibility: 'public', audience: 'women_only' }),
     );
+    expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
+  });
+
+  it('submit() invites the selected people after creating the table, then navigates to the guest list', () => {
+    tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
+    tableServiceSpy.invite.and.returnValue(of({ invited: [9, 20] }));
+
+    const fixture = createComponent();
+    const page = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigateByUrl');
+
+    page.date = '2026-10-01';
+    page.time = '19:00';
+    page.toggleInvitee(9);
+    page.toggleInvitee(20);
+    page.submit();
+
+    expect(tableServiceSpy.invite).toHaveBeenCalledWith(42, [9, 20]);
+    expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
+  });
+
+  it('submit() still navigates to the guest list if sending invites fails', () => {
+    tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
+    tableServiceSpy.invite.and.returnValue(throwError(() => new Error('down')));
+
+    const fixture = createComponent();
+    const page = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigateByUrl');
+
+    page.date = '2026-10-01';
+    page.time = '19:00';
+    page.toggleInvitee(9);
+    page.submit();
+
     expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
   });
 

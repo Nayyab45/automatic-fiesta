@@ -51,14 +51,6 @@ describe('DiningTableService', () => {
     req.flush({ table: {} });
   });
 
-  it('setBill() PATCHes totalBill to /tables/:id/bill', () => {
-    service.setBill(1, 5000).subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/1/bill`);
-    expect(req.request.method).toBe('PATCH');
-    expect(req.request.body).toEqual({ totalBill: 5000 });
-    req.flush({ table: {} });
-  });
-
   it('guests() GETs /tables/:id/guests', () => {
     service.guests(1).subscribe();
     const req = httpMock.expectOne(`${baseUrl}/1/guests`);
@@ -81,11 +73,12 @@ describe('DiningTableService', () => {
     req.flush({ seatRequest: null });
   });
 
-  it('seatRequests() GETs /tables/:id/seat-requests', () => {
-    service.seatRequests(1).subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/1/seat-requests`);
-    expect(req.request.method).toBe('GET');
-    req.flush({ seatRequests: [] });
+  it('invite() POSTs userIds to /tables/:id/invites', () => {
+    service.invite(1, [7, 8]).subscribe();
+    const req = httpMock.expectOne(`${baseUrl}/1/invites`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ userIds: [7, 8] });
+    req.flush({ invited: [7, 8] });
   });
 
   it('patchSeatRequest() PATCHes the status on the top-level /seat-requests/:id', () => {

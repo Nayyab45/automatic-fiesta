@@ -16,9 +16,10 @@ notificationsRouter.use(requireAuth);
 // and the push notification's body text never drift apart.
 function notificationMessageFor(type, { actorName = 'Someone', restaurantName = 'the restaurant' } = {}) {
   const messages = {
-    seat_request_received: `${actorName} requested a seat at ${restaurantName}`,
-    seat_request_confirmed: `Your seat request was approved at ${restaurantName}`,
-    seat_request_declined: `Your seat request was declined at ${restaurantName}`,
+    table_seat_joined: `${actorName} joined your table at ${restaurantName}`,
+    table_invite_received: `You've been invited to a table at ${restaurantName}`,
+    table_invite_accepted: `${actorName} accepted your invite to ${restaurantName}`,
+    table_invite_declined: `${actorName} declined your invite to ${restaurantName}`,
     friend_request_received: `${actorName} sent you a friend request`,
     friend_request_accepted: `${actorName} accepted your friend request`,
     new_table_near_you: `A new table was just created at ${restaurantName} near you`,

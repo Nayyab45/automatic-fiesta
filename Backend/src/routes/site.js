@@ -17,7 +17,7 @@ const DEFAULT_PRIVACY_POLICY = {
   sections: [
     {
       heading: 'Information We Collect',
-      body: "- **Account & profile:** name, email, password (stored hashed, never in plain text), age, city/province, a short bio, a profile photo you upload, and your food/cuisine preferences.\n- **Identity verification (optional):** if you choose to verify your identity, we store the ID photo and selfie you submit until your verification is reviewed.\n- **Dining activity:** tables you host or join, seat requests, reviews you write, and restaurants you save.\n- **Messages:** direct messages and table group chat messages you send through the app.\n- **Safety & trust:** emergency contacts you add, and any blocks or reports you file (or that are filed against you).",
+      body: "- **Account & profile:** name, email, password (stored hashed, never in plain text), age, city/province, a short bio, a profile photo you upload, and your food/cuisine preferences.\n- **Identity verification (optional):** if you choose to verify your identity, we store the CNIC photo you submit until your verification is reviewed.\n- **Dining activity:** tables you host or join, seat requests, reviews you write, and restaurants you save.\n- **Messages:** direct messages and table group chat messages you send through the app.\n- **Safety & trust:** emergency contacts you add, and any blocks or reports you file (or that are filed against you).",
     },
     {
       heading: 'Location',

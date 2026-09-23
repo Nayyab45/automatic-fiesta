@@ -36,14 +36,6 @@ describe('VerificationService', () => {
     req.flush({ status: 'not_started' });
   });
 
-  it('saveSelfie() PUTs selfieUrl', () => {
-    service.saveSelfie('selfie.jpg').subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/me/selfie`);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual({ selfieUrl: 'selfie.jpg' });
-    req.flush({ status: 'not_started' });
-  });
-
   it('submit() POSTs to /verification/me/submit', () => {
     service.submit().subscribe();
     const req = httpMock.expectOne(`${baseUrl}/me/submit`);

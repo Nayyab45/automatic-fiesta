@@ -78,10 +78,6 @@ async function tableWithContext(row, userId) {
     isHost: row.host_user_id === userId,
     isMember: await isTableMember(row, userId),
     hasReviewed: !!hasReviewed,
-    // Once the host records the real total (see PATCH /:id/bill), that's
-    // split across whoever's actually seated right now -- takes over from
-    // price_per_person, which was only ever an upfront estimate.
-    pricePerPerson: row.total_bill != null ? Math.round((row.total_bill / currentGuestCount) * 100) / 100 : row.price_per_person,
   };
 }
 
@@ -150,30 +146,6 @@ tablesRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({ table: await tableWithContext(row, req.user.sub) });
 }));
 
-// Host records the real bill once it's known (typically after the meal) --
-// tableWithContext then reports pricePerPerson as this split across
-// whoever's currently seated, taking over from the upfront estimate.
-// Re-settable (e.g. the host corrects a typo, or more guests join before
-// the group actually pays) rather than a one-time write.
-tablesRouter.patch('/:id/bill', asyncHandler(async (req, res) => {
-  const row = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(req.params.id);
-  if (!row) {
-    return res.status(404).json({ message: 'Table not found' });
-  }
-  if (row.host_user_id !== req.user.sub) {
-    return res.status(403).json({ message: 'Only the host can set the bill for this table' });
-  }
-
-  const { totalBill } = req.body ?? {};
-  if (typeof totalBill !== 'number' || !Number.isFinite(totalBill) || totalBill <= 0) {
-    return res.status(400).json({ message: 'totalBill must be a positive number' });
-  }
-
-  await db.prepare('UPDATE dining_tables SET total_bill = ? WHERE id = ?').run(totalBill, row.id);
-  const updated = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(row.id);
-  res.json({ table: await tableWithContext(updated, req.user.sub) });
-}));
-
 // Popup-notifies every other user in the restaurant's city when a new
 // *public* table is created there -- "near" here means same city, not real
 // GPS distance, since the app has nowhere it persists a user's live location
@@ -210,7 +182,7 @@ async function notifyNearbyUsersOfNewTable(table, restaurant, hostUserId) {
 }
 
 tablesRouter.post('/', asyncHandler(async (req, res) => {
-  const { restaurantId, gatheringType, dateTime, seatsTotal, visibility, audience, atmosphere, note, pricePerPerson, title } =
+  const { restaurantId, gatheringType, dateTime, seatsTotal, visibility, audience, atmosphere, note, title } =
     req.body ?? {};
 
   const missingFieldsError = requireFields(req.body, ['restaurantId', 'gatheringType', 'dateTime', 'seatsTotal']);
@@ -231,8 +203,8 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
   const result = await db
     .prepare(
       `INSERT INTO dining_tables
-       (title, restaurant_id, host_user_id, gathering_type, date_time, seats_total, visibility, audience, atmosphere, note, price_per_person)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (title, restaurant_id, host_user_id, gathering_type, date_time, seats_total, visibility, audience, atmosphere, note)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       title?.trim() || `${gatheringType} at ${restaurant.name}`,
@@ -245,7 +217,6 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
       audience ?? 'everyone',
       atmosphere ?? null,
       note ?? null,
-      pricePerPerson ?? null,
     );
 
   const created = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(result.lastInsertRowid);
@@ -286,6 +257,10 @@ tablesRouter.get('/:id/guests', asyncHandler(async (req, res) => {
   });
 }));
 
+// Requesting a seat at a public table now seats you immediately -- there's
+// no host-review step any more (see PATCH /seat-requests/:id below), so
+// leaving this 'sent' with nothing that would ever move it out of that
+// state would just strand every self-request pending forever.
 tablesRouter.post('/:id/seat-requests', asyncHandler(async (req, res) => {
   const table = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!table) {
@@ -298,22 +273,57 @@ tablesRouter.post('/:id/seat-requests', asyncHandler(async (req, res) => {
     const reason = table.audience === 'women_only' ? 'a women-only' : 'a friends-only';
     return res.status(403).json({ message: `This is ${reason} table you're not eligible to join` });
   }
-
-  const existing = await db
-    .prepare("SELECT id FROM seat_requests WHERE table_id = ? AND user_id = ? AND status = 'sent'")
-    .get(table.id, req.user.sub);
-  if (existing) {
-    return res.status(409).json({ message: 'You already have a pending request for this table' });
+  if (await isTableMember(table, req.user.sub)) {
+    return res.status(409).json({ message: "You're already part of this table" });
+  }
+  if ((await guestCount(table.id)) >= table.seats_total) {
+    return res.status(409).json({ message: 'This table is already fully booked -- no seats left' });
   }
 
   const result = await db
-    .prepare('INSERT INTO seat_requests (table_id, user_id, message) VALUES (?, ?, ?)')
+    .prepare("INSERT INTO seat_requests (table_id, user_id, message, status) VALUES (?, ?, ?, 'confirmed')")
     .run(table.id, req.user.sub, req.body?.message ?? null);
+  await db.prepare('INSERT IGNORE INTO table_guests (table_id, user_id) VALUES (?, ?)').run(table.id, req.user.sub);
 
-  await createNotification(table.host_user_id, 'seat_request_received', { tableId: table.id, actorUserId: req.user.sub });
+  await createNotification(table.host_user_id, 'table_seat_joined', { tableId: table.id, actorUserId: req.user.sub });
 
   const created = await db.prepare('SELECT * FROM seat_requests WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json({ seatRequest: toCamel(created) });
+}));
+
+// Host-only: send a specific set of people a table invite they can accept or
+// decline themselves (see PATCH /seat-requests/:id) -- the host-side
+// "Manage Requests" review queue this used to feed into is gone, so
+// resolving one of these is now entirely up to its recipient.
+tablesRouter.post('/:id/invites', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT * FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (table.host_user_id !== req.user.sub) {
+    return res.status(403).json({ message: 'Only the host can invite people to this table' });
+  }
+
+  const userIds = Array.isArray(req.body?.userIds) ? [...new Set(req.body.userIds.map(Number))] : [];
+  if (userIds.length === 0) {
+    return res.status(400).json({ message: 'userIds must be a non-empty array' });
+  }
+
+  const invited = [];
+  for (const userId of userIds) {
+    if (userId === table.host_user_id) continue;
+    if (await isTableMember(table, userId)) continue;
+    const existing = await db
+      .prepare("SELECT id FROM seat_requests WHERE table_id = ? AND user_id = ? AND status = 'sent'")
+      .get(table.id, userId);
+    if (existing) continue;
+
+    await db.prepare("INSERT INTO seat_requests (table_id, user_id, status) VALUES (?, ?, 'sent')").run(table.id, userId);
+    await createNotification(userId, 'table_invite_received', { tableId: table.id, actorUserId: req.user.sub });
+    invited.push(userId);
+  }
+
+  res.status(201).json({ invited });
 }));
 
 tablesRouter.get('/:id/seat-requests/me', asyncHandler(async (req, res) => {
@@ -323,28 +333,6 @@ tablesRouter.get('/:id/seat-requests/me', asyncHandler(async (req, res) => {
     )
     .get(req.params.id, req.user.sub);
   res.json({ seatRequest: row ? toCamel(row) : null });
-}));
-
-// Host-only: every request made for this table, not just the caller's own
-// (that's /:id/seat-requests/me above) -- lets the host review and act on
-// the full queue instead of needing each request's id from a notification.
-tablesRouter.get('/:id/seat-requests', asyncHandler(async (req, res) => {
-  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
-  if (!table) {
-    return res.status(404).json({ message: 'Table not found' });
-  }
-  if (table.host_user_id !== req.user.sub) {
-    return res.status(403).json({ message: 'Only the host can view seat requests for this table' });
-  }
-
-  const rows = await db
-    .prepare(
-      `SELECT sr.*, u.name as user_name FROM seat_requests sr
-       JOIN users u ON u.id = sr.user_id
-       WHERE sr.table_id = ? ORDER BY sr.created_at DESC`,
-    )
-    .all(table.id);
-  res.json({ seatRequests: toCamelRows(rows) });
 }));
 
 tablesRouter.post('/:id/check-in', asyncHandler(async (req, res) => {
@@ -515,11 +503,18 @@ seatRequestsRouter.patch('/:id', asyncHandler(async (req, res) => {
   if (!seatRequest) {
     return res.status(404).json({ message: 'Seat request not found' });
   }
+  if (seatRequest.status !== 'sent') {
+    return res.status(409).json({ message: 'This invite has already been responded to' });
+  }
+  // Only the invited person can accept/decline their own invite -- a
+  // self-request never reaches this endpoint (it's confirmed immediately at
+  // POST /:id/seat-requests), so every row still 'sent' at this point is a
+  // host-sent invite, and it's the invitee's decision, not the host's.
+  if (seatRequest.user_id !== req.user.sub) {
+    return res.status(403).json({ message: 'Only the invited person can respond to this invite' });
+  }
 
   const table = await db.prepare('SELECT host_user_id, seats_total FROM dining_tables WHERE id = ?').get(seatRequest.table_id);
-  if (table.host_user_id !== req.user.sub) {
-    return res.status(403).json({ message: 'Only the host can review this request' });
-  }
 
   // Confirming a seat request is what actually reserves it -- the seat count
   // sent to the restaurant when the table was booked (see
@@ -541,7 +536,7 @@ seatRequestsRouter.patch('/:id', asyncHandler(async (req, res) => {
     );
   }
 
-  await createNotification(seatRequest.user_id, status === 'confirmed' ? 'seat_request_confirmed' : 'seat_request_declined', {
+  await createNotification(table.host_user_id, status === 'confirmed' ? 'table_invite_accepted' : 'table_invite_declined', {
     tableId: seatRequest.table_id,
     actorUserId: req.user.sub,
   });

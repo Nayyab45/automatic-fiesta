@@ -55,7 +55,7 @@ export class IdentityVerificationIdUploadPage extends BasePage {
     this.submitting.set(true);
     this.errorMessage.set(null);
     this.verificationService.saveId(front, back).subscribe({
-      next: () => this.go('/face-verification'),
+      next: () => this.go('/identity-verification-submit-review'),
       error: (err) => {
         this.submitting.set(false);
         this.errorMessage.set(err?.error?.message ?? 'Could not save your ID photos. Please try again.');

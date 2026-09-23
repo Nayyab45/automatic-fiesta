@@ -23,7 +23,6 @@ const GROUP_TABLE = {
   visibility: 'public',
   atmosphere: null,
   note: null,
-  pricePerPerson: null,
   createdAt: new Date().toISOString(),
   restaurant: { name: 'Kolachi', photoUrl: null, address: null, rating: 4.8, cuisineTags: 'Pakistani' },
   host: { id: 3, name: 'Phase4 Tester' },

@@ -12,35 +12,23 @@
 <div class="text-center mb-section-gap space-y-stack-sm w-full">
 <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary tracking-tight">Everything looks great!</h2>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-[400px] mx-auto px-4">
-                Your ID and face verification have been successfully captured. You're one step away from joining our verified community of food enthusiasts.
+                Your CNIC has been successfully captured. You're one step away from joining our verified community of food enthusiasts.
             </p>
 </div>
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 
 <div *ngIf="!loading() && verification() as v" class="w-full bg-surface-container-lowest rounded-xl p-gutter shadow-[0_4px_16px_rgba(0,0,0,0.04)] border-[0.5px] border-outline-variant mb-stack-md flex flex-col gap-4">
-<div class="flex items-center justify-between pb-4 border-b border-outline-variant/30">
+<div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant">badge</span>
 </div>
-<span class="font-body-md text-body-md font-medium text-on-surface">National ID</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">CNIC</span>
 </div>
 <div class="flex items-center gap-2" [class.text-tertiary]="v.hasIdFront && v.hasIdBack" [class.text-error]="!v.hasIdFront || !v.hasIdBack">
 <span class="font-label-sm text-label-sm uppercase tracking-wider">{{ v.hasIdFront && v.hasIdBack ? 'Captured' : 'Missing' }}</span>
 <span class="material-symbols-outlined icon-fill text-lg">{{ v.hasIdFront && v.hasIdBack ? 'check_circle' : 'error' }}</span>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface-variant">face</span>
-</div>
-<span class="font-body-md text-body-md font-medium text-on-surface">Face Match</span>
-</div>
-<div class="flex items-center gap-2" [class.text-tertiary]="v.hasSelfie" [class.text-error]="!v.hasSelfie">
-<span class="font-label-sm text-label-sm uppercase tracking-wider">{{ v.hasSelfie ? 'Captured' : 'Missing' }}</span>
-<span class="material-symbols-outlined icon-fill text-lg">{{ v.hasSelfie ? 'check_circle' : 'error' }}</span>
 </div>
 </div>
 </div>
@@ -53,7 +41,7 @@
 </div>
 
 <div *ngIf="!loading()" class="w-full mt-auto pt-stack-lg">
-<button (click)="submit()" [disabled]="submitting() || !verification()?.hasIdFront || !verification()?.hasIdBack || !verification()?.hasSelfie" class="w-full h-14 bg-primary-container text-on-primary hover:bg-primary transition-colors rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(184,155,94,0.3)] active:scale-[0.98] disabled:opacity-50">
+<button (click)="submit()" [disabled]="submitting() || !verification()?.hasIdFront || !verification()?.hasIdBack" class="w-full h-14 bg-primary-container text-on-primary hover:bg-primary transition-colors rounded-lg font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(184,155,94,0.3)] active:scale-[0.98] disabled:opacity-50">
 <span>{{ submitting() ? 'SUBMITTING…' : 'SUBMIT FOR REVIEW' }}</span>
 <span class="material-symbols-outlined text-lg">arrow_forward</span>
 </button>

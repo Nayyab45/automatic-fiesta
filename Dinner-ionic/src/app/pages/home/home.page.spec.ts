@@ -21,8 +21,6 @@ function makeTable(overrides: Partial<DiningTable>): DiningTable {
     audience: 'everyone',
     atmosphere: null,
     note: null,
-    pricePerPerson: null,
-    totalBill: null,
     createdAt: new Date().toISOString(),
     restaurant: { name: 'Kolachi', photoUrl: null, address: null, city: 'Karachi', rating: 4.8, cuisineTags: 'Pakistani' },
     host: { id: 1, name: 'Host' },

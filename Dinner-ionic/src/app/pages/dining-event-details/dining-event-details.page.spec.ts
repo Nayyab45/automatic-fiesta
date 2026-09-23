@@ -42,7 +42,8 @@ describe('DiningEventDetailsPage', () => {
   }
 
   beforeEach(() => {
-    tableServiceSpy = jasmine.createSpyObj('DiningTableService', ['get']);
+    tableServiceSpy = jasmine.createSpyObj('DiningTableService', ['get', 'mySeatRequest', 'patchSeatRequest']);
+    tableServiceSpy.mySeatRequest.and.returnValue(of({ seatRequest: null }));
   });
 
   it('loads the table for the routed id', () => {
@@ -105,5 +106,34 @@ describe('DiningEventDetailsPage', () => {
       (el as HTMLElement).textContent?.includes('Leave a review'),
     );
     expect(button).toBeFalsy();
+  });
+
+  it('does not fetch a seat request for the host or an existing member', () => {
+    tableServiceSpy.get.and.returnValue(of({ table: { ...TABLE, isHost: true } }));
+    createComponent('5');
+    expect(tableServiceSpy.mySeatRequest).not.toHaveBeenCalled();
+  });
+
+  it('shows the invite as accepted and updates the table once respondToInvite("confirmed") resolves', () => {
+    const nonMemberTable = { ...TABLE, isHost: false, isMember: false, guestCount: 2 } as unknown as DiningTable;
+    tableServiceSpy.get.and.returnValue(of({ table: nonMemberTable }));
+    tableServiceSpy.mySeatRequest.and.returnValue(
+      of({ seatRequest: { id: 9, tableId: 5, userId: 1, status: 'sent', message: null, createdAt: '', updatedAt: '' } }),
+    );
+    tableServiceSpy.patchSeatRequest.and.returnValue(
+      of({ seatRequest: { id: 9, tableId: 5, userId: 1, status: 'confirmed', message: null, createdAt: '', updatedAt: '' } }),
+    );
+
+    const fixture = createComponent('5');
+    const page = fixture.componentInstance;
+    expect(page.mySeatRequest()?.status).toBe('sent');
+
+    page.respondToInvite('confirmed');
+
+    expect(tableServiceSpy.patchSeatRequest).toHaveBeenCalledWith(9, 'confirmed');
+    expect(page.mySeatRequest()?.status).toBe('confirmed');
+    expect(page.table()?.isMember).toBeTrue();
+    expect(page.table()?.guestCount).toBe(3);
+    expect(page.responding()).toBeFalse();
   });
 });

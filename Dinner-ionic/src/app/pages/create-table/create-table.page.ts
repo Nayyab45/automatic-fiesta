@@ -8,6 +8,7 @@ import { Restaurant, RestaurantService } from '../../services/restaurant.service
 import { DiningTableService, TableAudience } from '../../services/dining-table.service';
 import { Friend, FriendsService } from '../../services/friends.service';
 import { LocationService } from '../../services/location.service';
+import { Match, ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-create-table',
@@ -22,6 +23,7 @@ export class CreateTablePage extends BasePage {
   private readonly tableService = inject(DiningTableService);
   private readonly friendsService = inject(FriendsService);
   private readonly locationService = inject(LocationService);
+  private readonly profileService = inject(ProfileService);
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
@@ -45,6 +47,12 @@ export class CreateTablePage extends BasePage {
   readonly aiSuggesting = signal(false);
   readonly aiSuggestion = signal<{ restaurantName: string; reason: string; aiPowered: boolean } | null>(null);
   readonly aiError = signal<string | null>(null);
+
+  // Who to send a table invite to once this table is created -- friends()
+  // above doubles as the "Friends" group; suggestions is everyone matches()
+  // returns who isn't already a friend, i.e. the "Suggestions" group.
+  readonly suggestions = signal<Match[]>([]);
+  readonly selectedInviteeIds = signal<number[]>([]);
 
   gatheringType = 'Dinner';
   atmosphere = 'Social Conversation';
@@ -73,7 +81,14 @@ export class CreateTablePage extends BasePage {
     } else {
       this.loadRestaurants(this.locationService.current());
     }
-    this.friendsService.list().subscribe(({ friends }) => this.friends.set(friends));
+    this.friendsService.list().subscribe(({ friends }) => {
+      this.friends.set(friends);
+      const friendIds = new Set(friends.map((f) => f.id));
+      this.profileService.matches().subscribe({
+        next: ({ matches }) => this.suggestions.set(matches.filter((m) => !friendIds.has(m.id))),
+        error: () => {},
+      });
+    });
   }
 
   private loadRestaurants(city: string): void {
@@ -99,6 +114,13 @@ export class CreateTablePage extends BasePage {
       selected.includes(friendId) ? selected.filter((id) => id !== friendId) : [...selected, friendId],
     );
     this.aiSuggestion.set(null);
+  }
+
+  toggleInvitee(userId: number): void {
+    const selected = this.selectedInviteeIds();
+    this.selectedInviteeIds.set(
+      selected.includes(userId) ? selected.filter((id) => id !== userId) : [...selected, userId],
+    );
   }
 
   getAiSuggestion(): void {
@@ -146,7 +168,20 @@ export class CreateTablePage extends BasePage {
         note: this.note,
       })
       .subscribe({
-        next: ({ table }) => this.go(`/guest-list/${table.id}`),
+        next: ({ table }) => {
+          const inviteeIds = this.selectedInviteeIds();
+          if (inviteeIds.length === 0) {
+            this.go(`/guest-list/${table.id}`);
+            return;
+          }
+          // The table is already created at this point -- an invite failure
+          // shouldn't strand the host on this form or lose the table they
+          // just made, so it navigates through either way.
+          this.tableService.invite(table.id, inviteeIds).subscribe({
+            next: () => this.go(`/guest-list/${table.id}`),
+            error: () => this.go(`/guest-list/${table.id}`),
+          });
+        },
         error: () => {
           this.submitting.set(false);
           this.errorMessage.set('Could not create the table. Please try again.');

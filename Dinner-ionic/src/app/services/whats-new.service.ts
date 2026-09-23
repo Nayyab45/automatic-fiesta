@@ -23,7 +23,7 @@ export class WhatsNewService {
     {
       icon: 'badge',
       title: 'Streamlined Identity Verification',
-      description: 'Verify your identity in clear steps: upload your ID, a quick face scan, then submit for review.',
+      description: 'Verify your identity in clear steps: upload your CNIC, then submit for review.',
     },
     {
       icon: 'group',

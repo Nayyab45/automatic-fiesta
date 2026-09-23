@@ -30,7 +30,6 @@ const { app } = await import('../src/server.js');
 const { initSchema, pool, db } = await import('../src/db.js');
 const { importCityRestaurants } = await import('../src/lib/osmPlaces.js');
 const { getRealPlacePhoto, getOrCreateCuisinePhoto, enhancePhoto } = await import('../src/lib/restaurantPhotos.js');
-const { compareFaces } = await import('../src/lib/faceMatch.js');
 const { Jimp } = await import('jimp');
 
 let server;
@@ -198,7 +197,7 @@ describe('blocking', () => {
 });
 
 describe('seat requests & notifications', () => {
-  test('requesting then confirming a seat notifies the host, then the guest', async () => {
+  test('requesting a seat confirms it immediately and notifies the host', async () => {
     const host = await signup('host');
     const guest = await signup('guest');
 
@@ -221,25 +220,13 @@ describe('seat requests & notifications', () => {
       body: { message: 'Count me in!' },
     });
     assert.equal(seatReq.status, 201);
+    assert.equal(seatReq.body.seatRequest.status, 'confirmed');
 
     const hostNotifs = await api('GET', '/api/notifications', { token: host.accessToken });
-    assert.ok(hostNotifs.body.notifications.some((n) => n.type === 'seat_request_received'));
+    assert.ok(hostNotifs.body.notifications.some((n) => n.type === 'table_seat_joined'));
 
-    const confirm = await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
-      token: host.accessToken,
-      body: { status: 'confirmed' },
-    });
-    assert.equal(confirm.status, 200);
-
-    const guestNotifs = await api('GET', '/api/notifications', { token: guest.accessToken });
-    assert.ok(guestNotifs.body.notifications.some((n) => n.type === 'seat_request_confirmed'));
-
-    const hostList = await api('GET', `/api/tables/${table.body.table.id}/seat-requests`, { token: host.accessToken });
-    assert.equal(hostList.status, 200);
-    assert.ok(hostList.body.seatRequests.some((r) => r.id === seatReq.body.seatRequest.id && r.userName === 'Test User'));
-
-    const guestList = await api('GET', `/api/tables/${table.body.table.id}/seat-requests`, { token: guest.accessToken });
-    assert.equal(guestList.status, 403);
+    const tableAfter = await api('GET', `/api/tables/${table.body.table.id}`, { token: host.accessToken });
+    assert.equal(tableAfter.body.table.guestCount, 2);
   });
 
   test('a guest cannot request a seat at their own table', async () => {
@@ -263,13 +250,145 @@ describe('seat requests & notifications', () => {
     });
     assert.equal(res.status, 400);
   });
+
+  test('requesting a seat you already have is rejected', async () => {
+    const host = await signup('seat-dup-host');
+    const guest = await signup('seat-dup-guest');
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const table = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: { restaurantId: restaurants.body.restaurants[0].id, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
+    });
+    const tableId = table.body.table.id;
+
+    const first = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    assert.equal(first.status, 201);
+
+    const again = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    assert.equal(again.status, 409);
+  });
+
+  test('requesting a seat at a full table is rejected', async () => {
+    const host = await signup('seat-full-host');
+    const guest = await signup('seat-full-guest');
+    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
+    const table = await api('POST', '/api/tables', {
+      token: host.accessToken,
+      body: { restaurantId: restaurants.body.restaurants[0].id, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 1 },
+    });
+    const tableId = table.body.table.id;
+
+    const res = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    assert.equal(res.status, 409);
+  });
+});
+
+describe('table invites', () => {
+  async function tableWithSeats(hostToken, seatsTotal = 4) {
+    const restaurants = await api('GET', '/api/restaurants', { token: hostToken });
+    const table = await api('POST', '/api/tables', {
+      token: hostToken,
+      body: { restaurantId: restaurants.body.restaurants[0].id, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal },
+    });
+    return table.body.table.id;
+  }
+
+  test('a host can invite specific people, who each accept for themselves', async () => {
+    const host = await signup('invite-host');
+    const invitee = await signup('invite-invitee');
+    const other = await signup('invite-other');
+    const tableId = await tableWithSeats(host.accessToken);
+
+    const forbidden = await api('POST', `/api/tables/${tableId}/invites`, {
+      token: invitee.accessToken,
+      body: { userIds: [other.user.id] },
+    });
+    assert.equal(forbidden.status, 403);
+
+    const invite = await api('POST', `/api/tables/${tableId}/invites`, {
+      token: host.accessToken,
+      body: { userIds: [invitee.user.id] },
+    });
+    assert.equal(invite.status, 201);
+    assert.deepEqual(invite.body.invited, [invitee.user.id]);
+
+    const inviteeNotifs = await api('GET', '/api/notifications', { token: invitee.accessToken });
+    assert.ok(inviteeNotifs.body.notifications.some((n) => n.type === 'table_invite_received'));
+
+    const mine = await api('GET', `/api/tables/${tableId}/seat-requests/me`, { token: invitee.accessToken });
+    assert.equal(mine.body.seatRequest.status, 'sent');
+
+    const wrongPerson = await api('PATCH', `/api/seat-requests/${mine.body.seatRequest.id}`, {
+      token: other.accessToken,
+      body: { status: 'confirmed' },
+    });
+    assert.equal(wrongPerson.status, 403);
+
+    const accept = await api('PATCH', `/api/seat-requests/${mine.body.seatRequest.id}`, {
+      token: invitee.accessToken,
+      body: { status: 'confirmed' },
+    });
+    assert.equal(accept.status, 200);
+    assert.equal(accept.body.seatRequest.status, 'confirmed');
+
+    const hostNotifs = await api('GET', '/api/notifications', { token: host.accessToken });
+    assert.ok(hostNotifs.body.notifications.some((n) => n.type === 'table_invite_accepted'));
+
+    const tableAfter = await api('GET', `/api/tables/${tableId}`, { token: host.accessToken });
+    assert.equal(tableAfter.body.table.guestCount, 2);
+
+    const again = await api('PATCH', `/api/seat-requests/${mine.body.seatRequest.id}`, {
+      token: invitee.accessToken,
+      body: { status: 'declined' },
+    });
+    assert.equal(again.status, 409);
+  });
+
+  test('declining an invite notifies the host and does not seat the invitee', async () => {
+    const host = await signup('invite-decline-host');
+    const invitee = await signup('invite-decline-invitee');
+    const tableId = await tableWithSeats(host.accessToken);
+
+    await api('POST', `/api/tables/${tableId}/invites`, { token: host.accessToken, body: { userIds: [invitee.user.id] } });
+    const mine = await api('GET', `/api/tables/${tableId}/seat-requests/me`, { token: invitee.accessToken });
+
+    const decline = await api('PATCH', `/api/seat-requests/${mine.body.seatRequest.id}`, {
+      token: invitee.accessToken,
+      body: { status: 'declined' },
+    });
+    assert.equal(decline.status, 200);
+    assert.equal(decline.body.seatRequest.status, 'declined');
+
+    const hostNotifs = await api('GET', '/api/notifications', { token: host.accessToken });
+    assert.ok(hostNotifs.body.notifications.some((n) => n.type === 'table_invite_declined'));
+
+    const tableAfter = await api('GET', `/api/tables/${tableId}`, { token: host.accessToken });
+    assert.equal(tableAfter.body.table.guestCount, 1);
+  });
+
+  test('userIds must be a non-empty array, and inviting an existing member is a no-op', async () => {
+    const host = await signup('invite-validate-host');
+    const guest = await signup('invite-validate-guest');
+    const tableId = await tableWithSeats(host.accessToken);
+
+    const empty = await api('POST', `/api/tables/${tableId}/invites`, { token: host.accessToken, body: { userIds: [] } });
+    assert.equal(empty.status, 400);
+
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
+    const reinvite = await api('POST', `/api/tables/${tableId}/invites`, {
+      token: host.accessToken,
+      body: { userIds: [guest.user.id] },
+    });
+    assert.equal(reinvite.status, 201);
+    assert.deepEqual(reinvite.body.invited, []);
+  });
 });
 
 describe('check-in', () => {
-  test('the host and a confirmed guest can check in; a stranger and a pending requester cannot', async () => {
+  test('the host and a confirmed guest can check in; a stranger and an invitee who has not accepted cannot', async () => {
     const host = await signup('checkin-host');
     const confirmedGuest = await signup('checkin-confirmed');
-    const pendingGuest = await signup('checkin-pending');
+    const invitedGuest = await signup('checkin-invited');
     const stranger = await signup('checkin-stranger');
 
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
@@ -286,21 +405,13 @@ describe('check-in', () => {
     });
     const tableId = table.body.table.id;
 
-    const confirmedReq = await api('POST', `/api/tables/${tableId}/seat-requests`, {
-      token: confirmedGuest.accessToken,
-      body: {},
-    });
-    await api('PATCH', `/api/seat-requests/${confirmedReq.body.seatRequest.id}`, {
-      token: host.accessToken,
-      body: { status: 'confirmed' },
-    });
-
-    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: pendingGuest.accessToken, body: {} });
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: confirmedGuest.accessToken, body: {} });
+    await api('POST', `/api/tables/${tableId}/invites`, { token: host.accessToken, body: { userIds: [invitedGuest.user.id] } });
 
     const strangerCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: stranger.accessToken });
     assert.equal(strangerCheckIn.status, 403);
 
-    const pendingCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: pendingGuest.accessToken });
+    const pendingCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: invitedGuest.accessToken });
     assert.equal(pendingCheckIn.status, 403);
 
     const hostCheckIn = await api('POST', `/api/tables/${tableId}/check-in`, { token: host.accessToken });
@@ -330,11 +441,7 @@ describe('reviews', () => {
     });
     const tableId = table.body.table.id;
 
-    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
-    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
-      token: host.accessToken,
-      body: { status: 'confirmed' },
-    });
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
 
     const review = await api('POST', `/api/tables/${tableId}/reviews`, {
       token: guest.accessToken,
@@ -365,11 +472,7 @@ describe('people ratings', () => {
       },
     });
     const tableId = table.body.table.id;
-    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guestToken, body: {} });
-    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
-      token: hostToken,
-      body: { status: 'confirmed' },
-    });
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guestToken, body: {} });
     return tableId;
   }
 
@@ -433,11 +536,7 @@ describe('people ratings', () => {
       },
     });
     const tableId = table.body.table.id;
-    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
-    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, {
-      token: host.accessToken,
-      body: { status: 'confirmed' },
-    });
+    await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
 
     const tooSoon = await api('POST', `/api/tables/${tableId}/rate`, {
       token: guest.accessToken,
@@ -625,42 +724,6 @@ describe('profile views', () => {
 
     const viewsCount = await api('GET', '/api/profile/me', { token: viewed.accessToken });
     assert.equal(viewsCount.body.profileViewsCount, 1);
-  });
-});
-
-describe('split bill', () => {
-  test("host's total bill is split across current guests, host-only, and rejects a non-positive amount", async () => {
-    const host = await signup('bill-host');
-    const guest = await signup('bill-guest');
-    const stranger = await signup('bill-stranger');
-
-    const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
-    const restaurantId = restaurants.body.restaurants[0].id;
-
-    const created = await api('POST', '/api/tables', {
-      token: host.accessToken,
-      body: { restaurantId, gatheringType: 'dinner', dateTime: new Date(Date.now() + 86400000).toISOString(), seatsTotal: 4 },
-    });
-    const tableId = created.body.table.id;
-    assert.equal(created.body.table.pricePerPerson, null);
-
-    const seatReq = await api('POST', `/api/tables/${tableId}/seat-requests`, { token: guest.accessToken, body: {} });
-    await api('PATCH', `/api/seat-requests/${seatReq.body.seatRequest.id}`, { token: host.accessToken, body: { status: 'confirmed' } });
-
-    const forbidden = await api('PATCH', `/api/tables/${tableId}/bill`, { token: stranger.accessToken, body: { totalBill: 5000 } });
-    assert.equal(forbidden.status, 403);
-
-    const invalid = await api('PATCH', `/api/tables/${tableId}/bill`, { token: host.accessToken, body: { totalBill: -10 } });
-    assert.equal(invalid.status, 400);
-
-    // 2 guests seated (host + confirmed guest) -- Rs. 5000 split two ways.
-    const set = await api('PATCH', `/api/tables/${tableId}/bill`, { token: host.accessToken, body: { totalBill: 5000 } });
-    assert.equal(set.status, 200);
-    assert.equal(set.body.table.totalBill, 5000);
-    assert.equal(set.body.table.pricePerPerson, 2500);
-
-    const reread = await api('GET', `/api/tables/${tableId}`, { token: guest.accessToken });
-    assert.equal(reread.body.table.pricePerPerson, 2500);
   });
 });
 
@@ -968,7 +1031,7 @@ describe('restaurant photo enhancement', () => {
 describe('identity verification', () => {
   const TINY_DATA_URL = 'data:image/png;base64,aGVsbG8=';
 
-  test('uploading ID + selfie then submitting moves status to pending when no face-match provider is configured', async () => {
+  test('uploading a CNIC front/back then submitting approves immediately', async () => {
     const { accessToken } = await signup('verify-pending');
 
     const afterId = await api('PUT', '/api/verification/me/id', {
@@ -979,88 +1042,18 @@ describe('identity verification', () => {
     assert.equal(afterId.body.hasIdFront, true);
     assert.equal(afterId.body.status, 'not_started');
 
-    const afterSelfie = await api('PUT', '/api/verification/me/selfie', {
-      token: accessToken,
-      body: { selfieUrl: TINY_DATA_URL },
-    });
-    assert.equal(afterSelfie.body.hasSelfie, true);
-
-    // Force isConfigured() to false for this one test regardless of what's
-    // actually in this machine's .env, so it deterministically covers the
-    // no-provider fallback rather than depending on whether real FACEPP_*
-    // credentials happen to be set locally (they are, once you've followed
-    // the .env.example setup -- but this path still needs coverage for
-    // anyone/any CI run without them).
-    const { FACEPP_API_KEY, FACEPP_API_SECRET } = process.env;
-    delete process.env.FACEPP_API_KEY;
-    delete process.env.FACEPP_API_SECRET;
-    try {
-      const afterSubmit = await api('POST', '/api/verification/me/submit', { token: accessToken });
-      assert.equal(afterSubmit.status, 200);
-      assert.equal(afterSubmit.body.status, 'pending');
-      assert.equal(afterSubmit.body.faceMatchConfidence, null);
-      assert.ok(afterSubmit.body.submittedAt);
-    } finally {
-      if (FACEPP_API_KEY !== undefined) process.env.FACEPP_API_KEY = FACEPP_API_KEY;
-      if (FACEPP_API_SECRET !== undefined) process.env.FACEPP_API_SECRET = FACEPP_API_SECRET;
-    }
-  });
-
-  test('submitting with real face-match credentials configured records a confidence score either way', async () => {
-    if (!process.env.FACEPP_API_KEY || !process.env.FACEPP_API_SECRET) return; // not configured on this machine/CI run -- nothing to test
-    const { accessToken } = await signup('verify-configured');
-
-    await api('PUT', '/api/verification/me/id', { token: accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
-    await api('PUT', '/api/verification/me/selfie', { token: accessToken, body: { selfieUrl: TINY_DATA_URL } });
-
-    // TINY_DATA_URL is a 1x1 pixel, too small for Face++ to find a face in
-    // -- compareFaces() should come back null (inconclusive), so submit()
-    // falls back to 'pending' exactly like the not-configured case, rather
-    // than misreporting a real user's genuinely undecidable submission as
-    // rejected.
     const afterSubmit = await api('POST', '/api/verification/me/submit', { token: accessToken });
     assert.equal(afterSubmit.status, 200);
-    assert.equal(afterSubmit.body.status, 'pending');
-    assert.equal(afterSubmit.body.faceMatchConfidence, null);
+    assert.equal(afterSubmit.body.status, 'approved');
+    assert.ok(afterSubmit.body.submittedAt);
   });
 
-  test('submitting without both ID photos and a selfie is rejected', async () => {
+  test('submitting without uploading a CNIC is rejected', async () => {
     const { accessToken } = await signup('verify-incomplete');
-    await api('PUT', '/api/verification/me/id', { token: accessToken, body: { idFrontUrl: TINY_DATA_URL, idBackUrl: TINY_DATA_URL } });
 
     const { status, body } = await api('POST', '/api/verification/me/submit', { token: accessToken });
     assert.equal(status, 400);
-    assert.match(body.message, /upload your id and a selfie/i);
-  });
-
-  test('compareFaces reports a match when confidence clears the 1e-4 threshold', async () => {
-    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
-      fetchCompare: async () => ({ confidence: 92.5, thresholds: { '1e-3': 62.3, '1e-4': 73.8, '1e-5': 83.6 } }),
-    });
-    assert.deepEqual(result, { confidence: 92.5, isMatch: true });
-  });
-
-  test('compareFaces reports no match when confidence falls short of the threshold', async () => {
-    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
-      fetchCompare: async () => ({ confidence: 40.1, thresholds: { '1e-3': 62.3, '1e-4': 73.8, '1e-5': 83.6 } }),
-    });
-    assert.deepEqual(result, { confidence: 40.1, isMatch: false });
-  });
-
-  test('compareFaces returns null (inconclusive) when Face++ found no confidence -- e.g. no face detected', async () => {
-    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
-      fetchCompare: async () => ({ error_message: 'INVALID_IMAGE_SIZE' }),
-    });
-    assert.equal(result, null);
-  });
-
-  test('compareFaces returns null rather than throwing when the request itself fails', async () => {
-    const result = await compareFaces(TINY_DATA_URL, TINY_DATA_URL, {
-      fetchCompare: async () => {
-        throw new Error('network down');
-      },
-    });
-    assert.equal(result, null);
+    assert.match(body.message, /upload your cnic/i);
   });
 });
 

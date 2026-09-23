@@ -39,6 +39,39 @@
 <p *ngIf="aiError()" class="text-error font-body-sm text-body-sm">{{ aiError() }}</p>
 </section>
 
+<section *ngIf="friends().length > 0 || suggestions().length > 0" class="space-y-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface-variant">Invite People</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select who to send a table invite to once this table is created.</p>
+
+<div *ngIf="friends().length > 0" class="space-y-stack-sm">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Friends</h3>
+<div class="flex flex-col gap-stack-sm">
+<div *ngFor="let friend of friends()" (click)="toggleInvitee(friend.id)" [class.border-primary-container]="selectedInviteeIds().includes(friend.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(friend.id)">
+<div class="flex items-center gap-stack-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ friend.name.charAt(0) }}</div>
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ friend.name }}</span>
+</div>
+<span class="material-symbols-outlined text-primary" *ngIf="selectedInviteeIds().includes(friend.id)">check_circle</span>
+<span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedInviteeIds().includes(friend.id)">radio_button_unchecked</span>
+</div>
+</div>
+</div>
+
+<div *ngIf="suggestions().length > 0" class="space-y-stack-sm">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Suggestions</h3>
+<div class="flex flex-col gap-stack-sm">
+<div *ngFor="let person of suggestions()" (click)="toggleInvitee(person.id)" [class.border-primary-container]="selectedInviteeIds().includes(person.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(person.id)">
+<div class="flex items-center gap-stack-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ person.name.charAt(0) }}</div>
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ person.name }}</span>
+</div>
+<span class="material-symbols-outlined text-primary" *ngIf="selectedInviteeIds().includes(person.id)">check_circle</span>
+<span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedInviteeIds().includes(person.id)">radio_button_unchecked</span>
+</div>
+</div>
+</div>
+</section>
+
 <section class="space-y-stack-md">
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">The Details</h2>
 <div class="space-y-stack-sm">
@@ -124,7 +157,7 @@
 <section class="pt-stack-lg pb-section-gap">
 <p *ngIf="errorMessage()" class="text-error font-body-md text-body-md text-center mb-stack-sm" role="alert">{{ errorMessage() }}</p>
 <button (click)="submit()" [disabled]="submitting()" class="w-full bg-primary-container text-on-primary py-4 rounded-xl font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] transform disabled:opacity-60">
-                {{ submitting() ? 'Creating…' : 'Create Table' }}
+                {{ submitting() ? 'Sending…' : 'Send Request' }}
             </button>
 </section>
 </main>

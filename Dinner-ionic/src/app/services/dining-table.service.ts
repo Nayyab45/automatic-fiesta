@@ -33,13 +33,6 @@ export interface DiningTable {
   audience: TableAudience;
   atmosphere: string | null;
   note: string | null;
-  /** Set at creation as an upfront estimate. Once totalBill is set (see
-   * setBill), this instead reports that split across guestCount -- the
-   * host's estimate is superseded by the real number. */
-  pricePerPerson: number | null;
-  /** The real bill amount the host recorded after the meal, if any -- see
-   * setBill(). null until they set it. */
-  totalBill: number | null;
   createdAt: string;
   restaurant: TableRestaurantSummary;
   host: TableHost;
@@ -64,9 +57,6 @@ export interface SeatRequest {
   id: number;
   tableId: number;
   userId: number;
-  // Only present on the host-only list endpoint (getSeatRequests), not on
-  // mySeatRequest -- a guest already knows who they are.
-  userName?: string;
   status: 'sent' | 'confirmed' | 'declined';
   message: string | null;
   createdAt: string;
@@ -91,7 +81,6 @@ export interface CreateTablePayload {
   audience?: TableAudience;
   atmosphere?: string;
   note?: string;
-  pricePerPerson?: number;
 }
 
 export interface ReviewPayload {
@@ -150,12 +139,6 @@ export class DiningTableService {
     return this.http.post<{ table: DiningTable }>(this.baseUrl, payload);
   }
 
-  /** Host-only: records the real bill; pricePerPerson on the returned table
-   * is that split across whoever's currently seated. Re-settable. */
-  setBill(id: number | string, totalBill: number): Observable<{ table: DiningTable }> {
-    return this.http.patch<{ table: DiningTable }>(`${this.baseUrl}/${id}/bill`, { totalBill });
-  }
-
   guests(id: number | string): Observable<{ guests: TableGuest[] }> {
     return this.http.get<{ guests: TableGuest[] }>(`${this.baseUrl}/${id}/guests`);
   }
@@ -168,11 +151,14 @@ export class DiningTableService {
     return this.http.get<{ seatRequest: SeatRequest | null }>(`${this.baseUrl}/${id}/seat-requests/me`);
   }
 
-  /** Host-only: every request made for this table. */
-  seatRequests(id: number | string): Observable<{ seatRequests: SeatRequest[] }> {
-    return this.http.get<{ seatRequests: SeatRequest[] }>(`${this.baseUrl}/${id}/seat-requests`);
+  /** Host-only: send specific people an invite to this table, which each
+   * recipient then accepts or declines themselves via patchSeatRequest(). */
+  invite(id: number | string, userIds: number[]): Observable<{ invited: number[] }> {
+    return this.http.post<{ invited: number[] }>(`${this.baseUrl}/${id}/invites`, { userIds });
   }
 
+  /** Called by the invited person themselves to accept/decline their own
+   * pending table invite. */
   patchSeatRequest(requestId: number | string, status: 'confirmed' | 'declined'): Observable<{ seatRequest: SeatRequest }> {
     return this.http.patch<{ seatRequest: SeatRequest }>(`${environment.apiUrl}/seat-requests/${requestId}`, { status });
   }
