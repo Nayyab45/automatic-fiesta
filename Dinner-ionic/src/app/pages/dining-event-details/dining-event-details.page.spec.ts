@@ -6,6 +6,19 @@ import { DiningTable, DiningTableService } from '../../services/dining-table.ser
 
 const TABLE = { id: 5, title: 'Dinner', restaurant: { name: 'Kolachi' } } as unknown as DiningTable;
 
+const PAST_TABLE = {
+  id: 5,
+  title: 'Dinner',
+  dateTime: '2026-01-01T19:00:00.000Z',
+  guestCount: 2,
+  seatsTotal: 4,
+  note: null,
+  restaurant: { name: 'Kolachi', photoUrl: '' },
+  isPast: true,
+  isHost: false,
+  hasReviewed: false,
+} as unknown as DiningTable;
+
 function fakeRoute(id: string | null) {
   return {
     snapshot: { paramMap: convertToParamMap(id ? { id } : {}) },
@@ -56,5 +69,41 @@ describe('DiningEventDetailsPage', () => {
 
     expect(fixture.componentInstance.table()).toBeNull();
     expect(fixture.componentInstance.loading()).toBeFalse();
+  });
+
+  it('shows "Leave a review" to the host of a past, unreviewed table', () => {
+    tableServiceSpy.get.and.returnValue(of({ table: { ...PAST_TABLE, isHost: true } }));
+
+    const fixture = createComponent('5');
+    fixture.detectChanges();
+
+    const button = Array.from(fixture.nativeElement.querySelectorAll('button')).find((el) =>
+      (el as HTMLElement).textContent?.includes('Leave a review'),
+    );
+    expect(button).toBeTruthy();
+  });
+
+  it('shows "Leave a review" to a guest of a past, unreviewed table', () => {
+    tableServiceSpy.get.and.returnValue(of({ table: { ...PAST_TABLE, isHost: false } }));
+
+    const fixture = createComponent('5');
+    fixture.detectChanges();
+
+    const button = Array.from(fixture.nativeElement.querySelectorAll('button')).find((el) =>
+      (el as HTMLElement).textContent?.includes('Leave a review'),
+    );
+    expect(button).toBeTruthy();
+  });
+
+  it('hides "Leave a review" once the table has already been reviewed', () => {
+    tableServiceSpy.get.and.returnValue(of({ table: { ...PAST_TABLE, isHost: true, hasReviewed: true } }));
+
+    const fixture = createComponent('5');
+    fixture.detectChanges();
+
+    const button = Array.from(fixture.nativeElement.querySelectorAll('button')).find((el) =>
+      (el as HTMLElement).textContent?.includes('Leave a review'),
+    );
+    expect(button).toBeFalsy();
   });
 });

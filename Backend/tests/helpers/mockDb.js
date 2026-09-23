@@ -48,3 +48,34 @@ export function stubDbAlways({ get = null, all = [], run = { lastInsertRowid: 0,
     db.prepare = original;
   };
 }
+
+// Keyed stub: each db.prepare(sql) call is matched against `rules` in order
+// (a rule's `match` is a substring or RegExp tested against the SQL text),
+// and the first match's { get, all, run } handles that call; unmatched calls
+// fall back to `fallback`. Good for a route whose query *sequence* is long or
+// incidental (e.g. a profile assembled from a dozen near-irrelevant lookups)
+// but where one or two specific queries -- which ones ran, with what args --
+// are what the test actually cares about, regardless of surrounding order.
+// The returned restore function also carries `.calls`, the raw SQL text of
+// every call made while the stub was active, for asserting a query did (or
+// pointedly didn't) happen.
+export function stubDbMatching(rules, fallback = { get: null, all: [], run: { lastInsertRowid: 0, changes: 0 } }) {
+  const original = db.prepare;
+  const calls = [];
+  db.prepare = (sql) => {
+    calls.push(sql);
+    const rule = rules.find((r) => (typeof r.match === 'string' ? sql.includes(r.match) : r.match.test(sql)));
+    const entry = rule ?? fallback;
+    return {
+      get: async (...args) => (typeof entry.get === 'function' ? entry.get(...args) : entry.get ?? null),
+      all: async (...args) => (typeof entry.all === 'function' ? entry.all(...args) : entry.all ?? []),
+      run: async (...args) =>
+        (typeof entry.run === 'function' ? entry.run(...args) : entry.run) ?? { lastInsertRowid: 0, changes: 0 },
+    };
+  };
+  const restore = () => {
+    db.prepare = original;
+  };
+  restore.calls = calls;
+  return restore;
+}
