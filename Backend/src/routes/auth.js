@@ -637,3 +637,22 @@ authRouter.post('/admin/users/:id/unsuspend', requireAuth, requireAdmin, asyncHa
   await db.prepare('UPDATE users SET suspended_at = NULL, suspended_reason = NULL WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
 }));
+
+// Reuses the same cascade as self-delete (DELETE /me) -- this schema has no
+// FK constraints, so deleteUserAccount's manual cleanup across every
+// referencing table is the only thing standing between a raw `DELETE FROM
+// users` and orphaned rows everywhere else. For clearing out test/dummy
+// accounts (e.g. ones created directly in the DB or by a script) that were
+// never going to self-delete through the app.
+authRouter.delete('/admin/users/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const user = await db.prepare('SELECT id, is_admin FROM users WHERE id = ?').get(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+  if (user.is_admin) {
+    return res.status(400).json({ message: "Can't delete an admin account" });
+  }
+
+  await deleteUserAccount(req.params.id);
+  res.json({ ok: true });
+}));

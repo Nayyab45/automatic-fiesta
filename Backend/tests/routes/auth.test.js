@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
 import { authRouter } from '../../src/routes/auth.js';
 import { startTestServer } from '../helpers/testServer.js';
-import { stubDbSequence } from '../helpers/mockDb.js';
+import { stubDbSequence, stubDbMatching } from '../helpers/mockDb.js';
 
 let server;
 let restoreDb = () => {};
@@ -33,6 +33,11 @@ async function post(path, body, headers = {}) {
 
 async function get(path, headers = {}) {
   const res = await fetch(`${server.baseUrl}${path}`, { headers });
+  return { status: res.status, body: await res.json() };
+}
+
+async function del(path, headers = {}) {
+  const res = await fetch(`${server.baseUrl}${path}`, { method: 'DELETE', headers });
   return { status: res.status, body: await res.json() };
 }
 
@@ -200,3 +205,61 @@ async function signUpAndAuthenticate() {
   });
   return { accessToken, userId };
 }
+
+describe('DELETE /admin/users/:id', () => {
+  test('403s a non-admin caller', async () => {
+    const { accessToken } = await signUpAndAuthenticate();
+    restoreDb = stubDbMatching([{ match: 'is_admin FROM users WHERE id = ?', get: { is_admin: 0 } }]);
+    const { status } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
+    assert.equal(status, 403);
+  });
+
+  test('404s for an unknown target user', async () => {
+    const { accessToken } = await signUpAndAuthenticate();
+    const stub = stubDbMatching([
+      { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
+      { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: null },
+    ]);
+    restoreDb = stub;
+    const { status } = await del('/admin/users/999', { authorization: `Bearer ${accessToken}` });
+    assert.equal(status, 404);
+  });
+
+  test("400s trying to delete an admin account", async () => {
+    const { accessToken } = await signUpAndAuthenticate();
+    restoreDb = stubDbMatching([
+      { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
+      { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: { id: 5, is_admin: 1 } },
+    ]);
+    const { status, body } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
+    assert.equal(status, 400);
+    assert.match(body.message, /admin account/);
+  });
+
+  test('200s and cascades the delete across every referencing table for a normal user', async () => {
+    const { accessToken } = await signUpAndAuthenticate();
+    const deletedFrom = [];
+    const stub = stubDbMatching(
+      [
+        { match: 'SELECT is_admin FROM users WHERE id = ?', get: { is_admin: 1 } },
+        { match: 'SELECT id, is_admin FROM users WHERE id = ?', get: { id: 5, is_admin: 0 } },
+      ],
+      {
+        run: (...args) => {
+          deletedFrom.push(args);
+          return { changes: 1 };
+        },
+      },
+    );
+    restoreDb = stub;
+    const { status, body } = await del('/admin/users/5', { authorization: `Bearer ${accessToken}` });
+    assert.equal(status, 200);
+    assert.equal(body.ok, true);
+    // deleteUserAccount fires 13 DELETE statements (12 referencing tables + users itself).
+    assert.equal(deletedFrom.length, 13);
+    assert.ok(
+      stub.calls.some((sql) => sql.includes('DELETE FROM users WHERE id = ?')),
+      'must actually delete the users row, not just its related data',
+    );
+  });
+});
