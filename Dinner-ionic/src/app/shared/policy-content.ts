@@ -33,7 +33,7 @@ export const DEFAULT_PRIVACY_POLICY: PolicyContent = {
     },
     {
       heading: "How We Use Your Data",
-      body: "- To operate the core features you use directly: discovering restaurants and people, hosting/joining dining tables, messaging, and reviews.\n- To verify identity when you choose to, for trust and safety.\n- To act on safety reports, blocks, and emergency contact information if you use those features.\n- To secure your account (password hashing, session tokens, optional two-factor authentication).\nWe do not sell your personal data to third parties or advertisers."
+      body: "- To operate the core features you use directly: discovering restaurants and people, hosting/joining dining tables, messaging, and reviews.\n- To verify identity when you choose to, for trust and safety.\n- To act on safety reports, blocks, and emergency contact information if you use those features.\n- To secure your account (password hashing, session tokens).\nWe do not sell your personal data to third parties or advertisers."
     },
     {
       heading: "Who Can See Your Data",
@@ -41,7 +41,7 @@ export const DEFAULT_PRIVACY_POLICY: PolicyContent = {
     },
     {
       heading: "Your Controls",
-      body: "- Toggle your profile's visibility to other users from Privacy Settings.\n- Block or report another user at any time.\n- Enable or disable two-factor authentication from Manage Account.\n- Delete your account entirely from Manage Account, which removes your profile, preferences, and associated data."
+      body: "- Toggle your profile's visibility to other users from Privacy Settings.\n- Block or report another user at any time.\n- Delete your account entirely from Manage Account, which removes your profile, preferences, and associated data."
     },
     {
       heading: "Security",

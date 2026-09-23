@@ -4,7 +4,6 @@ import { randomUUID } from 'node:crypto';
 import { readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generate as generateTotp } from 'otplib';
 
 // db.js now talks to a live, shared MySQL/MariaDB database (see .env) instead
 // of an in-memory SQLite file, and the credentials there only grant access to
@@ -66,7 +65,6 @@ const USER_ID_TABLES = [
   ['conversation_participants', 'user_id'],
   ['user_reports', 'reporter_user_id'],
   ['user_reports', 'reported_user_id'],
-  ['two_factor_auth', 'user_id'],
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
   ['feature_waitlist', 'user_id'],
@@ -810,78 +808,6 @@ describe('friends', () => {
 
     const status = await api('GET', `/api/friends/status/${kevin.user.id}`, { token: julia.accessToken });
     assert.equal(status.body.status, 'pending_sent');
-  });
-});
-
-describe('two-factor auth', () => {
-  test('status is disabled until setup + enable, and enable rejects a wrong code', async () => {
-    const user = await signup('2fa-status');
-
-    const before2fa = await api('GET', '/api/auth/2fa/status', { token: user.accessToken });
-    assert.equal(before2fa.body.enabled, false);
-
-    const setup = await api('POST', '/api/auth/2fa/setup', { token: user.accessToken });
-    assert.ok(setup.body.secret);
-    assert.match(setup.body.qrCodeDataUrl, /^data:image\/png;base64,/);
-
-    const wrongCode = await api('POST', '/api/auth/2fa/enable', { token: user.accessToken, body: { code: '000000' } });
-    assert.equal(wrongCode.status, 401);
-
-    const stillDisabled = await api('GET', '/api/auth/2fa/status', { token: user.accessToken });
-    assert.equal(stillDisabled.body.enabled, false);
-
-    const code = await generateTotp({ secret: setup.body.secret });
-    const enabled = await api('POST', '/api/auth/2fa/enable', { token: user.accessToken, body: { code } });
-    assert.equal(enabled.status, 200);
-
-    const afterEnable = await api('GET', '/api/auth/2fa/status', { token: user.accessToken });
-    assert.equal(afterEnable.body.enabled, true);
-  });
-
-  test('login is gated behind a TOTP code once 2FA is enabled, then disable turns it back off', async () => {
-    const email = testEmail('2fa-login');
-    const password = 'password123!';
-    const signupRes = await api('POST', '/api/auth/signup', { body: { name: '2FA Login', email, password } });
-    createdUserIds.push(signupRes.body.user.id);
-
-    const setup = await api('POST', '/api/auth/2fa/setup', { token: signupRes.body.accessToken });
-    await api('POST', '/api/auth/2fa/enable', {
-      token: signupRes.body.accessToken,
-      body: { code: await generateTotp({ secret: setup.body.secret }) },
-    });
-    // Password alone no longer issues a session -- it hands back a
-    // short-lived challenge instead.
-    const loginAttempt = await api('POST', '/api/auth/login', { body: { email, password } });
-    assert.equal(loginAttempt.status, 200);
-    assert.equal(loginAttempt.body.twoFactorRequired, true);
-    assert.ok(loginAttempt.body.challengeToken);
-    assert.equal(loginAttempt.body.accessToken, undefined);
-
-    const wrongCodeLogin = await api('POST', '/api/auth/2fa/verify-login', {
-      body: { challengeToken: loginAttempt.body.challengeToken, code: '000000' },
-    });
-    assert.equal(wrongCodeLogin.status, 401);
-
-    const verified = await api('POST', '/api/auth/2fa/verify-login', {
-      body: { challengeToken: loginAttempt.body.challengeToken, code: await generateTotp({ secret: setup.body.secret }) },
-    });
-    assert.equal(verified.status, 200);
-    assert.ok(verified.body.accessToken);
-
-    // Disabling requires a current code, not just the access token.
-    const disableWrongCode = await api('POST', '/api/auth/2fa/disable', { token: verified.body.accessToken, body: { code: '000000' } });
-    assert.equal(disableWrongCode.status, 401);
-
-    const disabled = await api('POST', '/api/auth/2fa/disable', {
-      token: verified.body.accessToken,
-      body: { code: await generateTotp({ secret: setup.body.secret }) },
-    });
-    assert.equal(disabled.status, 200);
-
-    // With 2FA off again, a plain login issues a session directly.
-    const plainLogin = await api('POST', '/api/auth/login', { body: { email, password } });
-    assert.ok(plainLogin.body.accessToken);
-    assert.equal(plainLogin.body.twoFactorRequired, undefined);
   });
 });
 

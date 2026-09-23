@@ -101,31 +101,16 @@ describe('POST /login', () => {
     assert.equal(status, 401);
   });
 
-  test('200s with a session when 2FA is not enabled', async () => {
+  test('200s with a session on a correct password', async () => {
     const passwordHash = bcrypt.hashSync('password1!', 10);
     restoreDb = stubDbSequence([
       { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash } },
-      { get: null }, // two_factor_auth lookup -- not enabled
       { run: { lastInsertRowid: 1, changes: 1 } }, // INSERT INTO refresh_tokens
     ]);
     const { status, body } = await post('/login', { email: 'jane@example.com', password: 'password1!' });
     assert.equal(status, 200);
     assert.ok(body.accessToken);
     assert.ok(body.refreshToken);
-    assert.equal(body.twoFactorRequired, undefined);
-  });
-
-  test('responds with a challenge (no tokens) when 2FA is enabled', async () => {
-    const passwordHash = bcrypt.hashSync('password1!', 10);
-    restoreDb = stubDbSequence([
-      { get: { id: 1, name: 'Jane', email: 'jane@example.com', password_hash: passwordHash } },
-      { get: { enabled: 1 } },
-    ]);
-    const { status, body } = await post('/login', { email: 'jane@example.com', password: 'password1!' });
-    assert.equal(status, 200);
-    assert.equal(body.twoFactorRequired, true);
-    assert.ok(body.challengeToken);
-    assert.equal(body.accessToken, undefined);
   });
 
   // Must run last in this describe block -- it burns through (and leaves

@@ -60,16 +60,7 @@ export class SignupPage extends BasePage {
     this.errorMessage.set(null);
 
     this.authService.signInWithGoogle().subscribe({
-      next: (result) => {
-        if ('twoFactorRequired' in result) {
-          // An account with this Google email already exists and has 2FA
-          // enabled -- that flow lives on the login page, not here.
-          this.submitting.set(false);
-          this.errorMessage.set('This account has two-factor authentication enabled. Please sign in instead.');
-          return;
-        }
-        this.go('/profile-creation');
-      },
+      next: () => this.go('/profile-creation'),
       error: (err) => {
         this.submitting.set(false);
         // A user backing out of the account picker isn't an error worth

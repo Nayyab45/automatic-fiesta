@@ -97,21 +97,6 @@ describe('SignupPage', () => {
     expect(navigateSpy).toHaveBeenCalledWith('/profile-creation');
   });
 
-  it('continueWithGoogle() shows a "sign in instead" message when the account already has 2FA enabled', () => {
-    authServiceSpy.signInWithGoogle.and.returnValue(of({ twoFactorRequired: true, challengeToken: 'tok-1' }));
-
-    const fixture = createComponent();
-    const page = fixture.componentInstance;
-    const router = TestBed.inject(Router);
-    const navigateSpy = spyOn(router, 'navigateByUrl');
-
-    page.continueWithGoogle();
-
-    expect(page.submitting()).toBeFalse();
-    expect(page.errorMessage()).toContain('two-factor authentication');
-    expect(navigateSpy).not.toHaveBeenCalled();
-  });
-
   it('a cancelled Google sign-in is silently ignored, not shown as an error', () => {
     authServiceSpy.signInWithGoogle.and.returnValue(throwError(() => ({ code: 'USER_CANCELLED' })));
 

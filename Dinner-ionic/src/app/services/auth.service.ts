@@ -36,12 +36,6 @@ interface AuthSession {
   user: AuthUser;
 }
 
-/** /auth/login returns a real session directly, unless the account has 2FA
- * enabled -- then it returns a short-lived challenge instead, and the
- * caller must exchange it (+ a TOTP code) via verify2faLogin() for the
- * actual session. */
-export type LoginResult = AuthSession | { twoFactorRequired: true; challengeToken: string };
-
 const ACCESS_TOKEN_KEY = 'auth_access_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_KEY = 'auth_user';
@@ -91,12 +85,10 @@ export class AuthService {
     );
   }
 
-  login(email: string, password: string): Observable<LoginResult> {
-    return this.http.post<LoginResult>(`${this.baseUrl}/login`, { email, password }).pipe(
+  login(email: string, password: string): Observable<AuthSession> {
+    return this.http.post<AuthSession>(`${this.baseUrl}/login`, { email, password }).pipe(
       timeoutToHttpLikeError,
-      tap((result) => {
-        if (!('twoFactorRequired' in result)) this.setSession(result);
-      }),
+      tap((session) => this.setSession(session)),
     );
   }
 
@@ -105,19 +97,17 @@ export class AuthService {
   /** Gets a real Google ID token from the device's native account picker
    * (Android: Credential Manager; requires environment.googleWebClientId --
    * see its comment) and exchanges it with our own backend for a session,
-   * via the same shape /login already returns (including a 2FA challenge if
-   * the matched account has it enabled), so callers handle it identically. */
-  signInWithGoogle(): Observable<LoginResult> {
+   * via the same shape /login already returns, so callers handle it
+   * identically. */
+  signInWithGoogle(): Observable<AuthSession> {
     if (!environment.googleWebClientId) {
       return throwError(() => ({ error: { message: 'Google Sign-In is not set up yet.' } }));
     }
 
     return from(this.googleIdToken()).pipe(
-      switchMap((idToken) => this.http.post<LoginResult>(`${this.baseUrl}/google`, { idToken })),
+      switchMap((idToken) => this.http.post<AuthSession>(`${this.baseUrl}/google`, { idToken })),
       timeoutToHttpLikeError,
-      tap((result) => {
-        if (!('twoFactorRequired' in result)) this.setSession(result);
-      }),
+      tap((session) => this.setSession(session)),
     );
   }
 
@@ -131,29 +121,6 @@ export class AuthService {
       throw { error: { message: 'Google did not return an ID token. Please try again.' } };
     }
     return result.idToken;
-  }
-
-  verify2faLogin(challengeToken: string, code: string): Observable<AuthSession> {
-    return this.http.post<AuthSession>(`${this.baseUrl}/2fa/verify-login`, { challengeToken, code }).pipe(
-      timeoutToHttpLikeError,
-      tap((session) => this.setSession(session)),
-    );
-  }
-
-  get2faStatus(): Observable<{ enabled: boolean }> {
-    return this.http.get<{ enabled: boolean }>(`${this.baseUrl}/2fa/status`);
-  }
-
-  setup2fa(): Observable<{ secret: string; qrCodeDataUrl: string }> {
-    return this.http.post<{ secret: string; qrCodeDataUrl: string }>(`${this.baseUrl}/2fa/setup`, {});
-  }
-
-  enable2fa(code: string): Observable<{ ok: boolean }> {
-    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/2fa/enable`, { code });
-  }
-
-  disable2fa(code: string): Observable<{ ok: boolean }> {
-    return this.http.post<{ ok: boolean }>(`${this.baseUrl}/2fa/disable`, { code });
   }
 
   logout(): void {

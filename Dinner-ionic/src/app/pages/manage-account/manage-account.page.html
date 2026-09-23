@@ -76,43 +76,6 @@
 </div>
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
 </button>
-
-<div class="flex flex-col gap-stack-sm p-stack-md">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-gutter">
-<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
-</div>
-<div>
-<p class="font-body-lg text-body-lg text-on-surface">Two-Factor Authentication</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-unit">{{ twoFactorEnabled() ? 'Enabled' : 'Not enabled' }}</p>
-</div>
-</div>
-@if (!twoFactorSetup()) {
-@if (twoFactorEnabled()) {
-<button (click)="disableTwoFactor()" [disabled]="twoFactorBusy()" class="font-label-md text-label-md text-error disabled:opacity-60">Disable</button>
-} @else {
-<button (click)="startTwoFactorSetup()" [disabled]="twoFactorBusy()" class="font-label-md text-label-md text-primary disabled:opacity-60">Enable</button>
-}
-}
-</div>
-
-@if (twoFactorSetup(); as setup) {
-<div class="flex flex-col items-center gap-stack-sm bg-surface-container rounded-lg p-stack-md">
-<p class="font-body-md text-body-md text-on-surface-variant text-center">Scan this with your authenticator app (Google Authenticator, Authy, etc.), or enter the code manually.</p>
-<img [src]="setup.qrCodeDataUrl" alt="Two-factor authentication QR code" class="w-40 h-40 rounded-md bg-white p-2"/>
-<p class="font-mono text-label-sm text-on-surface-variant break-all text-center">{{ setup.secret }}</p>
-<input [(ngModel)]="twoFactorCode" inputmode="numeric" maxlength="6" placeholder="000000" class="w-full h-12 text-center tracking-[0.3em] bg-surface border border-outline-variant rounded-lg font-body-lg text-body-lg text-on-surface"/>
-@if (twoFactorError()) {
-<p class="font-body-md text-body-md text-error" role="alert">{{ twoFactorError() }}</p>
-}
-<div class="flex gap-stack-sm w-full">
-<button (click)="cancelTwoFactorSetup()" class="flex-1 h-11 rounded-full border border-outline-variant font-label-md text-label-md text-on-surface">Cancel</button>
-<button (click)="confirmTwoFactorSetup()" [disabled]="twoFactorBusy() || !twoFactorCode" class="flex-1 h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md disabled:opacity-60">Confirm</button>
-</div>
-</div>
-}
-</div>
 </div>
 </section>
 
