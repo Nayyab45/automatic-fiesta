@@ -23,16 +23,20 @@
 <button *ngFor="let region of regionChips()" (click)="selectRegion(region)" [class.filter-chip-selected]="selectedRegion === region" class="filter-chip text-on-surface-variant font-label-lg text-label-lg px-4 py-2 rounded-full border border-outline-variant whitespace-nowrap flex items-center gap-1 transition-all">
 <span *ngIf="selectedRegion === region" class="material-symbols-outlined text-sm filter-chip-check" style='font-variation-settings: "wght" 600;'>check</span>{{ region }}</button>
 </div>
-<div class="flex gap-stack-sm overflow-x-auto pb-stack-sm scrollbar-hide -mx-container-padding px-container-padding">
-<button *ngFor="let price of priceChips" (click)="selectPriceTier(price.tier)" [class.filter-chip-selected]="selectedPriceTier === price.tier" class="filter-chip bg-surface border border-outline-variant text-on-surface-variant font-label-lg text-label-lg px-4 py-1.5 rounded-full whitespace-nowrap hover:border-primary transition-all">{{ price.label }}</button>
+<div class="flex items-center gap-stack-sm">
+<select [ngModel]="selectedPricePreset" (ngModelChange)="applyPricePreset($event)" name="pricePreset" class="px-3 py-1.5 rounded-full border border-outline-variant bg-surface font-label-lg text-label-lg text-on-surface-variant">
+<option *ngFor="let preset of pricePresets; let i = index" [value]="i">{{ preset.label }}</option>
+</select>
+<input [(ngModel)]="minPrice" (change)="applyPriceInputs()" name="minPrice" type="number" min="0" placeholder="Min Rs" class="w-24 px-3 py-1.5 rounded-full border border-outline-variant bg-surface font-label-lg text-label-lg text-on-surface-variant"/>
+<span class="text-on-surface-variant">–</span>
+<input [(ngModel)]="maxPrice" (change)="applyPriceInputs()" name="maxPrice" type="number" min="0" placeholder="Max Rs" class="w-24 px-3 py-1.5 rounded-full border border-outline-variant bg-surface font-label-lg text-label-lg text-on-surface-variant"/>
 </div>
 <!-- Most listed restaurants are imported from OpenStreetMap with no real
      price data (see restaurants.js's price_tier comment) -- rather than
-     fabricate a tier for them, a price filter only ever matches the small
-     set of restaurants with a confirmed price, so this explains why it
-     looks so much narrower than the other filters instead of just looking
-     broken. -->
-<p *ngIf="selectedPriceTier !== null" class="font-label-sm text-label-sm text-on-surface-variant -mt-1">Only showing restaurants with confirmed pricing for this range.</p>
+     fabricate one for them, a price filter only ever matches the small set
+     of restaurants with a confirmed price, so this explains why it looks so
+     much narrower than the other filters instead of just looking broken. -->
+<p *ngIf="minPrice !== null || maxPrice !== null" class="font-label-sm text-label-sm text-on-surface-variant -mt-1">Only showing restaurants with confirmed pricing for this range.</p>
 </div>
 
 <p *ngIf="loading()" class="font-body-md text-body-md text-on-surface-variant py-section-gap text-center">Loading restaurants…</p>

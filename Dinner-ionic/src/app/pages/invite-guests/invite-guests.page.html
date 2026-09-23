@@ -1,0 +1,54 @@
+<app-header title="Send a request." (back)="goBack()"></app-header>
+<main class="px-container-padding max-w-2xl mx-auto space-y-section-gap pt-stack-md pb-section-gap">
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
+
+<ng-container *ngIf="!loading()">
+
+<div *ngIf="sent()" class="flex flex-col items-center text-center gap-stack-md py-section-gap">
+<span class="material-symbols-outlined text-primary-container" style="font-size: 48px;">check_circle</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Invites sent!</h2>
+<button (click)="goBack()" class="bg-primary-container text-on-primary font-label-lg text-label-lg py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">Done</button>
+</div>
+
+<ng-container *ngIf="!sent()">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select who else to invite to this table.</p>
+
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">search</span>
+<input [ngModel]="filterText()" (ngModelChange)="filterText.set($event)" name="filterText" type="text" placeholder="Filter people…" class="w-full pl-9 pr-3 py-2 rounded-lg glass-input font-body-md text-on-surface"/>
+</div>
+
+<div *ngIf="filteredFriends().length > 0" class="space-y-stack-sm">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Friends</h3>
+<div *ngFor="let friend of filteredFriends()" (click)="toggleSelect(friend.id)" [class.border-primary-container]="selectedIds().includes(friend.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleSelect(friend.id)">
+<div class="flex items-center gap-stack-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ friend.name.charAt(0) }}</div>
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ friend.name }}</span>
+</div>
+<span class="material-symbols-outlined text-primary" *ngIf="selectedIds().includes(friend.id)">check_circle</span>
+<span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedIds().includes(friend.id)">radio_button_unchecked</span>
+</div>
+</div>
+
+<div *ngIf="filteredSuggestions().length > 0" class="space-y-stack-sm">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Suggestions</h3>
+<div *ngFor="let person of filteredSuggestions()" (click)="toggleSelect(person.id)" [class.border-primary-container]="selectedIds().includes(person.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleSelect(person.id)">
+<div class="flex items-center gap-stack-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ person.name.charAt(0) }}</div>
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ person.name }}</span>
+</div>
+<span class="material-symbols-outlined text-primary" *ngIf="selectedIds().includes(person.id)">check_circle</span>
+<span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedIds().includes(person.id)">radio_button_unchecked</span>
+</div>
+</div>
+
+<p *ngIf="filteredFriends().length === 0 && filteredSuggestions().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">No one else to invite right now.</p>
+
+<p *ngIf="errorMessage()" class="text-error font-body-md text-body-md text-center" role="alert">{{ errorMessage() }}</p>
+<button (click)="send()" [disabled]="selectedIds().length === 0 || submitting()" class="w-full bg-primary-container text-on-primary py-4 rounded-xl font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98] transform disabled:opacity-60">
+{{ submitting() ? 'Sending…' : 'Send Request' }}
+</button>
+</ng-container>
+</ng-container>
+</main>

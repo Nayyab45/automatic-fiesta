@@ -209,6 +209,33 @@ profileRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({ profile: await fullProfile(user.id) });
 }));
 
+// Written reviews this person has received as a dining companion (see
+// tablesRouter's /:id/rate) -- public on their profile alongside the
+// aggregate star rating peopleRating() already shows. Comment-only rows are
+// skipped since a bare score with nothing written isn't a "review" to read.
+profileRouter.get('/:id/reviews', asyncHandler(async (req, res) => {
+  const user = await db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+  const rows = toCamelRows(
+    await db
+      .prepare(
+        `SELECT r.id, r.score, r.comment, r.created_at, u.id as rater_user_id, u.name as rater_name,
+                p.photo_url as rater_photo_url, t.id as table_id, t.title as table_title
+         FROM user_ratings r
+         JOIN users u ON u.id = r.rater_user_id
+         LEFT JOIN user_profiles p ON p.user_id = u.id
+         JOIN dining_tables t ON t.id = r.table_id
+         WHERE r.rated_user_id = ? AND r.comment IS NOT NULL AND r.comment != ''
+         ORDER BY r.created_at DESC
+         LIMIT 50`,
+      )
+      .all(req.params.id),
+  );
+  res.json({ reviews: rows });
+}));
+
 // Always recorded (drives the numeric profileViewsCount, which should
 // reflect real visits regardless of the visitor's own privacy choices) --
 // and never for a self-view. Upserts rather than inserting so re-visiting

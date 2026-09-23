@@ -176,6 +176,33 @@
 </div>
 </div>
 </section>
+
+<section *ngIf="loadingReviews() || reviews().length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-gutter mt-section-gap">
+<div class="md:col-span-12 glass-card rounded-xl p-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">rate_review</span>
+                    Reviews
+                </h3>
+<p *ngIf="loadingReviews()" class="font-body-md text-body-md text-on-surface-variant py-stack-sm">Loading reviews…</p>
+<div *ngIf="!loadingReviews()" class="flex flex-col gap-stack-md mt-stack-sm">
+<div *ngFor="let review of reviews()" class="p-stack-sm rounded-xl border border-outline-variant/30">
+<div class="flex items-center justify-between gap-stack-sm mb-stack-sm">
+<div class="flex items-center gap-2 min-w-0 cursor-pointer" (click)="go('/profile/' + review.raterUserId)" role="link" tabindex="0" (keydown.enter)="go('/profile/' + review.raterUserId)">
+<img *ngIf="review.raterPhotoUrl" [src]="review.raterPhotoUrl" [alt]="review.raterName" class="w-8 h-8 rounded-full object-cover shrink-0"/>
+<div *ngIf="!review.raterPhotoUrl" class="w-8 h-8 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-label-lg text-label-lg shrink-0">{{ review.raterName.charAt(0) }}</div>
+<span class="font-body-md text-body-md font-medium text-on-surface truncate">{{ review.raterName }}</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 text-primary-container">
+<span class="material-symbols-outlined fill text-[16px]">star</span>
+<span class="font-label-lg text-label-lg text-on-surface">{{ review.score }}</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ review.comment }}</p>
+<p *ngIf="review.tableTitle" class="font-label-sm text-label-sm text-outline-variant mt-1">From {{ review.tableTitle }}</p>
+</div>
+</div>
+</div>
+</section>
 </main>
 
 <app-bottom-nav [active]="isOwnProfile() ? 'profile' : undefined"></app-bottom-nav>

@@ -90,6 +90,18 @@ export interface Viewer {
   viewedAt: string;
 }
 
+export interface PersonReview {
+  id: number;
+  score: number;
+  comment: string | null;
+  createdAt: string;
+  raterUserId: number;
+  raterName: string;
+  raterPhotoUrl: string | null;
+  tableId: number;
+  tableTitle: string | null;
+}
+
 export interface PrivacySettings {
   profileVisible: boolean;
   showMutualInterests: boolean;
@@ -138,6 +150,11 @@ export class ProfileService {
 
   get(id: number | string): Observable<{ profile: Profile }> {
     return this.http.get<{ profile: Profile }>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Written reviews this person has received as a dining companion -- public, shown on their profile. */
+  reviews(id: number | string): Observable<{ reviews: PersonReview[] }> {
+    return this.http.get<{ reviews: PersonReview[] }>(`${this.baseUrl}/${id}/reviews`);
   }
 
   updateMe(payload: { age?: number; bio?: string; city?: string; province?: string; photoUrl?: string; phone?: string; gender?: Gender }): Observable<{ profile: Profile }> {

@@ -480,9 +480,9 @@ tablesRouter.get('/:id/rateable', asyncHandler(async (req, res) => {
         .prepare('SELECT u.id, u.name, p.photo_url FROM users u LEFT JOIN user_profiles p ON p.user_id = u.id WHERE u.id = ?')
         .get(userId);
       const existing = await db
-        .prepare('SELECT score FROM user_ratings WHERE table_id = ? AND rater_user_id = ? AND rated_user_id = ?')
+        .prepare('SELECT score, comment FROM user_ratings WHERE table_id = ? AND rater_user_id = ? AND rated_user_id = ?')
         .get(table.id, req.user.sub, userId);
-      return { ...toCamel(user), myRating: existing?.score ?? null };
+      return { ...toCamel(user), myRating: existing?.score ?? null, myComment: existing?.comment ?? null };
     }),
   );
   res.json({ people });
@@ -498,6 +498,11 @@ tablesRouter.post('/:id/rate', asyncHandler(async (req, res) => {
   if (!Number.isInteger(score) || score < 1 || score > 5) {
     return res.status(400).json({ message: 'score must be a whole number from 1 to 5' });
   }
+  // Optional written review shown on the rated person's public profile --
+  // trimmed and capped the same way a table review's comment would be, and
+  // blank strings are stored as null rather than an empty row of text.
+  const rawComment = typeof req.body.comment === 'string' ? req.body.comment.trim() : '';
+  const comment = rawComment ? rawComment.slice(0, 500) : null;
   if (ratedUserId === req.user.sub) {
     return res.status(400).json({ message: "You can't rate yourself" });
   }
@@ -517,10 +522,10 @@ tablesRouter.post('/:id/rate', asyncHandler(async (req, res) => {
 
   await db
     .prepare(
-      `INSERT INTO user_ratings (table_id, rater_user_id, rated_user_id, score) VALUES (?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE score = VALUES(score)`,
+      `INSERT INTO user_ratings (table_id, rater_user_id, rated_user_id, score, comment) VALUES (?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE score = VALUES(score), comment = VALUES(comment)`,
     )
-    .run(table.id, req.user.sub, ratedUserId, score);
+    .run(table.id, req.user.sub, ratedUserId, score, comment);
 
   res.json({ ok: true });
 }));

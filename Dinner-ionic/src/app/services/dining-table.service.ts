@@ -105,6 +105,7 @@ export interface RateablePerson {
   name: string;
   photoUrl: string | null;
   myRating: number | null;
+  myComment: string | null;
 }
 
 export interface TableMessage {
@@ -194,8 +195,8 @@ export class DiningTableService {
     return this.http.get<{ people: RateablePerson[] }>(`${this.baseUrl}/${id}/rateable`);
   }
 
-  ratePerson(id: number | string, ratedUserId: number, score: number): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}/${id}/rate`, { ratedUserId, score });
+  ratePerson(id: number | string, ratedUserId: number, score: number, comment?: string): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/${id}/rate`, { ratedUserId, score, comment });
   }
 
   messages(id: number | string): Observable<{ messages: TableMessage[] }> {

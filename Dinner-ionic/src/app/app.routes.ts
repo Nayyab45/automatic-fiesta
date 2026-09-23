@@ -52,6 +52,7 @@ const routeDefinitions: Routes = [
   { path: 'dining-event-details/:id', loadComponent: () => import('./pages/dining-event-details/dining-event-details.page').then((m) => m.DiningEventDetailsPage) },
   { path: 'guest-list', loadComponent: () => import('./pages/guest-list/guest-list.page').then((m) => m.GuestListPage) },
   { path: 'guest-list/:id', loadComponent: () => import('./pages/guest-list/guest-list.page').then((m) => m.GuestListPage) },
+  { path: 'invite-guests/:id', loadComponent: () => import('./pages/invite-guests/invite-guests.page').then((m) => m.InviteGuestsPage) },
   { path: 'request-seat', loadComponent: () => import('./pages/request-seat/request-seat.page').then((m) => m.RequestSeatPage) },
   { path: 'request-seat/:id', loadComponent: () => import('./pages/request-seat/request-seat.page').then((m) => m.RequestSeatPage) },
   { path: 'request-status', loadComponent: () => import('./pages/request-status/request-status.page').then((m) => m.RequestStatusPage) },

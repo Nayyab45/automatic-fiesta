@@ -220,7 +220,7 @@ restaurantsRouter.post('/group-recommendation', requireAuth, asyncHandler(async 
 }));
 
 restaurantsRouter.get('/', asyncHandler(async (req, res) => {
-  const { city, region, cuisine, priceTier, minRating, query } = req.query;
+  const { city, region, cuisine, priceTier, minPrice, maxPrice, minRating, query } = req.query;
 
   // First time this city is asked for, pull its real restaurants from
   // OpenStreetMap and cache them -- see importCityRestaurants for why this
@@ -267,6 +267,18 @@ restaurantsRouter.get('/', asyncHandler(async (req, res) => {
     // shows up under a specific tier.
     clauses.push('price_tier = ?');
     params.push(Number(priceTier));
+  }
+  // Same strict-match reasoning as priceTier above (see its comment): only a
+  // restaurant with a real, known avg_price_pkr (see migration 0034) shows up
+  // under a chosen range, rather than folding every unpriced restaurant into
+  // every range.
+  if (minPrice) {
+    clauses.push('avg_price_pkr >= ?');
+    params.push(Number(minPrice));
+  }
+  if (maxPrice) {
+    clauses.push('avg_price_pkr <= ?');
+    params.push(Number(maxPrice));
   }
   if (minRating) {
     clauses.push('(rating >= ? OR rating IS NULL)');

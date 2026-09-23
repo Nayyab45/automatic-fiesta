@@ -77,9 +77,12 @@
                             {{ table.seatsTotal - table.guestCount }} seats remaining
                         </div>
 </div>
-<div class="mt-stack-md w-full pt-stack-sm border-t-[0.5px] border-[#E8D8B8]">
-<button (click)="go('/dining-event-details/' + table.id)" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg uppercase tracking-widest py-3 rounded-lg hover:opacity-90 transition-opacity">
-                            View Table
+<div class="mt-stack-md w-full pt-stack-sm border-t-[0.5px] border-[#E8D8B8] flex gap-stack-sm">
+<button *ngIf="table.isHost" (click)="$event.stopPropagation(); go('/invite-guests/' + table.id)" class="flex-1 bg-primary-container text-on-primary font-label-lg text-label-lg uppercase tracking-widest py-3 rounded-lg hover:opacity-90 transition-opacity">
+                            Send Request
+                        </button>
+<button (click)="$event.stopPropagation(); go('/guest-list/' + table.id)" class="flex-1 border border-outline-variant text-on-surface font-label-lg text-label-lg uppercase tracking-widest py-3 rounded-lg hover:bg-surface-container transition-colors">
+                            Attendees
                         </button>
 </div>
 </div>

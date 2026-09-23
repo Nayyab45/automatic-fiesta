@@ -32,6 +32,7 @@ export class PostDiningReviewPage extends BasePage {
   // above (which rate the dining experience/restaurant, not the people).
   readonly rateablePeople = signal<RateablePerson[]>([]);
   readonly peopleRatings = signal<Record<number, number>>({});
+  readonly peopleComments = signal<Record<number, string>>({});
 
   constructor() {
     super();
@@ -42,6 +43,9 @@ export class PostDiningReviewPage extends BasePage {
           this.rateablePeople.set(people);
           this.peopleRatings.set(
             Object.fromEntries(people.filter((p) => p.myRating !== null).map((p) => [p.id, p.myRating as number])),
+          );
+          this.peopleComments.set(
+            Object.fromEntries(people.filter((p) => p.myComment).map((p) => [p.id, p.myComment as string])),
           );
         },
         // Rating people is a bonus on top of the review, not a blocker --
@@ -57,6 +61,14 @@ export class PostDiningReviewPage extends BasePage {
 
   ratingFor(userId: number): number {
     return this.peopleRatings()[userId] ?? 0;
+  }
+
+  setComment(userId: number, comment: string): void {
+    this.peopleComments.update((comments) => ({ ...comments, [userId]: comment }));
+  }
+
+  commentFor(userId: number): string {
+    return this.peopleComments()[userId] ?? '';
   }
 
   submit(): void {
@@ -79,7 +91,9 @@ export class PostDiningReviewPage extends BasePage {
     // Only the ratings the user actually set (or changed) get submitted --
     // an untouched person is left alone rather than force-rated 0.
     const ratings$ = Object.entries(this.peopleRatings()).map(([userId, score]) =>
-      this.tableService.ratePerson(id, Number(userId), score).pipe(catchError(() => of(null))),
+      this.tableService
+        .ratePerson(id, Number(userId), score, this.commentFor(Number(userId)).trim() || undefined)
+        .pipe(catchError(() => of(null))),
     );
 
     forkJoin([review$, ...ratings$]).subscribe({

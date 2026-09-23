@@ -37,9 +37,19 @@
 <div class="md:col-span-4 space-y-section-gap">
 
 <section class="space-y-stack-md">
-<h2 class="font-title-lg text-title-lg text-on-surface">Price Tier</h2>
-<div class="flex rounded-md border border-outline-variant overflow-hidden">
-<button *ngFor="let tier of priceTiers; let i = index" (click)="selectPriceTier(i)" [class.bg-surface-container]="priceTierIndex === i" [class.bg-surface]="priceTierIndex !== i" [class.border-b-2]="priceTierIndex === i" [class.border-primary-container]="priceTierIndex === i" class="flex-1 py-2 text-on-surface border-r border-outline-variant last:border-r-0 hover:bg-surface-container transition-colors text-center font-label-lg">{{ tier }}</button>
+<h2 class="font-title-lg text-title-lg text-on-surface">Price Range</h2>
+<select [ngModel]="selectedPricePreset" (ngModelChange)="applyPricePreset($event)" name="pricePreset" class="w-full px-3 py-2 rounded-md border border-outline-variant bg-surface font-body-md text-on-surface">
+<option *ngFor="let preset of pricePresets; let i = index" [value]="i">{{ preset.label }}</option>
+</select>
+<div class="flex items-center gap-stack-sm">
+<div class="flex-1">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="minPrice">Min (Rs)</label>
+<input [(ngModel)]="minPrice" name="minPrice" type="number" min="0" id="minPrice" placeholder="0" class="w-full px-3 py-2 rounded-md border border-outline-variant bg-surface font-body-md text-on-surface"/>
+</div>
+<div class="flex-1">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="maxPrice">Max (Rs)</label>
+<input [(ngModel)]="maxPrice" name="maxPrice" type="number" min="0" id="maxPrice" placeholder="Any" class="w-full px-3 py-2 rounded-md border border-outline-variant bg-surface font-body-md text-on-surface"/>
+</div>
 </div>
 </section>
 

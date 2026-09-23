@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { LocationService } from '../../services/location.service';
-import { Profile, ProfileService } from '../../services/profile.service';
+import { PersonReview, Profile, ProfileService } from '../../services/profile.service';
 import { MessagingService } from '../../services/messaging.service';
 import { SafetyService } from '../../services/safety.service';
 import { FriendsService, FriendStatus } from '../../services/friends.service';
@@ -43,6 +43,8 @@ export class ProfilePage extends BasePage {
   readonly profileViewsCount = signal(0);
   readonly publicEvents = signal<DiningTable[]>([]);
   readonly loadingPublicEvents = signal(false);
+  readonly reviews = signal<PersonReview[]>([]);
+  readonly loadingReviews = signal(false);
 
   constructor() {
     super();
@@ -58,6 +60,15 @@ export class ProfilePage extends BasePage {
         // from someone else's profile, and this never writes anything
         // visible on theirs either way.
         if (!id) this.cityService.syncHomeCityIfUnset(profile.city);
+
+        this.loadingReviews.set(true);
+        this.profileService.reviews(profile.id).subscribe({
+          next: ({ reviews }) => {
+            this.reviews.set(reviews);
+            this.loadingReviews.set(false);
+          },
+          error: () => this.loadingReviews.set(false),
+        });
       },
       error: () => this.loading.set(false),
     });

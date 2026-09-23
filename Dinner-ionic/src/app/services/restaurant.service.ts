@@ -37,6 +37,10 @@ export interface Restaurant {
   cuisineTags: string;
   /** Null for a real place imported from OpenStreetMap -- no fabricated price/rating. */
   priceTier: number | null;
+  /** Average price per person in PKR, used by the min/max price filter --
+   * see Backend/src/db/migrations/0034_restaurant_price_range.js. Null for
+   * the same restaurants priceTier is null for. */
+  avgPricePkr: number | null;
   rating: number | null;
   reviewCount: number | null;
   /** A real, human-verified Google Maps rating -- separate from `rating`
@@ -123,6 +127,8 @@ export interface RestaurantSearchParams {
   region?: string;
   cuisine?: string;
   priceTier?: number;
+  minPrice?: number;
+  maxPrice?: number;
   minRating?: number;
   query?: string;
 }

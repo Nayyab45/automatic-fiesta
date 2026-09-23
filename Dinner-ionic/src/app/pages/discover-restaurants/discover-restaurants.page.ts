@@ -1,5 +1,6 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
@@ -23,17 +24,22 @@ const REGION_TO_PROVINCE: Record<string, string> = {
   Sindh: 'Sindh',
   KPK: 'Khyber Pakhtunkhwa',
 };
-const PRICE_CHIPS: { label: string; tier: number | null }[] = [
-  { label: 'Under 500', tier: 1 },
-  { label: '500-1500', tier: 2 },
-  { label: '1500-3000', tier: 3 },
-  { label: '3000+', tier: 4 },
+// A dropdown of common PKR ranges that fills in the two editable number
+// fields next to it -- see search-filter.page.ts's own copy of this same
+// preset list (kept independent since each page's price control is its own
+// component, not shared).
+const PRICE_PRESETS: { label: string; min: number | null; max: number | null }[] = [
+  { label: 'Any price', min: null, max: null },
+  { label: 'Under Rs 500', min: null, max: 500 },
+  { label: 'Rs 500 - 1500', min: 500, max: 1500 },
+  { label: 'Rs 1500 - 3000', min: 1500, max: 3000 },
+  { label: 'Rs 3000+', min: 3000, max: null },
 ];
 
 @Component({
   selector: 'app-discover-restaurants',
   standalone: true,
-  imports: [CommonModule, RouterLink, BottomNavComponent, UserAvatarComponent, RootHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BottomNavComponent, UserAvatarComponent, RootHeaderComponent],
   templateUrl: './discover-restaurants.page.html',
   styleUrl: './discover-restaurants.page.scss',
 })
@@ -43,13 +49,15 @@ export class DiscoverRestaurantsPage extends BasePage {
   private readonly restaurantService = inject(RestaurantService);
 
   readonly regionChips = signal<string[]>(BASE_CHIPS);
-  readonly priceChips = PRICE_CHIPS;
+  readonly pricePresets = PRICE_PRESETS;
   readonly restaurants = signal<Restaurant[]>([]);
   readonly loading = signal(true);
   readonly savedIds = signal(new Set<number>());
 
   selectedRegion = 'All';
-  selectedPriceTier: number | null = null;
+  selectedPricePreset = 0;
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
   private minRating: number | null = null;
   // Set only when arriving from the search box on search-filter.page --
   // narrows results by restaurant name in addition to the other filters
@@ -61,11 +69,13 @@ export class DiscoverRestaurantsPage extends BasePage {
     super();
     const params = this.route.snapshot.queryParamMap;
     const cuisine = params.get('cuisine');
-    const priceTier = params.get('priceTier');
+    const minPrice = params.get('minPrice');
+    const maxPrice = params.get('maxPrice');
     const minRating = params.get('minRating');
     const query = params.get('query');
     if (cuisine) this.selectedRegion = cuisine;
-    if (priceTier) this.selectedPriceTier = Number(priceTier);
+    if (minPrice) this.minPrice = Number(minPrice);
+    if (maxPrice) this.maxPrice = Number(maxPrice);
     if (minRating) this.minRating = Number(minRating);
     if (query) this.searchQuery.set(query);
     this.loadCuisineChips();
@@ -119,7 +129,8 @@ export class DiscoverRestaurantsPage extends BasePage {
         city: searching || province ? undefined : this.cityService.current(),
         region: province,
         cuisine,
-        priceTier: this.selectedPriceTier ?? undefined,
+        minPrice: this.minPrice ?? undefined,
+        maxPrice: this.maxPrice ?? undefined,
         minRating: this.minRating ?? undefined,
         query: this.searchQuery() ?? undefined,
       })
@@ -137,8 +148,15 @@ export class DiscoverRestaurantsPage extends BasePage {
     this.loadRestaurants();
   }
 
-  selectPriceTier(tier: number | null): void {
-    this.selectedPriceTier = this.selectedPriceTier === tier ? null : tier;
+  applyPricePreset(index: number): void {
+    this.selectedPricePreset = index;
+    const preset = this.pricePresets[index];
+    this.minPrice = preset.min;
+    this.maxPrice = preset.max;
+    this.loadRestaurants();
+  }
+
+  applyPriceInputs(): void {
     this.loadRestaurants();
   }
 

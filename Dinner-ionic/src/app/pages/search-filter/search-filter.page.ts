@@ -18,8 +18,22 @@ import { RestaurantService } from '../../services/restaurant.service';
 export class SearchFilterPage extends BasePage {
   readonly pageTitle = "Search & Filter";
 
-  readonly priceTiers = ['Rs', 'Rs Rs', 'Rs Rs Rs', 'Rs Rs Rs Rs'];
   readonly stars = [1, 2, 3, 4, 5];
+
+  // A dropdown of common PKR ranges that fills in the two editable number
+  // fields below it -- picking one is a shortcut, not a constraint; either
+  // field can still be typed into afterward (e.g. "3000+" then narrowed to
+  // a max of 5000).
+  readonly pricePresets: { label: string; min: number | null; max: number | null }[] = [
+    { label: 'Any price', min: null, max: null },
+    { label: 'Under Rs 500', min: null, max: 500 },
+    { label: 'Rs 500 - 1500', min: 500, max: 1500 },
+    { label: 'Rs 1500 - 3000', min: 1500, max: 3000 },
+    { label: 'Rs 3000+', min: 3000, max: null },
+  ];
+  selectedPricePreset = 0;
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
 
   // Wired to the free-text box at the top of this page -- it used to render
   // with no binding at all, so anything typed there was silently discarded
@@ -35,7 +49,6 @@ export class SearchFilterPage extends BasePage {
   // null means "no filter chosen" -- these used to default to a specific
   // tier/rating and get sent regardless of whether the user touched them,
   // which silently filtered out most results.
-  priceTierIndex: number | null = null;
   ratingValue: number | null = null;
   guestCount = 2;
   readonly cityService = inject(LocationService);
@@ -57,8 +70,11 @@ export class SearchFilterPage extends BasePage {
     }
   }
 
-  selectPriceTier(index: number): void {
-    this.priceTierIndex = this.priceTierIndex === index ? null : index;
+  applyPricePreset(index: number): void {
+    this.selectedPricePreset = index;
+    const preset = this.pricePresets[index];
+    this.minPrice = preset.min;
+    this.maxPrice = preset.max;
   }
 
   setRating(value: number): void {
@@ -75,7 +91,7 @@ export class SearchFilterPage extends BasePage {
 
   resetFilters(): void {
     this.selectedCuisines = new Set<string>();
-    this.priceTierIndex = null;
+    this.applyPricePreset(0);
     this.ratingValue = null;
     this.guestCount = 2;
   }
@@ -84,7 +100,8 @@ export class SearchFilterPage extends BasePage {
     const params = new URLSearchParams();
     if (this.searchQuery.trim()) params.set('query', this.searchQuery.trim());
     if (this.selectedCuisines.size) params.set('cuisine', [...this.selectedCuisines].join(','));
-    if (this.priceTierIndex !== null) params.set('priceTier', String(this.priceTierIndex + 1));
+    if (this.minPrice !== null) params.set('minPrice', String(this.minPrice));
+    if (this.maxPrice !== null) params.set('maxPrice', String(this.maxPrice));
     if (this.ratingValue !== null) params.set('minRating', String(this.ratingValue));
     this.go(`/discover-restaurants?${params.toString()}`);
   }
