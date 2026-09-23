@@ -32,9 +32,10 @@
 <button type="button" (click)="getAiSuggestion()" [disabled]="selectedFriendIds().length === 0 || aiSuggesting()" class="w-full bg-surface-container-low border border-outline-variant/40 text-on-surface py-3 rounded-xl font-label-lg text-label-lg hover:border-primary-container transition-colors disabled:opacity-50">
 {{ aiSuggesting() ? 'Thinking…' : 'Get AI Suggestion' }}
 </button>
+<p *ngIf="selectedFriendIds().length === 0" class="font-body-sm text-body-sm text-outline-variant">Tap a friend above first to enable this.</p>
 <p *ngIf="aiSuggestion() as suggestion" class="font-body-sm text-body-sm text-on-surface-variant bg-surface-container-low rounded-xl p-3">
 <span class="font-label-md text-label-md text-on-surface">{{ suggestion.restaurantName }}</span> — {{ suggestion.reason }}
-<span *ngIf="!suggestion.aiPowered" class="block text-outline-variant">(heuristic pick -- no AI key configured)</span>
+<span *ngIf="!suggestion.aiPowered" class="block text-outline-variant">(heuristic pick -- AI suggestion unavailable right now)</span>
 </p>
 <p *ngIf="aiError()" class="text-error font-body-sm text-body-sm">{{ aiError() }}</p>
 </section>

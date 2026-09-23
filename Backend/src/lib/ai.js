@@ -6,10 +6,17 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // kind of deep reasoning task that needs a bigger/paid model anyway.
 const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
 
+// No default timeout in the SDK itself -- a rate-limited or slow Gemini
+// response could otherwise hang the caller's request indefinitely instead of
+// falling back to the heuristic (see complete() below). 8s is generous for a
+// one-sentence completion but still short enough that a user-facing request
+// (a match card, a group suggestion) never feels stuck.
+const REQUEST_TIMEOUT_MS = 8000;
+
 let client = null;
 function getModel() {
   if (!client) client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  return client.getGenerativeModel({ model: MODEL });
+  return client.getGenerativeModel({ model: MODEL }, { timeout: REQUEST_TIMEOUT_MS });
 }
 
 export function isConfigured() {
