@@ -95,12 +95,10 @@
 <div class="flex items-start gap-stack-sm border-b-[0.5px] border-[#E8D8B8] pb-stack-sm">
 <div class="w-12 h-12 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-lg text-title-lg shrink-0 border border-outline-variant cursor-pointer" (click)="go('/profile/' + match.id)" role="link" tabindex="0" (keydown.enter)="go('/profile/' + match.id)">{{ match.name.charAt(0) }}</div>
 <div class="flex flex-col min-w-0 flex-1">
-<div class="flex items-center gap-2 min-w-0">
-<button (click)="toggleFollow(match)" [disabled]="followBusyId() === match.id" [class.bg-primary-container]="match.following" [class.text-on-primary]="match.following" [class.border]="!match.following" [class.border-primary]="!match.following" [class.text-primary]="!match.following" class="shrink-0 px-3 py-1 rounded-full font-label-sm text-label-sm transition-colors disabled:opacity-60 whitespace-nowrap">{{ match.following ? 'Following' : 'Follow' }}</button>
 <h3 class="font-body-lg text-body-lg font-medium text-on-surface truncate cursor-pointer" (click)="go('/profile/' + match.id)" role="link" tabindex="0" (keydown.enter)="go('/profile/' + match.id)">{{ match.name }}</h3>
-</div>
 <span *ngIf="match.city" class="font-body-md text-body-md text-on-surface-variant">{{ match.city }}</span>
 </div>
+<button (click)="toggleFollow(match)" [disabled]="followBusyId() === match.id" [class.bg-primary-container]="match.following" [class.text-on-primary]="match.following" [class.border]="!match.following" [class.border-primary]="!match.following" [class.text-primary]="!match.following" class="shrink-0 px-3 py-1 rounded-full font-label-sm text-label-sm transition-colors disabled:opacity-60 whitespace-nowrap">{{ match.following ? 'Following' : 'Follow' }}</button>
 </div>
 <div class="flex flex-col gap-unit mt-unit">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Interests</span>
