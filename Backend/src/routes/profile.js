@@ -474,6 +474,12 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
       .all(req.user.sub, req.user.sub, req.user.sub),
   );
 
+  const followedIds = new Set(
+    (await db.prepare('SELECT followed_user_id FROM user_follows WHERE follower_user_id = ?').all(req.user.sub)).map(
+      (row) => row.followed_user_id,
+    ),
+  );
+
   const matches = (
     await Promise.all(
       candidates.map(async (candidate) => {
@@ -533,6 +539,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           reasons,
           rating: await peopleRating(candidate.id),
           tablesJoinedCount: await tablesJoinedCount(candidate.id),
+          following: followedIds.has(candidate.id),
           // Flipped true below only for a match that actually got an
           // AI-written reason -- lets the frontend show which ones are
           // AI-powered without a second round trip.

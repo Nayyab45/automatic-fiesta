@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
@@ -18,7 +18,7 @@ import { Match, ProfileService } from '../../services/profile.service';
   styleUrl: './create-table.page.scss',
 })
 export class CreateTablePage extends BasePage {
-  readonly pageTitle = 'Create Table';
+  readonly pageTitle = 'Send Request';
   private readonly restaurantService = inject(RestaurantService);
   private readonly tableService = inject(DiningTableService);
   private readonly friendsService = inject(FriendsService);
@@ -53,6 +53,24 @@ export class CreateTablePage extends BasePage {
   // returns who isn't already a friend, i.e. the "Suggestions" group.
   readonly suggestions = signal<Match[]>([]);
   readonly selectedInviteeIds = signal<number[]>([]);
+
+  // Dropdown-filter state for the "Invite People" picker below -- the
+  // Friends/Suggestions lists themselves and selectedInviteeIds are
+  // unchanged, only how they're browsed/selected.
+  readonly inviteDropdownOpen = signal(false);
+  readonly inviteFilter = signal('');
+  readonly filteredFriends = computed(() => {
+    const q = this.inviteFilter().trim().toLowerCase();
+    return q ? this.friends().filter((f) => f.name.toLowerCase().includes(q)) : this.friends();
+  });
+  readonly filteredSuggestions = computed(() => {
+    const q = this.inviteFilter().trim().toLowerCase();
+    return q ? this.suggestions().filter((s) => s.name.toLowerCase().includes(q)) : this.suggestions();
+  });
+  readonly selectedInviteeNames = computed(() => {
+    const ids = new Set(this.selectedInviteeIds());
+    return [...this.friends(), ...this.suggestions()].filter((p) => ids.has(p.id)).map((p) => p.name);
+  });
 
   gatheringType = 'Dinner';
   atmosphere = 'Social Conversation';
@@ -121,6 +139,10 @@ export class CreateTablePage extends BasePage {
     this.selectedInviteeIds.set(
       selected.includes(userId) ? selected.filter((id) => id !== userId) : [...selected, userId],
     );
+  }
+
+  toggleInviteDropdown(): void {
+    this.inviteDropdownOpen.update((open) => !open);
   }
 
   getAiSuggestion(): void {

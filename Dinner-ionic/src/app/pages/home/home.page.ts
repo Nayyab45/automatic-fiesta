@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 import { DiningTable, DiningTableService } from '../../services/dining-table.service';
 import { Match, ProfileService } from '../../services/profile.service';
 import { MessagingService } from '../../services/messaging.service';
+import { FollowService } from '../../services/follow.service';
 
 function timeOfDayGreeting(): string {
   const hour = new Date().getHours();
@@ -36,6 +37,7 @@ export class HomePage extends BasePage implements OnInit {
   private readonly tableService = inject(DiningTableService);
   private readonly profileService = inject(ProfileService);
   private readonly messagingService = inject(MessagingService);
+  private readonly followService = inject(FollowService);
 
   readonly greeting = timeOfDayGreeting();
   readonly firstName = computed(() => this.authService.currentUser()?.name?.split(' ')[0] ?? 'there');
@@ -45,6 +47,7 @@ export class HomePage extends BasePage implements OnInit {
 
   readonly loadingMatches = signal(true);
   readonly matches = signal<Match[]>([]);
+  readonly followBusyId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.showWhatsNew = this.whatsNew.shouldShow();
@@ -70,5 +73,18 @@ export class HomePage extends BasePage implements OnInit {
    * "Connect" here starts (or reopens) a DM with that match. */
   connect(match: Match): void {
     this.messagingService.getOrCreateWith(match.id).subscribe(({ conversation }) => this.go(`/dining-group-chat/dm/${conversation.id}`));
+  }
+
+  toggleFollow(match: Match): void {
+    if (this.followBusyId() === match.id) return;
+    this.followBusyId.set(match.id);
+    const request$ = match.following ? this.followService.unfollow(match.id) : this.followService.follow(match.id);
+    request$.subscribe({
+      next: ({ following }) => {
+        this.matches.update((list) => list.map((m) => (m.id === match.id ? { ...m, following } : m)));
+        this.followBusyId.set(null);
+      },
+      error: () => this.followBusyId.set(null),
+    });
   }
 }

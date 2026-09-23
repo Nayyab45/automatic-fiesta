@@ -10,6 +10,7 @@ import { MessagingService } from '../../services/messaging.service';
 import { SafetyService } from '../../services/safety.service';
 import { FriendsService, FriendStatus } from '../../services/friends.service';
 import { FollowService } from '../../services/follow.service';
+import { DiningTable, DiningTableService } from '../../services/dining-table.service';
 
 @Component({
   selector: 'app-profile',
@@ -26,6 +27,7 @@ export class ProfilePage extends BasePage {
   private readonly safetyService = inject(SafetyService);
   private readonly friendsService = inject(FriendsService);
   private readonly followService = inject(FollowService);
+  private readonly tableService = inject(DiningTableService);
 
   readonly profile = signal<Profile | null>(null);
   readonly loading = signal(true);
@@ -39,6 +41,8 @@ export class ProfilePage extends BasePage {
   readonly followersCount = signal(0);
   readonly followingCount = signal(0);
   readonly profileViewsCount = signal(0);
+  readonly publicEvents = signal<DiningTable[]>([]);
+  readonly loadingPublicEvents = signal(false);
 
   constructor() {
     super();
@@ -67,6 +71,14 @@ export class ProfilePage extends BasePage {
         this.friendRequestId.set(requestId ?? null);
       });
       this.followService.status(Number(id)).subscribe(({ following }) => this.isFollowing.set(following));
+      this.loadingPublicEvents.set(true);
+      this.tableService.publicEventsFor(id).subscribe({
+        next: ({ tables }) => {
+          this.publicEvents.set(tables);
+          this.loadingPublicEvents.set(false);
+        },
+        error: () => this.loadingPublicEvents.set(false),
+      });
     } else {
       this.friendsService.list().subscribe(({ friends }) => this.friendsCount.set(friends.length));
       this.friendsService.requests().subscribe(({ requests }) => this.pendingRequestsCount.set(requests.length));

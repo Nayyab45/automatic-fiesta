@@ -131,6 +131,11 @@ export class DiningTableService {
     return this.http.get<{ tables: DiningTable[] }>(`${this.baseUrl}/discover`);
   }
 
+  /** A specific other user's public, upcoming events -- for their profile page. */
+  publicEventsFor(userId: number | string): Observable<{ tables: DiningTable[] }> {
+    return this.http.get<{ tables: DiningTable[] }>(`${this.baseUrl}?hostId=${userId}`);
+  }
+
   get(id: number | string): Observable<{ table: DiningTable }> {
     return this.http.get<{ table: DiningTable }>(`${this.baseUrl}/${id}`);
   }

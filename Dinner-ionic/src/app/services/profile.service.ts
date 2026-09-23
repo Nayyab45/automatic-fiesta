@@ -110,6 +110,7 @@ export interface Match extends Person {
   aiPowered: boolean;
   rating: number | null;
   tablesJoinedCount: number;
+  following: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

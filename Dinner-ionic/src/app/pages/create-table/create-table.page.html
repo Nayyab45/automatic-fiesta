@@ -1,4 +1,4 @@
-<app-header title="Create your table." (back)="goBack()"></app-header>
+<app-header title="Send a request." (back)="goBack()"></app-header>
 <main class="px-container-padding max-w-2xl mx-auto space-y-section-gap pt-stack-md">
 
 <section class="space-y-stack-md">
@@ -43,10 +43,23 @@
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">Invite People</h2>
 <p class="font-body-sm text-body-sm text-on-surface-variant">Select who to send a table invite to once this table is created.</p>
 
-<div *ngIf="friends().length > 0" class="space-y-stack-sm">
+<div class="relative">
+<button type="button" (click)="toggleInviteDropdown()" class="w-full flex items-center justify-between gap-stack-sm p-stack-sm rounded-xl border border-outline-variant/40 bg-surface-container-low text-left hover:border-primary-container/50 transition-colors">
+<span class="font-body-lg text-body-lg text-on-surface truncate">{{ selectedInviteeIds().length === 0 ? 'Select people to invite' : selectedInviteeNames().join(', ') }}</span>
+<span class="material-symbols-outlined text-outline-variant shrink-0">{{ inviteDropdownOpen() ? 'expand_less' : 'expand_more' }}</span>
+</button>
+
+<div *ngIf="inviteDropdownOpen()" class="absolute z-20 mt-1 w-full rounded-xl border border-outline-variant/40 bg-surface soft-shadow max-h-80 overflow-y-auto">
+<div class="p-stack-sm sticky top-0 bg-surface border-b border-outline-variant/30">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">search</span>
+<input [ngModel]="inviteFilter()" (ngModelChange)="inviteFilter.set($event)" name="inviteFilter" type="text" placeholder="Filter people…" class="w-full pl-9 pr-3 py-2 rounded-lg glass-input font-body-md text-on-surface"/>
+</div>
+</div>
+
+<div *ngIf="filteredFriends().length > 0" class="p-stack-sm space-y-stack-sm">
 <h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Friends</h3>
-<div class="flex flex-col gap-stack-sm">
-<div *ngFor="let friend of friends()" (click)="toggleInvitee(friend.id)" [class.border-primary-container]="selectedInviteeIds().includes(friend.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(friend.id)">
+<div *ngFor="let friend of filteredFriends()" (click)="toggleInvitee(friend.id)" [class.border-primary-container]="selectedInviteeIds().includes(friend.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(friend.id)">
 <div class="flex items-center gap-stack-sm min-w-0">
 <div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ friend.name.charAt(0) }}</div>
 <span class="font-body-lg text-body-lg text-on-surface truncate">{{ friend.name }}</span>
@@ -55,12 +68,10 @@
 <span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedInviteeIds().includes(friend.id)">radio_button_unchecked</span>
 </div>
 </div>
-</div>
 
-<div *ngIf="suggestions().length > 0" class="space-y-stack-sm">
+<div *ngIf="filteredSuggestions().length > 0" class="p-stack-sm space-y-stack-sm">
 <h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Suggestions</h3>
-<div class="flex flex-col gap-stack-sm">
-<div *ngFor="let person of suggestions()" (click)="toggleInvitee(person.id)" [class.border-primary-container]="selectedInviteeIds().includes(person.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(person.id)">
+<div *ngFor="let person of filteredSuggestions()" (click)="toggleInvitee(person.id)" [class.border-primary-container]="selectedInviteeIds().includes(person.id)" class="flex items-center justify-between p-stack-sm rounded-xl border border-outline-variant/40 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="toggleInvitee(person.id)">
 <div class="flex items-center gap-stack-sm min-w-0">
 <div class="w-10 h-10 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-title-md text-title-md shrink-0">{{ person.name.charAt(0) }}</div>
 <span class="font-body-lg text-body-lg text-on-surface truncate">{{ person.name }}</span>
@@ -68,6 +79,9 @@
 <span class="material-symbols-outlined text-primary" *ngIf="selectedInviteeIds().includes(person.id)">check_circle</span>
 <span class="material-symbols-outlined text-outline-variant" *ngIf="!selectedInviteeIds().includes(person.id)">radio_button_unchecked</span>
 </div>
+</div>
+
+<p *ngIf="filteredFriends().length === 0 && filteredSuggestions().length === 0" class="p-stack-md text-center font-body-sm text-body-sm text-on-surface-variant">No matches.</p>
 </div>
 </div>
 </section>

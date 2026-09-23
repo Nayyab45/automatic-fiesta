@@ -154,6 +154,28 @@
 </div>
 </div>
 </section>
+
+<section *ngIf="!isOwnProfile() && (loadingPublicEvents() || publicEvents().length > 0)" class="grid grid-cols-1 md:grid-cols-12 gap-gutter mt-section-gap">
+<div class="md:col-span-12 glass-card rounded-xl p-stack-md">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">event</span>
+                    {{ p.name }}'s Events
+                </h3>
+<p *ngIf="loadingPublicEvents()" class="font-body-md text-body-md text-on-surface-variant py-stack-sm">Loading events…</p>
+<div *ngIf="!loadingPublicEvents()" class="flex flex-col gap-stack-sm mt-stack-sm">
+<div *ngFor="let table of publicEvents()" (click)="go('/dining-event-details/' + table.id)" class="flex items-center gap-stack-sm p-stack-sm rounded-xl border border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="go('/dining-event-details/' + table.id)">
+<img [alt]="table.restaurant.name" class="w-14 h-14 rounded-lg object-cover shrink-0" [src]="table.restaurant.photoUrl"/>
+<div class="flex flex-col min-w-0 flex-1">
+<h4 class="font-body-lg text-body-lg font-medium text-on-surface truncate">{{ table.title || table.restaurant.name }}</h4>
+<p class="font-body-md text-body-md text-on-surface-variant truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> {{ table.dateTime | date: 'medium' }}
+</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant shrink-0">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
 </main>
 
 <app-bottom-nav [active]="isOwnProfile() ? 'profile' : undefined"></app-bottom-nav>

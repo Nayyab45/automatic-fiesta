@@ -81,7 +81,41 @@ async function tableWithContext(row, userId) {
   };
 }
 
+// Another user's public, upcoming events -- shown on their profile page.
+// Registered as its own branch of GET '/' (via ?hostId=) rather than a
+// separate path so it can share tableWithContext/isEligibleForAudience with
+// '/discover' below.
+async function hostPublicEvents(hostId, viewerId) {
+  const blocked = await db
+    .prepare(
+      `SELECT 1 FROM user_blocks
+       WHERE (blocker_user_id = ? AND blocked_user_id = ?) OR (blocker_user_id = ? AND blocked_user_id = ?)`,
+    )
+    .get(viewerId, hostId, hostId, viewerId);
+  if (blocked) return [];
+
+  const rows = await db
+    .prepare(
+      `SELECT * FROM dining_tables
+       WHERE host_user_id = ? AND visibility = 'public' AND date_time > ?
+       ORDER BY date_time ASC`,
+    )
+    .all(hostId, nowAsTableTimeString());
+
+  const eligibleRows = [];
+  for (const row of rows) {
+    if (await isEligibleForAudience(row, viewerId)) eligibleRows.push(row);
+  }
+  return Promise.all(eligibleRows.map((row) => tableWithContext(row, viewerId)));
+}
+
 tablesRouter.get('/', asyncHandler(async (req, res) => {
+  const hostId = req.query.hostId ? Number(req.query.hostId) : null;
+  if (hostId) {
+    if (hostId === req.user.sub) return res.status(400).json({ message: 'Use mine=true for your own tables' });
+    return res.json({ tables: await hostPublicEvents(hostId, req.user.sub) });
+  }
+
   const rows = await db
     .prepare(
       `SELECT DISTINCT t.* FROM dining_tables t
