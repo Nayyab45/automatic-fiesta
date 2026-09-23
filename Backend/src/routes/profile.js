@@ -23,7 +23,7 @@ const DEFAULT_PRIVACY_SETTINGS = {
   profileVisible: true,
   showMutualInterests: true,
   showOnlineStatus: false,
-  showProfileViews: false,
+  showProfileViews: true,
   locationPrecision: 'approximate',
 };
 

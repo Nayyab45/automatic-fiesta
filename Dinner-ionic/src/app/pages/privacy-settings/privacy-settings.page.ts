@@ -24,7 +24,7 @@ export class PrivacySettingsPage extends BasePage {
     profileVisible: true,
     showMutualInterests: true,
     showOnlineStatus: false,
-    showProfileViews: false,
+    showProfileViews: true,
     locationPrecision: 'approximate',
   };
 
