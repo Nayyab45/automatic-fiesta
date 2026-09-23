@@ -229,9 +229,12 @@ async function recordProfileView(viewerUserId, viewedUserId) {
   ).run(viewerUserId, viewedUserId);
 }
 
-// Who has viewed my profile recently (most recent first) -- only viewers who
-// opted in via "show my profile views" are named here; the count above
-// still includes everyone.
+// Who has viewed my profile recently (most recent first) -- viewers who
+// opted OUT via "show my profile views" (default on) are left out of this
+// identity list; the count above still includes everyone regardless. The
+// COALESCE fallback here must track DEFAULT_PRIVACY_SETTINGS.showProfileViews
+// above -- a viewer with no privacy_settings row gets that default, not a
+// hardcoded value that can drift out of sync with it.
 profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
   const rows = toCamelRows(
     await db
@@ -240,7 +243,7 @@ profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
          JOIN users u ON u.id = pv.viewer_user_id
          LEFT JOIN user_profiles p ON p.user_id = u.id
          LEFT JOIN privacy_settings ps ON ps.user_id = pv.viewer_user_id
-         WHERE pv.viewed_user_id = ? AND COALESCE(ps.show_profile_views, 0) = 1
+         WHERE pv.viewed_user_id = ? AND COALESCE(ps.show_profile_views, 1) = 1
          ORDER BY pv.viewed_at DESC
          LIMIT 50`,
       )
