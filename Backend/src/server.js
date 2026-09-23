@@ -24,6 +24,14 @@ if (!process.env.JWT_SECRET) {
 
 const app = express();
 
+// nginx sits directly in front of this process (see deploy notes), so
+// without this Express sees every request as coming from nginx's own
+// address -- req.ip would be identical for all clients, which both breaks
+// the login/signup/forgot-password rate limiters (one real user's traffic
+// could exhaust the shared bucket for everyone) and would let a client
+// spoof X-Forwarded-For to fake a different IP. `1` trusts exactly one hop.
+app.set('trust proxy', 1);
+
 // CORS_ORIGIN is unset in local dev (falls back to `cors()`'s wide-open
 // default, matching prior behavior) and should be set to the real deployed
 // frontend's origin(s) in production. Comma-separated for the case where a

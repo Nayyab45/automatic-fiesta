@@ -21,6 +21,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
     "firebase-admin": "^14.4.0",
     "google-auth-library": "^11.0.2",
     "jimp": "^1.6.1",
@@ -28,5 +29,8 @@
     "mysql2": "^3.11.0",
     "otplib": "^13.5.0",
     "qrcode": "^1.5.4"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

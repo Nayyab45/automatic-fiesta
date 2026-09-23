@@ -133,6 +133,24 @@ describe('POST /login', () => {
     assert.ok(body.challengeToken);
     assert.equal(body.accessToken, undefined);
   });
+
+  // Must run last in this describe block -- it burns through (and leaves
+  // exhausted) the shared per-server rate-limit bucket for POST /login.
+  // Missing fields 400s before any DB call, so no stubbing needed; firing
+  // one more than the limiter's window ever allows a single test run to
+  // guarantees a 429 regardless of how much budget earlier tests in this
+  // file already consumed.
+  test('429s once too many login attempts land in the window', async () => {
+    // Matches loginLimiter's configured `limit` in src/middleware/rateLimit.js --
+    // update this alongside that value if it ever changes.
+    const LOGIN_LIMIT = 15;
+    let lastStatus;
+    for (let i = 0; i < LOGIN_LIMIT + 1; i += 1) {
+      // eslint-disable-next-line no-await-in-loop -- must be sequential to actually exhaust the window
+      ({ status: lastStatus } = await post('/login', { email: 'jane@example.com' }));
+    }
+    assert.equal(lastStatus, 429);
+  });
 });
 
 describe('POST /refresh', () => {

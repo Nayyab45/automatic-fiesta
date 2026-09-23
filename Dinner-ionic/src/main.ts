@@ -8,6 +8,7 @@ import { APP_INITIALIZER } from '@angular/core';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { authInterceptor } from './app/services/auth.interceptor';
+import { errorInterceptor } from './app/services/error.interceptor';
 import { AuthService } from './app/services/auth.service';
 
 bootstrapApplication(AppComponent, {
@@ -21,7 +22,12 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular({}),
     provideAnimations(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    // Order matters for the response path (it unwinds innermost-first): put
+    // authInterceptor closer to the backend so its 401-refresh-retry gets
+    // first look at an error, and errorInterceptor outermost so it only
+    // toasts whatever's left after that -- not a 401 that's about to
+    // silently succeed via a token refresh.
+    provideHttpClient(withInterceptors([errorInterceptor, authInterceptor])),
     // Loads the persisted session from Capacitor Preferences before the
     // router activates the first route, so authGuard sees the real
     // signed-in state on cold start instead of a flash of "logged out".

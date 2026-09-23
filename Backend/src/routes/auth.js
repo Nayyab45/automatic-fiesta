@@ -14,6 +14,7 @@ import { mailer } from '../lib/mailer.js';
 import { requireAdmin } from '../lib/adminAuth.js';
 import { toCamelRows } from '../lib/serialize.js';
 import { nowAsTableTimeString } from '../lib/tableTime.js';
+import { loginLimiter, signupLimiter, forgotPasswordLimiter } from '../middleware/rateLimit.js';
 
 export const authRouter = Router();
 
@@ -101,7 +102,7 @@ function verifyTwoFactorChallenge(challengeToken) {
   return decoded.sub;
 }
 
-authRouter.post('/signup', asyncHandler(async (req, res) => {
+authRouter.post('/signup', signupLimiter, asyncHandler(async (req, res) => {
   const { name, email, password } = req.body ?? {};
 
   const missingFieldsError = requireFields(req.body, ['name', 'email', 'password']);
@@ -128,7 +129,7 @@ authRouter.post('/signup', asyncHandler(async (req, res) => {
   res.status(201).json(await issueSession(user));
 }));
 
-authRouter.post('/login', asyncHandler(async (req, res) => {
+authRouter.post('/login', loginLimiter, asyncHandler(async (req, res) => {
   const { email, password } = req.body ?? {};
 
   const missingFieldsError = requireFields(req.body, ['email', 'password']);
@@ -259,7 +260,7 @@ authRouter.post('/logout', asyncHandler(async (req, res) => {
 // (SendGrid/SES/etc.) before this goes anywhere near real users; never
 // return the token in the response itself, and never reveal whether the
 // email matched an account (the response is identical either way).
-authRouter.post('/forgot-password', asyncHandler(async (req, res) => {
+authRouter.post('/forgot-password', forgotPasswordLimiter, asyncHandler(async (req, res) => {
   const { email } = req.body ?? {};
   const missingFieldsError = requireFields(req.body, ['email']);
   if (missingFieldsError) {
@@ -279,21 +280,28 @@ authRouter.post('/forgot-password', asyncHandler(async (req, res) => {
     );
 
     const resetUrl = `${process.env.PUBLIC_APP_URL || 'http://localhost:8100'}/reset-password-new?token=${token}`;
+    // The raw reset link (and therefore the plaintext token) is only ever
+    // written to logs when explicitly opted into via LOG_PASSWORD_RESET_LINKS
+    // -- a dev-only convenience for running without a mail provider. Default
+    // is off, not gated on NODE_ENV, since a misconfigured/missing NODE_ENV
+    // in production must never fall back to leaking a live reset token into
+    // log files someone else could read.
+    const canLogRawLink = process.env.LOG_PASSWORD_RESET_LINKS === 'true';
     if (mailer.isConfigured()) {
       try {
         await mailer.sendPasswordResetEmail({ to: normalizedEmail, resetUrl });
       } catch (err) {
         // Still respond ok:true below -- an email-delivery hiccup shouldn't
-        // reveal to the caller whether the address matched an account, and
-        // the token is still valid via the logged fallback if support needs
-        // to hand it to the user manually.
-        console.error('[password reset] failed to send email:', err);
-        console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
+        // reveal to the caller whether the address matched an account.
+        console.error(`[password reset] failed to send email to user ${user.id}:`, err);
+        if (canLogRawLink) console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
       }
     } else {
-      // No RESEND_API_KEY/RESEND_FROM_EMAIL configured -- log the link so
-      // it's still usable in dev instead of silently going nowhere.
-      console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
+      console.error(
+        `[password reset] mailer not configured (RESEND_API_KEY/RESEND_FROM_EMAIL unset) -- ` +
+          `cannot deliver reset email to user ${user.id}`,
+      );
+      if (canLogRawLink) console.log(`[password reset] ${normalizedEmail} -> ${resetUrl}`);
     }
   }
 
