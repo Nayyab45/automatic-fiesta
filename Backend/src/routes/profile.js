@@ -214,22 +214,24 @@ profileRouter.get('/:id', asyncHandler(async (req, res) => {
   res.json({ profile: await fullProfile(user.id) });
 }));
 
-// Only recorded when the viewer's own "show my profile views" privacy
-// setting is on -- same toggle already used for that purpose (see
-// privacySettingsRouter below) -- and never for a self-view. Upserts rather
-// than inserting so re-visiting someone's profile just bumps viewed_at
-// instead of the "who viewed you" list filling up with repeat entries.
+// Always recorded (drives the numeric profileViewsCount, which should
+// reflect real visits regardless of the visitor's own privacy choices) --
+// and never for a self-view. Upserts rather than inserting so re-visiting
+// someone's profile just bumps viewed_at instead of the "who viewed you"
+// list filling up with repeat entries. Whether the viewer's *identity* is
+// exposed in that list is a separate, viewer-controlled decision -- see the
+// showProfileViews filter in GET /me/viewers below.
 async function recordProfileView(viewerUserId, viewedUserId) {
   if (viewerUserId === viewedUserId) return;
-  const { showProfileViews } = await privacySettingsFor(viewerUserId);
-  if (!showProfileViews) return;
   await db.prepare(
     `INSERT INTO profile_views (viewer_user_id, viewed_user_id, viewed_at) VALUES (?, ?, NOW())
      ON DUPLICATE KEY UPDATE viewed_at = NOW()`,
   ).run(viewerUserId, viewedUserId);
 }
 
-// Who has viewed my profile recently (most recent first).
+// Who has viewed my profile recently (most recent first) -- only viewers who
+// opted in via "show my profile views" are named here; the count above
+// still includes everyone.
 profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
   const rows = toCamelRows(
     await db
@@ -237,7 +239,8 @@ profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
         `SELECT u.id, u.name, p.photo_url, p.verified, pv.viewed_at FROM profile_views pv
          JOIN users u ON u.id = pv.viewer_user_id
          LEFT JOIN user_profiles p ON p.user_id = u.id
-         WHERE pv.viewed_user_id = ?
+         LEFT JOIN privacy_settings ps ON ps.user_id = pv.viewer_user_id
+         WHERE pv.viewed_user_id = ? AND COALESCE(ps.show_profile_views, 0) = 1
          ORDER BY pv.viewed_at DESC
          LIMIT 50`,
       )
