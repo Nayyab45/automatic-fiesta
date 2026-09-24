@@ -28,6 +28,7 @@ export class EmergencyContactsPage extends BasePage {
   email = '';
   notifyOnCheckin = true;
   notifyOnNoCheckout = true;
+  notifyOnCheckout = true;
 
   constructor() {
     super();
@@ -61,6 +62,7 @@ export class EmergencyContactsPage extends BasePage {
         email: this.email.trim() || undefined,
         notifyOnCheckin: this.notifyOnCheckin,
         notifyOnNoCheckout: this.notifyOnNoCheckout,
+        notifyOnCheckout: this.notifyOnCheckout,
       })
       .subscribe({
         next: ({ contact }) => {

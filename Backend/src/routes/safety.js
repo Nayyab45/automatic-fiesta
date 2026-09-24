@@ -21,7 +21,7 @@ emergencyContactsRouter.get('/', asyncHandler(async (req, res) => {
 }));
 
 emergencyContactsRouter.post('/', asyncHandler(async (req, res) => {
-  const { name, relationship, phone, email, notifyOnCheckin, notifyOnNoCheckout } = req.body ?? {};
+  const { name, relationship, phone, email, notifyOnCheckin, notifyOnNoCheckout, notifyOnCheckout } = req.body ?? {};
   const missingFieldsError = requireFields(req.body, ['name', 'phone']);
   if (missingFieldsError) {
     return res.status(400).json({ message: missingFieldsError });
@@ -29,8 +29,8 @@ emergencyContactsRouter.post('/', asyncHandler(async (req, res) => {
 
   const result = await db
     .prepare(
-      `INSERT INTO emergency_contacts (user_id, name, relationship, phone, email, notify_on_checkin, notify_on_no_checkout)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO emergency_contacts (user_id, name, relationship, phone, email, notify_on_checkin, notify_on_no_checkout, notify_on_checkout)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       req.user.sub,
@@ -40,6 +40,7 @@ emergencyContactsRouter.post('/', asyncHandler(async (req, res) => {
       email ?? null,
       notifyOnCheckin === false ? 0 : 1,
       notifyOnNoCheckout === false ? 0 : 1,
+      notifyOnCheckout === false ? 0 : 1,
     );
 
   const created = await db.prepare('SELECT * FROM emergency_contacts WHERE id = ?').get(result.lastInsertRowid);

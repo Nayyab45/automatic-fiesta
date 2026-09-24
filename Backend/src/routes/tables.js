@@ -7,6 +7,7 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
 import { isTablePast, nowAsTableTimeString } from '../lib/tableTime.js';
+import { sms } from '../lib/sms.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -396,24 +397,77 @@ tablesRouter.get('/:id/seat-requests/me', asyncHandler(async (req, res) => {
   res.json({ seatRequest: row ? toCamel(row) : null });
 }));
 
+// Best-effort, same reasoning as notifyRestaurantOfBooking -- a text-message
+// failure (bad number, Twilio outage, or simply no credentials configured at
+// all, see sms.js's isConfigured()) must never break the check-in/check-out
+// action that triggered it. notify_on_checkin/notify_on_checkout are the
+// same per-contact opt-ins shown on the Emergency Contact screen.
+async function notifyEmergencyContactsOfCheckStatus(userId, table, event) {
+  if (!sms.isConfigured()) return;
+  const flagColumn = event === 'checkin' ? 'notify_on_checkin' : 'notify_on_checkout';
+  const contacts = await db
+    .prepare(`SELECT phone FROM emergency_contacts WHERE user_id = ? AND ${flagColumn} = 1`)
+    .all(userId);
+  if (contacts.length === 0) return;
+
+  const [user, restaurant] = await Promise.all([
+    db.prepare('SELECT name FROM users WHERE id = ?').get(userId),
+    db.prepare('SELECT name FROM restaurants WHERE id = ?').get(table.restaurant_id),
+  ]);
+  const verb = event === 'checkin' ? 'has arrived safely at' : 'has safely left';
+  const body = `What Should We Eat: ${user.name} ${verb} ${restaurant.name}.`;
+
+  const results = await Promise.allSettled(contacts.map((contact) => sms.sendSms({ to: contact.phone, body })));
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error('[safety] failed to notify an emergency contact:', result.reason?.message);
+    }
+  }
+}
+
 tablesRouter.post('/:id/check-in', asyncHandler(async (req, res) => {
-  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  const table = await db.prepare('SELECT id, host_user_id, restaurant_id FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!table) {
     return res.status(404).json({ message: 'Table not found' });
   }
   if (!(await isTableMember(table, req.user.sub))) {
     return res.status(403).json({ message: 'Only the host or a confirmed guest can check in to this table' });
   }
-  await db.prepare('INSERT IGNORE INTO check_ins (table_id, user_id) VALUES (?, ?)').run(table.id, req.user.sub);
+  // ON DUPLICATE KEY UPDATE, not INSERT IGNORE: the unique(table_id, user_id)
+  // constraint means a second check-in after already checking out once
+  // would otherwise silently no-op against the existing (checked-out) row,
+  // leaving checked_out_at stuck set forever -- "Checked In" would never be
+  // reachable again for this table, no matter how many times Check In was
+  // tapped. This lets a genuine re-arrival actually reset it.
+  await db
+    .prepare(
+      `INSERT INTO check_ins (table_id, user_id) VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE checked_in_at = NOW(), checked_out_at = NULL`,
+    )
+    .run(table.id, req.user.sub);
   const row = await db.prepare('SELECT * FROM check_ins WHERE table_id = ? AND user_id = ?').get(table.id, req.user.sub);
+  await notifyEmergencyContactsOfCheckStatus(req.user.sub, table, 'checkin');
   res.json({ checkIn: toCamel(row) });
 }));
 
 tablesRouter.post('/:id/check-out', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT id, host_user_id, restaurant_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
   await db.prepare(
     'UPDATE check_ins SET checked_out_at = NOW() WHERE table_id = ? AND user_id = ? AND checked_out_at IS NULL',
-  ).run(req.params.id, req.user.sub);
-  const row = await db.prepare('SELECT * FROM check_ins WHERE table_id = ? AND user_id = ?').get(req.params.id, req.user.sub);
+  ).run(table.id, req.user.sub);
+  const row = await db.prepare('SELECT * FROM check_ins WHERE table_id = ? AND user_id = ?').get(table.id, req.user.sub);
+
+  await notifyEmergencyContactsOfCheckStatus(req.user.sub, table, 'checkout');
+  // Also lets whoever they were dining with know -- the host if a guest just
+  // checked out, or every other guest if the host did.
+  const others = (await attendeeIdsOf(table)).filter((attendeeId) => attendeeId !== req.user.sub);
+  await Promise.allSettled(
+    others.map((attendeeId) => createNotification(attendeeId, 'table_checked_out', { tableId: table.id, actorUserId: req.user.sub })),
+  );
+
   res.json({ checkIn: row ? toCamel(row) : null });
 }));
 

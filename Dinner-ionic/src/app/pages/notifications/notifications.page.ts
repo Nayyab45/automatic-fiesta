@@ -1,8 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { AuthService } from '../../services/auth.service';
 import { AppNotification, NotificationService } from '../../services/notification.service';
 import { MessagingService } from '../../services/messaging.service';
 import { timeAgo } from '../../shared/time-ago';
@@ -15,6 +16,7 @@ const TYPE_ICONS: Record<string, string> = {
   friend_request_received: 'person_add',
   friend_request_accepted: 'how_to_reg',
   direct_message_received: 'chat',
+  table_checked_out: 'logout',
 };
 
 @Component({
@@ -26,6 +28,7 @@ const TYPE_ICONS: Record<string, string> = {
 })
 export class NotificationsPage extends BasePage {
   readonly pageTitle = "Notifications";
+  private readonly authService = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
   private readonly messagingService = inject(MessagingService);
 
@@ -36,13 +39,23 @@ export class NotificationsPage extends BasePage {
 
   constructor() {
     super();
-    this.notificationService.list().subscribe({
-      next: ({ notifications }) => {
-        this.notifications.set(notifications);
-        this.loading.set(false);
+    // Ionic's route-reuse strategy (see main.ts) can keep this page's
+    // component instance alive across a log-out/log-in-as-someone-else
+    // cycle -- see the identical fix in home.page.ts/profile.page.ts.
+    effect(
+      () => {
+        if (!this.authService.currentUser()) return;
+        this.loading.set(true);
+        this.notificationService.list().subscribe({
+          next: ({ notifications }) => {
+            this.notifications.set(notifications);
+            this.loading.set(false);
+          },
+          error: () => this.loading.set(false),
+        });
       },
-      error: () => this.loading.set(false),
-    });
+      { allowSignalWrites: true },
+    );
   }
 
   iconFor(type: string): string {
@@ -60,7 +73,7 @@ export class NotificationsPage extends BasePage {
     // A table notification names the table it's about -- route straight to
     // it (where a pending invite's Accept/Decline buttons live, for
     // table_invite_received) rather than just their counterpart's profile.
-    const tableTypes = ['table_seat_joined', 'table_invite_received', 'table_invite_accepted', 'table_invite_declined'];
+    const tableTypes = ['table_seat_joined', 'table_invite_received', 'table_invite_accepted', 'table_invite_declined', 'table_checked_out'];
     if (tableTypes.includes(n.type) && n.tableId) {
       this.go(`/dining-event-details/${n.tableId}`);
       return;

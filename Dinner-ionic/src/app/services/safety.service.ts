@@ -11,6 +11,7 @@ export interface EmergencyContact {
   email: string | null;
   notifyOnCheckin: number;
   notifyOnNoCheckout: number;
+  notifyOnCheckout: number;
   createdAt: string;
 }
 
@@ -21,6 +22,7 @@ export interface EmergencyContactPayload {
   email?: string;
   notifyOnCheckin?: boolean;
   notifyOnNoCheckout?: boolean;
+  notifyOnCheckout?: boolean;
 }
 
 export interface BlockedUser {

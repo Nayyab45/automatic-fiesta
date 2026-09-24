@@ -24,6 +24,7 @@ function notificationMessageFor(type, { actorName = 'Someone', restaurantName = 
     friend_request_accepted: `${actorName} accepted your friend request`,
     new_table_near_you: `A new table was just created at ${restaurantName} near you`,
     direct_message_received: `${actorName} sent you a message`,
+    table_checked_out: `${actorName} checked out safely from ${restaurantName}`,
   };
   return messages[type] ?? 'You have a new notification';
 }

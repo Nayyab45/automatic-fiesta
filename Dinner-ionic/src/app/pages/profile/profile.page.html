@@ -71,6 +71,19 @@
 </div>
 </section>
 
+<section *ngIf="isOwnProfile() && !p.verified" class="glass-card rounded-xl p-container-padding mb-section-gap flex flex-col sm:flex-row items-center gap-stack-md">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div class="flex-1 text-center sm:text-left">
+<h3 class="font-title-lg text-title-lg text-on-surface">Verify your profile</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Confirm your identity to get a verified badge and build trust with other diners.</p>
+</div>
+<button (click)="go('/identity-verification')" class="shrink-0 bg-primary-container text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap">
+                Verify Now
+            </button>
+</section>
+
 <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
 
 <div class="md:col-span-4 glass-card rounded-xl p-stack-md flex flex-col justify-center items-center gap-stack-sm">

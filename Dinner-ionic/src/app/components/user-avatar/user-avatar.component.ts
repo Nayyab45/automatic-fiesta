@@ -174,18 +174,38 @@ export class UserAvatarComponent implements AfterViewInit, OnDestroy {
     this.menuOpen.set(false);
   }
 
-  viewProfile(): void {
+  // Navigating right after closing the menu can detach this component's view
+  // (Ionic's route-reuse strategy, see ngAfterViewInit) before Angular's
+  // change detection ever flushes menuOpen's update to the [hidden] binding
+  // -- a detached view stops running change detection entirely, so a signal
+  // write made in the same tick as the navigation can simply never reach the
+  // DOM. That wouldn't matter for a normally-positioned element (it'd be
+  // hidden along with the rest of the now-inactive page), but this menu
+  // lives in <body>, outside the routed view it'd otherwise be hidden with
+  // -- so it was staying open, floating over whatever page loaded next (most
+  // noticeably: still showing over the sign-in screen right after Log Out).
+  // Setting the DOM property directly, rather than only through the signal,
+  // guarantees it's actually hidden regardless of whether change detection
+  // gets to run again.
+  private closeMenuImmediately(): void {
     this.menuOpen.set(false);
+    if (this.menuPanel) {
+      this.menuPanel.nativeElement.hidden = true;
+    }
+  }
+
+  viewProfile(): void {
+    this.closeMenuImmediately();
     this.router.navigateByUrl('/profile');
   }
 
   openSettings(): void {
-    this.menuOpen.set(false);
+    this.closeMenuImmediately();
     this.router.navigateByUrl('/settings');
   }
 
   logout(): void {
-    this.menuOpen.set(false);
+    this.closeMenuImmediately();
     this.authService.logout();
     this.router.navigateByUrl('/login');
   }
