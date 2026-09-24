@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
@@ -60,7 +60,36 @@ export class ProfilePage extends BasePage {
 
   constructor() {
     super();
-    const id = this.routeId();
+    // Ionic's route-reuse strategy (see main.ts) caches and reuses this page's
+    // component instance across visits to the same route -- including "/profile"
+    // itself across a log-out/log-in-as-someone-else cycle, since reuse is
+    // keyed by route, not by which account is signed in. A constructor-only,
+    // one-shot read of routeId() (and of the signed-in id, for "my own
+    // profile") froze this page on whichever profile was open when the
+    // instance was first created, so it kept showing that same person's data
+    // to whoever was actually logged in afterward. Reacting to the signal
+    // itself instead means every navigation here, fresh instance or reused,
+    // loads the right profile.
+    effect(() => this.loadProfile(this.routeId()), { allowSignalWrites: true });
+  }
+
+  private loadProfile(id: string | null): void {
+    this.profile.set(null);
+    this.loading.set(true);
+    this.isBlocked.set(false);
+    this.friendStatus.set('none');
+    this.friendRequestId.set(null);
+    this.friendsCount.set(0);
+    this.pendingRequestsCount.set(0);
+    this.isFollowing.set(false);
+    this.followersCount.set(0);
+    this.followingCount.set(0);
+    this.profileViewsCount.set(0);
+    this.publicEvents.set([]);
+    this.loadingPublicEvents.set(false);
+    this.reviews.set([]);
+    this.loadingReviews.set(false);
+
     const request$ = id ? this.profileService.get(id) : this.profileService.me();
     request$.subscribe({
       next: ({ profile }) => {

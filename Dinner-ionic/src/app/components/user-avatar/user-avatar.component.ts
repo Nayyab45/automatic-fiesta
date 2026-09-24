@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, Renderer2, ViewChild, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -41,7 +41,8 @@ import { ProfileService } from '../../services/profile.service';
     </button>
 
     <div
-      *ngIf="menuOpen()"
+      #menuPanel
+      [hidden]="!menuOpen()"
       (click)="$event.stopPropagation()"
       role="menu"
       class="fixed z-50 w-56 bg-surface rounded-xl ambient-shadow border-[0.5px] border-outline-variant overflow-hidden"
@@ -87,11 +88,14 @@ import { ProfileService } from '../../services/profile.service';
   // only the old <img> did). Block avoids that footgun everywhere at once.
   styles: [':host { display: block; }'],
 })
-export class UserAvatarComponent {
+export class UserAvatarComponent implements AfterViewInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly renderer = inject(Renderer2);
+
+  @ViewChild('menuPanel') private menuPanel?: ElementRef<HTMLElement>;
 
   readonly photoUrl = signal<string | null>(null);
   readonly initial = signal(this.authService.currentUser()?.name?.charAt(0)?.toUpperCase() ?? '?');
@@ -101,15 +105,54 @@ export class UserAvatarComponent {
   readonly menuPosition = signal({ top: 0, right: 16 });
 
   constructor() {
-    this.profileService.me().subscribe({
-      next: ({ profile }) => {
-        this.photoUrl.set(profile.photoUrl);
-        this.initial.set(profile.name.charAt(0).toUpperCase());
-        this.displayName.set(profile.name);
-        this.displayAge.set(profile.age);
+    // Ionic's route-reuse strategy (see main.ts) can keep this component
+    // instance alive across a log-out/log-in-as-someone-else cycle, since a
+    // page gets reused by route, not by which account is signed in -- a
+    // constructor-only, one-shot `.me()` fetch left this avatar (and its
+    // account menu) permanently showing whichever person was signed in when
+    // the instance was first created. Reacting to currentUser() instead
+    // means a change of account always refetches, whether this is a fresh
+    // instance or a reused one.
+    effect(
+      () => {
+        const user = this.authService.currentUser();
+        this.photoUrl.set(null);
+        this.initial.set(user?.name?.charAt(0)?.toUpperCase() ?? '?');
+        this.displayName.set(user?.name ?? null);
+        this.displayAge.set(null);
+        if (!user) return;
+
+        this.profileService.me().subscribe({
+          next: ({ profile }) => {
+            this.photoUrl.set(profile.photoUrl);
+            this.initial.set(profile.name.charAt(0).toUpperCase());
+            this.displayName.set(profile.name);
+            this.displayAge.set(profile.age);
+          },
+          error: () => {},
+        });
       },
-      error: () => {},
-    });
+      { allowSignalWrites: true },
+    );
+  }
+
+  ngAfterViewInit(): void {
+    // Every call site wraps this component in its own small circular avatar
+    // div (`overflow-hidden`, for clipping the photo/initials -- see this
+    // class's own doc comment). Since Angular renders the menu panel as a
+    // DOM child of that same host, the wrapper's overflow-hidden ends up
+    // affecting this `position: fixed` panel's compositing too on some
+    // pages, even though `fixed` is meant to escape it -- it showed up as a
+    // menu with the page content bleeding through instead of its own
+    // background. Moving the node to <body> once it exists takes it out of
+    // that ancestor for good.
+    if (this.menuPanel) {
+      this.renderer.appendChild(document.body, this.menuPanel.nativeElement);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.menuPanel?.nativeElement.remove();
   }
 
   toggleMenu(event: Event): void {
@@ -117,8 +160,9 @@ export class UserAvatarComponent {
     if (!this.menuOpen()) {
       // Positioned from the avatar's own on-screen rect (rather than a
       // fixed offset) so the menu lines up correctly regardless of which
-      // page's header it's rendered in -- `fixed` keeps it from being
-      // clipped by the avatar's own overflow-hidden circular wrapper.
+      // page's header it's rendered in -- it's portaled to <body> (see
+      // ngAfterViewInit) so nothing about the avatar's own wrapper affects
+      // where or how it renders.
       const rect = this.elementRef.nativeElement.getBoundingClientRect();
       this.menuPosition.set({ top: rect.bottom + 8, right: Math.max(16, window.innerWidth - rect.right) });
     }

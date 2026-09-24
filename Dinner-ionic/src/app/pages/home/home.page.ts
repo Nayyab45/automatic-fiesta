@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RootHeaderComponent } from '../../components/root-header/root-header.component';
 import { RouterLink } from '@angular/router';
@@ -28,7 +28,7 @@ function timeOfDayGreeting(): string {
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss',
 })
-export class HomePage extends BasePage implements OnInit {
+export class HomePage extends BasePage {
   readonly pageTitle = "Home";
   showWhatsNew = false;
   private readonly whatsNew = inject(WhatsNewService);
@@ -49,23 +49,42 @@ export class HomePage extends BasePage implements OnInit {
   readonly matches = signal<Match[]>([]);
   readonly followBusyId = signal<number | null>(null);
 
-  ngOnInit(): void {
+  constructor() {
+    super();
     this.showWhatsNew = this.whatsNew.shouldShow();
-    this.tableService.listMine().subscribe({
-      next: ({ tables }) => {
-        const upcoming = tables.filter((t) => !t.isPast).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
-        this.upcomingTable.set(upcoming[0] ?? null);
-        this.loadingTables.set(false);
+    // Ionic's route-reuse strategy (see main.ts) can keep this page's
+    // component instance alive across a log-out/log-in-as-someone-else
+    // cycle, since "/home" is reused by route, not by which account is
+    // signed in -- an ngOnInit-only, one-shot fetch left tonight's table and
+    // "People You May Enjoy Dining With" permanently showing whichever
+    // account was signed in when this instance was first created. Reacting
+    // to currentUser() instead means a change of account always refetches.
+    effect(
+      () => {
+        if (!this.authService.currentUser()) return;
+        this.loadingTables.set(true);
+        this.upcomingTable.set(null);
+        this.tableService.listMine().subscribe({
+          next: ({ tables }) => {
+            const upcoming = tables.filter((t) => !t.isPast).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+            this.upcomingTable.set(upcoming[0] ?? null);
+            this.loadingTables.set(false);
+          },
+          error: () => this.loadingTables.set(false),
+        });
+
+        this.loadingMatches.set(true);
+        this.matches.set([]);
+        this.profileService.matches().subscribe({
+          next: ({ matches }) => {
+            this.matches.set(matches.slice(0, 6));
+            this.loadingMatches.set(false);
+          },
+          error: () => this.loadingMatches.set(false),
+        });
       },
-      error: () => this.loadingTables.set(false),
-    });
-    this.profileService.matches().subscribe({
-      next: ({ matches }) => {
-        this.matches.set(matches.slice(0, 6));
-        this.loadingMatches.set(false);
-      },
-      error: () => this.loadingMatches.set(false),
-    });
+      { allowSignalWrites: true },
+    );
   }
 
   /** Mirrors discover-people's "message" action: there's no separate
