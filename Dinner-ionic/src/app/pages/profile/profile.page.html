@@ -163,42 +163,40 @@
                 </h3>
 <p *ngIf="loadingPublicEvents()" class="font-body-md text-body-md text-on-surface-variant py-stack-sm">Loading events…</p>
 <div *ngIf="!loadingPublicEvents()" class="flex flex-col gap-stack-sm mt-stack-sm">
-<div *ngFor="let table of publicEvents()" (click)="go('/dining-event-details/' + table.id)" class="flex items-center gap-stack-sm p-stack-sm rounded-xl border border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="go('/dining-event-details/' + table.id)">
+<div *ngFor="let table of publicEvents()" class="rounded-xl border border-outline-variant/30 overflow-hidden">
+<div (click)="go('/dining-event-details/' + table.id)" class="flex items-center gap-stack-sm p-stack-sm cursor-pointer hover:bg-surface-container-low transition-colors" role="button" tabindex="0" (keydown.enter)="go('/dining-event-details/' + table.id)">
 <img [alt]="table.restaurant.name" class="w-14 h-14 rounded-lg object-cover shrink-0" [src]="table.restaurant.photoUrl"/>
 <div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-2 min-w-0">
 <h4 class="font-body-lg text-body-lg font-medium text-on-surface truncate">{{ table.title || table.restaurant.name }}</h4>
+<span *ngIf="table.isPast" class="px-2 py-0.5 bg-surface-container text-on-surface-variant font-label-sm text-label-sm rounded uppercase shrink-0">Past</span>
+</div>
 <p class="font-body-md text-body-md text-on-surface-variant truncate flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">schedule</span> {{ table.dateTime | date: 'medium' }}
 </p>
 </div>
 <span class="material-symbols-outlined text-outline-variant shrink-0">chevron_right</span>
 </div>
-</div>
-</div>
-</section>
 
-<section *ngIf="loadingReviews() || reviews().length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-gutter mt-section-gap">
-<div class="md:col-span-12 glass-card rounded-xl p-stack-md">
-<h3 class="font-title-lg text-title-lg text-on-surface mb-stack-sm flex items-center gap-2">
-<span class="material-symbols-outlined text-primary-container">rate_review</span>
-                    Reviews
-                </h3>
-<p *ngIf="loadingReviews()" class="font-body-md text-body-md text-on-surface-variant py-stack-sm">Loading reviews…</p>
-<div *ngIf="!loadingReviews()" class="flex flex-col gap-stack-md mt-stack-sm">
-<div *ngFor="let review of reviews()" class="p-stack-sm rounded-xl border border-outline-variant/30">
-<div class="flex items-center justify-between gap-stack-sm mb-stack-sm">
+<!-- Reviews this person received for this specific past event -- see
+     profile.page.ts's reviewsForTable(), grouped from the flat reviews()
+     list fetched from GET /profile/:id/reviews. -->
+<div *ngIf="table.isPast && reviewsForTable(table.id).length > 0" class="flex flex-col gap-stack-sm px-stack-sm pb-stack-sm pt-1 border-t border-outline-variant/20">
+<div *ngFor="let review of reviewsForTable(table.id)" class="p-stack-sm rounded-lg bg-surface-container-low">
+<div class="flex items-center justify-between gap-stack-sm mb-1">
 <div class="flex items-center gap-2 min-w-0 cursor-pointer" (click)="go('/profile/' + review.raterUserId)" role="link" tabindex="0" (keydown.enter)="go('/profile/' + review.raterUserId)">
-<img *ngIf="review.raterPhotoUrl" [src]="review.raterPhotoUrl" [alt]="review.raterName" class="w-8 h-8 rounded-full object-cover shrink-0"/>
-<div *ngIf="!review.raterPhotoUrl" class="w-8 h-8 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-label-lg text-label-lg shrink-0">{{ review.raterName.charAt(0) }}</div>
-<span class="font-body-md text-body-md font-medium text-on-surface truncate">{{ review.raterName }}</span>
+<img *ngIf="review.raterPhotoUrl" [src]="review.raterPhotoUrl" [alt]="review.raterName" class="w-6 h-6 rounded-full object-cover shrink-0"/>
+<div *ngIf="!review.raterPhotoUrl" class="w-6 h-6 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center font-label-sm text-label-sm shrink-0">{{ review.raterName.charAt(0) }}</div>
+<span class="font-body-sm text-body-sm font-medium text-on-surface truncate">{{ review.raterName }}</span>
 </div>
 <div class="flex items-center gap-1 shrink-0 text-primary-container">
-<span class="material-symbols-outlined fill text-[16px]">star</span>
-<span class="font-label-lg text-label-lg text-on-surface">{{ review.score }}</span>
+<span class="material-symbols-outlined fill text-[14px]">star</span>
+<span class="font-label-md text-label-md text-on-surface">{{ review.score }}</span>
 </div>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant">{{ review.comment }}</p>
-<p *ngIf="review.tableTitle" class="font-label-sm text-label-sm text-outline-variant mt-1">From {{ review.tableTitle }}</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">{{ review.comment }}</p>
+</div>
+</div>
 </div>
 </div>
 </div>

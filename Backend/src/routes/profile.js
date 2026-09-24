@@ -187,7 +187,7 @@ async function preferenceChangeStatus(userId) {
 // a visitor seeing how many people viewed *your* profile would defeat the
 // whole point of the privacy toggle those views are gated behind.
 async function profileViewsCount(userId) {
-  const { count } = await db.prepare('SELECT COUNT(*) as count FROM profile_views WHERE viewed_user_id = ?').get(userId);
+  const { count } = await db.prepare('SELECT COUNT(*) as count FROM profile_view_events WHERE viewed_user_id = ?').get(userId);
   return count;
 }
 
@@ -236,19 +236,25 @@ profileRouter.get('/:id/reviews', asyncHandler(async (req, res) => {
   res.json({ reviews: rows });
 }));
 
-// Always recorded (drives the numeric profileViewsCount, which should
-// reflect real visits regardless of the visitor's own privacy choices) --
-// and never for a self-view. Upserts rather than inserting so re-visiting
-// someone's profile just bumps viewed_at instead of the "who viewed you"
-// list filling up with repeat entries. Whether the viewer's *identity* is
-// exposed in that list is a separate, viewer-controlled decision -- see the
-// showProfileViews filter in GET /me/viewers below.
+// Always recorded regardless of the visitor's own privacy choices, and never
+// for a self-view. Writes to two tables for two different jobs:
+// profile_views upserts (one row per viewer, re-visiting just bumps
+// viewed_at) so the "who viewed you" identity list never fills up with
+// repeat entries for the same person -- see the showProfileViews filter in
+// GET /me/viewers below. profile_view_events has no such dedup and gets a
+// fresh row every time, since that's the one profileViewsCount() sums --
+// counting the (deduped) first table would make the number stop climbing
+// the moment every regular visitor had viewed you once, which read as the
+// count "not updating" even though views were being recorded correctly.
 async function recordProfileView(viewerUserId, viewedUserId) {
   if (viewerUserId === viewedUserId) return;
   await db.prepare(
     `INSERT INTO profile_views (viewer_user_id, viewed_user_id, viewed_at) VALUES (?, ?, NOW())
      ON DUPLICATE KEY UPDATE viewed_at = NOW()`,
   ).run(viewerUserId, viewedUserId);
+  await db
+    .prepare('INSERT INTO profile_view_events (viewer_user_id, viewed_user_id, viewed_at) VALUES (?, ?, NOW())')
+    .run(viewerUserId, viewedUserId);
 }
 
 // Who has viewed my profile recently (most recent first) -- viewers who

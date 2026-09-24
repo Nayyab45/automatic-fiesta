@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -42,12 +42,30 @@ export class DiningGroupChatPage extends BasePage {
   readonly bubbles = signal<ChatBubble[]>([]);
   readonly sendError = signal<string | null>(null);
 
-  private readonly conversationOrTableId = this.routeId();
   private readonly myId = this.authService.currentUser()?.id ?? null;
 
   constructor() {
     super();
-    const id = this.conversationOrTableId;
+    // ion-router-outlet reuses a previously-visited page's component instance
+    // across navigations instead of recreating it (see discover-restaurants.
+    // page.ts's own effect() for the same reasoning) -- a constructor-only,
+    // one-shot read of routeId() froze the chat on whichever conversation/
+    // table was open when this instance was first created, so opening a
+    // second DM or group chat kept loading (and, worse, kept *sending to*)
+    // the original one. Reacting to the signal itself instead means every
+    // navigation to this route, fresh instance or reused, loads the right
+    // conversation.
+    effect(() => this.loadChat(this.routeId()), { allowSignalWrites: true });
+  }
+
+  private loadChat(id: string | null): void {
+    this.loading.set(true);
+    this.table.set(null);
+    this.guests.set([]);
+    this.dmPerson.set(null);
+    this.bubbles.set([]);
+    this.sendError.set(null);
+
     if (!id) {
       this.loading.set(false);
       return;
@@ -93,7 +111,7 @@ export class DiningGroupChatPage extends BasePage {
 
   sendMessage(input: HTMLInputElement): void {
     const text = input.value.trim();
-    const id = this.conversationOrTableId;
+    const id = this.routeId();
     if (!text || !id || this.sending()) return;
 
     this.sending.set(true);

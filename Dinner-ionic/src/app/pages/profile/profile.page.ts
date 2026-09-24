@@ -45,6 +45,18 @@ export class ProfilePage extends BasePage {
   readonly loadingPublicEvents = signal(false);
   readonly reviews = signal<PersonReview[]>([]);
   readonly loadingReviews = signal(false);
+  // Reviews are shown nested under the specific past event they came from
+  // (see profile.page.html's events section) rather than as their own flat
+  // list, so they need to be grouped by tableId for quick per-card lookup.
+  readonly reviewsByTableId = computed(() => {
+    const map = new Map<number, PersonReview[]>();
+    for (const review of this.reviews()) {
+      const list = map.get(review.tableId) ?? [];
+      list.push(review);
+      map.set(review.tableId, list);
+    }
+    return map;
+  });
 
   constructor() {
     super();
@@ -159,5 +171,9 @@ export class ProfilePage extends BasePage {
     if (!profile) return;
     const request$ = this.isFollowing() ? this.followService.unfollow(profile.id) : this.followService.follow(profile.id);
     request$.subscribe(({ following }) => this.isFollowing.set(following));
+  }
+
+  reviewsForTable(tableId: number): PersonReview[] {
+    return this.reviewsByTableId().get(tableId) ?? [];
   }
 }

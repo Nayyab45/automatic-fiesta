@@ -81,10 +81,11 @@ async function tableWithContext(row, userId) {
   };
 }
 
-// Another user's public, upcoming events -- shown on their profile page.
-// Registered as its own branch of GET '/' (via ?hostId=) rather than a
-// separate path so it can share tableWithContext/isEligibleForAudience with
-// '/discover' below.
+// Another user's public events, past and upcoming -- shown on their profile
+// page (past ones carry any reviews they received, see profileRouter's
+// /:id/reviews in profile.js). Registered as its own branch of GET '/' (via
+// ?hostId=) rather than a separate path so it can share
+// tableWithContext/isEligibleForAudience with '/discover' below.
 async function hostPublicEvents(hostId, viewerId) {
   const blocked = await db
     .prepare(
@@ -97,10 +98,10 @@ async function hostPublicEvents(hostId, viewerId) {
   const rows = await db
     .prepare(
       `SELECT * FROM dining_tables
-       WHERE host_user_id = ? AND visibility = 'public' AND date_time > ?
-       ORDER BY date_time ASC`,
+       WHERE host_user_id = ? AND visibility = 'public'
+       ORDER BY date_time DESC`,
     )
-    .all(hostId, nowAsTableTimeString());
+    .all(hostId);
 
   const eligibleRows = [];
   for (const row of rows) {

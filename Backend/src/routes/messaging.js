@@ -23,6 +23,7 @@ function notificationMessageFor(type, { actorName = 'Someone', restaurantName = 
     friend_request_received: `${actorName} sent you a friend request`,
     friend_request_accepted: `${actorName} accepted your friend request`,
     new_table_near_you: `A new table was just created at ${restaurantName} near you`,
+    direct_message_received: `${actorName} sent you a message`,
   };
   return messages[type] ?? 'You have a new notification';
 }
@@ -184,6 +185,19 @@ conversationsRouter.post('/:id/messages', asyncHandler(async (req, res) => {
     `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, NOW())
      ON DUPLICATE KEY UPDATE last_read_at = NOW()`,
   ).run(req.params.id, req.user.sub);
+
+  // Without this, a new DM never surfaced anywhere for its recipient -- no
+  // bell notification, no push -- so unless they happened to already have
+  // that exact conversation open, it just sat unseen in the DB until they
+  // thought to check Messages themselves. Every other cross-user event
+  // (seat joins, invites, friend requests) already notifies its recipient;
+  // this was the one that didn't.
+  const recipient = await db
+    .prepare('SELECT user_id FROM conversation_participants WHERE conversation_id = ? AND user_id != ?')
+    .get(req.params.id, req.user.sub);
+  if (recipient) {
+    await createNotification(recipient.user_id, 'direct_message_received', { actorUserId: req.user.sub });
+  }
 
   const created = await db
     .prepare(

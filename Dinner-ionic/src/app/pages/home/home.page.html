@@ -35,19 +35,6 @@
 <a (click)="go('/my-tables')" class="font-label-lg text-label-lg text-primary uppercase tracking-widest hover:opacity-80 transition-opacity" role="link" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/my-tables')">View All</a>
 </div>
 
-<div class="relative w-full rounded-xl bg-surface-container border-2 border-dashed border-primary/30 p-stack-md flex flex-col items-center justify-center gap-stack-sm interactive-card mb-stack-md">
-<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[32px]">add_circle</span>
-</div>
-<div class="text-center">
-<h3 class="font-title-lg text-title-lg text-primary">Host a Table</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Create your own dining event and invite others</p>
-</div>
-<button (click)="go('/create-table')" class="mt-unit px-6 py-2 bg-primary text-on-primary font-label-lg text-label-lg uppercase tracking-widest rounded-full hover:opacity-90 transition-opacity">
-    Send Request
-  </button>
-</div>
-
 <div *ngIf="!loadingTables() && upcomingTable() as table" (click)="go('/dining-event-details/' + table.id)" class="relative w-full rounded-xl bg-surface soft-shadow border-[0.5px] border-outline-variant overflow-hidden interactive-card flex flex-col cursor-pointer" role="button" tabindex="0" (keydown.enter)="$event.target === $event.currentTarget && go('/dining-event-details/' + table.id)" (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && go('/dining-event-details/' + table.id)">
 
 <div class="w-full h-48 relative border-b-[0.5px] border-outline-variant">
