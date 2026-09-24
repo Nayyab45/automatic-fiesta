@@ -24,6 +24,17 @@ async function isTableMember(table, userId) {
   return !!(await db.prepare('SELECT 1 FROM table_guests WHERE table_id = ? AND user_id = ?').get(table.id, userId));
 }
 
+// A host-sent invite the invitee hasn't responded to yet -- deliberately
+// separate from isTableMember (which check-in, reviews, ratings and the
+// group chat all rely on to mean "confirmed attendee"; a mere invite isn't
+// that). Someone needs to be able to see the event they're being invited to
+// before they can decide whether to accept it, though -- see GET /:id below.
+async function hasPendingInvite(table, userId) {
+  return !!(await db
+    .prepare("SELECT 1 FROM seat_requests WHERE table_id = ? AND user_id = ? AND status = 'sent'")
+    .get(table.id, userId));
+}
+
 const TABLE_AUDIENCES = ['everyone', 'women_only', 'friends_only'];
 
 // Event creation is unlimited for every account. Exported so profileRouter's
@@ -175,7 +186,7 @@ tablesRouter.get('/:id', asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Table not found' });
   }
   const canPreview = row.visibility === 'public' && (await isEligibleForAudience(row, req.user.sub));
-  if (!(await isTableMember(row, req.user.sub)) && !canPreview) {
+  if (!(await isTableMember(row, req.user.sub)) && !canPreview && !(await hasPendingInvite(row, req.user.sub))) {
     return res.status(403).json({ message: 'Not a member of this table' });
   }
   res.json({ table: await tableWithContext(row, req.user.sub) });
