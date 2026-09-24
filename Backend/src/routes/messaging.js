@@ -77,7 +77,7 @@ conversationsRouter.get('/', asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const conversations = await db
     .prepare(
-      `SELECT c.id, c.created_at, cp.last_read_at FROM conversations c
+      `SELECT c.id, c.created_at, cp.last_read_at, cp.deleted_at FROM conversations c
        JOIN conversation_participants cp ON cp.conversation_id = c.id AND cp.user_id = ?`,
     )
     .all(userId);
@@ -88,6 +88,16 @@ conversationsRouter.get('/', asyncHandler(async (req, res) => {
       const lastMessage = await db
         .prepare('SELECT body, sender_id, created_at FROM direct_messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1')
         .get(conversation.id);
+
+      // A conversation this user deleted (see DELETE /:id below) stays out
+      // of their list until someone sends a new message into it -- otherwise
+      // a reply that arrives after the deletion would just be lost instead
+      // of reopening the thread, the same way most chat apps' "delete chat"
+      // behaves.
+      if (conversation.deleted_at && (!lastMessage || lastMessage.created_at <= conversation.deleted_at)) {
+        return null;
+      }
+
       const { count: unreadCount } = await db
         .prepare(
           `SELECT COUNT(*) as count FROM direct_messages
@@ -104,13 +114,14 @@ conversationsRouter.get('/', asyncHandler(async (req, res) => {
     }),
   );
 
-  result.sort((a, b) => {
+  const visible = result.filter((conversation) => conversation !== null);
+  visible.sort((a, b) => {
     const aTime = a.lastMessage?.createdAt ?? '';
     const bTime = b.lastMessage?.createdAt ?? '';
     return bTime.localeCompare(aTime);
   });
 
-  res.json({ conversations: result });
+  res.json({ conversations: visible });
 }));
 
 conversationsRouter.post('/', asyncHandler(async (req, res) => {
@@ -169,6 +180,20 @@ conversationsRouter.get('/:id/messages', asyncHandler(async (req, res) => {
   res.json({ messages: toCamelRows(rows) });
 }));
 
+// Deletes the conversation from the caller's own inbox only -- see the
+// deleted_at column added in migration 0036 and how GET / and POST
+// /:id/messages above use it. The other participant's copy, and the message
+// history itself, are untouched.
+conversationsRouter.delete('/:id', asyncHandler(async (req, res) => {
+  if (!(await isParticipant(req.params.id, req.user.sub))) {
+    return res.status(403).json({ message: 'Not a participant in this conversation' });
+  }
+  await db
+    .prepare('UPDATE conversation_participants SET deleted_at = NOW() WHERE conversation_id = ? AND user_id = ?')
+    .run(req.params.id, req.user.sub);
+  res.json({ ok: true });
+}));
+
 conversationsRouter.post('/:id/messages', asyncHandler(async (req, res) => {
   if (!(await isParticipant(req.params.id, req.user.sub))) {
     return res.status(403).json({ message: 'Not a participant in this conversation' });
@@ -181,9 +206,13 @@ conversationsRouter.post('/:id/messages', asyncHandler(async (req, res) => {
   const result = await db
     .prepare('INSERT INTO direct_messages (conversation_id, sender_id, body) VALUES (?, ?, ?)')
     .run(req.params.id, req.user.sub, req.body.body);
+  // Clearing deleted_at here (not just bumping last_read_at) means sending
+  // into a conversation you'd previously deleted un-deletes it for you too --
+  // you're plainly using it again, so there's no reason it should stay
+  // hidden from your own list.
   await db.prepare(
-    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at) VALUES (?, ?, NOW())
-     ON DUPLICATE KEY UPDATE last_read_at = NOW()`,
+    `INSERT INTO conversation_participants (conversation_id, user_id, last_read_at, deleted_at) VALUES (?, ?, NOW(), NULL)
+     ON DUPLICATE KEY UPDATE last_read_at = NOW(), deleted_at = NULL`,
   ).run(req.params.id, req.user.sub);
 
   // Without this, a new DM never surfaced anywhere for its recipient -- no

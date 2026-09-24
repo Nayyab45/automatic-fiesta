@@ -44,6 +44,10 @@ export interface DiningTable {
   /** Host or a confirmed guest -- false for a pending/declined/no seat request. */
   isMember: boolean;
   hasReviewed: boolean;
+  /** This user hid the table's group chat from their own Messages list (see
+   * deleteChat()) -- purely cosmetic, doesn't affect isMember/guestCount or
+   * anyone else's view of the chat. */
+  chatHidden: boolean;
 }
 
 export interface TableGuest {
@@ -205,5 +209,11 @@ export class DiningTableService {
 
   sendMessage(id: number | string, body: string): Observable<{ message: TableMessage }> {
     return this.http.post<{ message: TableMessage }>(`${this.baseUrl}/${id}/messages`, { body });
+  }
+
+  /** Hides this table's group chat from the caller's own Messages list --
+   * see the chatHidden field above. Doesn't remove them from the table. */
+  deleteChat(id: number | string): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/${id}/chat`);
   }
 }

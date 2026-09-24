@@ -6,7 +6,12 @@
 
 <main class="flex-1 px-container-padding pb-32 pt-stack-md">
 
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-stack-md tracking-tight">Conversations</h1>
+<div class="flex justify-between items-center mb-stack-md">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">Conversations</h1>
+<button *ngIf="conversations().length > 0 || groups().length > 0" (click)="toggleSelecting()" class="font-label-lg text-label-lg uppercase tracking-widest text-primary hover:opacity-80 transition-opacity shrink-0 pl-2">
+{{ selecting() ? 'Cancel' : 'Select' }}
+</button>
+</div>
 
 <div class="flex gap-gutter mb-stack-lg border-b border-secondary-container overflow-x-auto no-scrollbar pb-[1px]">
 <button (click)="selectTab('messages')" class="relative pb-stack-sm px-2 font-label-lg text-label-lg uppercase tracking-widest outline-none flex-shrink-0 group transition-colors" [class.text-primary]="activeTab() === 'messages'" [class.font-bold]="activeTab() === 'messages'" [class.text-on-surface-variant]="activeTab() !== 'messages'">
@@ -24,7 +29,10 @@
 <p *ngIf="!loadingConversations() && conversations().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No conversations yet.</p>
 
 <div class="flex flex-col gap-unit" *ngIf="!loadingConversations() && conversations().length > 0">
-<button *ngFor="let c of conversations()" (click)="go('/dining-group-chat/dm/' + c.id)" class="flex items-center gap-gutter py-stack-md border-b border-secondary-container/50 hover:bg-surface-container-low transition-colors text-left group w-full">
+<button *ngFor="let c of conversations()" (click)="selecting() ? toggleConversationSelected(c.id) : go('/dining-group-chat/dm/' + c.id)" class="flex items-center gap-gutter py-stack-md border-b border-secondary-container/50 hover:bg-surface-container-low transition-colors text-left group w-full">
+<div *ngIf="selecting()" class="w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors" [class.border-primary]="selectedConversationIds().has(c.id)" [class.bg-primary]="selectedConversationIds().has(c.id)" [class.border-outline-variant]="!selectedConversationIds().has(c.id)">
+<span *ngIf="selectedConversationIds().has(c.id)" class="material-symbols-outlined text-[16px] text-on-primary">check</span>
+</div>
 <div class="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-secondary-container shadow-sm group-hover:border-primary transition-colors relative bg-secondary-container/40 text-primary flex items-center justify-center font-title-lg text-title-lg" *ngIf="c.person as p; else unknownPersonAvatar">
 <img *ngIf="p.photoUrl" alt="" class="w-full h-full object-cover" [src]="p.photoUrl"/>
 <span *ngIf="!p.photoUrl">{{ p.name.charAt(0) }}</span>
@@ -39,7 +47,7 @@
 </div>
 <p class="font-body-md text-body-md truncate" [class.text-on-surface]="c.unreadCount > 0" [class.font-medium]="c.unreadCount > 0" [class.text-on-surface-variant]="c.unreadCount === 0">{{ c.lastMessage?.body || 'Say hello!' }}</p>
 </div>
-<div *ngIf="c.unreadCount > 0" class="w-2.5 h-2.5 rounded-full bg-primary shrink-0 self-center"></div>
+<div *ngIf="!selecting() && c.unreadCount > 0" class="w-2.5 h-2.5 rounded-full bg-primary shrink-0 self-center"></div>
 </button>
 </div>
 </ng-container>
@@ -49,7 +57,10 @@
 <p *ngIf="!loadingGroups() && groups().length === 0" class="font-body-md text-body-md text-on-surface-variant text-center py-section-gap">No dining groups yet.</p>
 
 <div class="flex flex-col gap-unit" *ngIf="!loadingGroups() && groups().length > 0">
-<button *ngFor="let g of groups()" (click)="go('/dining-group-chat/' + g.id)" class="flex items-center gap-gutter py-stack-md border-b border-secondary-container/50 hover:bg-surface-container-low transition-colors text-left group w-full">
+<button *ngFor="let g of groups()" (click)="selecting() ? toggleGroupSelected(g.id) : go('/dining-group-chat/' + g.id)" class="flex items-center gap-gutter py-stack-md border-b border-secondary-container/50 hover:bg-surface-container-low transition-colors text-left group w-full">
+<div *ngIf="selecting()" class="w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors" [class.border-primary]="selectedGroupIds().has(g.id)" [class.bg-primary]="selectedGroupIds().has(g.id)" [class.border-outline-variant]="!selectedGroupIds().has(g.id)">
+<span *ngIf="selectedGroupIds().has(g.id)" class="material-symbols-outlined text-[16px] text-on-primary">check</span>
+</div>
 <div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-secondary-container shadow-sm group-hover:border-primary transition-colors relative">
 <img [alt]="g.restaurant.name" class="w-full h-full object-cover" [src]="g.restaurant.photoUrl"/>
 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-surface rounded-full flex items-center justify-center border border-secondary-container shadow-sm">
@@ -68,6 +79,24 @@
 </ng-container>
 </main>
 
+<div *ngIf="selecting()" class="fixed bottom-[80px] md:bottom-0 left-0 right-0 z-40 bg-surface border-t border-secondary-container px-container-padding py-stack-sm flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface-variant">{{ selectedCount() }} selected</span>
+<button (click)="showDeleteConfirm.set(true)" [disabled]="selectedCount() === 0 || deleting()" class="flex items-center gap-2 px-4 py-2 rounded-full text-error font-label-lg text-label-lg uppercase tracking-widest disabled:opacity-40 hover:bg-error/5 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+{{ deleting() ? 'Deleting…' : 'Delete' }}
+</button>
+</div>
+
 <div class="h-[80px] md:hidden"></div>
 
 <app-bottom-nav active="messages"></app-bottom-nav>
+
+<app-confirm-dialog
+  *ngIf="showDeleteConfirm()"
+  title="Delete selected chats?"
+  [message]="'This removes ' + selectedCount() + ' chat' + (selectedCount() === 1 ? '' : 's') + ' from your Messages. The other person (or dining group) keeps their own copy.'"
+  confirmLabel="Delete"
+  [destructive]="true"
+  (cancelled)="showDeleteConfirm.set(false)"
+  (confirm)="deleteSelected()"
+></app-confirm-dialog>

@@ -70,6 +70,20 @@ async function isEligibleForAudience(table, userId) {
   return true;
 }
 
+// Mirrors direct_messages' conversation_participants.deleted_at (see
+// messaging.js/migration 0036): hiding a table's group chat from this user's
+// own Messages list, without touching table_guests or anyone else's view of
+// it -- and, same as a DM, it un-hides itself once a new message lands, so a
+// reply after hiding it doesn't just go unseen.
+async function isChatHidden(tableId, userId) {
+  const hide = await db.prepare('SELECT hidden_at FROM table_chat_hides WHERE table_id = ? AND user_id = ?').get(tableId, userId);
+  if (!hide) return false;
+  const latestMessage = await db
+    .prepare('SELECT created_at FROM table_messages WHERE table_id = ? ORDER BY created_at DESC LIMIT 1')
+    .get(tableId);
+  return !latestMessage || latestMessage.created_at <= hide.hidden_at;
+}
+
 async function tableWithContext(row, userId) {
   const restaurant = await db.prepare('SELECT name, photo_url, address, city, rating, cuisine_tags FROM restaurants WHERE id = ?').get(row.restaurant_id);
   const host = await db.prepare('SELECT id, name FROM users WHERE id = ?').get(row.host_user_id);
@@ -89,6 +103,7 @@ async function tableWithContext(row, userId) {
     isHost: row.host_user_id === userId,
     isMember: await isTableMember(row, userId),
     hasReviewed: !!hasReviewed,
+    chatHidden: await isChatHidden(row.id, userId),
   };
 }
 
@@ -615,6 +630,27 @@ tablesRouter.get('/:id/messages', asyncHandler(async (req, res) => {
   res.json({ messages: toCamelRows(rows) });
 }));
 
+// Hides this table's group chat from the caller's own Messages list only --
+// see isChatHidden above and migration 0036. Never touches table_guests, so
+// hiding the chat has no effect on the actual event: the host, the seat, and
+// every other guest's view of the chat are all unaffected.
+tablesRouter.delete('/:id/chat', asyncHandler(async (req, res) => {
+  const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
+  if (!table) {
+    return res.status(404).json({ message: 'Table not found' });
+  }
+  if (!(await isTableMember(table, req.user.sub))) {
+    return res.status(403).json({ message: 'Not a member of this table' });
+  }
+  await db
+    .prepare(
+      `INSERT INTO table_chat_hides (table_id, user_id, hidden_at) VALUES (?, ?, NOW())
+       ON DUPLICATE KEY UPDATE hidden_at = NOW()`,
+    )
+    .run(req.params.id, req.user.sub);
+  res.json({ ok: true });
+}));
+
 tablesRouter.post('/:id/messages', asyncHandler(async (req, res) => {
   const table = await db.prepare('SELECT id, host_user_id FROM dining_tables WHERE id = ?').get(req.params.id);
   if (!table) {
@@ -631,6 +667,9 @@ tablesRouter.post('/:id/messages', asyncHandler(async (req, res) => {
   const result = await db
     .prepare('INSERT INTO table_messages (table_id, sender_id, body) VALUES (?, ?, ?)')
     .run(table.id, req.user.sub, req.body.body);
+  // Sending into a chat you'd previously hidden un-hides it for you too --
+  // same reasoning as clearing deleted_at on send in messaging.js.
+  await db.prepare('DELETE FROM table_chat_hides WHERE table_id = ? AND user_id = ?').run(table.id, req.user.sub);
 
   const created = await db
     .prepare(

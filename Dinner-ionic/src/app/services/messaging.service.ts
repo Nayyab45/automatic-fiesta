@@ -53,4 +53,11 @@ export class MessagingService {
   markRead(conversationId: number | string): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/${conversationId}/read`, {});
   }
+
+  /** Deletes the conversation from the caller's own inbox only -- the other
+   * person's copy and the message history itself are untouched. Sending a
+   * new message into it afterward (from either side) brings it back. */
+  delete(conversationId: number | string): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/${conversationId}`);
+  }
 }
