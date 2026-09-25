@@ -13,14 +13,24 @@
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 
 <section class="flex flex-col gap-stack-md" *ngIf="!loading() && contacts().length > 0">
+<div class="flex justify-between items-center">
 <h2 class="font-title-lg text-title-lg text-on-surface">Your Emergency Contacts</h2>
-<div *ngFor="let c of contacts()" class="bg-surface rounded-xl p-container-padding flex items-center justify-between gap-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-outline-variant/30">
-<div>
-<p class="font-title-lg text-title-lg text-on-surface">{{ c.name }}</p>
-<p class="font-body-md text-body-md text-on-surface-variant">{{ c.relationship || 'Contact' }} · {{ c.phone }}</p>
+<button (click)="toggleSelecting()" class="font-label-lg text-label-lg uppercase tracking-widest text-primary hover:opacity-80 transition-opacity shrink-0 pl-2">
+{{ selecting() ? 'Cancel' : 'Select' }}
+</button>
 </div>
-<button (click)="remove(c)" aria-label="Remove contact" class="text-on-surface-variant hover:text-error transition-colors p-2">
-<span class="material-symbols-outlined text-[20px]">delete</span>
+<div *ngFor="let c of contacts()" (click)="selecting() && toggleSelected(c.id)" class="bg-surface rounded-xl p-container-padding flex items-center justify-between gap-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-outline-variant/30" [class.cursor-pointer]="selecting()">
+<div class="flex items-center gap-stack-md min-w-0">
+<div *ngIf="selecting()" class="w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors" [class.border-primary]="selectedIds().has(c.id)" [class.bg-primary]="selectedIds().has(c.id)" [class.border-outline-variant]="!selectedIds().has(c.id)">
+<span *ngIf="selectedIds().has(c.id)" class="material-symbols-outlined text-[16px] text-on-primary">check</span>
+</div>
+<div class="min-w-0">
+<p class="font-title-lg text-title-lg text-on-surface truncate">{{ c.name }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">{{ c.relationship || 'Contact' }} · {{ c.phone }}</p>
+</div>
+</div>
+<button *ngIf="!selecting()" (click)="$event.stopPropagation(); call(c)" [attr.aria-label]="'Call ' + c.name" class="text-primary hover:opacity-80 transition-opacity p-2 shrink-0">
+<span class="material-symbols-outlined text-[20px]">call</span>
 </button>
 </div>
 </section>
@@ -79,7 +89,15 @@
 </section>
 </main>
 
-<footer class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe z-50">
+<div *ngIf="selecting()" class="fixed bottom-0 w-full bg-surface border-t border-secondary-container px-container-padding py-stack-sm flex items-center justify-between z-50 pb-safe">
+<span class="font-body-md text-body-md text-on-surface-variant">{{ selectedCount() }} selected</span>
+<button (click)="showDeleteConfirm.set(true)" [disabled]="selectedCount() === 0 || deleting()" class="flex items-center gap-2 px-4 py-2 rounded-full text-error font-label-lg text-label-lg uppercase tracking-widest disabled:opacity-40 hover:bg-error/5 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+{{ deleting() ? 'Deleting…' : 'Delete' }}
+</button>
+</div>
+
+<footer *ngIf="!selecting()" class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/20 px-container-padding py-4 pb-safe z-50">
 <div class="w-full max-w-md mx-auto flex flex-col items-center gap-stack-sm">
 <button *ngIf="showForm()" (click)="save()" [disabled]="!name.trim() || !phone.trim() || saving()" class="w-full h-12 bg-primary-container text-on-primary rounded-full font-title-lg text-title-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50">{{ saving() ? 'Saving…' : 'Save Emergency Contact' }}</button>
 <button *ngIf="!showForm()" (click)="addAnother()" class="font-body-md text-body-md text-primary font-medium py-2 hover:underline">
@@ -91,3 +109,13 @@
             </p>
 </div>
 </footer>
+
+<app-confirm-dialog
+  *ngIf="showDeleteConfirm()"
+  title="Delete selected contacts?"
+  [message]="'This removes ' + selectedCount() + ' emergency contact' + (selectedCount() === 1 ? '' : 's') + '. They will no longer be notified when you check in or out.'"
+  confirmLabel="Delete"
+  [destructive]="true"
+  (cancelled)="showDeleteConfirm.set(false)"
+  (confirm)="deleteSelected()"
+></app-confirm-dialog>

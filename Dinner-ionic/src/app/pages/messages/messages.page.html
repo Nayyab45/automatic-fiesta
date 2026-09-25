@@ -1,6 +1,7 @@
 <app-root-header [cityLabel]="cityService.label()">
-  <button (click)="go('/notifications')" aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+  <button (click)="go('/notifications')" aria-label="Notifications" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
     <span class="material-symbols-outlined">notifications</span>
+    <span *ngIf="hasUnreadNotifications()" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-error border-2 border-surface dark:border-surface"></span>
   </button>
 </app-root-header>
 

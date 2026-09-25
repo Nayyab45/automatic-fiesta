@@ -9,6 +9,7 @@ import { LocationService } from '../../services/location.service';
 import { AuthService } from '../../services/auth.service';
 import { ConversationSummary, MessagingService } from '../../services/messaging.service';
 import { DiningTable, DiningTableService } from '../../services/dining-table.service';
+import { AppNotification, NotificationService } from '../../services/notification.service';
 import { timeAgo } from '../../shared/time-ago';
 
 @Component({
@@ -24,6 +25,7 @@ export class MessagesPage extends BasePage {
   private readonly authService = inject(AuthService);
   private readonly messagingService = inject(MessagingService);
   private readonly tableService = inject(DiningTableService);
+  private readonly notificationService = inject(NotificationService);
   readonly timeAgo = timeAgo;
 
   readonly activeTab = signal<'messages' | 'groups'>('messages');
@@ -31,6 +33,11 @@ export class MessagesPage extends BasePage {
   readonly groups = signal<DiningTable[]>([]);
   readonly loadingConversations = signal(true);
   readonly loadingGroups = signal(true);
+
+  // Drives the dot on the header's bell icon -- see notifications.page.ts's
+  // identical hasUnread, this just needs the boolean, not the list itself.
+  readonly notifications = signal<AppNotification[]>([]);
+  readonly hasUnreadNotifications = computed(() => this.notifications().some((n) => !n.read));
 
   readonly selecting = signal(false);
   readonly selectedConversationIds = signal<Set<number>>(new Set());
@@ -69,6 +76,11 @@ export class MessagesPage extends BasePage {
             this.loadingGroups.set(false);
           },
           error: () => this.loadingGroups.set(false),
+        });
+
+        this.notificationService.list().subscribe({
+          next: ({ notifications }) => this.notifications.set(notifications),
+          error: () => {},
         });
       },
       { allowSignalWrites: true },

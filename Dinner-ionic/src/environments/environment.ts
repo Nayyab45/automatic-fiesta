@@ -15,5 +15,5 @@ export const environment = {
   // webClientId, not the separate Android client) -- see
   // AuthService.signInWithGoogle. Empty until that's set up; the Google
   // button will show a clear error instead of silently failing until then.
-  googleWebClientId: '213347467379-1m4n20msv4o6blto7qh3nq3aeluhhj4g.apps.googleusercontent.com',
+  googleWebClientId: '717968251470-ehde551ho258btf9a76v5iqiu4suie7s.apps.googleusercontent.com',
 };

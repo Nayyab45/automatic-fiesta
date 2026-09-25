@@ -110,6 +110,20 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
     const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
     effectiveCity = myProfile?.city;
   }
+
+  // Same on-demand OSM import as Discover (the '/' route below) -- without
+  // this, a city nobody has browsed yet (e.g. right after a user moves and
+  // updates their profile city) has zero cached restaurants, so this would
+  // silently score an empty pool instead of actually picking up the new
+  // city's real restaurants.
+  if (effectiveCity && !hasCoords) {
+    try {
+      await importCityRestaurants(db, effectiveCity);
+    } catch (err) {
+      console.error(`[restaurants] OSM import for "${effectiveCity}" failed, serving cached results instead:`, err.message);
+    }
+  }
+
   const rows = toCamelRows(
     effectiveCity && !hasCoords
       ? await db.prepare('SELECT * FROM restaurants WHERE city = ?').all(effectiveCity)
@@ -184,6 +198,17 @@ restaurantsRouter.post('/group-recommendation', requireAuth, asyncHandler(async 
     const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
     effectiveCity = myProfile?.city;
   }
+
+  // Same on-demand OSM import as Discover -- see the identical comment in
+  // /recommended above.
+  if (effectiveCity) {
+    try {
+      await importCityRestaurants(db, effectiveCity);
+    } catch (err) {
+      console.error(`[restaurants] OSM import for "${effectiveCity}" failed, serving cached results instead:`, err.message);
+    }
+  }
+
   const rows = toCamelRows(
     effectiveCity
       ? await db.prepare('SELECT * FROM restaurants WHERE city = ?').all(effectiveCity)
