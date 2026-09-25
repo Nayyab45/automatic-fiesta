@@ -47,9 +47,9 @@ export class AiRestaurantRecommendationPage extends BasePage {
   }
 
   private async loadRecommendation(): Promise<void> {
-    // A real GPS fix gives "near me" its actual meaning; if location is
-    // denied/unavailable the backend still works, just falling back to the
-    // user's manually-set city (same as Discover) -- see recommended() in
+    // The picked city (same as Discover) always scopes the candidate pool
+    // server-side; a real GPS fix, when shared, only ranks within that city
+    // by distance instead of overriding it entirely -- see recommended() in
     // restaurants.js.
     let coords: { lat: number; lng: number } | undefined;
     try {
@@ -59,7 +59,7 @@ export class AiRestaurantRecommendationPage extends BasePage {
       coords = undefined;
     }
 
-    this.restaurantService.recommended(coords).subscribe({
+    this.restaurantService.recommended(this.cityService.current(), coords).subscribe({
       next: ({ restaurants }) => {
         this.recommendation.set(restaurants[0] ?? null);
         this.loading.set(false);

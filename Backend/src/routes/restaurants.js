@@ -101,12 +101,17 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
   const myTaste = await tastePrefsFor(req.user.sub);
   const favoriteFoods = myTaste.favoriteFoods.map((food) => food.toLowerCase());
 
-  // Real GPS already narrows "near me" better than a city string does, so
-  // only city-scope the candidate pool when there are no coordinates to
-  // sort by -- otherwise a good match just outside the city line would be
-  // filtered out before distance ever gets a say.
+  // The city the user picked (Select Location, same as Discover) always
+  // scopes the candidate pool -- GPS, when shared, only ranks *within* that
+  // city by distance, it never searches outside it. This used to let a raw
+  // GPS fix override the picked city entirely (skipping city-scoping
+  // whenever coordinates were present), which meant an imprecise/stale GPS
+  // reading -- or just being physically near something OSM mistagged --
+  // could surface a restaurant nowhere near the city someone deliberately
+  // selected. Only with no picked city AND no profile city at all do we
+  // fall back to scoring every restaurant nationwide by raw distance.
   let effectiveCity = city;
-  if (!hasCoords && !effectiveCity) {
+  if (!effectiveCity) {
     const myProfile = await db.prepare('SELECT city FROM user_profiles WHERE user_id = ?').get(req.user.sub);
     effectiveCity = myProfile?.city;
   }
@@ -116,7 +121,7 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
   // updates their profile city) has zero cached restaurants, so this would
   // silently score an empty pool instead of actually picking up the new
   // city's real restaurants.
-  if (effectiveCity && !hasCoords) {
+  if (effectiveCity) {
     try {
       await importCityRestaurants(db, effectiveCity);
     } catch (err) {
@@ -125,7 +130,7 @@ restaurantsRouter.get('/recommended', requireAuth, asyncHandler(async (req, res)
   }
 
   const rows = toCamelRows(
-    effectiveCity && !hasCoords
+    effectiveCity
       ? await db.prepare('SELECT * FROM restaurants WHERE city = ?').all(effectiveCity)
       : await db.prepare('SELECT * FROM restaurants').all(),
   );

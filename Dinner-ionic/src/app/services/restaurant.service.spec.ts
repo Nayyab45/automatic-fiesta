@@ -99,17 +99,22 @@ describe('RestaurantService', () => {
     req.flush({ restaurant: { id: 7, dishes: [] } });
   });
 
-  it('recommended() only sets lat/lng when coords are passed', () => {
+  it('recommended() only sets city/lat/lng when passed', () => {
     service.recommended().subscribe();
     const req = httpMock.expectOne(`${baseUrl}/recommended`);
+    expect(req.request.params.has('city')).toBeFalse();
     expect(req.request.params.has('lat')).toBeFalse();
     req.flush({ restaurants: [] });
 
-    service.recommended({ lat: 31.5, lng: 74.3 }).subscribe();
-    const reqWithCoords = httpMock.expectOne(
-      (r) => r.url === `${baseUrl}/recommended` && r.params.get('lat') === '31.5' && r.params.get('lng') === '74.3',
+    service.recommended('Rawalpindi', { lat: 31.5, lng: 74.3 }).subscribe();
+    const reqWithCityAndCoords = httpMock.expectOne(
+      (r) =>
+        r.url === `${baseUrl}/recommended` &&
+        r.params.get('city') === 'Rawalpindi' &&
+        r.params.get('lat') === '31.5' &&
+        r.params.get('lng') === '74.3',
     );
-    reqWithCoords.flush({ restaurants: [] });
+    reqWithCityAndCoords.flush({ restaurants: [] });
   });
 
   it('groupRecommendation() POSTs memberIds in the body and city as a query param', () => {

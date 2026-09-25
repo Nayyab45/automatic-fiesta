@@ -160,8 +160,12 @@ export class RestaurantService {
     return this.http.get<{ restaurant: RestaurantDetail }>(`${this.baseUrl}/${id}`);
   }
 
-  recommended(coords?: { lat: number; lng: number }): Observable<{ restaurants: RestaurantDetail[] }> {
+  /** `city` should be the currently picked/browsing city (LocationService.current(),
+   * same as Discover) -- it always scopes the candidate pool server-side;
+   * `coords`, when shared, only ranks within that city by distance. */
+  recommended(city?: string, coords?: { lat: number; lng: number }): Observable<{ restaurants: RestaurantDetail[] }> {
     let httpParams = new HttpParams();
+    if (city) httpParams = httpParams.set('city', city);
     if (coords) {
       httpParams = httpParams.set('lat', coords.lat).set('lng', coords.lng);
     }
