@@ -6,6 +6,8 @@ import { Share } from '@capacitor/share';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
 import { googleMapsUrl, staticMapUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
+import { Friend, FriendsService } from '../../services/friends.service';
+import { MessagingService } from '../../services/messaging.service';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -18,10 +20,22 @@ export class RestaurantDetailPage extends BasePage {
   readonly pageTitle = 'Restaurant Detail';
   private readonly restaurantService = inject(RestaurantService);
   private readonly authService = inject(AuthService);
+  private readonly friendsService = inject(FriendsService);
+  private readonly messagingService = inject(MessagingService);
 
   readonly restaurant = signal<RestaurantDetail | null>(null);
   readonly loading = signal(true);
   saved = false;
+
+  // In-app "send to a friend" -- separate from share() above, which only
+  // ever hands off to the OS share sheet (no record of who it reached, and
+  // nothing for someone without the app installed to open). This sends a
+  // real DM through the same conversations a friend already has.
+  readonly showFriendPicker = signal(false);
+  readonly friends = signal<Friend[]>([]);
+  readonly loadingFriends = signal(false);
+  readonly sendingToFriendId = signal<number | null>(null);
+  readonly sentToFriendIds = signal<Set<number>>(new Set());
 
   readonly stars = [1, 2, 3, 4, 5];
   readonly reviews = signal<RestaurantReview[]>([]);
@@ -139,5 +153,42 @@ export class RestaurantDetailPage extends BasePage {
     } catch {
       navigator.clipboard?.writeText(shareData.url).catch(() => {});
     }
+  }
+
+  openFriendPicker(): void {
+    this.showFriendPicker.set(true);
+    this.sentToFriendIds.set(new Set());
+    if (this.friends().length > 0) return;
+    this.loadingFriends.set(true);
+    this.friendsService.list().subscribe({
+      next: ({ friends }) => {
+        this.friends.set(friends);
+        this.loadingFriends.set(false);
+      },
+      error: () => this.loadingFriends.set(false),
+    });
+  }
+
+  closeFriendPicker(): void {
+    this.showFriendPicker.set(false);
+  }
+
+  sendToFriend(friend: Friend): void {
+    const restaurant = this.restaurant();
+    if (!restaurant || this.sendingToFriendId() !== null) return;
+    this.sendingToFriendId.set(friend.id);
+    const body = `Check out ${restaurant.name}${restaurant.city ? ` in ${restaurant.city}` : ''}${restaurant.rating !== null ? ` (${restaurant.rating}★)` : ''} -- thought you'd like it.`;
+    this.messagingService.getOrCreateWith(friend.id).subscribe({
+      next: ({ conversation }) => {
+        this.messagingService.sendMessage(conversation.id, body).subscribe({
+          next: () => {
+            this.sendingToFriendId.set(null);
+            this.sentToFriendIds.update((ids) => new Set(ids).add(friend.id));
+          },
+          error: () => this.sendingToFriendId.set(null),
+        });
+      },
+      error: () => this.sendingToFriendId.set(null),
+    });
   }
 }

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BasePage } from '../base.page';
 import { ProfileService } from '../../services/profile.service';
 import { LocationService } from '../../services/location.service';
+import { AuthService } from '../../services/auth.service';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
 import { PAKISTAN_CITIES } from '../../data/pakistan-cities';
 import { Gender } from '../../services/profile.service';
@@ -34,6 +35,7 @@ export class ProfileCreationPage extends BasePage {
   readonly pageTitle = 'Profile Creation';
   private readonly profileService = inject(ProfileService);
   private readonly locationService = inject(LocationService);
+  private readonly authService = inject(AuthService);
 
   // /profile-creation also serves as the "Edit Profile" screen for existing
   // users (see profile.page.html) -- ?mode=edit stops submit() from chaining
@@ -48,6 +50,7 @@ export class ProfileCreationPage extends BasePage {
   cities: string[] = [];
   favoriteFoods: string[] = [];
   name = '';
+  private originalName = '';
   age: number | null = null;
   province = '';
   city = '';
@@ -60,6 +63,7 @@ export class ProfileCreationPage extends BasePage {
     super();
     this.profileService.me().subscribe(({ profile }) => {
       this.name = profile.name;
+      this.originalName = profile.name;
       this.age = profile.age;
       this.province = profile.province ?? '';
       this.city = profile.city ?? '';
@@ -111,6 +115,15 @@ export class ProfileCreationPage extends BasePage {
   submit(): void {
     if (this.submitting()) return;
     this.submitting.set(true);
+
+    // Name lives on `users`, not `user_profiles` -- a separate endpoint
+    // (same one Manage Account's editFullName uses) from the rest of this
+    // form's fields below. Best-effort, like the rest of this method: a
+    // failure here shouldn't block saving everything else.
+    const trimmedName = this.name.trim();
+    if (trimmedName && trimmedName !== this.originalName) {
+      this.authService.updateMe({ name: trimmedName }).subscribe({ error: () => {} });
+    }
 
     const next = this.isEditMode ? '/profile' : '/personal-interests';
     this.profileService

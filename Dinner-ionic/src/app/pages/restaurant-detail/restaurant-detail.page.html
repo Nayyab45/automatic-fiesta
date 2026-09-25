@@ -7,6 +7,9 @@
 <button (click)="toggleSave()" aria-label="Save" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
 <span class="material-symbols-outlined text-white" [style.font-variation-settings]="saved ? '\'FILL\' 1' : '\'FILL\' 0'">bookmark</span>
 </button>
+<button (click)="openFriendPicker()" aria-label="Send to a friend" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
+<span class="material-symbols-outlined text-white">forward_to_inbox</span>
+</button>
 <button (click)="share()" aria-label="Share" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/50 transition-colors">
 <span class="material-symbols-outlined text-white">share</span>
 </button>
@@ -156,5 +159,31 @@
 <button (click)="go('/create-table?restaurantId=' + restaurant()?.id)" class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-4 rounded-full shadow-sm hover:opacity-90 transition-opacity">
                 Create Dining Event
             </button>
+</div>
+</div>
+
+<div *ngIf="showFriendPicker()" (click)="closeFriendPicker()" class="fixed inset-0 bg-black/50 z-50 flex items-end">
+<div (click)="$event.stopPropagation()" class="w-full max-w-md mx-auto bg-surface rounded-t-2xl max-h-[70vh] flex flex-col">
+<div class="flex items-center justify-between px-container-padding py-stack-md border-b border-outline-variant/30">
+<h2 class="font-title-lg text-title-lg text-on-surface">Send to a friend</h2>
+<button (click)="closeFriendPicker()" aria-label="Close" class="p-2 -mr-2 text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="overflow-y-auto px-container-padding py-stack-sm flex flex-col gap-unit">
+<p *ngIf="loadingFriends()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading friends…</p>
+<p *ngIf="!loadingFriends() && friends().length === 0" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Add some friends first to send them a recommendation.</p>
+<button *ngFor="let f of friends()" (click)="sendToFriend(f)" [disabled]="sendingToFriendId() === f.id || sentToFriendIds().has(f.id)" class="flex items-center gap-gutter py-stack-sm text-left w-full disabled:opacity-60">
+<div class="w-11 h-11 rounded-full overflow-hidden shrink-0 bg-secondary-container/40 text-primary flex items-center justify-center font-title-lg text-title-lg border border-secondary-container">
+<img *ngIf="f.photoUrl" alt="" class="w-full h-full object-cover" [src]="f.photoUrl"/>
+<span *ngIf="!f.photoUrl">{{ f.name.charAt(0) }}</span>
+</div>
+<span class="flex-1 font-title-lg text-title-lg text-on-surface truncate">{{ f.name }}</span>
+<span *ngIf="sentToFriendIds().has(f.id)" class="font-label-lg text-label-lg text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">check</span>Sent
+</span>
+<span *ngIf="sendingToFriendId() === f.id" class="font-label-lg text-label-lg text-on-surface-variant">Sending…</span>
+</button>
+</div>
 </div>
 </div>
