@@ -16,10 +16,10 @@ if (hasReleaseSigning) {
 }
 
 android {
-    namespace = "com.whatshouldweeat.app"
+    namespace = "weeat.netstech.net"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.whatshouldweeat.app"
+        applicationId "weeat.netstech.net"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // versionCode: a plain integer, must strictly increase on every Play

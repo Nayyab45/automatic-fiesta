@@ -1,4 +1,4 @@
-package com.whatshouldweeat.app;
+package weeat.netstech.net;
 
 import com.getcapacitor.BridgeActivity;
 

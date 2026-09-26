@@ -8,6 +8,8 @@ data/
 backend.log
 backend_live.log
 backend_start.log
+backend_dev.log
+backend_dev_err.log
 app.log
 
 # Auto-generated photo cache for real (OpenStreetMap-imported) restaurants --

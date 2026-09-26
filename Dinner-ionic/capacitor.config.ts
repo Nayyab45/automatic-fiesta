@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.whatshouldweeat.app',
+  appId: 'weeat.netstech.net',
   appName: 'What Should We Eat?',
   webDir: 'www/browser',
   // Capacitor's default (https://localhost) makes the WebView treat the
