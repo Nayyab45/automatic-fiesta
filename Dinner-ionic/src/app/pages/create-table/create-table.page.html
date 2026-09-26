@@ -44,7 +44,7 @@
 <h2 class="font-title-lg text-title-lg text-on-surface-variant">Invite People</h2>
 <p class="font-body-sm text-body-sm text-on-surface-variant">Select who to send a table invite to once this table is created.</p>
 
-<div class="relative">
+<div class="relative" #inviteDropdownContainer>
 <button type="button" (click)="toggleInviteDropdown()" class="w-full flex items-center justify-between gap-stack-sm p-stack-sm rounded-xl border border-outline-variant/40 bg-surface-container-low text-left hover:border-primary-container/50 transition-colors">
 <span class="font-body-lg text-body-lg text-on-surface truncate">{{ selectedInviteeIds().length === 0 ? 'Select people to invite' : selectedInviteeNames().join(', ') }}</span>
 <span class="material-symbols-outlined text-outline-variant shrink-0">{{ inviteDropdownOpen() ? 'expand_less' : 'expand_more' }}</span>

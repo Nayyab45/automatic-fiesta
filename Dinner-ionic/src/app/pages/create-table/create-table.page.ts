@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { RouterLink } from '@angular/router';
@@ -59,6 +59,7 @@ export class CreateTablePage extends BasePage {
   // unchanged, only how they're browsed/selected.
   readonly inviteDropdownOpen = signal(false);
   readonly inviteFilter = signal('');
+  @ViewChild('inviteDropdownContainer') private inviteDropdownContainer?: ElementRef<HTMLElement>;
   readonly filteredFriends = computed(() => {
     const q = this.inviteFilter().trim().toLowerCase();
     return q ? this.friends().filter((f) => f.name.toLowerCase().includes(q)) : this.friends();
@@ -143,6 +144,13 @@ export class CreateTablePage extends BasePage {
 
   toggleInviteDropdown(): void {
     this.inviteDropdownOpen.update((open) => !open);
+  }
+
+  @HostListener('document:click', ['$event'])
+  private closeInviteDropdownOnOutsideClick(event: MouseEvent): void {
+    if (!this.inviteDropdownOpen()) return;
+    if (this.inviteDropdownContainer?.nativeElement.contains(event.target as Node)) return;
+    this.inviteDropdownOpen.set(false);
   }
 
   getAiSuggestion(): void {
