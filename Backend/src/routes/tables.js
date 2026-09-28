@@ -8,6 +8,7 @@ import { createNotification } from './messaging.js';
 import { notifyRestaurantOfBooking } from '../lib/restaurantNotify.js';
 import { isTablePast, nowAsTableTimeString } from '../lib/tableTime.js';
 import { sms } from '../lib/sms.js';
+import { tableLimitFor } from './subscriptions.js';
 
 export const tablesRouter = Router();
 export const seatRequestsRouter = Router();
@@ -38,11 +39,25 @@ async function hasPendingInvite(table, userId) {
 
 const TABLE_AUDIENCES = ['everyone', 'women_only', 'friends_only'];
 
-// Event creation is unlimited for every account. Exported so profileRouter's
-// /me can surface this shape, the same way it already does for
-// preferenceChangeStatus.
-export async function tableCreationStatus() {
-  return { unlimited: true, remaining: null, nextResetAt: null };
+// Free tier caps hosting to TIERS.free.features.monthlyTableLimit events per
+// calendar month (see lib/tiers.js); Standard/Premium are unlimited, Basic
+// gets a higher-but-still-capped limit. Exported so profileRouter's /me can
+// surface this shape, the same way it already does for preferenceChangeStatus.
+export async function tableCreationStatus(userId) {
+  const limit = await tableLimitFor(userId);
+  if (!Number.isFinite(limit)) {
+    return { unlimited: true, remaining: null, nextResetAt: null };
+  }
+  const { usedCount } = await db
+    .prepare(
+      `SELECT COUNT(*) as usedCount FROM dining_tables
+       WHERE host_user_id = ? AND created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')`,
+    )
+    .get(userId);
+  const { nextResetAt } = await db
+    .prepare("SELECT DATE_FORMAT(CURDATE() + INTERVAL 1 MONTH, '%Y-%m-01') as nextResetAt")
+    .get();
+  return { unlimited: false, remaining: Math.max(0, limit - usedCount), nextResetAt };
 }
 
 // A table's audience only restricts who may *discover or request a seat at*
@@ -260,6 +275,13 @@ tablesRouter.post('/', asyncHandler(async (req, res) => {
     .get(restaurantId);
   if (!restaurant) {
     return res.status(404).json({ message: 'Restaurant not found' });
+  }
+
+  const creationStatus = await tableCreationStatus(req.user.sub);
+  if (!creationStatus.unlimited && creationStatus.remaining <= 0) {
+    return res.status(402).json({
+      message: `You've used your free events for this month. Upgrade your plan for more, or try again ${creationStatus.nextResetAt}.`,
+    });
   }
 
   const result = await db

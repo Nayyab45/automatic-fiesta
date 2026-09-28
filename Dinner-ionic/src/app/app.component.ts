@@ -1,8 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonRouterOutlet } from '@ionic/angular/standalone';
 import { NetworkService } from './services/network.service';
 import { PushNotificationService } from './services/push-notification.service';
+import { AdmobService } from './services/admob.service';
+import { AuthService } from './services/auth.service';
+import { SubscriptionService } from './services/subscription.service';
 
 // PILOT: swapped from a plain <router-outlet> to <ion-router-outlet> to
 // validate whether real Ionic components (native transitions, swipe-back)
@@ -52,8 +55,32 @@ import { PushNotificationService } from './services/push-notification.service';
 })
 export class AppComponent implements OnInit {
   readonly push = inject(PushNotificationService);
+  readonly admob = inject(AdmobService);
+  private readonly authService = inject(AuthService);
+  private readonly subscription = inject(SubscriptionService);
 
-  constructor(public network: NetworkService) {}
+  constructor(public network: NetworkService) {
+    // Re-syncs on every sign-in/sign-out, not just cold start -- AuthService
+    // hydrates before this component constructs (see its APP_INITIALIZER),
+    // so this effect's first run already reflects a persisted session, and
+    // it re-fires for a login/logout that happens later in the same app
+    // session (e.g. switching accounts without restarting the app).
+    effect(() => {
+      if (!this.authService.isAuthenticated()) {
+        this.subscription.reset();
+        this.admob.refresh();
+        return;
+      }
+      void this.subscription.load().then(() => {
+        // init() is a one-time no-op after the first successful call;
+        // refresh() is what actually re-applies the now-loaded tier's
+        // ad-free status if admob was already initialized under a
+        // previous (or default Free) subscription state.
+        void this.admob.init();
+        this.admob.refresh();
+      });
+    });
+  }
 
   ngOnInit(): void {
     void this.push.init();

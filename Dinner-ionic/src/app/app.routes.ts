@@ -74,6 +74,7 @@ const routeDefinitions: Routes = [
   { path: 'profile-views', loadComponent: () => import('./pages/profile-views/profile-views.page').then((m) => m.ProfileViewsPage) },
   { path: 'edit-preferences', loadComponent: () => import('./pages/edit-preferences/edit-preferences.page').then((m) => m.EditPreferencesPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage) },
+  { path: 'pricing', loadComponent: () => import('./pages/pricing/pricing.page').then((m) => m.PricingPage) },
   { path: 'safety-center', loadComponent: () => import('./pages/safety-center/safety-center.page').then((m) => m.SafetyCenterPage) },
   { path: 'safety-checkin', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },
   { path: 'safety-checkin/:id', loadComponent: () => import('./pages/safety-checkin/safety-checkin.page').then((m) => m.SafetyCheckinPage) },

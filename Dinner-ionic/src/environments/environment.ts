@@ -16,4 +16,11 @@ export const environment = {
   // AuthService.signInWithGoogle. Empty until that's set up; the Google
   // button will show a clear error instead of silently failing until then.
   googleWebClientId: '717968251470-ehde551ho258btf9a76v5iqiu4suie7s.apps.googleusercontent.com',
+  // Google's official public TEST banner unit id -- always serves a clearly
+  // labeled "Test Ad", never a real one. Correct as-is for a debug build.
+  // See environment.prod.ts for what changes before a real Play Store release.
+  adMob: {
+    bannerAdUnitId: 'ca-app-pub-3940256099942544/6300978111',
+    isTesting: true,
+  },
 };

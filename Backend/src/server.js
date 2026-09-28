@@ -15,6 +15,7 @@ import { friendsRouter, followsRouter } from './routes/friends.js';
 import { waitlistRouter } from './routes/waitlist.js';
 import { contentRouter } from './routes/content.js';
 import { siteRouter } from './routes/site.js';
+import { subscriptionsRouter } from './routes/subscriptions.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set. Copy .env.example to .env and set one.');
@@ -82,6 +83,7 @@ app.use('/api/friends', friendsRouter);
 app.use('/api/follows', followsRouter);
 app.use('/api/waitlist', waitlistRouter);
 app.use('/api/content', contentRouter);
+app.use('/api/subscriptions', subscriptionsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

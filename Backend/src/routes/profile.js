@@ -7,6 +7,8 @@ import { tastePrefsFor, distanceKm } from '../lib/taste.js';
 import { cityCoordinates } from '../lib/cityGeocode.js';
 import { tableCreationStatus } from './tables.js';
 import { explainMatch } from '../lib/ai.js';
+import { hasFeature, tiersFor } from './subscriptions.js';
+import { TIERS } from '../lib/tiers.js';
 
 export const profileRouter = Router();
 export const interestsRouter = Router();
@@ -259,7 +261,14 @@ async function recordProfileView(viewerUserId, viewedUserId) {
 // COALESCE fallback here must track DEFAULT_PRIVACY_SETTINGS.showProfileViews
 // above -- a viewer with no privacy_settings row gets that default, not a
 // hardcoded value that can drift out of sync with it.
+//
+// Standard+ perk (see lib/tiers.js) -- the count on /me stays visible to
+// everyone, only these identities are gated.
 profileRouter.get('/me/viewers', asyncHandler(async (req, res) => {
+  if (!(await hasFeature(req.user.sub, 'profileViewers'))) {
+    return res.status(402).json({ message: 'Upgrade to Standard or Premium to see who viewed your profile.' });
+  }
+
   const rows = toCamelRows(
     await db
       .prepare(
@@ -421,10 +430,11 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
 
   let people = toCamelRows(rows);
   const ids = people.map((person) => person.id);
-  const [interestsByUserId, favoriteFoodsByUserId, mutualVisibilityByUserId] = await Promise.all([
+  const [interestsByUserId, favoriteFoodsByUserId, mutualVisibilityByUserId, tierByUserId] = await Promise.all([
     interestsForBatch(ids),
     favoriteFoodsForBatch(ids),
     mutualInterestsVisibilityForBatch(ids),
+    tiersFor(ids),
   ]);
   // Mutual interests: the overlap between the viewer's own interests and
   // each candidate's, so "3 mutual interests" means something real rather
@@ -441,20 +451,27 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
       sharedInterests: mutualVisibilityByUserId.get(person.id)
         ? interests.filter((interest) => myInterestIds.has(interest.id))
         : [],
+      tier: tierByUserId.get(person.id) ?? 'free',
     };
   });
+
+  // Interest/cuisine/distance filters are a Standard+ perk (see
+  // lib/tiers.js) -- a Free/Basic requester's query params are silently
+  // ignored rather than erroring, and advancedFiltersUnlocked tells the
+  // frontend whether to show its upsell for them.
+  const advancedFiltersUnlocked = await hasFeature(req.user.sub, 'advancedFilters');
 
   const requestedInterestIds = interestIds
     ? String(interestIds).split(',').map(Number).filter((id) => !Number.isNaN(id))
     : [];
-  if (requestedInterestIds.length) {
+  if (advancedFiltersUnlocked && requestedInterestIds.length) {
     people = people.filter((person) => person.interests.some((interest) => requestedInterestIds.includes(interest.id)));
   }
 
   const requestedCuisines = cuisine
     ? String(cuisine).split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
     : [];
-  if (requestedCuisines.length) {
+  if (advancedFiltersUnlocked && requestedCuisines.length) {
     people = people.filter((person) =>
       person.favoriteFoods.some((food) => requestedCuisines.some((c) => food.toLowerCase().includes(c) || c.includes(food.toLowerCase()))),
     );
@@ -467,7 +484,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
   // no city, or a city that can't be geocoded, is excluded rather than
   // guessed into or out of range.
   const hasCoords = lat !== undefined && lng !== undefined && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
-  if (hasCoords && maxDistanceKm) {
+  if (advancedFiltersUnlocked && hasCoords && maxDistanceKm) {
     const viewerLat = Number(lat);
     const viewerLng = Number(lng);
     const radiusKm = Number(maxDistanceKm);
@@ -483,7 +500,7 @@ peopleRouter.get('/', asyncHandler(async (req, res) => {
       .filter((person) => person.distanceKm !== null && person.distanceKm <= radiusKm);
   }
 
-  res.json({ people: people.map(({ favoriteFoods, ...person }) => person) });
+  res.json({ people: people.map(({ favoriteFoods, ...person }) => person), advancedFiltersUnlocked });
 }));
 
 matchesRouter.get('/', asyncHandler(async (req, res) => {
@@ -508,6 +525,8 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
       (row) => row.followed_user_id,
     ),
   );
+
+  const tierByUserId = await tiersFor(candidates.map((c) => c.id));
 
   const matches = (
     await Promise.all(
@@ -569,6 +588,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
           rating: await peopleRating(candidate.id),
           tablesJoinedCount: await tablesJoinedCount(candidate.id),
           following: followedIds.has(candidate.id),
+          tier: tierByUserId.get(candidate.id) ?? 'free',
           // Flipped true below only for a match that actually got an
           // AI-written reason -- lets the frontend show which ones are
           // AI-powered without a second round trip.
@@ -578,12 +598,20 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
     )
   ).sort((a, b) => {
     // Same-area people first as a whole group (top), everyone else after
-    // (bottom), then by the taste/interest score.
+    // (bottom). Priority placement (Premium perk, see lib/tiers.js) breaks
+    // ties within each area group next, ahead of the taste/interest score.
     if (a.sameCity !== b.sameCity) return a.sameCity ? -1 : 1;
+    const aPriority = TIERS[a.tier]?.features.priorityPlacement ?? false;
+    const bPriority = TIERS[b.tier]?.features.priorityPlacement ?? false;
+    if (aPriority !== bPriority) return aPriority ? -1 : 1;
     return b.score - a.score;
   });
 
-  {
+  // AI-written match reasons are a Premium perk (see lib/tiers.js) --
+  // everyone else keeps the heuristic reasons built above untouched.
+  const aiInsightsUnlocked = await hasFeature(req.user.sub, 'aiInsights');
+
+  if (aiInsightsUnlocked) {
     // AI-write the top reason for only the highest-ranked matches -- capped
     // at 5 (confirmed live: Gemini's free tier allows exactly 5
     // generateContent calls/minute per model, see ai.js) so one page load
@@ -613,7 +641,7 @@ matchesRouter.get('/', asyncHandler(async (req, res) => {
     );
   }
 
-  res.json({ matches });
+  res.json({ matches, aiInsightsUnlocked });
 }));
 
 privacySettingsRouter.get('/', asyncHandler(async (req, res) => {

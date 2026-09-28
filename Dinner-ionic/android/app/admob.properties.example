@@ -1,0 +1,12 @@
+# Copy this file to admob.properties (gitignored, same as keystore.properties)
+# and fill in the app's real AdMob App ID before a real Play Store release.
+#
+# Get it from admob.google.com -> Apps -> (this app) -> App settings -> App ID.
+# Format: ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
+#
+# This is NOT the same as a banner ad unit id (format .../YYYYYYYYYY, one
+# slash) -- that one lives in Dinner-ionic/src/environments/environment.prod.ts
+# instead, alongside the isTesting flag that must flip to false in the same
+# change. Without this file, the app ships Google's public TEST App ID,
+# which is safe (serves only test ads) but must not go to a real release.
+admobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY

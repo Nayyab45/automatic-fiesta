@@ -67,6 +67,8 @@ const USER_ID_TABLES = [
   ['friend_requests', 'requester_id'],
   ['friend_requests', 'recipient_id'],
   ['feature_waitlist', 'user_id'],
+  ['subscriptions', 'user_id'],
+  ['subscription_events', 'user_id'],
 ];
 
 async function cleanupTestData() {
@@ -680,7 +682,7 @@ describe('preference change limit', () => {
 });
 
 describe('event creation', () => {
-  test('is unlimited', async () => {
+  test('is capped on the free tier and unlimited once upgraded', async () => {
     const host = await signup('table-limit-host');
     const restaurants = await api('GET', '/api/restaurants', { token: host.accessToken });
     const restaurantId = restaurants.body.restaurants[0].id;
@@ -692,23 +694,42 @@ describe('event creation', () => {
       });
 
     const initial = await api('GET', '/api/profile/me', { token: host.accessToken });
-    assert.equal(initial.body.tableCreation.unlimited, true);
+    assert.equal(initial.body.tableCreation.unlimited, false);
+    const freeLimit = initial.body.tableCreation.remaining;
 
-    for (let n = 1; n <= 4; n++) {
+    for (let n = 1; n <= freeLimit; n++) {
       const created = await createTable();
       assert.equal(created.status, 201, `event ${n}`);
     }
+    const overLimit = await createTable();
+    assert.equal(overLimit.status, 402);
+
+    // Standard tier is unlimited (see lib/tiers.js) -- granted directly here
+    // rather than through a real Play purchase, which this suite can't make.
+    await pool.query("INSERT INTO subscriptions (user_id, tier, status) VALUES (?, 'standard', 'active')", [host.user.id]);
+
+    const afterUpgrade = await api('GET', '/api/profile/me', { token: host.accessToken });
+    assert.equal(afterUpgrade.body.tableCreation.unlimited, true);
+    const created = await createTable();
+    assert.equal(created.status, 201);
   });
 });
 
 describe('profile views', () => {
-  test('recorded only when the viewer opts in', async () => {
+  test('identities are gated behind Standard+, recorded only when the viewer opts in', async () => {
     const viewer = await signup('view-tracking-viewer');
     const viewed = await signup('view-tracking-viewed');
 
     // Default privacy setting (showProfileViews: false) -- visiting the
     // profile should NOT create a viewable trail.
     await api('GET', `/api/profile/${viewed.user.id}`, { token: viewer.accessToken });
+
+    const freeTierLocked = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
+    assert.equal(freeTierLocked.status, 402);
+
+    // Viewer identities are a Standard+ perk (see lib/tiers.js) -- granted
+    // directly here rather than through a real Play purchase.
+    await pool.query("INSERT INTO subscriptions (user_id, tier, status) VALUES (?, 'standard', 'active')", [viewed.user.id]);
 
     const noViewYet = await api('GET', '/api/profile/me/viewers', { token: viewed.accessToken });
     assert.equal(noViewYet.status, 200);

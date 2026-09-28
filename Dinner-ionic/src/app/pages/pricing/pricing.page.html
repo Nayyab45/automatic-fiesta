@@ -1,0 +1,71 @@
+<app-header title="Plans & Pricing" (back)="goBack()"></app-header>
+<main class="flex-grow pb-32 px-container-padding max-w-lg mx-auto w-full flex flex-col gap-stack-lg">
+
+<section class="text-center px-4 pt-stack-sm">
+<p class="font-body-md text-body-md text-on-surface-variant">
+Upgrade for an ad-free experience, more events, and better matches. Billed monthly through Google Play -- cancel anytime from the Play Store.
+</p>
+</section>
+
+<p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading plans…</p>
+
+<section *ngIf="!loading()" class="flex flex-col gap-stack-md">
+<div
+  *ngFor="let tier of tiers()"
+  class="tier-card bg-surface-container-lowest rounded-xl p-stack-md border-[0.5px] border-outline-variant"
+  [class.tier-card--current]="isCurrent(tier)"
+>
+<div class="flex items-center justify-between mb-stack-sm">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-primary-container text-2xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<h2 class="font-title-lg text-title-lg text-on-surface">{{ tier.name }}</h2>
+</div>
+<span *ngIf="isCurrent(tier)" class="bg-tertiary-fixed text-on-tertiary-container font-label-sm text-label-sm px-2 py-1 rounded-full uppercase tracking-wider">Current Plan</span>
+</div>
+
+<p class="font-headline-md text-headline-md-mobile text-on-surface mb-stack-md">
+<ng-container *ngIf="tier.pricePkr > 0; else freePrice">Rs {{ tier.pricePkr }}<span class="font-body-md text-body-md text-on-surface-variant"> / month</span></ng-container>
+<ng-template #freePrice>Free</ng-template>
+</p>
+
+<ul class="flex flex-col gap-stack-sm mb-stack-md">
+<li *ngFor="let row of featureRowsFor(tier)" class="flex items-start gap-stack-sm">
+<span
+  class="material-symbols-outlined text-sm mt-1"
+  [class.text-primary]="row.included"
+  [class.text-outline-variant]="!row.included"
+>
+{{ row.included ? 'check_circle' : 'close' }}
+</span>
+<span class="font-body-md text-body-md" [class.text-on-surface]="row.included" [class.text-on-surface-variant]="!row.included">{{ row.label }}</span>
+</li>
+</ul>
+
+<button
+  *ngIf="tier.playProductId && !isCurrent(tier)"
+  (click)="subscribe(tier)"
+  [disabled]="!!purchasingProductId()"
+  class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full py-3 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+>
+{{ purchasingProductId() === tier.playProductId ? 'Processing…' : 'Subscribe' }}
+</button>
+
+<p *ngIf="!isNative && tier.playProductId" class="font-label-sm text-label-sm text-on-surface-variant text-center pt-stack-sm">
+Available in the Android app.
+</p>
+</div>
+</section>
+
+<section *ngIf="!loading()" class="text-center pt-stack-sm">
+<button (click)="restore()" class="font-label-lg text-label-lg text-primary uppercase tracking-wide">Restore Purchases</button>
+</section>
+</main>
+
+<div *ngIf="errorMessage()" class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.05)] border-t-[0.5px] border-outline-variant px-container-padding py-stack-md pb-safe">
+<div class="max-w-lg mx-auto">
+<p class="font-body-md text-body-md text-error text-center flex items-center justify-center gap-2" role="alert">
+<span class="material-symbols-outlined text-[18px]">info</span>
+{{ errorMessage() }}
+</p>
+</div>
+</div>

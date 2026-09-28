@@ -95,6 +95,10 @@ describe('GET /:id', () => {
 describe('GET /me/viewers', () => {
   test('only names viewers who opted into showProfileViews, filtered at the SQL level', async () => {
     const stub = stubDbMatching([
+      // Standard+ perk (see lib/tiers.js) -- this requester needs an active
+      // paid subscription or the route 402s before ever reaching the query
+      // under test below.
+      { match: 'FROM subscriptions WHERE user_id', get: { tier: 'standard', status: 'active' } },
       {
         match: 'FROM profile_views pv',
         all: [{ id: 5, name: 'Sam', photo_url: null, verified: 0, viewed_at: '2026-09-20T00:00:00.000Z' }],
@@ -109,5 +113,16 @@ describe('GET /me/viewers', () => {
     assert.equal(body.viewers[0].id, 5);
     const viewersSql = stub.calls.find((sql) => sql.includes('FROM profile_views pv'));
     assert.match(viewersSql, /show_profile_views/, 'identity list must still respect the per-viewer opt-in');
+  });
+
+  test('402s on the free tier without ever running the viewers query', async () => {
+    const stub = stubDbMatching([{ match: 'FROM subscriptions WHERE user_id', get: null }]);
+    restoreDb = stub;
+
+    const { status, body } = await get('/me/viewers', authHeader);
+
+    assert.equal(status, 402);
+    assert.ok(!stub.calls.some((sql) => sql.includes('FROM profile_views pv')));
+    assert.match(body.message, /upgrade/i);
   });
 });

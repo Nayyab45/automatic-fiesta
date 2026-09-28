@@ -1,0 +1,10 @@
+// Screen-specific styles for "Plans & Pricing" -- shared rules live in src/global.scss.
+
+.tier-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.tier-card--current {
+  border: 1.5px solid #b89b5e; /* primary-container */
+  background-color: rgba(232, 216, 184, 0.2); /* subtle Champagne tint */
+}

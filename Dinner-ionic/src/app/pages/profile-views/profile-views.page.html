@@ -9,7 +9,20 @@
 
 <p *ngIf="loading()" class="text-center py-section-gap font-body-md text-body-md text-on-surface-variant">Loading…</p>
 
-<ul class="flex flex-col w-full" *ngIf="!loading() && viewers().length > 0">
+<div *ngIf="!loading() && locked()" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-[40px] text-primary-container" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm text-[20px]">See who's viewed you</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[250px] mb-stack-md">
+Upgrade to Standard or Premium to see the identities of people who viewed your profile.
+</p>
+<button [routerLink]="['/pricing']" class="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full px-6 py-3 uppercase tracking-widest">
+View Plans
+</button>
+</div>
+
+<ul class="flex flex-col w-full" *ngIf="!loading() && !locked() && viewers().length > 0">
 <li *ngFor="let viewer of viewers()" [routerLink]="['/profile', viewer.id]" class="interactive-element flex items-center gap-gutter py-stack-md border-b border-outline-variant/30 cursor-pointer">
 <img *ngIf="viewer.photoUrl" [alt]="viewer.name" class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" [src]="viewer.photoUrl"/>
 <div *ngIf="!viewer.photoUrl" class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant/30">
@@ -25,7 +38,7 @@
 </li>
 </ul>
 
-<div *ngIf="!loading() && viewers().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
+<div *ngIf="!loading() && !locked() && viewers().length === 0" class="flex flex-col items-center justify-center text-center py-section-gap h-64">
 <div class="w-20 h-20 rounded-full bg-secondary-container/30 flex items-center justify-center mb-stack-md">
 <span class="material-symbols-outlined text-[40px] text-primary-container">visibility</span>
 </div>
