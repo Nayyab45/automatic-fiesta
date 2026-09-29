@@ -175,7 +175,7 @@ export class RestaurantService {
   /** memberIds must all be friends of the caller -- see Backend's
    * POST /restaurants/group-recommendation, which enforces that server-side
    * since it reads each member's food/dietary preferences to pick. `aiPowered`
-   * is false when no ANTHROPIC_API_KEY is configured server-side; the pick
+   * is false when no GEMINI_API_KEY is configured server-side; the pick
    * itself still works either way, just from the plain heuristic instead. */
   groupRecommendation(
     memberIds: number[],
