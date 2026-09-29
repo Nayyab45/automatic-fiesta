@@ -45,7 +45,7 @@ const DEFAULT_PRIVACY_POLICY = {
     },
     {
       heading: 'Contact Us',
-      body: 'Questions about this policy or your data:\nnayyabashfaq05@gmail.com',
+      body: 'Questions about this policy or your data:\nadmin@netstech.net',
     },
   ],
 };
@@ -144,7 +144,7 @@ siteRouter.get('/', (_req, res) => {
 <footer>
 <a href="/privacy-policy">Privacy Policy</a>
 <span>&middot;</span>
-<a href="mailto:nayyabashfaq05@gmail.com">Contact</a>
+<a href="mailto:admin@netstech.net">Contact</a>
 </footer>
 </body>
 </html>`);

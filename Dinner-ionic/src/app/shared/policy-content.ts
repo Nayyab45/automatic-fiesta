@@ -53,7 +53,7 @@ export const DEFAULT_PRIVACY_POLICY: PolicyContent = {
     },
     {
       heading: "Contact Us",
-      body: "Questions about this policy or your data:\nnayyabashfaq05@gmail.com"
+      body: "Questions about this policy or your data:\nadmin@netstech.net"
     }
   ]
 };
