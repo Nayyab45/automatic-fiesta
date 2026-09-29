@@ -46,8 +46,8 @@ android {
         // and in device settings -- follow semver (major.minor.patch) and
         // bump it alongside versionCode, but it carries no upload constraint
         // of its own.
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 4
+        versionName "1.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [admobAppId: admobAppId]
         aaptOptions {
