@@ -1,6 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { AdMob, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, type BannerAdOptions } from '@capacitor-community/admob';
+import {
+  AdMob,
+  BannerAdPluginEvents,
+  BannerAdPosition,
+  BannerAdSize,
+  type AdMobBannerSize,
+  type BannerAdOptions,
+} from '@capacitor-community/admob';
 import { environment } from '../../environments/environment';
 import { SubscriptionService } from './subscription.service';
 
@@ -13,12 +20,17 @@ import { SubscriptionService } from './subscription.service';
 const BANNER_OPTIONS: BannerAdOptions = {
   adId: environment.adMob.bannerAdUnitId,
   adSize: BannerAdSize.ADAPTIVE_BANNER,
-  position: BannerAdPosition.BOTTOM_CENTER,
-  // Room for BottomNavComponent's own bar so the ad doesn't sit on top of
-  // its tap targets.
-  margin: 56,
+  position: BannerAdPosition.TOP_CENTER,
   isTesting: environment.adMob.isTesting,
 };
+
+// The banner is a native view drawn on top of the WebView, not a DOM
+// element -- nothing in the page layout knows it's there unless told. Every
+// screen's sticky/fixed top-anchored bar (header, root header, offline/push
+// banners) reads this CSS var via Tailwind's top-[var(--ad-offset,0px)] /
+// mt-[var(--ad-offset,0px)] to sit below the banner instead of under it.
+const AD_OFFSET_VAR = '--ad-offset';
+const AD_GAP_PX = 8;
 
 // Native-only -- there's no ad SDK to initialize on the plain web build
 // (`ng serve`).
@@ -45,6 +57,14 @@ export class AdmobService {
     // permanently blocking showBanner() from ever retrying.
     await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => {
       this.bannerShowing = false;
+      this.setOffset(0);
+    });
+
+    // The banner's actual rendered height (adaptive, varies by device
+    // width) -- only known once Google actually sizes/loads a creative, so
+    // screens sit flush (offset 0) until this fires once, then shift down.
+    await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
+      if (this.bannerShowing) this.setOffset(size.height + AD_GAP_PX);
     });
 
     this.showBanner();
@@ -81,6 +101,11 @@ export class AdmobService {
   private hideBanner(): void {
     if (!this.bannerShowing) return;
     this.bannerShowing = false;
+    this.setOffset(0);
     AdMob.hideBanner().catch(() => {});
+  }
+
+  private setOffset(px: number): void {
+    document.documentElement.style.setProperty(AD_OFFSET_VAR, `${px}px`);
   }
 }
