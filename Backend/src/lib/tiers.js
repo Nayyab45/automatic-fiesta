@@ -66,6 +66,29 @@ export const TIERS = {
   },
 };
 
+// Standalone "Remove ads" add-on: one Play subscription product with two base
+// plans (the base plan ids below must match Play Console exactly). Independent
+// of the tiers above -- see migration 0039 and routes/subscriptions.js.
+export const AD_REMOVAL = {
+  productId: 'removal_ads',
+  plans: {
+    monthly: { basePlanId: 'monthly', pricePkr: 500, period: 'month' },
+    yearly: { basePlanId: 'yearly', pricePkr: 5500, period: 'year' },
+  },
+};
+
+export function isAdRemovalProduct(productId) {
+  return productId === AD_REMOVAL.productId;
+}
+
+export function isAdRemovalBasePlan(basePlanId) {
+  return Object.prototype.hasOwnProperty.call(AD_REMOVAL.plans, basePlanId);
+}
+
+export function publicAdRemoval() {
+  return { productId: AD_REMOVAL.productId, plans: Object.values(AD_REMOVAL.plans) };
+}
+
 export const TIER_IDS = Object.keys(TIERS);
 
 export function isValidTier(tier) {

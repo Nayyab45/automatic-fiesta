@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Capacitor } from '@capacitor/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { BasePage } from '../base.page';
-import { BillingService, PlayProductId } from '../../services/billing.service';
-import { SubscriptionService, Tier, TierId } from '../../services/subscription.service';
+import { AD_REMOVAL_PRODUCT_ID, AdRemovalBasePlanId, BillingService, PlayProductId } from '../../services/billing.service';
+import { AdRemovalPlan, SubscriptionService, Tier, TierId } from '../../services/subscription.service';
 import { AdmobService } from '../../services/admob.service';
 
 const TIER_ORDER: TierId[] = ['free', 'basic', 'standard', 'premium'];
@@ -59,6 +59,10 @@ export class PricingPage extends BasePage implements OnInit {
   readonly currentTier = this.subscriptionService.tier;
   readonly purchasingProductId = this.billingService.purchasing;
 
+  readonly adRemovalPlans = computed(() => this.subscriptionService.adRemovalPlans()?.plans ?? []);
+  readonly adRemoval = this.subscriptionService.adRemoval;
+  readonly adRemovalActive = this.subscriptionService.adRemovalActive;
+
   readonly tiers = computed(() => {
     const byId = new Map(this.subscriptionService.tiers().map((tier) => [tier.id, tier]));
     return TIER_ORDER.map((id) => byId.get(id)).filter((tier): tier is Tier => !!tier);
@@ -97,6 +101,38 @@ export class PricingPage extends BasePage implements OnInit {
 
     try {
       await this.billingService.purchase(tier.playProductId as PlayProductId);
+      this.admobService.refresh();
+    } catch (err) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    }
+  }
+
+  isCurrentAdRemovalPlan(plan: AdRemovalPlan): boolean {
+    return this.adRemovalActive() && this.adRemoval().basePlan === plan.basePlanId;
+  }
+
+  /** Play's own localized price once the store has answered, else the
+   * backend's plain PKR number. */
+  adRemovalPrice(plan: AdRemovalPlan): string {
+    const product = this.billingService.products().find((p) => p.id === AD_REMOVAL_PRODUCT_ID);
+    return product?.basePlanPrices[plan.basePlanId] || `Rs ${plan.pricePkr}`;
+  }
+
+  adRemovalPurchaseKey(plan: AdRemovalPlan): string {
+    return `${AD_REMOVAL_PRODUCT_ID}@${plan.basePlanId}`;
+  }
+
+  async subscribeAdRemoval(plan: AdRemovalPlan): Promise<void> {
+    if (this.purchasingProductId()) return;
+    this.errorMessage.set(null);
+
+    if (!this.isNative) {
+      this.errorMessage.set('Subscribing is only available in the Android app.');
+      return;
+    }
+
+    try {
+      await this.billingService.purchase(AD_REMOVAL_PRODUCT_ID, plan.basePlanId as AdRemovalBasePlanId);
       this.admobService.refresh();
     } catch (err) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Something went wrong. Please try again.');

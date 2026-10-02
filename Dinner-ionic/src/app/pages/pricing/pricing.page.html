@@ -56,6 +56,42 @@ Available in the Android app.
 </div>
 </section>
 
+<section *ngIf="!loading() && adRemovalPlans().length" class="flex flex-col gap-stack-md">
+<div class="tier-card bg-surface-container-lowest rounded-xl p-stack-md border-[0.5px] border-outline-variant" [class.tier-card--current]="adRemovalActive()">
+<div class="flex items-center justify-between mb-stack-sm">
+<div class="flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-primary-container text-2xl" style="font-variation-settings: 'FILL' 1;">block</span>
+<h2 class="font-title-lg text-title-lg text-on-surface">Remove Ads</h2>
+</div>
+<span *ngIf="adRemovalActive()" class="bg-tertiary-fixed text-on-tertiary-container font-label-sm text-label-sm px-2 py-1 rounded-full uppercase tracking-wider">Active</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">
+Get rid of the banner ads without changing your plan. Pick monthly or yearly -- cancel anytime from the Play Store.
+</p>
+
+<div class="flex flex-col gap-stack-md">
+<div *ngFor="let plan of adRemovalPlans()" class="flex items-center justify-between gap-stack-md">
+<p class="font-headline-md text-headline-md-mobile text-on-surface">
+{{ adRemovalPrice(plan) }}<span class="font-body-md text-body-md text-on-surface-variant"> / {{ plan.period }}</span>
+</p>
+<button
+  *ngIf="!isCurrentAdRemovalPlan(plan)"
+  (click)="subscribeAdRemoval(plan)"
+  [disabled]="!!purchasingProductId()"
+  class="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-full px-6 py-3 uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+>
+{{ purchasingProductId() === adRemovalPurchaseKey(plan) ? 'Processing…' : 'Subscribe' }}
+</button>
+<span *ngIf="isCurrentAdRemovalPlan(plan)" class="font-label-lg text-label-lg text-primary uppercase tracking-widest">Current</span>
+</div>
+</div>
+
+<p *ngIf="!isNative" class="font-label-sm text-label-sm text-on-surface-variant text-center pt-stack-sm">
+Available in the Android app.
+</p>
+</div>
+</section>
+
 <section *ngIf="!loading()" class="text-center pt-stack-sm">
 <button (click)="restore()" class="font-label-lg text-label-lg text-primary uppercase tracking-wide">Restore Purchases</button>
 </section>

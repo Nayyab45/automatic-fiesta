@@ -42,7 +42,7 @@ export class AdmobService {
   private bannerShowing = false;
 
   private get adsRemoved(): boolean {
-    return this.subscriptionService.hasFeature('noAds');
+    return this.subscriptionService.adsRemoved();
   }
 
   async init(): Promise<void> {
@@ -72,7 +72,7 @@ export class AdmobService {
 
   /** Called right after a purchase/restore completes (see PricingPage) --
    * SubscriptionService's own signal is already updated by then, this just
-   * acts on it: hides the banner immediately for a newly ad-free tier, or
+   * acts on it: hides the banner immediately for a newly ad-free tier or Remove ads plan, or
    * shows it again if a subscription lapsed, without waiting for the next
    * natural showBanner() call. */
   refresh(): void {

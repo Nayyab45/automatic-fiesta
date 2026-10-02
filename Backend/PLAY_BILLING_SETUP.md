@@ -1,4 +1,4 @@
-# Google Play Billing setup (Basic/Standard/Premium subscriptions)
+# Google Play Billing setup (Basic/Standard/Premium + Remove ads subscriptions)
 
 Code is already wired up (`src/lib/tiers.js`, `src/lib/googlePlay.js`,
 `src/routes/subscriptions.js`, and the Dinner-ionic pricing page/billing
@@ -22,6 +22,19 @@ monthly:
 The product IDs must match exactly -- they're hardcoded in
 `Backend/src/lib/tiers.js` and `Dinner-ionic/src/app/services/billing.service.ts`.
 If you want different IDs, change them in both places.
+
+Then create a 4th subscription for the standalone **Remove ads** add-on. This
+one is a single product with TWO base plans (not two products):
+
+| Product ID     | Base plan ID | Billing period | Price (PKR) |
+|----------------|--------------|----------------|-------------|
+| `removal_ads`  | `monthly`    | monthly        | 500         |
+| `removal_ads`  | `yearly`     | yearly         | 5500        |
+
+Product ID and base plan IDs must match exactly (`AD_REMOVAL` in
+`Backend/src/lib/tiers.js`). It is billed separately from the three tiers, so
+someone can hold both; the app hides ads if either grants it. It is verified
+through Google's `subscriptionsv2` API, which the same service account covers.
 
 A subscription product can't go live until the app has at least one APK/AAB
 uploaded to a track (even internal testing) with billing permission -- if

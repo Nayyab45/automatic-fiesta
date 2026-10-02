@@ -50,6 +50,24 @@ export async function verifySubscriptionPurchase(productId, purchaseToken) {
   return data;
 }
 
+// Subscriptions with multiple base plans (the Remove ads product) are looked
+// up through the v2 API: it needs only the token, and reports which product
+// and base plan Google actually sold, so neither is taken from the client.
+// Returns { subscriptionState, acknowledgementState, lineItems: [{ productId,
+// expiryTime, autoRenewingPlan, offerDetails: { basePlanId } }], ... }.
+export async function verifySubscriptionPurchaseV2(purchaseToken) {
+  if (!isConfigured()) {
+    throw new Error('Google Play billing verification is not configured on this server yet.');
+  }
+  const client = await authClient();
+  const { data } = await client.request({
+    url: `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${PACKAGE_NAME}/purchases/subscriptionsv2/tokens/${encodeURIComponent(
+      purchaseToken,
+    )}`,
+  });
+  return data;
+}
+
 // A purchase must be acknowledged within 3 days of the charge or Google
 // automatically refunds it -- see the acknowledgementState check in
 // subscriptions.js's /verify handler that calls this.

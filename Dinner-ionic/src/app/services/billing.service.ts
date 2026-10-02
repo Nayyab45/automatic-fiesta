@@ -17,8 +17,12 @@ import { SubscriptionService } from './subscription.service';
 // type says.
 declare const CdvPurchase: any;
 
-export const PLAY_PRODUCT_IDS = ['weeat_basic_monthly', 'weeat_standard_monthly', 'weeat_premium_monthly'] as const;
+export const AD_REMOVAL_PRODUCT_ID = 'removal_ads';
+export const PLAY_PRODUCT_IDS = ['weeat_basic_monthly', 'weeat_standard_monthly', 'weeat_premium_monthly', AD_REMOVAL_PRODUCT_ID] as const;
 export type PlayProductId = (typeof PLAY_PRODUCT_IDS)[number];
+
+/** Ids of the Remove ads base plans, as created in Play Console. */
+export type AdRemovalBasePlanId = 'monthly' | 'yearly';
 
 export interface BillingProduct {
   id: string;
@@ -26,6 +30,9 @@ export interface BillingProduct {
    * once the Play Store responds; the pricing page falls back to the
    * backend's plain pricePkr number until then. */
   priceString: string | null;
+  /** Per base plan (Remove ads has monthly + yearly under one product id),
+   * keyed by base plan id. Empty for single-plan products. */
+  basePlanPrices: Record<string, string>;
 }
 
 interface PendingPurchase {
@@ -43,7 +50,10 @@ export class BillingService {
   private pendingPurchase: PendingPurchase | null = null;
 
   readonly products = signal<BillingProduct[]>([]);
-  readonly purchasing = signal<PlayProductId | null>(null);
+  /** Identifies the in-flight purchase: the product id, or
+   * `removal_ads@<basePlan>` for a Remove ads plan so each plan's button can
+   * show its own "Processing..." state. */
+  readonly purchasing = signal<string | null>(null);
   readonly lastError = signal<string | null>(null);
 
   /** Safe to call more than once (e.g. app start + arriving on the pricing
@@ -89,7 +99,15 @@ export class BillingService {
 
     store.when().productUpdated(() => {
       this.products.set(
-        (store.products ?? []).map((p: any) => ({ id: p.id, priceString: p.pricing?.price ?? null })),
+        (store.products ?? []).map((p: any) => ({
+          id: p.id,
+          priceString: p.pricing?.price ?? null,
+          basePlanPrices: Object.fromEntries(
+            (p.offers ?? [])
+              .filter((o: any) => o.id?.includes('@'))
+              .map((o: any) => [o.id.split('@')[1], o.pricingPhases?.[0]?.price ?? '']),
+          ),
+        })),
       );
     });
 
@@ -146,16 +164,20 @@ export class BillingService {
    * finished, or rejects on error/cancel. The actual tier change is
    * reflected via SubscriptionService (updated inside handleApproved above)
    * before this resolves. */
-  async purchase(productId: PlayProductId): Promise<void> {
+  async purchase(productId: PlayProductId, basePlanId?: AdRemovalBasePlanId): Promise<void> {
     if (!this.store) {
       throw new Error('Billing is not initialized yet.');
     }
-    const offer = this.store.get(productId)?.getOffer();
+    // A product with several base plans (Remove ads) names each offer
+    // `<productId>@<basePlanId>` -- without an id, getOffer() would just pick
+    // whichever plan Play lists first, not the one the user tapped.
+    const product = this.store.get(productId);
+    const offer = basePlanId ? product?.getOffer(`${productId}@${basePlanId}`) : product?.getOffer();
     if (!offer) {
       throw new Error('This plan is not available for purchase right now. Try again shortly.');
     }
 
-    this.purchasing.set(productId);
+    this.purchasing.set(basePlanId ? `${productId}@${basePlanId}` : productId);
     this.lastError.set(null);
     try {
       await new Promise<void>((resolve, reject) => {
