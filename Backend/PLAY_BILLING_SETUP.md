@@ -13,11 +13,15 @@ Play Console -> your app -> Monetize -> Products -> Subscriptions -> Create
 subscription. Create exactly these 3, each with ONE base plan, auto-renewing,
 monthly:
 
-| Product ID              | Base plan price (PKR) |
-|--------------------------|------------------------|
-| `weeat_basic_monthly`    | 500                    |
-| `weeat_standard_monthly` | 1000                   |
-| `weeat_premium_monthly`  | 2000                   |
+| Product ID | Base plan ID      | Base plan price (PKR) |
+|------------|-------------------|------------------------|
+| `basic`    | `basic-monthly`   | 500                    |
+| `standard` | `monthly-standard`| 1000                   |
+| `premium`  | `premium-monthly` | 2000                   |
+
+(These are the IDs actually created in Play Console. Only the product ID is
+used by the code; each product has a single base plan so the base plan ID
+is informational.)
 
 The product IDs must match exactly -- they're hardcoded in
 `Backend/src/lib/tiers.js` and `Dinner-ionic/src/app/services/billing.service.ts`.

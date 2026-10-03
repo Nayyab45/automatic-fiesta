@@ -7,6 +7,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BasePage } from '../base.page';
 import { DiningTableService, RateablePerson } from '../../services/dining-table.service';
+import { AdmobService } from '../../services/admob.service';
 
 @Component({
   selector: 'app-post-dining-review',
@@ -18,6 +19,7 @@ import { DiningTableService, RateablePerson } from '../../services/dining-table.
 export class PostDiningReviewPage extends BasePage {
   readonly pageTitle = 'Post-Dining Review';
   private readonly tableService = inject(DiningTableService);
+  private readonly admob = inject(AdmobService);
 
   readonly stars = [1, 2, 3, 4, 5];
   readonly foodRating = signal(0);
@@ -97,7 +99,13 @@ export class PostDiningReviewPage extends BasePage {
     );
 
     forkJoin([review$, ...ratings$]).subscribe({
-      next: () => this.go('/my-tables'),
+      // Natural break (a finished review, back to the list) -- the one place
+      // here an interstitial doesn't interrupt anything. No-op for ad-free
+      // tiers or inside the cooldown; never delays the navigation.
+      next: () => {
+        this.go('/my-tables');
+        this.admob.showInterstitial();
+      },
       error: () => this.go('/my-tables'),
     });
   }

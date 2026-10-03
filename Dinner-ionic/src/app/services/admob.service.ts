@@ -5,7 +5,9 @@ import {
   BannerAdPluginEvents,
   BannerAdPosition,
   BannerAdSize,
+  InterstitialAdPluginEvents,
   type AdMobBannerSize,
+  type AdOptions,
   type BannerAdOptions,
 } from '@capacitor-community/admob';
 import { environment } from '../../environments/environment';
@@ -24,6 +26,17 @@ const BANNER_OPTIONS: BannerAdOptions = {
   isTesting: environment.adMob.isTesting,
 };
 
+const INTERSTITIAL_OPTIONS: AdOptions = {
+  adId: environment.adMob.interstitialAdUnitId,
+  isTesting: environment.adMob.isTesting,
+};
+
+// Minimum gap between full-screen ads, also counted from app start so one
+// never greets a user who just opened the app. Interstitials are only ever
+// triggered from natural breaks (see showInterstitial's callers), never
+// from safety/check-in flows or in response to a tap on a control.
+const INTERSTITIAL_COOLDOWN_MS = 3 * 60 * 1000;
+
 // The banner is a native view drawn on top of the WebView, not a DOM
 // element -- nothing in the page layout knows it's there unless told. Every
 // screen's sticky/fixed top-anchored bar (header, root header, offline/push
@@ -40,6 +53,9 @@ export class AdmobService {
 
   private initialized = false;
   private bannerShowing = false;
+  private interstitialReady = false;
+  private interstitialLoading = false;
+  private lastInterstitialAt = Date.now();
 
   private get adsRemoved(): boolean {
     return this.subscriptionService.adsRemoved();
@@ -67,7 +83,40 @@ export class AdmobService {
       if (this.bannerShowing) this.setOffset(size.height + AD_GAP_PX);
     });
 
+    // Loaded/failed only matter for the *next* showInterstitial() call. After
+    // an ad is dismissed (or fails to show) a fresh one is preloaded so the
+    // next natural break has one ready instead of waiting on a network load.
+    await AdMob.addListener(InterstitialAdPluginEvents.Loaded, () => {
+      this.interstitialLoading = false;
+      this.interstitialReady = true;
+    });
+    await AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
+      this.interstitialLoading = false;
+      this.interstitialReady = false;
+    });
+    await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+      this.interstitialReady = false;
+      this.lastInterstitialAt = Date.now();
+      this.prepareInterstitial();
+    });
+    await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+      this.interstitialReady = false;
+      this.prepareInterstitial();
+    });
+
     this.showBanner();
+    this.prepareInterstitial();
+  }
+
+  /** Shows a full-screen ad if one is preloaded, the user isn't ad-free, and
+   * the cooldown has elapsed -- otherwise silently does nothing, so callers
+   * can invoke it at a natural break without checking anything themselves.
+   * Never awaited by callers: an ad must not delay or block navigation. */
+  showInterstitial(): void {
+    if (!this.initialized || this.adsRemoved || !this.interstitialReady) return;
+    if (Date.now() - this.lastInterstitialAt < INTERSTITIAL_COOLDOWN_MS) return;
+    this.interstitialReady = false;
+    AdMob.showInterstitial().catch(() => this.prepareInterstitial());
   }
 
   /** Called right after a purchase/restore completes (see PricingPage) --
@@ -79,8 +128,9 @@ export class AdmobService {
     if (!this.initialized) return;
     if (this.adsRemoved) {
       this.hideBanner();
-    } else if (!this.bannerShowing) {
-      this.showBanner();
+    } else {
+      if (!this.bannerShowing) this.showBanner();
+      this.prepareInterstitial();
     }
   }
 
@@ -95,6 +145,14 @@ export class AdmobService {
     this.bannerShowing = true;
     AdMob.showBanner(BANNER_OPTIONS).catch(() => {
       this.bannerShowing = false;
+    });
+  }
+
+  private prepareInterstitial(): void {
+    if (this.interstitialReady || this.interstitialLoading || !this.initialized || this.adsRemoved) return;
+    this.interstitialLoading = true;
+    AdMob.prepareInterstitial(INTERSTITIAL_OPTIONS).catch(() => {
+      this.interstitialLoading = false;
     });
   }
 

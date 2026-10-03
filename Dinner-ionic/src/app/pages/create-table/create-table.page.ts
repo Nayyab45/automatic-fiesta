@@ -9,6 +9,7 @@ import { DiningTableService, TableAudience } from '../../services/dining-table.s
 import { Friend, FriendsService } from '../../services/friends.service';
 import { LocationService } from '../../services/location.service';
 import { Match, ProfileService } from '../../services/profile.service';
+import { AdmobService } from '../../services/admob.service';
 
 @Component({
   selector: 'app-create-table',
@@ -24,6 +25,7 @@ export class CreateTablePage extends BasePage {
   private readonly friendsService = inject(FriendsService);
   private readonly locationService = inject(LocationService);
   private readonly profileService = inject(ProfileService);
+  private readonly admob = inject(AdmobService);
 
   readonly gatheringTypes = ['Dinner', 'Lunch', 'Brunch', 'Chai Meetup'];
   readonly atmospheres = ['Casual Dinner', 'Social Conversation', 'Business Networking'];
@@ -199,6 +201,9 @@ export class CreateTablePage extends BasePage {
       })
       .subscribe({
         next: ({ table }) => {
+          // Table is created -- a natural break before the guest list. No-op
+          // for ad-free tiers or inside the cooldown; never delays navigation.
+          this.admob.showInterstitial();
           const inviteeIds = this.selectedInviteeIds();
           if (inviteeIds.length === 0) {
             this.go(`/guest-list/${table.id}`);

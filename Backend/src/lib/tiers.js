@@ -26,7 +26,7 @@ export const TIERS = {
     id: 'basic',
     name: 'Basic',
     pricePkr: 500,
-    playProductId: 'weeat_basic_monthly',
+    playProductId: 'basic',
     features: {
       noAds: true,
       monthlyTableLimit: 10,
@@ -40,7 +40,7 @@ export const TIERS = {
     id: 'standard',
     name: 'Standard',
     pricePkr: 1000,
-    playProductId: 'weeat_standard_monthly',
+    playProductId: 'standard',
     features: {
       noAds: true,
       monthlyTableLimit: Infinity,
@@ -54,7 +54,7 @@ export const TIERS = {
     id: 'premium',
     name: 'Premium',
     pricePkr: 2000,
-    playProductId: 'weeat_premium_monthly',
+    playProductId: 'premium',
     features: {
       noAds: true,
       monthlyTableLimit: Infinity,

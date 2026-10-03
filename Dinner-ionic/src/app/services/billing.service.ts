@@ -18,7 +18,7 @@ import { SubscriptionService } from './subscription.service';
 declare const CdvPurchase: any;
 
 export const AD_REMOVAL_PRODUCT_ID = 'removal_ads';
-export const PLAY_PRODUCT_IDS = ['weeat_basic_monthly', 'weeat_standard_monthly', 'weeat_premium_monthly', AD_REMOVAL_PRODUCT_ID] as const;
+export const PLAY_PRODUCT_IDS = ['basic', 'standard', 'premium', AD_REMOVAL_PRODUCT_ID] as const;
 export type PlayProductId = (typeof PLAY_PRODUCT_IDS)[number];
 
 /** Ids of the Remove ads base plans, as created in Play Console. */

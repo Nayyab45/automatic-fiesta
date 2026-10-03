@@ -21,6 +21,8 @@ export const environment = {
   // See environment.prod.ts for what changes before a real Play Store release.
   adMob: {
     bannerAdUnitId: 'ca-app-pub-3940256099942544/6300978111',
+    // Google's public TEST interstitial unit id, same reasoning as above.
+    interstitialAdUnitId: 'ca-app-pub-3940256099942544/1033173712',
     isTesting: true,
   },
 };
