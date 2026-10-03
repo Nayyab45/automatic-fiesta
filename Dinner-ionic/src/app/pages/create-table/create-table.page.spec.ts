@@ -7,6 +7,7 @@ import { DiningTable, DiningTableService } from '../../services/dining-table.ser
 import { Friend, FriendsService } from '../../services/friends.service';
 import { LocationService } from '../../services/location.service';
 import { Match, ProfileService } from '../../services/profile.service';
+import { AdmobService } from '../../services/admob.service';
 
 function makeRestaurant(id: number, overrides: Partial<Restaurant> = {}): Restaurant {
   return { id, name: `Restaurant ${id}`, city: 'Karachi', cuisineTags: 'Pakistani', rating: 4.5, ...overrides } as unknown as Restaurant;
@@ -32,6 +33,7 @@ describe('CreateTablePage', () => {
       { provide: DiningTableService, useValue: tableServiceSpy },
       { provide: FriendsService, useValue: friendsServiceSpy },
       { provide: ProfileService, useValue: profileServiceSpy },
+      { provide: AdmobService, useValue: jasmine.createSpyObj('AdmobService', ['showInterstitial', 'refresh']) },
     ];
     if (routeOverride) {
       providers.push({ provide: ActivatedRoute, useValue: routeOverride });

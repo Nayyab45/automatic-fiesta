@@ -3,6 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AiRestaurantRecommendationPage } from './ai-restaurant-recommendation.page';
 import { RestaurantDetail, RestaurantService } from '../../services/restaurant.service';
+import { AdmobService } from '../../services/admob.service';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 
@@ -22,6 +23,7 @@ function makeRestaurant(overrides: Partial<RestaurantDetail> = {}): RestaurantDe
 
 describe('AiRestaurantRecommendationPage', () => {
   let restaurantServiceSpy: jasmine.SpyObj<RestaurantService>;
+  let admobServiceSpy: jasmine.SpyObj<AdmobService>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
   let profileServiceSpy: jasmine.SpyObj<ProfileService>;
 
@@ -31,6 +33,7 @@ describe('AiRestaurantRecommendationPage', () => {
       providers: [
         provideRouter([]),
         { provide: RestaurantService, useValue: restaurantServiceSpy },
+        { provide: AdmobService, useValue: admobServiceSpy },
         // Unused by this page directly -- its <app-user-avatar> child
         // component calls these in its own constructor, which runs eagerly.
         { provide: AuthService, useValue: authServiceSpy },
@@ -64,6 +67,7 @@ describe('AiRestaurantRecommendationPage', () => {
         error?.({ code: 1, message: 'denied' } as GeolocationPositionError),
     );
     restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['recommended']);
+    admobServiceSpy = jasmine.createSpyObj('AdmobService', ['showInterstitial']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['currentUser']);
     authServiceSpy.currentUser.and.returnValue({ name: 'Sam Ali' } as never);
     profileServiceSpy = jasmine.createSpyObj('ProfileService', ['me']);
@@ -86,6 +90,18 @@ describe('AiRestaurantRecommendationPage', () => {
     restaurantServiceSpy.recommended.and.returnValue(of({ restaurants: [] }));
     const fixture = createComponent();
     expect(fixture.componentInstance.recommendation()).toBeNull();
+  }));
+
+  it('shows an interstitial once a recommendation has loaded', fakeAsync(() => {
+    restaurantServiceSpy.recommended.and.returnValue(of({ restaurants: [makeRestaurant()] }));
+    createComponent();
+    expect(admobServiceSpy.showInterstitial).toHaveBeenCalledTimes(1);
+  }));
+
+  it('does not show an interstitial when there is no recommendation', fakeAsync(() => {
+    restaurantServiceSpy.recommended.and.returnValue(of({ restaurants: [] }));
+    createComponent();
+    expect(admobServiceSpy.showInterstitial).not.toHaveBeenCalled();
   }));
 
   it('cuisineTags splits the comma-separated string', fakeAsync(() => {

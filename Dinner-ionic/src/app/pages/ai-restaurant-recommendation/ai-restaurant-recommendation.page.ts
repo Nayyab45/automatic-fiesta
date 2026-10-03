@@ -5,6 +5,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
+import { AdmobService } from '../../services/admob.service';
 import { LocationService } from '../../services/location.service';
 import { RestaurantDetail, RestaurantService } from '../../services/restaurant.service';
 
@@ -19,6 +20,7 @@ export class AiRestaurantRecommendationPage extends BasePage {
   readonly pageTitle = 'AI Recommendation';
   readonly cityService = inject(LocationService);
   private readonly restaurantService = inject(RestaurantService);
+  private readonly admob = inject(AdmobService);
 
   readonly recommendation = signal<RestaurantDetail | null>(null);
   readonly loading = signal(true);
@@ -63,6 +65,10 @@ export class AiRestaurantRecommendationPage extends BasePage {
       next: ({ restaurants }) => {
         this.recommendation.set(restaurants[0] ?? null);
         this.loading.set(false);
+        // The suggestion is ready after the user waited on it -- a natural
+        // break. Only when there's actually a result to look at; no-op for
+        // ad-free tiers or inside the cooldown, and never blocks the page.
+        if (restaurants[0]) this.admob.showInterstitial();
       },
       error: () => this.loading.set(false),
     });

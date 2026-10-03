@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PostDiningReviewPage } from './post-dining-review.page';
+import { AdmobService } from '../../services/admob.service';
 import { DiningTableService, RateablePerson } from '../../services/dining-table.service';
 
 function makePerson(overrides: Partial<RateablePerson> = {}): RateablePerson {
-  return { id: 1, name: 'Bilal', photoUrl: null, myRating: null, ...overrides };
+  return { id: 1, name: 'Bilal', photoUrl: null, myRating: null, myComment: null, ...overrides } as RateablePerson;
 }
 
 function fakeRoute(id: string | null) {
@@ -25,6 +26,7 @@ describe('PostDiningReviewPage', () => {
         provideRouter([]),
         { provide: ActivatedRoute, useValue: fakeRoute(id) },
         { provide: DiningTableService, useValue: tableServiceSpy },
+        { provide: AdmobService, useValue: jasmine.createSpyObj('AdmobService', ['showInterstitial']) },
       ],
     });
     return TestBed.createComponent(PostDiningReviewPage);
@@ -73,7 +75,7 @@ describe('PostDiningReviewPage', () => {
       '5',
       jasmine.objectContaining({ foodRating: 5, overallRating: 4 }),
     );
-    expect(tableServiceSpy.ratePerson).toHaveBeenCalledWith('5', 1, 5);
+    expect(tableServiceSpy.ratePerson).toHaveBeenCalledWith('5', 1, 5, undefined);
     expect(tableServiceSpy.ratePerson).not.toHaveBeenCalledWith('5', 2, jasmine.anything());
     expect(navigateSpy).toHaveBeenCalledWith('/my-tables');
   });
