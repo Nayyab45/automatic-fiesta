@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
+import { googleSignInErrorMessage } from '../../services/google-sign-in-error';
 import { passwordErrorMessage, strongPasswordValidator } from '../../shared/password-validator';
 
 @Component({
@@ -63,10 +64,8 @@ export class SignupPage extends BasePage {
       next: () => this.go('/profile-creation'),
       error: (err) => {
         this.submitting.set(false);
-        // A user backing out of the account picker isn't an error worth
-        // showing -- same as tapping outside a dialog to dismiss it.
-        if (err?.code === 'USER_CANCELLED') return;
-        this.errorMessage.set(err?.error?.message ?? 'Unable to sign up with Google. Please try again.');
+        const message = googleSignInErrorMessage(err, 'sign up');
+        if (message) this.errorMessage.set(message);
       },
     });
   }

@@ -7,6 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { filter } from 'rxjs';
 import { BasePage } from '../base.page';
 import { AuthService } from '../../services/auth.service';
+import { googleSignInErrorMessage } from '../../services/google-sign-in-error';
 
 @Component({
   selector: 'app-login',
@@ -104,10 +105,8 @@ export class LoginPage extends BasePage {
       error: (err) => {
         if (token !== this.attemptToken) return;
         this.submitting.set(false);
-        // A user backing out of the account picker isn't an error worth
-        // showing -- same as tapping outside a dialog to dismiss it.
-        if (err?.code === 'USER_CANCELLED') return;
-        this.errorMessage.set(err?.error?.message ?? 'Unable to sign in with Google. Please try again.');
+        const message = googleSignInErrorMessage(err, 'sign in');
+        if (message) this.errorMessage.set(message);
       },
     });
   }
