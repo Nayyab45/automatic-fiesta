@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { BasePage } from '../base.page';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { UserAvatarComponent } from '../../components/user-avatar/user-avatar.component';
+import { AdmobService } from '../../services/admob.service';
 import { LocationService } from '../../services/location.service';
 import { googleMapsUrl, Restaurant, RestaurantService } from '../../services/restaurant.service';
 
@@ -47,6 +48,7 @@ export class DiscoverRestaurantsPage extends BasePage {
   readonly pageTitle = 'Discover Restaurants';
   readonly cityService = inject(LocationService);
   private readonly restaurantService = inject(RestaurantService);
+  private readonly admob = inject(AdmobService);
 
   readonly regionChips = signal<string[]>(BASE_CHIPS);
   readonly pricePresets = PRICE_PRESETS;
@@ -191,5 +193,13 @@ export class DiscoverRestaurantsPage extends BasePage {
       }
       this.savedIds.set(next);
     });
+  }
+
+  // Opens the Send Request form. Shows the interstitial on the tap itself
+  // (cooldown ignored, per product decision); no-op for ad-free tiers or if
+  // none is loaded yet, and never delays the navigation.
+  sendRequest(restaurantId: number | undefined): void {
+    this.admob.showInterstitial({ ignoreCooldown: true });
+    this.go('/create-table?restaurantId=' + restaurantId);
   }
 }

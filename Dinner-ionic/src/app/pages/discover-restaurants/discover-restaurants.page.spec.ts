@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { DiscoverRestaurantsPage } from './discover-restaurants.page';
 import { Restaurant, RestaurantService } from '../../services/restaurant.service';
 import { LocationService } from '../../services/location.service';
+import { AdmobService } from '../../services/admob.service';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 
@@ -30,6 +31,7 @@ describe('DiscoverRestaurantsPage', () => {
         provideRouter([]),
         { provide: ActivatedRoute, useValue: fakeRoute(queryParams) },
         { provide: RestaurantService, useValue: restaurantServiceSpy },
+        { provide: AdmobService, useValue: jasmine.createSpyObj('AdmobService', ['showInterstitial']) },
         // Unused by this page directly -- its <app-user-avatar> child
         // component calls AuthService/ProfileService in its own constructor,
         // which TestBed.createComponent() runs eagerly.

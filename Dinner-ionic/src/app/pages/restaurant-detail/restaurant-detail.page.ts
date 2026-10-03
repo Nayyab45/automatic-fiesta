@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Share } from '@capacitor/share';
 import { BasePage } from '../base.page';
+import { AdmobService } from '../../services/admob.service';
 import { AuthService } from '../../services/auth.service';
 import { googleMapsUrl, staticMapUrl, RestaurantDetail, RestaurantReview, RestaurantService } from '../../services/restaurant.service';
 import { Friend, FriendsService } from '../../services/friends.service';
@@ -19,6 +20,7 @@ import { MessagingService } from '../../services/messaging.service';
 export class RestaurantDetailPage extends BasePage {
   readonly pageTitle = 'Restaurant Detail';
   private readonly restaurantService = inject(RestaurantService);
+  private readonly admob = inject(AdmobService);
   private readonly authService = inject(AuthService);
   private readonly friendsService = inject(FriendsService);
   private readonly messagingService = inject(MessagingService);
@@ -190,5 +192,13 @@ export class RestaurantDetailPage extends BasePage {
       },
       error: () => this.sendingToFriendId.set(null),
     });
+  }
+
+  // Opens the Send Request form. Shows the interstitial on the tap itself
+  // (cooldown ignored, per product decision); no-op for ad-free tiers or if
+  // none is loaded yet, and never delays the navigation.
+  sendRequest(restaurantId: number | undefined): void {
+    this.admob.showInterstitial({ ignoreCooldown: true });
+    this.go('/create-table?restaurantId=' + restaurantId);
   }
 }

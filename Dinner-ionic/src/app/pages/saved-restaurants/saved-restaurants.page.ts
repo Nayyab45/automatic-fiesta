@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { BasePage } from '../base.page';
+import { AdmobService } from '../../services/admob.service';
 import { googleMapsUrl, Restaurant, RestaurantService } from '../../services/restaurant.service';
 
 @Component({
@@ -14,6 +15,7 @@ import { googleMapsUrl, Restaurant, RestaurantService } from '../../services/res
 export class SavedRestaurantsPage extends BasePage {
   readonly pageTitle = 'Saved Restaurants';
   private readonly restaurantService = inject(RestaurantService);
+  private readonly admob = inject(AdmobService);
 
   readonly restaurants = signal<Restaurant[]>([]);
   readonly loading = signal(true);
@@ -42,5 +44,13 @@ export class SavedRestaurantsPage extends BasePage {
     this.restaurantService.unsave(restaurant.id).subscribe(() => {
       this.restaurants.update((list) => list.filter((r) => r.id !== restaurant.id));
     });
+  }
+
+  // Opens the Send Request form. Shows the interstitial on the tap itself
+  // (cooldown ignored, per product decision); no-op for ad-free tiers or if
+  // none is loaded yet, and never delays the navigation.
+  sendRequest(restaurantId: number | undefined): void {
+    this.admob.showInterstitial({ ignoreCooldown: true });
+    this.go('/create-table?restaurantId=' + restaurantId);
   }
 }
