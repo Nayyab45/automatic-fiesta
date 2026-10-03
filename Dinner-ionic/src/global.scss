@@ -79,6 +79,16 @@ ion-content {
   flex-direction: column;
 }
 
+/* The ad banner is a native view pinned just under the status bar (or just
+   under the page header, for screens that have one -- those reserve its space
+   via .ad-header's margin). A screen with no header bar of its own (login,
+   signup, splash...) has nothing to hold that space, so the page itself
+   leaves room; --ad-page-offset is 0 when no banner is showing. Needs :has();
+   on a WebView too old for it the page simply isn't padded (the old behaviour). */
+.ion-page:not(:has(.ad-header)) {
+  padding-top: var(--ad-page-offset, 0px);
+}
+
 .ion-page main {
   flex: 1 1 0%;
   min-height: 0;

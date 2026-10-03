@@ -23,7 +23,7 @@ import { SubscriptionService } from './services/subscription.service';
   template: `
     <div
       *ngIf="!network.isOnline()"
-      class="fixed top-[var(--ad-offset,0px)] left-0 w-full z-[1000] bg-error text-on-error font-label-lg text-label-lg text-center py-2 flex items-center justify-center gap-2"
+      class="fixed top-0 left-0 w-full z-[1000] bg-error text-on-error font-label-lg text-label-lg text-center py-2 flex items-center justify-center gap-2"
       style="padding-top: max(8px, env(safe-area-inset-top, 8px));"
     >
       <span class="material-symbols-outlined text-[18px]">wifi_off</span>
@@ -38,7 +38,7 @@ import { SubscriptionService } from './services/subscription.service';
       (keydown.enter)="$event.target === $event.currentTarget && push.onBannerTapped()"
       (keydown.space)="$event.target === $event.currentTarget && $event.preventDefault(); $event.target === $event.currentTarget && push.onBannerTapped()"
       class="fixed left-4 right-4 z-[2000] bg-on-background text-cream-background rounded-2xl shadow-xl px-4 py-3 flex items-start gap-3 active:scale-[0.98] transition-transform"
-      style="top: calc(var(--ad-offset, 0px) + max(12px, env(safe-area-inset-top, 12px)));"
+      style="top: max(12px, env(safe-area-inset-top, 12px));"
     >
       <span class="material-symbols-outlined text-[22px] shrink-0" style="font-variation-settings: 'FILL' 1;">notifications</span>
       <div class="min-w-0 flex-1">
