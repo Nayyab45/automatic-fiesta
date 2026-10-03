@@ -37,6 +37,10 @@ const INTERSTITIAL_OPTIONS: AdOptions = {
 // from safety/check-in flows or in response to a tap on a control.
 const INTERSTITIAL_COOLDOWN_MS = 3 * 60 * 1000;
 
+const BANNER_RETRY_BASE_MS = 15_000;
+const BANNER_RETRY_MAX_MS = 120_000;
+const BANNER_MAX_RETRIES = 8;
+
 // The banner is a native view drawn on top of the WebView, not a DOM
 // element -- nothing in the page layout knows it's there unless told. Every
 // screen's sticky/fixed top-anchored bar (header, root header, offline/push
@@ -53,6 +57,8 @@ export class AdmobService {
 
   private initialized = false;
   private bannerShowing = false;
+  private bannerRetries = 0;
+  private bannerRetryTimer: ReturnType<typeof setTimeout> | null = null;
   private interstitialReady = false;
   private interstitialLoading = false;
   private lastInterstitialAt = Date.now();
@@ -74,6 +80,10 @@ export class AdmobService {
     await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => {
       this.bannerShowing = false;
       this.setOffset(0);
+      this.scheduleBannerRetry();
+    });
+    await AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+      this.bannerRetries = 0;
     });
 
     // The banner's actual rendered height (adaptive, varies by device
@@ -112,9 +122,9 @@ export class AdmobService {
    * the cooldown has elapsed -- otherwise silently does nothing, so callers
    * can invoke it at a natural break without checking anything themselves.
    * Never awaited by callers: an ad must not delay or block navigation. */
-  showInterstitial(): void {
+  showInterstitial(options: { ignoreCooldown?: boolean } = {}): void {
     if (!this.initialized || this.adsRemoved || !this.interstitialReady) return;
-    if (Date.now() - this.lastInterstitialAt < INTERSTITIAL_COOLDOWN_MS) return;
+    if (!options.ignoreCooldown && Date.now() - this.lastInterstitialAt < INTERSTITIAL_COOLDOWN_MS) return;
     this.interstitialReady = false;
     AdMob.showInterstitial().catch(() => this.prepareInterstitial());
   }
@@ -146,6 +156,20 @@ export class AdmobService {
     AdMob.showBanner(BANNER_OPTIONS).catch(() => {
       this.bannerShowing = false;
     });
+  }
+
+  // A failed banner load (very common for a brand-new ad unit, which can
+  // take a while to start filling) otherwise leaves the screen without an
+  // ad until some unrelated refresh() call. Retries with a growing delay,
+  // capped, and resets as soon as one loads.
+  private scheduleBannerRetry(): void {
+    if (this.bannerRetryTimer || this.bannerRetries >= BANNER_MAX_RETRIES) return;
+    const delay = Math.min(BANNER_RETRY_BASE_MS * 2 ** this.bannerRetries, BANNER_RETRY_MAX_MS);
+    this.bannerRetries++;
+    this.bannerRetryTimer = setTimeout(() => {
+      this.bannerRetryTimer = null;
+      this.showBanner();
+    }, delay);
   }
 
   private prepareInterstitial(): void {

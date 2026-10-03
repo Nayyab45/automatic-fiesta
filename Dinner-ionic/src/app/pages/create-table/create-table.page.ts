@@ -89,6 +89,9 @@ export class CreateTablePage extends BasePage {
 
   constructor() {
     super();
+    // Make sure the banner is up (and an interstitial preloaded) as soon as
+    // this screen opens, not only after some unrelated refresh.
+    this.admob.refresh();
     const restaurantIdParam = this.route.snapshot.queryParamMap.get('restaurantId');
     this.restaurantId = restaurantIdParam ? Number(restaurantIdParam) : null;
     // Only the city being browsed (same one Discover uses) -- except when
@@ -188,6 +191,11 @@ export class CreateTablePage extends BasePage {
     this.submitting.set(true);
     this.errorMessage.set(null);
 
+    // Shown on every Send tap (cooldown ignored, per product decision) once
+    // the form has validated. No-op for ad-free tiers or if none is loaded
+    // yet; never blocks the request itself.
+    this.admob.showInterstitial({ ignoreCooldown: true });
+
     this.tableService
       .create({
         restaurantId: this.restaurantId,
@@ -201,9 +209,6 @@ export class CreateTablePage extends BasePage {
       })
       .subscribe({
         next: ({ table }) => {
-          // Table is created -- a natural break before the guest list. No-op
-          // for ad-free tiers or inside the cooldown; never delays navigation.
-          this.admob.showInterstitial();
           const inviteeIds = this.selectedInviteeIds();
           if (inviteeIds.length === 0) {
             this.go(`/guest-list/${table.id}`);
