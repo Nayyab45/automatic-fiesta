@@ -65,6 +65,10 @@ const BANNER_SYNC_DELAYS_MS = [400, 1200];
 // height actually changed by more than this, so ordinary navigation between
 // same-height screens never reloads the ad.
 const BANNER_MARGIN_TOLERANCE_PX = 3;
+const BANNER_POSITION_POLL_MS = 1000;
+// How long to let the plugin finish destroying a removed banner before a new
+// one is requested (see recreateBanner).
+const BANNER_REMOVE_SETTLE_MS = 400;
 
 // An interstitial this long after opening a chat (group or DM), once per
 // visit. If the user is mid-message it waits (up to the limit below) rather
@@ -83,7 +87,9 @@ export class AdmobService {
 
   private initialized = false;
   private bannerShowing = false;
+  private bannerRecreating = false;
   private bannerMargin = 0;
+  private lastMeasuredMargin = 0;
   private bannerSyncTimers: ReturnType<typeof setTimeout>[] = [];
   private chatTimer: ReturnType<typeof setTimeout> | null = null;
   private chatPostpones = 0;
@@ -146,16 +152,26 @@ export class AdmobService {
       this.interstitialReady = false;
       this.lastInterstitialAt = Date.now();
       this.prepareInterstitial();
+      this.recreateBanner();
     });
     await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
       this.interstitialReady = false;
       this.prepareInterstitial();
+      this.recreateBanner();
     });
 
     this.bannerMargin = this.measureBannerMargin();
+    this.lastMeasuredMargin = this.bannerMargin;
     this.showBanner();
     this.prepareInterstitial();
     this.onNavigated(this.router.url);
+
+    // The two one-off re-measures after a navigation can both land before the
+    // new page's header has rendered (e.g. right after login, while data is
+    // still loading), leaving the banner on top of it for good. Keep checking.
+    setInterval(() => {
+      if (document.visibilityState === 'visible') this.syncBannerPosition();
+    }, BANNER_POSITION_POLL_MS);
   }
 
   /** Shows a full-screen ad if one is preloaded, the user isn't ad-free, and
@@ -255,15 +271,37 @@ export class AdmobService {
   private syncBannerPosition(): void {
     if (!this.initialized) return;
     const next = this.measureBannerMargin();
-    if (Math.abs(next - this.bannerMargin) < BANNER_MARGIN_TOLERANCE_PX) return;
+    // Only act on a reading seen twice in a row, so a header caught mid page
+    // transition doesn't trigger a pointless rebuild (= a fresh ad request).
+    const stable = Math.abs(next - this.lastMeasuredMargin) < BANNER_MARGIN_TOLERANCE_PX;
+    this.lastMeasuredMargin = next;
+    if (!stable || Math.abs(next - this.bannerMargin) < BANNER_MARGIN_TOLERANCE_PX) return;
     this.bannerMargin = next;
-    if (!this.bannerShowing || this.adsRemoved) return;
     // The plugin has no "move" call: re-create the banner at the new margin.
+    this.recreateBanner();
+  }
+
+  // A full-screen ad takes over the activity and the native banner view
+  // doesn't reliably come back after it closes (it's left hidden or torn
+  // down while bannerShowing still says true, so showBanner() would never
+  // run again) -- so after one, and when the header moved, rebuild it.
+  //
+  // removeBanner() resolves before the plugin has actually torn the old view
+  // down (that's posted to the UI thread). Calling showBanner() straight away
+  // lands on the plugin's "update the existing banner" path, and the queued
+  // teardown then destroys it -- leaving no banner at all. So wait for it.
+  private recreateBanner(): void {
+    if (!this.initialized || !this.bannerShowing || this.bannerRecreating || this.adsRemoved) return;
+    this.bannerRecreating = true;
     AdMob.removeBanner()
       .catch(() => {})
       .finally(() => {
-        this.bannerShowing = false;
-        this.showBanner();
+        setTimeout(() => {
+          this.bannerRecreating = false;
+          this.bannerShowing = false;
+          this.bannerMargin = this.measureBannerMargin();
+          this.showBanner();
+        }, BANNER_REMOVE_SETTLE_MS);
       });
   }
 
