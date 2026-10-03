@@ -7,8 +7,9 @@ describe('googleSignInErrorMessage', () => {
 
   it('explains a Google account reauth failure instead of hiding it, even when reported as a cancellation', () => {
     const msg = googleSignInErrorMessage({ code: 'USER_CANCELLED', message: '[16] Account reauth failed.' }, 'sign in');
-    expect(msg).toContain('verify this account');
-    expect(msg).toContain('Settings');
+    expect(msg).toContain("isn't available for this version");
+    expect(msg).toContain('Play Store');
+    expect(msg).not.toContain('Settings');
   });
 
   it('prefers a server-provided message', () => {
