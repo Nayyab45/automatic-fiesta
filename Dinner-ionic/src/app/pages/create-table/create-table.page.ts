@@ -11,6 +11,9 @@ import { LocationService } from '../../services/location.service';
 import { Match, ProfileService } from '../../services/profile.service';
 import { AdmobService } from '../../services/admob.service';
 
+// How long the "request sent" message stays up before moving to the guest list.
+const SENT_MESSAGE_MS = 1500;
+
 @Component({
   selector: 'app-create-table',
   standalone: true,
@@ -36,6 +39,9 @@ export class CreateTablePage extends BasePage {
   ];
   readonly restaurants = signal<Restaurant[]>([]);
   readonly submitting = signal(false);
+  // True once the table is created: drives the "request sent" message under
+  // the Send button, shown briefly before moving on to the guest list.
+  readonly sent = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   // "AI suggests restaurants everyone in the group will enjoy" -- lets the
@@ -211,15 +217,15 @@ export class CreateTablePage extends BasePage {
         next: ({ table }) => {
           const inviteeIds = this.selectedInviteeIds();
           if (inviteeIds.length === 0) {
-            this.go(`/guest-list/${table.id}`);
+            this.finish(table.id);
             return;
           }
           // The table is already created at this point -- an invite failure
           // shouldn't strand the host on this form or lose the table they
-          // just made, so it navigates through either way.
+          // just made, so it finishes through either way.
           this.tableService.invite(table.id, inviteeIds).subscribe({
-            next: () => this.go(`/guest-list/${table.id}`),
-            error: () => this.go(`/guest-list/${table.id}`),
+            next: () => this.finish(table.id),
+            error: () => this.finish(table.id),
           });
         },
         error: () => {
@@ -227,5 +233,12 @@ export class CreateTablePage extends BasePage {
           this.errorMessage.set('Could not create the table. Please try again.');
         },
       });
+  }
+
+  // Leaves the button disabled (submitting stays true) and shows the "sent"
+  // message for a moment so it's actually seen before the screen changes.
+  private finish(tableId: number): void {
+    this.sent.set(true);
+    setTimeout(() => this.go(`/guest-list/${tableId}`), SENT_MESSAGE_MS);
   }
 }

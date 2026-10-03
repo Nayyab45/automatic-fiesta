@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CreateTablePage } from './create-table.page';
@@ -173,7 +173,7 @@ describe('CreateTablePage', () => {
     expect(page.errorMessage()).toContain('pick a restaurant');
   });
 
-  it('submit() creates the table and navigates to the guest list on success', () => {
+  it('submit() creates the table and navigates to the guest list on success', fakeAsync(() => {
     tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
 
     const fixture = createComponent();
@@ -190,10 +190,15 @@ describe('CreateTablePage', () => {
     expect(tableServiceSpy.create).toHaveBeenCalledWith(
       jasmine.objectContaining({ dateTime: '2026-10-01T19:00', visibility: 'public', audience: 'women_only' }),
     );
+    // The "request sent" message shows first; navigation follows a moment later.
+    expect(page.sent()).toBeTrue();
+    expect(page.submitting()).toBeTrue();
+    expect(navigateSpy).not.toHaveBeenCalled();
+    tick(1500);
     expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
-  });
+  }));
 
-  it('submit() invites the selected people after creating the table, then navigates to the guest list', () => {
+  it('submit() invites the selected people after creating the table, then navigates to the guest list', fakeAsync(() => {
     tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
     tableServiceSpy.invite.and.returnValue(of({ invited: [9, 20] }));
 
@@ -209,10 +214,11 @@ describe('CreateTablePage', () => {
     page.submit();
 
     expect(tableServiceSpy.invite).toHaveBeenCalledWith(42, [9, 20]);
+    tick(1500);
     expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
-  });
+  }));
 
-  it('submit() still navigates to the guest list if sending invites fails', () => {
+  it('submit() still navigates to the guest list if sending invites fails', fakeAsync(() => {
     tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
     tableServiceSpy.invite.and.returnValue(throwError(() => new Error('down')));
 
@@ -226,14 +232,16 @@ describe('CreateTablePage', () => {
     page.toggleInvitee(9);
     page.submit();
 
+    tick(1500);
     expect(navigateSpy).toHaveBeenCalledWith('/guest-list/42');
-  });
+  }));
 
-  it('submit() forces audience to "everyone" for a private table regardless of the selected audience', () => {
+  it('submit() forces audience to "everyone" for a private table regardless of the selected audience', fakeAsync(() => {
     tableServiceSpy.create.and.returnValue(of({ table: { id: 42 } as unknown as DiningTable }));
 
     const fixture = createComponent();
     const page = fixture.componentInstance;
+    spyOn(TestBed.inject(Router), 'navigateByUrl');
     page.date = '2026-10-01';
     page.time = '19:00';
     page.visibility = false;
@@ -243,7 +251,8 @@ describe('CreateTablePage', () => {
     expect(tableServiceSpy.create).toHaveBeenCalledWith(
       jasmine.objectContaining({ visibility: 'private', audience: 'everyone' }),
     );
-  });
+    flush();
+  }));
 
   it('submit() shows an error and resets submitting on failure', () => {
     tableServiceSpy.create.and.returnValue(throwError(() => new Error('down')));
@@ -255,6 +264,7 @@ describe('CreateTablePage', () => {
     page.submit();
 
     expect(page.submitting()).toBeFalse();
+    expect(page.sent()).toBeFalse();
     expect(page.errorMessage()).toContain('Could not create the table');
   });
 });
