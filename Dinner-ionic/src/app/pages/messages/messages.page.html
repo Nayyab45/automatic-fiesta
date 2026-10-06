@@ -80,7 +80,7 @@
 </ng-container>
 </main>
 
-<div *ngIf="selecting()" class="fixed bottom-[80px] md:bottom-0 left-0 right-0 z-40 bg-surface border-t border-secondary-container px-container-padding py-stack-sm flex items-center justify-between">
+<div *ngIf="selecting()" class="fixed bottom-[calc(80px+var(--ad-bottom-offset,0px))] md:bottom-0 left-0 right-0 z-40 bg-surface border-t border-secondary-container px-container-padding py-stack-sm flex items-center justify-between">
 <span class="font-body-md text-body-md text-on-surface-variant">{{ selectedCount() }} selected</span>
 <button (click)="showDeleteConfirm.set(true)" [disabled]="selectedCount() === 0 || deleting()" class="flex items-center gap-2 px-4 py-2 rounded-full text-error font-label-lg text-label-lg uppercase tracking-widest disabled:opacity-40 hover:bg-error/5 transition-colors">
 <span class="material-symbols-outlined text-lg">delete</span>

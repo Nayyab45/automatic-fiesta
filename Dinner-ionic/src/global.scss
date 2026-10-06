@@ -79,14 +79,16 @@ ion-content {
   flex-direction: column;
 }
 
-/* The ad banner is a native view pinned just under the status bar (or just
-   under the page header, for screens that have one -- those reserve its space
-   via .ad-header's margin). A screen with no header bar of its own (login,
-   signup, splash...) has nothing to hold that space, so the page itself
-   leaves room; --ad-page-offset is 0 when no banner is showing. Needs :has();
-   on a WebView too old for it the page simply isn't padded (the old behaviour). */
-.ion-page:not(:has(.ad-header)) {
-  padding-top: var(--ad-page-offset, 0px);
+/* The ad banner is a native view pinned to the bottom of the screen, just
+   below the tab bar. admob.service.ts sets --ad-bottom-offset to the space it
+   occupies (0 / unset when no banner is showing): every page leaves that space
+   free at the bottom, and anything pinned to the bottom of the viewport (the
+   tab bar, sticky action bars, bottom sheets) sits on top of it. */
+.ion-page {
+  padding-bottom: var(--ad-bottom-offset, 0px);
+}
+.ion-page .fixed.bottom-0 {
+  bottom: var(--ad-bottom-offset, 0px);
 }
 
 .ion-page main {
@@ -116,7 +118,9 @@ ion-content {
 
 /* Safe-area helpers used throughout the prototypes */
 .pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+  /* --ad-safe-bottom is 0 while the ad banner is up: it already covers the
+     system inset, so bars sitting above it don't need to pad for it too. */
+  padding-bottom: var(--ad-safe-bottom, env(safe-area-inset-bottom, 20px));
 }
 .pt-safe {
   padding-top: env(safe-area-inset-top, 20px);
