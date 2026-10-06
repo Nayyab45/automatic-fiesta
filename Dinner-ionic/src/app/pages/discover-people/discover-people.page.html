@@ -84,7 +84,7 @@
 
 <app-bottom-nav active="discover"></app-bottom-nav>
 
-<div class="fixed inset-0 bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end transition-opacity duration-300" [class.opacity-0]="!filterSheetOpen()" [class.pointer-events-none]="!filterSheetOpen()" (click)="closeFilterSheet()" role="presentation">
+<div class="fixed inset-0 pb-[var(--ad-bottom-offset,0px)] bg-on-background/20 backdrop-blur-[5px] z-[60] flex flex-col justify-end transition-opacity duration-300" [class.opacity-0]="!filterSheetOpen()" [class.pointer-events-none]="!filterSheetOpen()" (click)="closeFilterSheet()" role="presentation">
 <div class="bg-surface rounded-t-[24px] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] transform transition-transform duration-300 max-h-[80vh] flex flex-col" [class.translate-y-full]="!filterSheetOpen()" (click)="$event.stopPropagation()" role="presentation">
 <div class="flex justify-center pt-4 pb-2">
 <div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
